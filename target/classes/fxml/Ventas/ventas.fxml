@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<ScrollPane fitToWidth="true" fitToHeight="false" styleClass="productos-scroll"
+            xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.VentasController">
+    <content>
+    <VBox styleClass="ventas-main-panel" stylesheets="@/css/Ventas/ventas.css" spacing="0">
+        <children>
+            <VBox spacing="0" styleClass="ventas-header-box">
+                <children>
+                    <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-padding: 24 24 10 24;">
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <children>
+                                    <ImageView fitHeight="32" fitWidth="32" preserveRatio="true">
+                                        <image>
+                                            <Image url="@/icons/ventas.png" />
+                                        </image>
+                                    </ImageView>
+                                    <Label text="PUNTO DE VENTA" style="-fx-text-fill: #222; -fx-font-size: 24px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', 'Arial', sans-serif;" />
+                                </children>
+                            </HBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER" spacing="24.0" styleClass="filter-bar">
+                        <children>
+                            <Label styleClass="filter-label" text="Buscar:" />
+                            <VBox spacing="4.0">
+                                <children>
+                                    <TextField fx:id="txtBuscarProducto" promptText="Buscar producto..." styleClass="search-field" />
+                                    <ListView fx:id="listSugerencias" visible="false" managed="false" prefHeight="100.0" styleClass="buscador-listview" />
+                                </children>
+                            </VBox>
+                            <Label text="Cantidad:" styleClass="cantidad-label" />
+                            <Spinner fx:id="spinnerCantidad" editable="true" min="1" max="999" initialValue="1" prefWidth="80.0" />
+                            <Button fx:id="btnAgregarProducto" text="Agregar producto" styleClass="btn-agregar">
+                                <graphic><Label text="+" styleClass="icon-agregar" /></graphic>
+                            </Button>
+                            <Region HBox.hgrow="ALWAYS" />
+                        </children>
+                        <padding>
+                            <Insets bottom="10.0" left="24.0" right="24.0" top="10.0" />
+                        </padding>
+                    </HBox>
+                </children>
+            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-padding: 24 24 18 66;">
+                <children>
+                    <ImageView fitHeight="28" fitWidth="28" preserveRatio="true">
+                        <image>
+                            <Image url="@/icons/carrito.png" />
+                        </image>
+                    </ImageView>
+                    <Label text="CARRITO DE VENTA" style="-fx-text-fill: #222; -fx-font-size: 20px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', 'Arial', sans-serif;" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <HBox spacing="12.0">
+                        <!-- Aquí puedes agregar dos íconos extra si lo deseas -->
+                    </HBox>
+                </children>
+            </HBox>
+            <VBox spacing="0" styleClass="ventas-main-panel" VBox.vgrow="ALWAYS">
+                <children>
+                    <TableView fx:id="tablaCarrito" styleClass="table-view" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colCodigo" prefWidth="120.0" text="Código" />
+                            <TableColumn fx:id="colNombre" prefWidth="200.0" text="Producto" />
+                            <TableColumn fx:id="colCantidad" prefWidth="80.0" text="Cant." />
+                            <TableColumn fx:id="colPrecioUnitario" prefWidth="100.0" text="P.Unit." />
+                            <TableColumn fx:id="colSubtotal" prefWidth="100.0" text="Subtotal" />
+                            <TableColumn fx:id="colEditar" prefWidth="80.0" text="Editar" />
+                            <TableColumn fx:id="colEliminar" prefWidth="80.0" text="Eliminar" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                    </TableView>
+                </children>
+            </VBox>
+            <!-- Panel de cliente, pago y totales -->
+            <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
+                <Label text="Cliente existente:" styleClass="cliente-label" />
+                <ComboBox fx:id="comboClientes" promptText="Seleccionar cliente" styleClass="combo-box" />
+            </HBox>
+            <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
+                <Label text="Método de pago:" styleClass="pago-label" />
+                <ComboBox fx:id="comboPago" promptText="Seleccionar método de pago" styleClass="combo-box" />
+                <Label text="Tipo de comprobante:" styleClass="cliente-label" />
+                <ComboBox fx:id="comboComprobante" promptText="Selecciona comprobante" styleClass="combo-box" />
+            </HBox>
+            <HBox spacing="32.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
+                <VBox spacing="10.0" style="-fx-padding: 0 0 0 0;">
+                    <Label fx:id="lblSubtotal" text="Subtotal: S/ 0.00" styleClass="subtotal-label" />
+                    <Label fx:id="lblIGV" text="IGV (18%): S/ 0.00" styleClass="igv-label" />
+                    <Label fx:id="lblTotal" text="Total: S/ 0.00" styleClass="total-label" />
+                </VBox>
+                <Label fx:id="lblDescuento" text="Descuento: S/ 0.00" styleClass="descuento-label" />
+            </HBox>
+            <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 16px 0 0 0;">
+                <Button fx:id="btnConfirmarVenta" text="Confirmar venta" styleClass="btn-confirmar" />
+                <Button fx:id="btnAnularVenta" text="Anular venta" styleClass="btn-anular" />
+                <Button fx:id="btnHistorial" text="Ver historial de ventas" styleClass="btn-historial" />
+            </HBox>
+        </children>
+    </VBox>
+    </content>
+</ScrollPane>

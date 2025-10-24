@@ -1,0 +1,99 @@
+/* clientes.css profesionalizado para dashboard y tabla avanzada */
+
+.clientes-view {
+    -fx-background-color: #f8f9fa;
+}
+
+.clientes-header-box {
+    -fx-background-color: #1bb934;
+}
+
+.clientes-header-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.clientes-header-btn-blue {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 18;
+    -fx-background-radius: 8;
+}
+
+.clientes-header-btn-green {
+    -fx-background-color: #43a047;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 18;
+    -fx-background-radius: 8;
+}
+
+.clientes-header-btn-orange {
+    -fx-background-color: #ff9800;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 18;
+    -fx-background-radius: 8;
+}
+
+.filter-bar {
+    -fx-background-color: #e8f5e9;
+    -fx-padding: 10 24;
+}
+
+.filter-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1bb934;
+}
+
+.search-field {
+    -fx-background-color: #fff;
+    -fx-border-color: #1bb934;
+    -fx-border-radius: 6;
+    -fx-padding: 6 12;
+}
+
+.total-count {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1bb934;
+}
+
+.clientes-table {
+    -fx-background-color: #fff;
+    -fx-border-color: #1bb934;
+    -fx-border-radius: 8;
+}
+
+.clientes-table-box {
+    -fx-background-color: #fff;
+    -fx-padding: 12 18;
+    -fx-border-radius: 8;
+}
+
+.dashboard-bar {
+    -fx-background-color: #e8f5e9;
+    -fx-padding: 20 32;
+    -fx-border-radius: 12;
+}
+
+.dashboard-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1976d2;
+}
+
+.pagination-bar {
+    -fx-background-color: #e8f5e9;
+    -fx-padding: 10 24;
+    -fx-border-radius: 8;
+}
+
+.actualizacion-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #888;
+    -fx-padding: 4 0 4 0;
+}

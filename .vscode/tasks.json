@@ -1,0 +1,127 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "java-run-javafx",
+			"type": "shell",
+			"command": "java",
+			"args": [
+				"--add-modules",
+				"javafx.controls,javafx.fxml,javafx.base,javafx.graphics",
+				"--add-exports",
+				"javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+				"--add-opens",
+				"javafx.graphics/javafx.stage=ALL-UNNAMED",
+				"-cp",
+				"target/classes",
+				"com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication"
+			],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run JavaFX Application",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"javafx:run"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "new"
+			},
+			"problemMatcher": [],
+			"detail": "Ejecutar aplicación JavaFX de PHARMAVICTORIA"
+		},
+		{
+			"label": "Compile JavaFX Project",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"compile"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared"
+			},
+			"problemMatcher": [],
+			"detail": "Compilar proyecto JavaFX"
+		},
+		{
+			"label": "Compile JavaFX Project",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"compile"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Compilar proyecto JavaFX",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"compile"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Compilar proyecto JavaFX",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"compile"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$javac"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Compilar proyecto JavaFX (clean)",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"compile"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$maven"
+			],
+			"group": "build"
+		}
+	]
+}

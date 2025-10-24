@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox styleClass="form-container" stylesheets="@/css/Inventario/producto-form.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Inventario.ProductoFormController">
+   <children>
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="form-header">
+         <children>
+            <Label fx:id="lblTitulo" styleClass="form-title" text="➕ NUEVO PRODUCTO" />
+         </children>
+      </HBox>
+
+      <!-- Formulario -->
+      <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="20.0" styleClass="form-content">
+               <children>
+                  <!-- Información Básica -->
+                  <VBox spacing="15.0" styleClass="form-section">
+                     <children>
+                        <Label styleClass="section-title" text="📋 INFORMACIÓN BÁSICA" />
+                        
+                        <!-- Fila 1: Código con generador automático -->
+                        <VBox spacing="10.0">
+                           <children>
+                              <HBox spacing="15.0">
+                                 <children>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="field-label" text="Código del Producto *" />
+                                          <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                             <children>
+                                                <TextField fx:id="txtCodigo" maxWidth="200.0" promptText="Ej: ANA001" styleClass="field-input" />
+                                                <Button fx:id="btnGenerarCodigo" mnemonicParsing="false" styleClass="btn-generator" text="🚀 Generar Código" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label styleClass="field-label" text="Nombre del Producto *" />
+                                          <TextField fx:id="txtNombre" promptText="Ej: Paracetamol 500mg" styleClass="field-input" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              
+                              <!-- Labels informativos del generador -->
+                              <HBox spacing="20.0" alignment="CENTER_LEFT">
+                                 <children>
+                                    <Label fx:id="lblValidacionCodigo" styleClass="info-label" />
+                                    <Label fx:id="lblUltimoCodigo" styleClass="info-label-secondary" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+
+                        <!-- Fila 2: Principio Activo y Concentración -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Principio Activo" />
+                                    <TextField fx:id="txtPrincipioActivo" promptText="Ej: Paracetamol" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Concentración" />
+                                    <TextField fx:id="txtConcentracion" promptText="Ej: 500mg" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <!-- Fila 3: Forma Farmacéutica y Categoría -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Forma Farmacéutica" />
+                                    <ComboBox fx:id="cmbFormaFarmaceutica" promptText="Seleccionar forma" styleClass="field-combo" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Categoría *" />
+                                    <ComboBox fx:id="cmbCategoria" maxWidth="1.7976931348623157E308" promptText="Seleccionar categoría" styleClass="field-combo" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <!-- Descripción -->
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="field-label" text="Descripción" />
+                              <TextArea fx:id="txtDescripcion" maxHeight="80.0" promptText="Descripción del producto..." styleClass="field-textarea" wrapText="true" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+
+                  <!-- Información Comercial -->
+                  <VBox spacing="15.0" styleClass="form-section">
+                     <children>
+                        <Label styleClass="section-title" text="💰 INFORMACIÓN COMERCIAL" />
+                        
+                        <!-- Fila 1: Precios -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Precio de Compra *" />
+                                    <TextField fx:id="txtPrecioCompra" promptText="0.00" styleClass="field-input field-number" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Precio de Venta *" />
+                                    <TextField fx:id="txtPrecioVenta" promptText="0.00" styleClass="field-input field-number" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Margen %" />
+                                    <TextField fx:id="txtMargen" editable="false" promptText="0.00%" styleClass="field-input field-readonly" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <!-- Fila 2: Proveedor -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Proveedor *" />
+                                    <ComboBox fx:id="cmbProveedor" maxWidth="1.7976931348623157E308" promptText="Seleccionar proveedor" styleClass="field-combo" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Laboratorio" />
+                                    <TextField fx:id="txtLaboratorio" promptText="Ej: Laboratorios ABC" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+
+                  <!-- Control de Inventario -->
+                  <VBox spacing="15.0" styleClass="form-section">
+                     <children>
+                        <Label styleClass="section-title" text="📦 CONTROL DE INVENTARIO" />
+                        
+                        <!-- Fila 1: Stock -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Stock Actual *" />
+                                    <Spinner fx:id="spnStockActual" editable="true" max="9999" min="0" styleClass="field-spinner" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Stock Mínimo" />
+                                    <Spinner fx:id="spnStockMinimo" editable="true" max="9999" min="0" styleClass="field-spinner" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Stock Máximo" />
+                                    <Spinner fx:id="spnStockMaximo" editable="true" max="9999" min="0" styleClass="field-spinner" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <!-- Fila 2: Ubicación y Lote -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Ubicación" />
+                                    <TextField fx:id="txtUbicacion" promptText="Ej: A1-B2" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Lote" />
+                                    <TextField fx:id="txtLote" promptText="Ej: LOT123456" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <!-- Fila 3: Fechas -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Fecha de Vencimiento *" />
+                                    <DatePicker fx:id="dpFechaVencimiento" promptText="dd/mm/yyyy" styleClass="field-datepicker" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Fecha de Fabricación" />
+                                    <DatePicker fx:id="dpFechaFabricacion" promptText="dd/mm/yyyy" styleClass="field-datepicker" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+
+                  <!-- Estado y Configuración -->
+                  <VBox spacing="15.0" styleClass="form-section">
+                     <children>
+                        <HBox spacing="8.0" alignment="CENTER_LEFT">
+                           <children>
+                              <ImageView fx:id="imgConfiguracion" fitHeight="20.0" fitWidth="20.0" preserveRatio="true" pickOnBounds="true" styleClass="section-icon" />
+                              <Label styleClass="section-title" text="CONFIGURACIÓN" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="20.0">
+                           <children>
+                              <CheckBox fx:id="chkActivo" selected="true" styleClass="field-checkbox" text="Producto Activo" />
+                              <CheckBox fx:id="chkRequiereReceta" styleClass="field-checkbox" text="Requiere Receta Médica" />
+                              <CheckBox fx:id="chkControlado" styleClass="field-checkbox" text="Medicamento Controlado" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+
+      <!-- Botones de Acción -->
+      <HBox alignment="CENTER" spacing="15.0" styleClass="form-actions">
+         <children>
+            <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#onGuardar" styleClass="btn-primary" text="💾 Guardar Producto" />
+            <Button fx:id="btnLimpiar" mnemonicParsing="false" onAction="#onLimpiar" styleClass="btn-secondary" text="🔄 Limpiar Campos" />
+            <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#onCancelar" styleClass="btn-danger" text="❌ Cancelar" />
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>

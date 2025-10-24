@@ -1,0 +1,392 @@
+/*
+ * Archivo: proveedores.css
+ * COPIA EXACTA DE ESTILOS DE PRODUCTOS, ADAPTADA PARA PROVEEDORES.
+ */
+
+.productos-view {
+    -fx-background-color: #f8f9fa;
+}
+
+/* ========================================
+    HEADER DE PROVEEDORES - ESTILO DASHBOARD
+    (Copia directa de Productos)
+    ======================================== */
+.productos-header-box {
+    -fx-background-color: white;
+    -fx-spacing: 0;
+    -fx-padding: 0 0 10px 0;
+}
+
+.productos-header {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: none;
+}
+
+.productos-header-title {
+    -fx-text-fill: #222;
+    -fx-font-weight: bold;
+    -fx-font-size: 24px;
+}
+
+/* Botones Principales (Copia directa de Productos) */
+.productos-header-btn-blue { /* Nuevo Proveedor */
+    -fx-background-color: linear-gradient(to bottom, #22577A, #163d57);
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-text-fill: #e9f7fb; /* texto en celeste muy claro para resaltar sobre el fondo oscuro */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 20px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0.3, 0, 1);
+}
+.productos-header-btn-blue:hover {
+    -fx-background-color: linear-gradient(to bottom, #347FC4, #245C8E);
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(gaussian, rgba(52,127,196,0.6), 8, 0.4, 0, 3);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.productos-header-btn-green { /* Refrescar (Antiguo Exportar de Productos) */
+    -fx-background-color: linear-gradient(to bottom, #D78855, #B86B3F);
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-text-fill: #FFF4E8;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 20px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0.3, 0, 1);
+}
+.productos-header-btn-green:hover {
+    -fx-background-color: linear-gradient(to bottom, #F1A46B, #DA8045);
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(gaussian, rgba(218,128,69,0.5), 8, 0.4, 0, 3);
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+}
+
+.productos-header-btn-orange { /* Ajustes Vista (Edición Masiva de Productos) */
+    -fx-background-color: linear-gradient(to bottom, #7A6C72, #5E4B52);
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-text-fill: #F5F0EC;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 20px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 4, 0.3, 0, 1);
+}
+.productos-header-btn-orange:hover {
+    -fx-background-color: linear-gradient(to bottom, #8B7C82, #6B585F);
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 6, 0.4, 0, 2);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-translate-y: -1px;
+}
+
+/* Botón Gris (por si lo necesitas en el futuro) */
+.productos-header-btn-gray {
+    -fx-background-color: #6c757d;
+    -fx-background-radius: 8px;
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 12px 20px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0.3, 0, 1);
+}
+.productos-header-btn-gray:hover {
+    -fx-background-color: #495057;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+/* ========================================
+    BARRA DE FILTROS (Copia directa de Productos)
+    ======================================== */
+.filter-bar {
+    -fx-background-color: white;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 15 20;
+}
+
+.filter-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+    -fx-font-size: 12px;
+}
+
+.search-field {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 12;
+    -fx-font-size: 14px;
+}
+
+.search-field:focused {
+    -fx-border-color: #007bff;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,123,255,0.25), 0, 0, 0, 0);
+}
+
+.filter-combo {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 8 12;
+}
+
+.filter-combo:focused {
+    -fx-border-color: #007bff;
+}
+
+.filter-checkbox {
+    -fx-font-size: 13px;
+    -fx-text-fill: #495057;
+    -fx-font-weight: 500;
+}
+
+.filter-checkbox .box {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.filter-checkbox:selected .box {
+    -fx-background-color: #007bff;
+    -fx-border-color: #007bff;
+}
+
+.filter-checkbox:selected .mark {
+    -fx-background-color: white;
+}
+
+.total-count {
+    -fx-font-weight: bold;
+    -fx-text-fill: #20c997; /* Color azul para el contador */
+    -fx-font-size: 14px;
+}
+
+/* ========================================
+    TABLA DE PROVEEDORES (Copia de Productos)
+    ======================================== */
+.productos-table-box {
+    -fx-background-color: #fff;
+    -fx-background-radius: 16px;
+    -fx-padding: 18px 24px 0 24px;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.07), 8, 0.2, 0, 2);
+    -fx-margin: 0 0 18px 0;
+}
+
+.productos-table { /* Se usa productos-table en lugar de table-view */
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.productos-table .column-header-background {
+    -fx-background-color: linear-gradient(to right, #28a745, #20c997);
+    -fx-border-color: #20c997;
+    -fx-border-width: 0 0 2px 0;
+}
+.productos-table .column-header .label, .productos-table .column-header {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.productos-table .column-header {
+    -fx-background-color: transparent;
+    -fx-text-fill: #495057;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-alignment: center-left;
+    -fx-padding: 10 8;
+}
+
+.productos-table .table-cell {
+    -fx-text-fill: #495057;
+    -fx-padding: 8;
+    -fx-border-color: #f8f9fa;
+    -fx-border-width: 0 0 1 0;
+    -fx-font-size: 12px;
+}
+
+.productos-table .table-row-cell:selected {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+}
+
+.productos-table .table-row-cell:hover {
+    -fx-background-color: #e3f2fd;
+}
+
+/* ========================================
+    ESTILOS DE FILAS DE TABLA - PROVEEDORES
+    (Adaptación del estilo Inactivo de Productos)
+    ======================================== */
+
+/* Proveedores Inactivos (Copia de la clase .row-inactivo de Productos) */
+.table-row-cell.row-inactivo {
+    -fx-background-color: #F9FAFB !important; /* Fondo gris muy suave */
+    -fx-opacity: 0.7 !important; /* Transparencia para efecto deshabilitado */
+}
+
+.table-row-cell.row-inactivo .table-cell {
+    -fx-text-fill: #6B7280 !important; /* Texto gris medio */
+    -fx-font-style: italic !important; /* Cursiva para diferenciación */
+}
+
+.table-row-cell.row-inactivo:hover {
+    -fx-background-color: #F3F4F6 !important; /* Hover gris */
+    -fx-opacity: 0.8 !important;
+}
+
+/* Proveedores Activos (Para asegurar que la clase row-activo si la usas, tenga el estilo normal) */
+.table-row-cell.row-activo {
+    -fx-background-color: white;
+    -fx-opacity: 1.0;
+}
+.table-row-cell.row-activo:hover {
+    -fx-background-color: #e3f2fd;
+    -fx-opacity: 1.0;
+}
+
+/* ========================================
+    PAGINACIÓN MODERNA (Copia directa de Productos)
+    ======================================== */
+.pagination-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 12px;
+    -fx-padding: 12px 24px;
+    -fx-spacing: 12px;
+    -fx-alignment: center;
+    /* margin-top: 18px; No se puede usar directamente en JavaFX, se hace con padding/margin en el FXML */
+}
+
+.pagination-bar .button {
+    -fx-background-color: linear-gradient(to bottom, #43e97b, #28a745);
+    -fx-background-radius: 8px;
+    -fx-text-fill: #fff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 8px 18px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.15), 4, 0.2, 0, 1);
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+.pagination-bar .button:disabled {
+    -fx-background-color: #b2f2e5;
+    -fx-text-fill: #e9ecef;
+    -fx-opacity: 0.7;
+}
+.pagination-bar .button:hover:enabled {
+    -fx-background-color: linear-gradient(to bottom, #20c997, #28a745);
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+}
+.pagination-label {
+    -fx-text-fill: #495057; /* Cambiado a un color oscuro para visibilidad en fondo claro */
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 4px;
+}
+.pagination-combo {
+    -fx-background-color: #fff;
+    -fx-background-radius: 6px;
+    -fx-border-color: #ced4da;
+    -fx-border-width: 1.2px;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #28a745;
+    -fx-padding: 2px 8px;
+    -fx-pref-width: 80px;
+}
+.pagination-combo:focused {
+    -fx-border-color: #43e97b;
+    -fx-effect: dropshadow(gaussian, #43e97b, 4, 0.2, 0, 1);
+}
+
+/* ========================================
+    FOOTER DE RESUMEN (ADAPTACIÓN DE LEYENDA/STATS)
+    ======================================== */
+.legend-stats-bar {
+    -fx-background-color: #343a40; /* Fondo oscuro del pie de página */
+    -fx-padding: 18px 24px 18px 24px; /* Ajuste de padding para que se vea más limpio */
+    -fx-spacing: 40px;
+    -fx-alignment: center-left; /* Alineado a la izquierda */
+}
+
+/* Reutilización de clases para el resumen de Proveedores */
+.legend-title {
+    -fx-text-fill: #adb5bd; /* Gris claro */
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* Estilos adaptados para los contadores simples del footer de Proveedores */
+.summary-count-blue {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #17a2b8; /* Azul claro/Cyan */
+}
+
+.summary-count-green {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #28a745; /* Verde */
+}
+
+/* Puedes ignorar el resto de clases de Leyenda/Estadísticas si no las usas en Proveedores */
+.legend-vencido, .legend-vencer, .legend-bajo, .legend-sin-stock,
+.stat-card, .stat-number, .stat-label {
+    /* Clases de productos no usadas en este módulo */
+}
+
+/* Copia de estilos de contexto y scrollbar */
+.context-menu {
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 2);
+}
+
+/* ========================================
+   ACCIONES EN TABLA DE PROVEEDORES (igual que Inventario)
+   ======================================== */
+.actions-container {
+    -fx-spacing: 5px;
+    -fx-alignment: center;
+}
+
+.btn-action {
+    -fx-background-color: transparent;
+    -fx-border-color: #6c757d;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 4 8;
+    -fx-cursor: hand;
+    -fx-font-size: 10px;
+}
+.btn-action:hover {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+}

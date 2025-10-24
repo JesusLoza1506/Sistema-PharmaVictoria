@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="form-container" stylesheets="@/css/Proveedor/proveedor-form.css"
+      xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor.ProveedorFormController">
+
+   <children>
+      <!-- ===== HEADER ===== -->
+      <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="form-header">
+         <children>
+            <Label fx:id="lblTitulo" styleClass="form-title" text="➕ NUEVO PROVEEDOR" />
+         </children>
+      </HBox>
+
+      <!-- ===== FORMULARIO ===== -->
+      <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="20.0" styleClass="form-content">
+               <children>
+
+                  <!-- ===== SECCIÓN INFORMACIÓN BÁSICA ===== -->
+                  <VBox spacing="15.0" styleClass="form-section">
+                     <children>
+                        <Label styleClass="section-title" text="📋 INFORMACIÓN BÁSICA" />
+
+                        <!-- Razón Social -->
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="field-label" text="Nombre / Razón Social *" />
+                              <TextField fx:id="txtRazonSocial" promptText="Ingrese el nombre del proveedor" styleClass="field-input" />
+                           </children>
+                        </VBox>
+
+                                 <!-- Tipo de Producto -->
+                                    <VBox spacing="5.0">
+                                       <children>
+                                          <Label styleClass="field-label" text="Tipo de Producto" />
+                                          <ComboBox fx:id="cmbTipoProducto" prefWidth="220.0" promptText="Seleccionar tipo" styleClass="field-combo" />
+                                       </children>
+                                    </VBox>
+                                 <!-- Sucursal -->
+                                    <VBox spacing="5.0">
+                                       <children>
+                                          <Label styleClass="field-label" text="Sucursal (ID)" />
+                                          <ComboBox fx:id="cmbSucursalId" prefWidth="180.0" promptText="Seleccionar sucursal" styleClass="field-combo" />
+                                       </children>
+                                    </VBox>
+                        <!-- Contacto y RUC -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Contacto Principal" />
+                                    <TextField fx:id="txtContacto" promptText="Nombre del contacto" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="RUC" />
+                                    <TextField fx:id="txtRuc" promptText="RUC del proveedor (8-11 dígitos)" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <!-- Teléfono y Email -->
+                        <HBox spacing="15.0">
+                           <children>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Teléfono" />
+                                    <TextField fx:id="txtTelefono" promptText="Número de teléfono" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                              <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                 <children>
+                                    <Label styleClass="field-label" text="Email" />
+                                    <TextField fx:id="txtEmail" promptText="Correo electrónico" styleClass="field-input" />
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+
+                        <!-- Dirección -->
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="field-label" text="Dirección" />
+                              <TextArea fx:id="txtDireccion" prefRowCount="3" promptText="Dirección completa del proveedor" styleClass="field-textarea" />
+                           </children>
+                        </VBox>
+
+                        <!-- Condiciones de Pago -->
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="field-label" text="Condiciones de Pago" />
+                              <ComboBox fx:id="cmbCondicionesPago" prefWidth="300.0" promptText="Seleccione condiciones" styleClass="field-combo" />
+                           </children>
+                        </VBox>
+
+                        <!-- Observaciones -->
+                        <VBox spacing="5.0">
+                           <children>
+                              <Label styleClass="field-label" text="Observaciones (Opcional)" />
+                              <TextArea fx:id="txtObservaciones" prefRowCount="2" promptText="Observaciones adicionales" styleClass="field-textarea" wrapText="true" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+
+                  <!-- ===== CONFIGURACIÓN ===== -->
+                  <VBox spacing="15.0" styleClass="form-section">
+                     <children>
+                        <Label styleClass="section-title" text="⚙️ CONFIGURACIÓN" />
+                        <HBox spacing="20.0">
+                           <children>
+                              <CheckBox fx:id="chkActivo" selected="true" styleClass="field-checkbox" text="Proveedor Activo" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+
+               </children>
+               <padding>
+                  <Insets bottom="20" left="20" right="20" top="20" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+
+      <!-- ===== BOTONES ===== -->
+      <HBox alignment="CENTER" spacing="15.0" styleClass="form-actions">
+         <children>
+            <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#guardar" styleClass="btn-primary" text="💾 Guardar Proveedor" />
+            <Button fx:id="btnLimpiar" mnemonicParsing="false" onAction="#limpiar" styleClass="btn-secondary" text="🔄 Limpiar Campos" />
+            <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#cancelar" styleClass="btn-danger" text="❌ Cancelar" />
+         </children>
+         <padding>
+            <Insets bottom="15" left="15" right="15" top="15" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>

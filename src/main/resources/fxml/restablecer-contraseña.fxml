@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.ResetPasswordController" styleClass="reset-password-root">
+    <VBox alignment="CENTER" spacing="18" styleClass="reset-password-card">
+        <Label text="Restablecer contraseña" styleClass="reset-password-title" />
+        <Label text="Ingrese el código recibido y su nueva contraseña." styleClass="reset-password-subtitle" />
+        <VBox spacing="10" alignment="CENTER">
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <ImageView fitHeight="20" fitWidth="20" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../icons/key.png" />
+                    </image>
+                </ImageView>
+                <TextField fx:id="tokenField" promptText="Código de recuperación" styleClass="reset-password-field" />
+            </HBox>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <ImageView fitHeight="20" fitWidth="20" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../icons/passwordlogin.png" />
+                    </image>
+                </ImageView>
+                <PasswordField fx:id="newPasswordField" promptText="Nueva contraseña" styleClass="reset-password-field" />
+            </HBox>
+        </VBox>
+    <Label text="El código es válido por 10 minutos." styleClass="reset-password-hint" />
+    <Label fx:id="mensajeLabel" text="" styleClass="reset-password-message" />
+    <Button text="Confirmar" fx:id="confirmButton" styleClass="reset-password-btn" />
+    </VBox>
+</StackPane>

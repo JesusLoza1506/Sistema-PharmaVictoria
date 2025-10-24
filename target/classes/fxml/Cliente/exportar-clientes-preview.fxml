@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="0" styleClass="exportar-modal" stylesheets="@/css/styles.css, @/css/Cliente/clientes.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Cliente.ExportarClientesController">
+    <children>
+        <Label styleClass="modal-title" text="Exportar Clientes / Reporte" />
+        <Separator />
+        <VBox spacing="18.0" styleClass="modal-content-box">
+            <children>
+                <HBox alignment="CENTER" spacing="24.0" styleClass="filter-bar">
+                    <children>
+                        <Label styleClass="filter-label" text="Buscar:" />
+                        <TextField fx:id="txtBuscar" prefWidth="250.0" promptText="DNI, nombre, apellidos, teléfono, email..." styleClass="search-field" />
+                        <Label styleClass="filter-label" text="Buscar por:" />
+                        <ComboBox fx:id="cmbTipoFiltro" prefWidth="130.0" promptText="Tipo" styleClass="filter-combo" />
+                        <Label styleClass="filter-label" text="Estado:" />
+                        <ComboBox fx:id="cmbEstadoFiltro" prefWidth="120.0" promptText="Todos" styleClass="filter-combo" />
+                        <CheckBox fx:id="chkSoloFrecuentes" styleClass="filter-checkbox" text="Solo frecuentes" />
+                        <Region HBox.hgrow="ALWAYS" />
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="24.0" right="24.0" top="10.0" />
+                    </padding>
+                </HBox>
+                <Label styleClass="preview-label" text="Vista previa de exportación:" />
+                <TableView fx:id="tablePreview" styleClass="clientes-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <!-- Columna ID eliminada -->
+                        <TableColumn fx:id="colDni" prefWidth="100.0" text="DNI" />
+                        <TableColumn fx:id="colNombres" prefWidth="140.0" text="Nombres" />
+                        <TableColumn fx:id="colApellidos" prefWidth="140.0" text="Apellidos" />
+                        <TableColumn fx:id="colTelefono" prefWidth="120.0" text="Teléfono" />
+                        <TableColumn fx:id="colEmail" prefWidth="180.0" text="Email" />
+                        <TableColumn fx:id="colDireccion" prefWidth="180.0" text="Dirección" />
+                        <TableColumn fx:id="colFechaNacimiento" prefWidth="130.0" text="F. Nacimiento" />
+                        <TableColumn fx:id="colPuntosTotales" prefWidth="100.0" text="Puntos Totales" />
+                        <TableColumn fx:id="colPuntosUsados" prefWidth="100.0" text="Puntos Usados" />
+                        <TableColumn fx:id="colPuntosDisponibles" prefWidth="120.0" text="Puntos Disponibles" />
+                        <TableColumn fx:id="colFrecuente" prefWidth="90.0" text="Frecuente" />
+                    </columns>
+                </TableView>
+            </children>
+        </VBox>
+        <HBox spacing="32.0" alignment="CENTER" styleClass="modal-footer-bar">
+         <children>
+            <Button fx:id="btnExportarExcel" styleClass="exportar-excel-btn">
+                <graphic>
+                    <ImageView fitHeight="70" fitWidth="820" preserveRatio="true">
+                        <image>
+                            <Image url="@/icons/excel download.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button fx:id="btnExportarPDF" styleClass="exportar-pdf-btn">
+                <graphic>
+                    <ImageView fitHeight="70" fitWidth="820" preserveRatio="true">
+                        <image>
+                            <Image url="@/icons/pdf download.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+         </children>
+            <padding>
+                <Insets top="18.0" bottom="8.0" left="0.0" right="0.0" />
+            </padding>
+        </HBox>
+    </children>
+    <padding>
+        <Insets top="28.0" bottom="28.0" left="36.0" right="36.0" />
+    </padding>
+</VBox>

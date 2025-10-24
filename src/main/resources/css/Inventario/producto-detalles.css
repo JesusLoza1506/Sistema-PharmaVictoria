@@ -1,0 +1,254 @@
+.historial-table .column-header .label {
+    -fx-text-fill: #222 !important;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+/* Estilos para Vista de Detalles de Producto */
+
+.producto-detalles-view {
+    -fx-background-color: #f8f9fa;
+}
+
+/* Header de detalles */
+.detalles-header {
+    -fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e);
+    -fx-padding: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 5, 0, 0, 2);
+}
+
+.detalles-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.detalles-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #bdc3c7;
+}
+
+/* Botón cerrar */
+.btn-cerrar {
+    -fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 8 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.btn-cerrar:hover {
+    -fx-background-color: linear-gradient(to bottom, #c0392b, #a93226);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 4, 0, 0, 2);
+}
+
+/* Contenedor principal de detalles */
+.detalles-container {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 30;
+    -fx-spacing: 25;
+}
+
+/* Tarjetas de información */
+.info-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-padding: 25;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);
+    -fx-spacing: 15;
+}
+
+/* Títulos de sección */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Separadores */
+.section-separator {
+    -fx-background-color: #e8e8e8;
+    -fx-pref-height: 1;
+}
+
+/* Grid de información */
+.info-grid {
+    -fx-hgap: 20;
+    -fx-vgap: 15;
+}
+
+/* Labels de campo */
+.field-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #5d6d7e;
+    -fx-font-size: 14px;
+}
+
+/* Valores de campo */
+.field-value {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 14px;
+    -fx-wrap-text: true;
+}
+
+/* Estado badges */
+.estado-activo {
+    -fx-background-color: #27ae60;
+    -fx-text-fill: white;
+    -fx-padding: 5px 12px;
+    -fx-background-radius: 15px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.estado-inactivo {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-padding: 5px 12px;
+    -fx-background-radius: 15px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* Botones de acción */
+.detalles-actions {
+    -fx-alignment: center;
+    -fx-spacing: 20;
+    -fx-padding: 20px 0px;
+}
+
+.btn-editar {
+    -fx-background-color: linear-gradient(to bottom, #3498db, #2980b9);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 12px 25px;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.btn-editar:hover {
+    -fx-background-color: linear-gradient(to bottom, #2980b9, #1f5f99);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 4, 0, 0, 2);
+}
+
+.btn-eliminar {
+    -fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-padding: 12px 25px;
+    -fx-font-size: 14px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 3, 0, 0, 1);
+}
+
+.btn-eliminar:hover {
+    -fx-background-color: linear-gradient(to bottom, #c0392b, #a93226);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 4, 0, 0, 2);
+}
+
+/* ScrollPane */
+.detalles-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.detalles-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.detalles-scroll .scroll-bar:vertical {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: transparent;
+    -fx-background-radius: 2em;
+    -fx-pref-width: 8;
+}
+
+.detalles-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: #ced4da;
+    -fx-background-radius: 2em;
+    -fx-border-color: transparent;
+}
+
+.detalles-scroll .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #adb5bd;
+}
+
+/* Iconos de sección */
+.icon-info {
+    -fx-text-fill: #3498db;
+    -fx-font-size: 16px;
+}
+
+.icon-contact {
+    -fx-text-fill: #27ae60;
+    -fx-font-size: 16px;
+}
+
+.icon-business {
+    -fx-text-fill: #f39c12;
+    -fx-font-size: 16px;
+}
+
+.icon-notes {
+    -fx-text-fill: #9b59b6;
+    -fx-font-size: 16px;
+}
+
+/* Efectos de hover en tarjetas */
+.info-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);
+    -fx-cursor: default;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .detalles-container {
+        -fx-padding: 15;
+        -fx-spacing: 15;
+    }
+    
+    .info-card {
+        -fx-padding: 15;
+    }
+    
+    .detalles-title {
+        -fx-font-size: 20px;
+    }
+    
+    .section-title {
+        -fx-font-size: 16px;
+    }
+    
+    .field-label,
+    .field-value {
+        -fx-font-size: 12px;
+    }
+}
+
+/* Animaciones suaves */
+.info-card,
+.btn-editar,
+.btn-eliminar,
+.btn-cerrar {
+    -fx-transition: all 0.3s ease;
+}
+
+/* Estados de carga */
+.loading {
+    -fx-opacity: 0.6;
+    -fx-cursor: wait;
+}
+
+/* Tooltip personalizado */
+.custom-tooltip {
+    -fx-background-color: #2c3e50;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-background-radius: 4;
+    -fx-padding: 5 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+}

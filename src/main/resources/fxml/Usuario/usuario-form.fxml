@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox styleClass="form-container" stylesheets="@/css/Proveedor/proveedor-form.css"
+    xmlns="http://javafx.com/javafx/11.0.1"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Usuario.UsuarioFormController">
+    <children>
+        <!-- ===== HEADER ===== -->
+        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="form-header">
+            <children>
+                <Label styleClass="form-title" text="➕ NUEVO USUARIO" />
+            </children>
+        </HBox>
+        <!-- ===== FORMULARIO ===== -->
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox spacing="20.0" styleClass="form-content">
+                    <children>
+                        <!-- ===== SECCIÓN INFORMACIÓN BÁSICA ===== -->
+                        <VBox spacing="15.0" styleClass="form-section">
+                            <children>
+                                <Label styleClass="section-title" text="📋 INFORMACIÓN DE USUARIO" />
+                                <!-- Usuario y Contraseña -->
+                                <HBox spacing="15.0">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Usuario *" />
+                                                <TextField fx:id="txtUsername" promptText="Ingrese el usuario" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Contraseña *" />
+                                                <PasswordField fx:id="txtPassword" promptText="Ingrese la contraseña" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <!-- Rol y Sucursal -->
+                                <HBox spacing="15.0">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Rol *" />
+                                                <ComboBox fx:id="cmbRol" promptText="Seleccionar rol" styleClass="field-combo" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Sucursal *" />
+                                                <ComboBox fx:id="cmbSucursal" promptText="Seleccionar sucursal" styleClass="field-combo" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <!-- Nombres y Apellidos -->
+                                <HBox spacing="15.0">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Nombres *" />
+                                                <TextField fx:id="txtNombres" promptText="Ingrese nombres" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Apellidos *" />
+                                                <TextField fx:id="txtApellidos" promptText="Ingrese apellidos" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <!-- DNI y Teléfono -->
+                                <HBox spacing="15.0">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="DNI" />
+                                                <TextField fx:id="txtDni" promptText="Ingrese DNI" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Teléfono" />
+                                                <TextField fx:id="txtTelefono" promptText="Ingrese teléfono" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <!-- Email y Estado -->
+                                <HBox spacing="15.0">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Email" />
+                                                <TextField fx:id="txtEmail" promptText="Ingrese email" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+        <!-- ===== BOTONES ===== -->
+        <HBox spacing="16" alignment="CENTER_RIGHT" style="-fx-padding: 18 32 18 32;">
+            <children>
+                <Button fx:id="btnGuardar" mnemonicParsing="false" styleClass="btn-primary" text="💾 Registrar Usuario" onAction="#guardarUsuario" />
+                <Button fx:id="btnLimpiar" mnemonicParsing="false" styleClass="btn-secondary" text="🔄 Limpiar Campos" onAction="#limpiarCampos" />
+                <Button fx:id="btnCancelar" mnemonicParsing="false" styleClass="btn-danger" text="❌ Cancelar" onAction="#cancelar" />
+            </children>
+            <padding>
+                <Insets bottom="15" left="15" right="15" top="15" />
+            </padding>
+        </HBox>
+    </children>
+</VBox>

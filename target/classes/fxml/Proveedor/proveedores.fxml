@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" fitToHeight="false" styleClass="productos-scroll"
+            xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor.ProveedoresController">
+        <content>
+        <VBox styleClass="productos-view" stylesheets="@/css/Proveedor/proveedores.css" spacing="0">
+                <children>
+        <VBox spacing="0" styleClass="productos-header-box">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="productos-header">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <ImageView fitHeight="32" fitWidth="32" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/icons/proveedor.png" /> 
+                                    </image>
+                                </ImageView>
+                                <Label styleClass="productos-header-title" text="GESTIÓN DE PROVEEDORES" />
+                            </children>
+                        </HBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        
+                        <Button fx:id="btnNuevoProveedor" mnemonicParsing="false" onAction="#nuevoProveedor" styleClass="productos-header-btn-blue">
+                            <graphic>
+                                <ImageView fitHeight="22" fitWidth="22" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/icons/agregarproveedor.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                            <text>Nuevo Proveedor</text>
+                        </Button>
+                        <Button fx:id="btnExportarProveedores" mnemonicParsing="false" onAction="#onExportarProveedores" styleClass="productos-header-btn-green">
+                            <graphic>
+                                <ImageView fitHeight="22" fitWidth="22" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/icons/exportar.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                            <text>Exportar</text>
+                        </Button>
+                        <!-- Eliminado: solo un botón Exportar -->
+                        <!-- Botón 'Enviar correo' eliminado por requerimiento -->
+                        <Button fx:id="btnContactarProveedores" mnemonicParsing="false" onAction="#onContactarProveedores" styleClass="productos-header-btn-orange">
+                            <graphic>
+                                <ImageView fitHeight="22" fitWidth="22" preserveRatio="true">
+                                    <image>
+                                        <Image url="@/icons/correo.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                            <text>Contactar Proveedores</text>
+                        </Button>
+                    </children>
+                    <padding>
+                        <Insets bottom="18.0" left="24.0" right="24.0" top="18.0" />
+                    </padding>
+                </HBox>
+                
+                <HBox alignment="CENTER" spacing="24.0" styleClass="filter-bar">
+                    <children>
+                        <Label styleClass="filter-label" text="Buscar:" />
+                        <TextField fx:id="txtBuscar" onKeyReleased="#onBuscar" prefWidth="250.0" promptText="Razón social, RUC, contacto..." styleClass="search-field" />
+                        
+                        <Label styleClass="filter-label" text="Buscar por:" />
+                        <ComboBox fx:id="cmbTipoFiltro" prefWidth="120.0" promptText="Razón Social" styleClass="filter-combo" />
+                        
+                        <CheckBox fx:id="chkSoloActivos" onAction="#onToggleSoloActivos" styleClass="filter-checkbox" text="Solo activos" />
+                        
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="lblContadorTotal" styleClass="total-count" text="Total: 0 proveedores" />
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" left="24.0" right="24.0" top="10.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+
+        <VBox spacing="0" styleClass="productos-table-box" VBox.vgrow="ALWAYS">
+            <children>
+                <TableView fx:id="tableProveedores" styleClass="productos-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colRazonSocial" prefWidth="250.0" text="Razón Social" />
+                        <TableColumn fx:id="colRuc" prefWidth="100.0" text="RUC" />
+                        <TableColumn fx:id="colContacto" prefWidth="140.0" text="Contacto" />
+                        <TableColumn fx:id="colTelefono" prefWidth="110.0" text="Teléfono" />
+                        <TableColumn fx:id="colEstado" prefWidth="90.0" text="Estado" />
+                        <TableColumn fx:id="colSucursalId" prefWidth="140.0" text="Sucursal" />
+                        <!-- Acciones siempre al final -->
+                        <TableColumn fx:id="colAcciones" prefWidth="200.0" text="Acciones" />
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                    </columnResizePolicy>
+                </TableView>
+                <Region minHeight="24.0" maxHeight="32.0" VBox.vgrow="NEVER" />
+                <HBox alignment="CENTER" spacing="10.0" styleClass="pagination-bar" VBox.vgrow="NEVER">
+                    <children>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnPaginaAnterior" text="⟨ Anterior" onAction="#onPaginaAnterior" />
+                        <Label fx:id="lblPaginaActual" text="Página 1 de 1" />
+                        <Button fx:id="btnPaginaSiguiente" text="Siguiente ⟩" onAction="#onPaginaSiguiente" />
+                        <Label text="Mostrar:" styleClass="pagination-label" />
+                        <ComboBox fx:id="cmbTamanoPagina" prefWidth="80.0" styleClass="pagination-combo" />
+                        <Label text="por página" styleClass="pagination-label" />
+                        <Region HBox.hgrow="ALWAYS" />
+                    </children>
+                    <padding>
+                        <Insets bottom="10.0" top="10.0" left="24.0" right="24.0" />
+                    </padding>
+                </HBox>
+            </children>
+        </VBox>
+    <Region minHeight="120.0" maxHeight="140.0" VBox.vgrow="NEVER" />
+        
+        <!-- DASHBOARD INFERIOR: Gráficas profesionales -->
+        <HBox alignment="CENTER" spacing="60.0" styleClass="dashboard-bar" VBox.vgrow="NEVER">
+            <children>
+                <!-- Gráfica de barras: Top proveedores -->
+                <VBox spacing="18.0" alignment="CENTER" prefWidth="650.0">
+                    <Label text="Top Proveedores con más productos" styleClass="dashboard-title" />
+                    <BarChart fx:id="barChartTopProveedores" prefWidth="600.0" prefHeight="270.0">
+                        <xAxis>
+                            <CategoryAxis label="Proveedor" />
+                        </xAxis>
+                        <yAxis>
+                            <NumberAxis label="Nº productos" />
+                        </yAxis>
+                    </BarChart>
+                </VBox>
+                <!-- Gráfica de pastel: Estado proveedores -->
+                <VBox spacing="18.0" alignment="CENTER" prefWidth="400.0">
+                    <Label text="Distribución por Estado" styleClass="dashboard-title" />
+                    <PieChart fx:id="pieChartEstadoProveedores" prefWidth="350.0" prefHeight="270.0" />
+                </VBox>
+            </children>
+            <padding>
+                <Insets top="20.0" right="32.0" bottom="20.0" left="32.0" />
+            </padding>
+        </HBox>
+    </children>
+    </VBox>
+    </content>
+</ScrollPane>
