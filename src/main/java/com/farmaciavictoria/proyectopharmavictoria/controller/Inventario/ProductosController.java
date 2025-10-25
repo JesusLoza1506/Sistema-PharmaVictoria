@@ -917,11 +917,9 @@ public class ProductosController implements Initializable, SystemEventObserver {
                     producto.setStockActual(nuevoStock);
                     productoService.actualizar(producto);
                     // Registrar movimiento en historial solo si hay cambio real
-                    com.farmaciavictoria.proyectopharmavictoria.model.Inventario.AjusteStockCommand cmd = new com.farmaciavictoria.proyectopharmavictoria.model.Inventario.AjusteStockCommand(
-                            producto, stockAnterior, nuevoStock, System.getProperty("user.name", "Desconocido"),
-                            "Ajuste manual de stock");
-                    com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.InventarioAuditoriaRepository
-                            .registrarMovimiento(cmd);
+                    // Auditoría de inventario ahora solo se registra en producto_historial_cambio
+                    // Si se requiere, aquí se puede llamar a
+                    // ProductoHistorialCambioRepository.registrarCambio
                     notificationService.mostrarExito("Stock actualizado correctamente");
                 } else {
                     notificationService.mostrarError("No se realizó ningún cambio de stock.");

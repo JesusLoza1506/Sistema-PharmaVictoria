@@ -31,7 +31,7 @@ public class BoletaPreviewDialog {
         this.boleta = builder.boleta;
         this.nombreFarmacia = builder.nombreFarmacia;
         this.ruc = builder.ruc;
-        this.direccion = "Av. Ramos 418, Imperial";
+        this.direccion = "Av. Ramos 418 - Imperial";
         this.serie = builder.serie;
         this.numero = builder.numero;
         this.cajero = builder.cajero;
@@ -46,7 +46,7 @@ public class BoletaPreviewDialog {
         private Boleta boleta;
         private String nombreFarmacia = "BOTICA PHARMAVICTORIA S.A.C.";
         private String ruc = "2064XXXXXXX";
-        private String direccion = "Jr. Lima N° 456 – Huancayo";
+        private String direccion = "Av. Ramos 418 - Imperial";
         private String serie = "B001";
         private String numero = "002314";
         private String cajero = "[Cajero]";
