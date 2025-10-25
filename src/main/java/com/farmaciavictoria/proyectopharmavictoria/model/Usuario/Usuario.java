@@ -7,12 +7,14 @@ import java.time.LocalDateTime;
  * Representa a los usuarios que pueden acceder al sistema (Admin y Vendedor)
  */
 public class Usuario {
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
 
     private Long id;
     private String username;
     private String passwordHash;
     private Rol rol;
-    private Long sucursalId;
     private String nombres;
     private String apellidos;
     private String dni;
@@ -52,13 +54,12 @@ public class Usuario {
     }
 
     // Constructor completo
-    public Usuario(String username, String passwordHash, Rol rol, Long sucursalId,
+    public Usuario(String username, String passwordHash, Rol rol,
             String nombres, String apellidos, String dni) {
         this();
         this.username = username;
         this.passwordHash = passwordHash;
         this.rol = rol;
-        this.sucursalId = sucursalId;
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.dni = dni;
@@ -107,18 +108,6 @@ public class Usuario {
 
     public Rol getRol() {
         return rol;
-    }
-
-    public void setRol(Rol rol) {
-        this.rol = rol;
-    }
-
-    public Long getSucursalId() {
-        return sucursalId;
-    }
-
-    public void setSucursalId(Long sucursalId) {
-        this.sucursalId = sucursalId;
     }
 
     public String getNombres() {

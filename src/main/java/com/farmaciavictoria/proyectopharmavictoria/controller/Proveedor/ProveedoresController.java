@@ -394,8 +394,6 @@ public class ProveedoresController implements Initializable {
     @FXML
     private TableColumn<Proveedor, String> colTipoProducto;
     @FXML
-    private TableColumn<Proveedor, String> colSucursalId;
-    @FXML
     private TableColumn<Proveedor, String> colEstado;
     @FXML
     private TableColumn<Proveedor, Void> colAcciones;
@@ -464,30 +462,12 @@ public class ProveedoresController implements Initializable {
         colRuc.setCellValueFactory(new PropertyValueFactory<>("ruc"));
         colContacto.setCellValueFactory(new PropertyValueFactory<>("contacto"));
         colTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        colSucursalId.setCellValueFactory(cellData -> {
-            String nombreSucursal = "";
-            try {
-                int sucursalId = cellData.getValue().getSucursalId();
-                com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = ServiceContainer
-                        .getInstance()
-                        .getRepository(com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-                nombreSucursal = sucursalRepo != null ? sucursalRepo.findNombreById(sucursalId) : "";
-            } catch (Exception e) {
-                nombreSucursal = "";
-            }
-            return new javafx.beans.property.SimpleStringProperty(nombreSucursal);
-        });
         // Asegurar que la columna de acciones sea visible y no se compacte demasiado
         try {
             if (colAcciones != null) {
                 colAcciones.setPrefWidth(200);
                 colAcciones.setMinWidth(140);
                 colAcciones.setMaxWidth(300);
-            }
-            // Reducir un poco la columna Sucursal para dar espacio a Acciones
-            if (colSucursalId != null) {
-                colSucursalId.setPrefWidth(120);
-                colSucursalId.setMaxWidth(180);
             }
         } catch (Exception ex) {
             // No bloquear la inicialización si algo falla al ajustar tamaños

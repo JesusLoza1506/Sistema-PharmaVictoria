@@ -80,8 +80,7 @@
                             </columnConstraints>
                             <Label styleClass="field-label" text="Rol:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                             <Label fx:id="lblRol" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                            <Label styleClass="field-label" text="Sucursal:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                            <Label fx:id="lblSucursal" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            <!-- Eliminado campo sucursal -->
                             <Label styleClass="field-label" text="Último acceso:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                             <Label fx:id="lblUltimoAcceso" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         </GridPane>

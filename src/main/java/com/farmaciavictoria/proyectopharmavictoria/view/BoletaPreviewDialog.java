@@ -31,7 +31,7 @@ public class BoletaPreviewDialog {
         this.boleta = builder.boleta;
         this.nombreFarmacia = builder.nombreFarmacia;
         this.ruc = builder.ruc;
-        this.direccion = builder.direccion;
+        this.direccion = "Av. Ramos 418, Imperial";
         this.serie = builder.serie;
         this.numero = builder.numero;
         this.cajero = builder.cajero;

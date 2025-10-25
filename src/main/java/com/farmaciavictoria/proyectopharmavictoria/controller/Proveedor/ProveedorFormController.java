@@ -21,48 +21,62 @@ import java.util.regex.Pattern;
 
 /**
  * ✅ ENTERPRISE CONTROLLER - Formulario de proveedores refactorizado
- * Aplica Service Layer Pattern, Dependency Injection y validaciones centralizadas
+ * Aplica Service Layer Pattern, Dependency Injection y validaciones
+ * centralizadas
  */
 public class ProveedorFormController implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(ProveedorFormController.class);
 
     // FXML Components - Información Básica
-    @FXML private Label lblTitulo;
-    @FXML private TextField txtRazonSocial;
-    @FXML private TextField txtRuc;
-    @FXML private TextField txtContacto;
+    @FXML
+    private Label lblTitulo;
+    @FXML
+    private TextField txtRazonSocial;
+    @FXML
+    private TextField txtRuc;
+    @FXML
+    private TextField txtContacto;
 
     // FXML Components - Información de Contacto
-    @FXML private TextField txtTelefono;
-    @FXML private TextField txtEmail;
-    @FXML private TextArea txtDireccion;
+    @FXML
+    private TextField txtTelefono;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    private TextArea txtDireccion;
 
     // FXML Components - Información Comercial
-    @FXML private ComboBox<String> cmbCondicionesPago;
-    @FXML private TextArea txtObservaciones;
-    @FXML private ComboBox<String> cmbTipoProducto;
-    @FXML private ComboBox<Sucursal> cmbSucursalId;
-    @FXML private CheckBox chkActivo;
+    @FXML
+    private ComboBox<String> cmbCondicionesPago;
+    @FXML
+    private TextArea txtObservaciones;
+    @FXML
+    private ComboBox<String> cmbTipoProducto;
+    @FXML
+    private CheckBox chkActivo;
 
     // FXML Components - Botones
-    @FXML private Button btnGuardar;
-    @FXML private Button btnLimpiar;
-    @FXML private Button btnCancelar;
+    @FXML
+    private Button btnGuardar;
+    @FXML
+    private Button btnLimpiar;
+    @FXML
+    private Button btnCancelar;
 
     // ✅ SERVICE LAYER PATTERN + DEPENDENCY INJECTION
     private final ProveedorService proveedorService;
-    
+
     private Proveedor proveedorActual;
     private boolean modoEdicion = false;
     private Consumer<Proveedor> onProveedorGuardado;
 
     // Patrones de validación flexibles
     private static final Pattern PATTERN_EMAIL = Pattern.compile(
-        "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-    );
+            "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     private static final Pattern PATTERN_RUC = Pattern.compile("^\\d{8,11}$"); // ✅ FLEXIBLE: 8-11 dígitos
-    private static final Pattern PATTERN_TELEFONO = Pattern.compile("^[0-9+\\-\\s\\(\\)]{7,20}$"); // ✅ FLEXIBLE: formato libre
+    private static final Pattern PATTERN_TELEFONO = Pattern.compile("^[0-9+\\-\\s\\(\\)]{7,20}$"); // ✅ FLEXIBLE:
+                                                                                                   // formato libre
 
     /**
      * ✅ DEPENDENCY INJECTION: Constructor con inyección de dependencias
@@ -71,7 +85,7 @@ public class ProveedorFormController implements Initializable {
         try {
             ServiceContainer container = ServiceContainer.getInstance();
             this.proveedorService = container.getProveedorService();
-            
+
             logger.info("ProveedorFormController inicializado con enterprise patterns");
         } catch (Exception e) {
             logger.error("Error al inicializar ProveedorFormController: {}", e.getMessage(), e);
@@ -89,49 +103,22 @@ public class ProveedorFormController implements Initializable {
     private void initializeComponents() {
         // Configurar ComboBox de condiciones de pago
         cmbCondicionesPago.setItems(FXCollections.observableArrayList(
-            "Contado",
-            "15 días", 
-            "30 días",
-            "45 días",
-            "60 días",
-            "90 días",
-            "Contra entrega"
-        ));
+                "Contado",
+                "15 días",
+                "30 días",
+                "45 días",
+                "60 días",
+                "90 días",
+                "Contra entrega"));
         cmbCondicionesPago.setValue("30 días");
 
         // ComboBox Tipo de Producto
         cmbTipoProducto.setItems(FXCollections.observableArrayList(
-            "Medicamentos",
-            "Insumos",
-            "Material Médico",
-            "Otros"
-        ));
+                "Medicamentos",
+                "Insumos",
+                "Material Médico",
+                "Otros"));
         cmbTipoProducto.setPromptText("Seleccionar tipo");
-
-        // Poblar ComboBox de sucursales reales
-        try {
-            ServiceContainer container = ServiceContainer.getInstance();
-            SucursalRepository sucursalRepo = container.getRepository(SucursalRepository.class);
-            java.util.List<Sucursal> sucursales = sucursalRepo.findAllActivas();
-            cmbSucursalId.setItems(FXCollections.observableArrayList(sucursales));
-            cmbSucursalId.setPromptText("Seleccionar sucursal");
-            cmbSucursalId.setCellFactory(listView -> new ListCell<>() {
-                @Override
-                protected void updateItem(Sucursal item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? null : item.getNombre());
-                }
-            });
-            cmbSucursalId.setButtonCell(new ListCell<>() {
-                @Override
-                protected void updateItem(Sucursal item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty || item == null ? null : item.getNombre());
-                }
-            });
-        } catch (Exception e) {
-            logger.error("Error al poblar sucursales: {}", e.getMessage(), e);
-        }
 
     }
 
@@ -170,7 +157,8 @@ public class ProveedorFormController implements Initializable {
     }
 
     private void cargarDatos() {
-        if (proveedorActual == null) return;
+        if (proveedorActual == null)
+            return;
 
         txtRazonSocial.setText(proveedorActual.getRazonSocial());
         txtRuc.setText(proveedorActual.getRuc() != null ? proveedorActual.getRuc() : "");
@@ -178,20 +166,11 @@ public class ProveedorFormController implements Initializable {
         txtTelefono.setText(proveedorActual.getTelefono() != null ? proveedorActual.getTelefono() : "");
         txtEmail.setText(proveedorActual.getEmail() != null ? proveedorActual.getEmail() : "");
         txtDireccion.setText(proveedorActual.getDireccion() != null ? proveedorActual.getDireccion() : "");
-        cmbCondicionesPago.setValue(proveedorActual.getCondicionesPago() != null ? 
-            proveedorActual.getCondicionesPago() : "30 días");
+        cmbCondicionesPago.setValue(
+                proveedorActual.getCondicionesPago() != null ? proveedorActual.getCondicionesPago() : "30 días");
         txtObservaciones.setText(proveedorActual.getObservaciones() != null ? proveedorActual.getObservaciones() : "");
-            if (proveedorActual.getTipoProducto() != null) {
-                cmbTipoProducto.setValue(proveedorActual.getTipoProducto());
-            }
-        if (proveedorActual.getSucursalId() != null) {
-            ServiceContainer container = ServiceContainer.getInstance();
-            SucursalRepository sucursalRepo = container.getRepository(SucursalRepository.class);
-            java.util.List<Sucursal> sucursales = sucursalRepo.findAllActivas();
-            Sucursal selected = sucursales.stream()
-                .filter(s -> proveedorActual.getSucursalId().equals(s.getId()))
-                .findFirst().orElse(null);
-            cmbSucursalId.setValue(selected);
+        if (proveedorActual.getTipoProducto() != null) {
+            cmbTipoProducto.setValue(proveedorActual.getTipoProducto());
         }
         chkActivo.setSelected(proveedorActual.getActivo() != null ? proveedorActual.getActivo() : true);
 
@@ -215,26 +194,27 @@ public class ProveedorFormController implements Initializable {
 
                 // Datos comerciales
                 proveedor.setCondicionesPago(cmbCondicionesPago.getValue());
-                proveedor.setObservaciones(txtObservaciones.getText().trim().isEmpty() ? null : txtObservaciones.getText().trim());
-                    proveedor.setTipoProducto(cmbTipoProducto.getValue());
-                    proveedor.setSucursalId(cmbSucursalId.getValue() != null ? cmbSucursalId.getValue().getId() : null);
+                proveedor.setObservaciones(
+                        txtObservaciones.getText().trim().isEmpty() ? null : txtObservaciones.getText().trim());
+                proveedor.setTipoProducto(cmbTipoProducto.getValue());
                 proveedor.setActivo(chkActivo.isSelected());
 
-                    // Validar unicidad de razón social (nombre)
-                    boolean existeNombre = proveedorService.existePorRazonSocial(proveedor.getRazonSocial(), modoEdicion ? proveedor.getId() : null);
-                    if (existeNombre) {
-                        showWarning("Validación", "Ya existe un proveedor con el mismo nombre. No se puede registrar ni actualizar.");
-                        return;
-                    }
+                // Validar unicidad de razón social (nombre)
+                boolean existeNombre = proveedorService.existePorRazonSocial(proveedor.getRazonSocial(),
+                        modoEdicion ? proveedor.getId() : null);
+                if (existeNombre) {
+                    showWarning("Validación",
+                            "Ya existe un proveedor con el mismo nombre. No se puede registrar ni actualizar.");
+                    return;
+                }
 
                 // ✅ SERVICE LAYER: Guardar usando service layer
-                Proveedor proveedorGuardado = modoEdicion ? 
-                    proveedorService.actualizar(proveedor, System.getProperty("user.name", "sistema")) : 
-                    proveedorService.guardar(proveedor);
+                Proveedor proveedorGuardado = modoEdicion
+                        ? proveedorService.actualizar(proveedor, System.getProperty("user.name", "sistema"))
+                        : proveedorService.guardar(proveedor);
 
-                showInfo("Éxito", modoEdicion ? 
-                    "Proveedor actualizado exitosamente" : 
-                    "Proveedor registrado exitosamente");
+                showInfo("Éxito",
+                        modoEdicion ? "Proveedor actualizado exitosamente" : "Proveedor registrado exitosamente");
 
                 // Notificar al componente padre
                 if (onProveedorGuardado != null) {
@@ -322,9 +302,8 @@ public class ProveedorFormController implements Initializable {
         // Información comercial
         cmbCondicionesPago.setValue("30 días");
         txtObservaciones.clear();
-    cmbTipoProducto.setValue(null);
-    cmbSucursalId.setValue(null);
-    chkActivo.setSelected(true);
+        cmbTipoProducto.setValue(null);
+        chkActivo.setSelected(true);
 
     }
 

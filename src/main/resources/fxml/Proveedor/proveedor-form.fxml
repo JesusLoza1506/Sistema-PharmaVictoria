@@ -46,8 +46,6 @@
                                  <!-- Sucursal -->
                                     <VBox spacing="5.0">
                                        <children>
-                                          <Label styleClass="field-label" text="Sucursal (ID)" />
-                                          <ComboBox fx:id="cmbSucursalId" prefWidth="180.0" promptText="Seleccionar sucursal" styleClass="field-combo" />
                                        </children>
                                     </VBox>
                         <!-- Contacto y RUC -->

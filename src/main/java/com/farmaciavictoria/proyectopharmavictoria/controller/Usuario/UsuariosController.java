@@ -7,7 +7,6 @@ import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorNom
 import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorApellido;
 import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorDni;
 import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorRol;
-import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorSucursal;
 import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorEstado;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
 import com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService;
@@ -41,13 +40,9 @@ public class UsuariosController {
     @FXML
     private ComboBox<String> cmbRol;
     @FXML
-    private ComboBox<String> cmbSucursal;
-    @FXML
     private ComboBox<String> cmbEstado;
     @FXML
     private Button btnNuevoUsuario;
-    @FXML
-    private Button btnExportar;
     @FXML
     private Button btnExportarPDF;
     @FXML
@@ -66,43 +61,24 @@ public class UsuariosController {
     @FXML
     private TableColumn<Usuario, String> colTelefono;
     @FXML
-    private TableColumn<Usuario, String> colSucursal;
-    @FXML
     private TableColumn<Usuario, String> colEstado;
-    // Columna Último Acceso eliminada del FXML
     @FXML
     private TableColumn<Usuario, Void> colAcciones;
-
+    // Columna Último Acceso eliminada del FXML
     private final UsuarioService usuarioService = UsuarioService.getInstance();
     private Usuario usuarioAutenticado;
     private ObservableList<Usuario> usuariosList = FXCollections.observableArrayList();
     private javafx.collections.transformation.FilteredList<Usuario> usuariosFiltrados;
-    private java.util.Map<Integer, String> sucursalNombreMap = new java.util.HashMap<>();
-
-    // Variables de paginación
-    @FXML
-    private Button btnPaginaAnterior;
-    @FXML
-    private Button btnPaginaSiguiente;
-    @FXML
-    private Label lblPaginaActual;
-    @FXML
-    private ComboBox<Integer> cmbTamanoPagina;
-    private int paginaActual = 1;
-    private int totalPaginas = 1;
-    private int tamanoPagina = 10;
+    // Variables de paginación eliminadas
 
     @FXML
     public void initialize() {
-        cargarSucursales();
         configurarTabla();
         cargarUsuarios();
         configurarFiltros();
-        configurarPaginacion();
+        // Paginación eliminada
         // Dashboard eliminado: no se actualizan estadísticas ni gráficas
         btnNuevoUsuario.setOnAction(e -> onNuevoUsuario());
-        if (btnExportar != null)
-            btnExportar.setOnAction(e -> exportarUsuariosExcel());
         if (btnExportarPDF != null)
             btnExportarPDF.setOnAction(e -> exportarUsuariosPDF());
     }
@@ -122,7 +98,7 @@ public class UsuariosController {
             stage.setTitle("Exportar Usuarios - Vista Previa");
             Scene scene = new Scene(vistaPrevia);
             stage.setScene(scene);
-            stage.initOwner(btnExportar.getScene().getWindow());
+            // ...existing code...
             stage.setResizable(true);
             stage.showAndWait();
         } catch (Exception ex) {
@@ -165,129 +141,100 @@ public class UsuariosController {
         colApellidos.setCellValueFactory(new PropertyValueFactory<>("apellidos"));
         colDni.setCellValueFactory(new PropertyValueFactory<>("dni"));
         colTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        // Mostrar nombre de sucursal en vez de ID
-        colSucursal.setCellValueFactory(cellData -> {
-            Usuario usuario = cellData.getValue();
-            Integer sucursalId = null;
-            if (usuario.getSucursalId() != null) {
-                try {
-                    sucursalId = Integer.valueOf(usuario.getSucursalId().toString());
-                } catch (Exception e) {
-                    sucursalId = null;
-                }
-            }
-            String nombre = (sucursalId != null && sucursalNombreMap.containsKey(sucursalId))
-                    ? sucursalNombreMap.get(sucursalId)
-                    : "-";
-            return new javafx.beans.property.SimpleStringProperty(nombre);
-        });
+        // ...existing code...
         colEstado.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
                 cellData.getValue().isActivo() ? "Activo" : "Inactivo"));
         tablaUsuarios.setItems(usuariosList);
+
+        // CellFactory para acciones (editar, ver, activar/desactivar, eliminar)
+        colAcciones.setCellFactory(param -> new TableCell<>() {
+            private final Button btnEditar = new Button();
+            private final Button btnVer = new Button();
+            private final Button btnToggleEstado = new Button();
+            private final Button btnEliminar = new Button();
+
+            {
+                javafx.scene.image.ImageView iconEditar = new javafx.scene.image.ImageView(
+                        getClass().getResource("/icons/editar.png").toExternalForm());
+                javafx.scene.image.ImageView iconVer = new javafx.scene.image.ImageView(
+                        getClass().getResource("/icons/ver.png").toExternalForm());
+                javafx.scene.image.ImageView iconEliminar = new javafx.scene.image.ImageView(
+                        getClass().getResource("/icons/eliminar.png").toExternalForm());
+
+                iconEditar.setFitWidth(24);
+                iconEditar.setFitHeight(24);
+                iconVer.setFitWidth(24);
+                iconVer.setFitHeight(24);
+                iconEliminar.setFitWidth(24);
+                iconEliminar.setFitHeight(24);
+
+                btnEditar.setGraphic(iconEditar);
+                btnVer.setGraphic(iconVer);
+                btnEliminar.setGraphic(iconEliminar);
+
+                btnEditar.getStyleClass().setAll("btn-action", "btn-add");
+                btnVer.getStyleClass().setAll("btn-action", "btn-eye");
+                btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle");
+                btnEliminar.getStyleClass().setAll("btn-action", "btn-trash");
+
+                btnEditar.setPrefSize(35, 35);
+                btnVer.setPrefSize(35, 35);
+                btnToggleEstado.setPrefSize(35, 35);
+                btnEliminar.setPrefSize(35, 35);
+
+                btnEditar.setTooltip(new Tooltip("Editar usuario"));
+                btnVer.setTooltip(new Tooltip("Ver detalles"));
+                btnEliminar.setTooltip(new Tooltip("Eliminar usuario"));
+
+                // Acciones
+                btnEditar.setOnAction(e -> {
+                    Usuario usuario = getTableView().getItems().get(getIndex());
+                    editarUsuario(usuario);
+                });
+                btnVer.setOnAction(e -> {
+                    Usuario usuario = getTableView().getItems().get(getIndex());
+                    verDetallesUsuario(usuario);
+                });
+                btnToggleEstado.setOnAction(e -> {
+                    Usuario usuario = getTableView().getItems().get(getIndex());
+                    toggleEstadoUsuario(usuario);
+                });
+                btnEliminar.setOnAction(e -> {
+                    Usuario usuario = getTableView().getItems().get(getIndex());
+                    eliminarUsuario(usuario);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Usuario usuario = getTableView().getItems().get(getIndex());
+                    HBox box = new HBox(6, btnEditar, btnVer, btnToggleEstado, btnEliminar);
+                    box.setAlignment(javafx.geometry.Pos.CENTER);
+                    // Toggle estado visual
+                    if (usuario != null && usuario.isActivo()) {
+                        btnToggleEstado.setText("⏸");
+                        btnToggleEstado.setTooltip(new Tooltip("Inactivar usuario"));
+                        btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-active");
+                    } else {
+                        btnToggleEstado.setText("▶");
+                        btnToggleEstado.setTooltip(new Tooltip("Activar usuario"));
+                        btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-inactive");
+                    }
+                    setGraphic(box);
+                }
+            }
+        });
     }
 
     private void cargarSucursales() {
-        // Obtener el repositorio desde el ServiceContainer
-        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                .getInstance()
-                .getRepository(com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-        java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Sucursal> sucursales = sucursalRepo
-                .findAllActivas();
-        sucursalNombreMap.clear();
-        for (com.farmaciavictoria.proyectopharmavictoria.model.Sucursal suc : sucursales) {
-            sucursalNombreMap.put(suc.getId(), suc.getNombre());
-        }
+        // ...existing code...
 
         // Reutilizar exactamente la implementación de acciones del Inventario
-        colAcciones.setCellFactory(new javafx.util.Callback<TableColumn<Usuario, Void>, TableCell<Usuario, Void>>() {
-            @Override
-            public TableCell<Usuario, Void> call(TableColumn<Usuario, Void> param) {
-                return new TableCell<Usuario, Void>() {
-                    private final Button btnEditar = new Button();
-                    private final Button btnVer = new Button();
-                    private final Button btnToggleEstado = new Button();
-                    private final Button btnEliminar = new Button();
-
-                    {
-                        // Íconos iguales a los usados en Inventario (recursos /icons)
-                        javafx.scene.image.ImageView iconEditar = new javafx.scene.image.ImageView(
-                                getClass().getResource("/icons/editar.png").toExternalForm());
-                        javafx.scene.image.ImageView iconVer = new javafx.scene.image.ImageView(
-                                getClass().getResource("/icons/ver.png").toExternalForm());
-                        javafx.scene.image.ImageView iconEliminar = new javafx.scene.image.ImageView(
-                                getClass().getResource("/icons/eliminar.png").toExternalForm());
-
-                        iconEditar.setFitWidth(24);
-                        iconEditar.setFitHeight(24);
-                        iconVer.setFitWidth(24);
-                        iconVer.setFitHeight(24);
-                        iconEliminar.setFitWidth(24);
-                        iconEliminar.setFitHeight(24);
-
-                        btnEditar.setGraphic(iconEditar);
-                        btnVer.setGraphic(iconVer);
-                        btnEliminar.setGraphic(iconEliminar);
-
-                        btnEditar.getStyleClass().setAll("btn-action", "btn-add");
-                        btnVer.getStyleClass().setAll("btn-action", "btn-eye");
-                        btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle");
-                        btnEliminar.getStyleClass().setAll("btn-action", "btn-trash");
-
-                        btnEditar.setPrefWidth(35);
-                        btnEditar.setPrefHeight(35);
-                        btnVer.setPrefWidth(35);
-                        btnVer.setPrefHeight(35);
-                        btnToggleEstado.setPrefWidth(35);
-                        btnToggleEstado.setPrefHeight(35);
-                        btnEliminar.setPrefWidth(35);
-                        btnEliminar.setPrefHeight(35);
-
-                        HBox buttons = new HBox(5, btnEditar, btnVer, btnToggleEstado, btnEliminar);
-                        buttons.setAlignment(javafx.geometry.Pos.CENTER);
-
-                        btnEditar.setOnAction(e -> {
-                            Usuario usuario = getTableView().getItems().get(getIndex());
-                            editarUsuario(usuario);
-                        });
-                        btnVer.setOnAction(e -> {
-                            Usuario usuario = getTableView().getItems().get(getIndex());
-                            verDetallesUsuario(usuario);
-                        });
-                        btnToggleEstado.setOnAction(e -> {
-                            Usuario usuario = getTableView().getItems().get(getIndex());
-                            toggleEstadoUsuario(usuario);
-                        });
-                        btnEliminar.setOnAction(e -> {
-                            Usuario usuario = getTableView().getItems().get(getIndex());
-                            eliminarUsuario(usuario);
-                        });
-                    }
-
-                    @Override
-                    protected void updateItem(Void item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            Usuario usuario = getTableView().getItems().get(getIndex());
-                            if (usuario != null && usuario.isActivo()) {
-                                btnToggleEstado.setText("⏸");
-                                btnToggleEstado.setTooltip(new Tooltip("Inactivar usuario"));
-                                btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-active");
-                            } else {
-                                btnToggleEstado.setText("▶");
-                                btnToggleEstado.setTooltip(new Tooltip("Activar usuario"));
-                                btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle",
-                                        "btn-toggle-inactive");
-                            }
-                            HBox botones = new HBox(5, btnEditar, btnVer, btnToggleEstado, btnEliminar);
-                            botones.setAlignment(javafx.geometry.Pos.CENTER);
-                            setGraphic(botones);
-                        }
-                    }
-                };
-            }
-        });
+        // ...existing code...
     }
 
     // Métodos de acción para los botones
@@ -331,7 +278,7 @@ public class UsuariosController {
                     // Guardar valores originales para auditoría ANTES de modificar el usuario
                     String oldUsername = usuario.getUsername() != null ? usuario.getUsername() : "";
                     Usuario.Rol oldRol = usuario.getRol();
-                    Long oldSucursalId = usuario.getSucursalId();
+                    // Eliminado campo sucursalId
                     String oldNombres = usuario.getNombres() != null ? usuario.getNombres() : "";
                     String oldApellidos = usuario.getApellidos() != null ? usuario.getApellidos() : "";
                     String oldDni = usuario.getDni() != null ? usuario.getDni() : "";
@@ -343,16 +290,7 @@ public class UsuariosController {
                     String newUsername = formController.getUsername();
                     Usuario.Rol newRol = "ADMIN".equals(formController.getRol()) ? Usuario.Rol.ADMIN
                             : Usuario.Rol.VENDEDOR;
-                    String sucursalValue = formController.getSucursal();
-                    Long newSucursalId = null;
-                    if (sucursalValue != null && sucursalValue.matches("^\\d+.*")) {
-                        String idStr = sucursalValue.split(" ", 2)[0];
-                        try {
-                            newSucursalId = Long.parseLong(idStr);
-                        } catch (NumberFormatException ex2) {
-                            newSucursalId = null;
-                        }
-                    }
+                    // Eliminado campo sucursal
                     String newNombres = formController.getNombres();
                     String newApellidos = formController.getApellidos();
                     String newDni = formController.getDni();
@@ -368,7 +306,7 @@ public class UsuariosController {
                     // Actualiza el usuario con los datos del formulario
                     usuario.setUsername(newUsername);
                     usuario.setRol(newRol);
-                    usuario.setSucursalId(newSucursalId);
+                    // ...existing code...
                     usuario.setNombres(newNombres);
                     usuario.setApellidos(newApellidos);
                     usuario.setDni(newDni);
@@ -391,12 +329,7 @@ public class UsuariosController {
                             usuarioService.editarUsuario(usuario, "rol", oldRol != null ? oldRol.name() : "",
                                     newRol != null ? newRol.name() : "", adminId);
                         }
-                        if ((oldSucursalId != null ? oldSucursalId : -1L) != (newSucursalId != null ? newSucursalId
-                                : -1L)) {
-                            usuarioService.editarUsuario(usuario, "sucursalId",
-                                    oldSucursalId != null ? oldSucursalId.toString() : "",
-                                    newSucursalId != null ? newSucursalId.toString() : "", adminId);
-                        }
+                        // Eliminado control de auditoría para sucursalId
                         if (!oldNombres.equals(newNombres)) {
                             usuarioService.editarUsuario(usuario, "nombres", oldNombres, newNombres, adminId);
                         }
@@ -508,36 +441,22 @@ public class UsuariosController {
         List<Usuario> usuarios = usuarioService.obtenerUsuarios();
         usuariosList.setAll(usuarios);
         usuariosFiltrados = new javafx.collections.transformation.FilteredList<>(usuariosList, u -> true);
-        paginaActual = 1;
-        actualizarPaginacion();
+        // Paginación eliminada
         lblTotalUsuarios.setText("Total: " + usuarios.size() + " usuarios");
     }
 
     private void configurarFiltros() {
         cmbRol.setItems(FXCollections.observableArrayList("ADMIN", "VENDEDOR"));
         cmbEstado.setItems(FXCollections.observableArrayList("Activo", "Inactivo"));
-        // Poblar sucursales reales desde la base de datos
-        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                .getInstance()
-                .getRepository(com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-        java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Sucursal> sucursales = sucursalRepo
-                .findAllActivas();
-        javafx.collections.ObservableList<String> sucursalItems = FXCollections.observableArrayList();
-        for (com.farmaciavictoria.proyectopharmavictoria.model.Sucursal suc : sucursales) {
-            sucursalItems.add(suc.getId() + " - " + suc.getNombre());
-        }
-        cmbSucursal.setItems(sucursalItems);
         txtBuscar.textProperty().addListener((obs, oldVal, newVal) -> filtrarUsuarios());
         cmbRol.valueProperty().addListener((obs, oldVal, newVal) -> filtrarUsuarios());
         cmbEstado.valueProperty().addListener((obs, oldVal, newVal) -> filtrarUsuarios());
-        cmbSucursal.valueProperty().addListener((obs, oldVal, newVal) -> filtrarUsuarios());
     }
 
     private void filtrarUsuarios() {
         String busqueda = txtBuscar.getText().trim().toLowerCase();
         String rol = cmbRol.getValue();
         String estado = cmbEstado.getValue();
-        String sucursal = cmbSucursal.getValue();
         usuariosFiltrados.setPredicate(u -> {
             boolean coincideBusqueda = busqueda.isEmpty()
                     || u.getUsername().toLowerCase().contains(busqueda)
@@ -549,73 +468,27 @@ public class UsuariosController {
                     || (u.getRol() != null && u.getRol().name().equalsIgnoreCase(rol));
             boolean coincideEstado = estado == null || estado.isBlank() || (estado.equals("Activo") && u.isActivo())
                     || (estado.equals("Inactivo") && !u.isActivo());
-            boolean coincideSucursal = sucursal == null || sucursal.isBlank()
-                    || (u.getSucursalId() != null && sucursal.startsWith(u.getSucursalId().toString()));
-            return coincideBusqueda && coincideRol && coincideEstado && coincideSucursal;
+            return coincideBusqueda && coincideRol && coincideEstado;
         });
-        paginaActual = 1;
-        actualizarPaginacion();
+        // Paginación eliminada
         lblTotalUsuarios.setText("Total: " + usuariosFiltrados.size() + " usuarios");
     }
 
     // Configuración de paginación profesional
     private void configurarPaginacion() {
-        if (cmbTamanoPagina != null) {
-            cmbTamanoPagina.getItems().clear();
-            cmbTamanoPagina.getItems().addAll(5, 10, 20, 50);
-            cmbTamanoPagina.setValue(10);
-            tamanoPagina = 10;
-            cmbTamanoPagina.valueProperty().addListener((obs, oldVal, newVal) -> {
-                tamanoPagina = newVal;
-                paginaActual = 1;
-                actualizarPaginacion();
-            });
-        }
-        if (btnPaginaAnterior != null) {
-            btnPaginaAnterior.setOnAction(e -> onPaginaAnterior());
-        }
-        if (btnPaginaSiguiente != null) {
-            btnPaginaSiguiente.setOnAction(e -> onPaginaSiguiente());
-        }
+        // Método de paginación eliminado
     }
 
     private void actualizarPaginacion() {
-        int total = usuariosFiltrados.size();
-        totalPaginas = (int) Math.ceil((double) total / tamanoPagina);
-        if (totalPaginas == 0)
-            totalPaginas = 1;
-        if (paginaActual > totalPaginas)
-            paginaActual = totalPaginas;
-        int desde = (paginaActual - 1) * tamanoPagina;
-        int hasta = Math.min(desde + tamanoPagina, total);
-        ObservableList<Usuario> pagina = FXCollections.observableArrayList();
-        for (int i = desde; i < hasta; i++) {
-            pagina.add(usuariosFiltrados.get(i));
-        }
-        tablaUsuarios.setItems(pagina);
-        if (lblPaginaActual != null) {
-            lblPaginaActual.setText("Página " + paginaActual + " de " + totalPaginas);
-        }
-        if (btnPaginaAnterior != null) {
-            btnPaginaAnterior.setDisable(paginaActual == 1);
-        }
-        if (btnPaginaSiguiente != null) {
-            btnPaginaSiguiente.setDisable(paginaActual == totalPaginas);
-        }
+        // Método de paginación eliminado
     }
 
     private void onPaginaAnterior() {
-        if (paginaActual > 1) {
-            paginaActual--;
-            actualizarPaginacion();
-        }
+        // Método de paginación eliminado
     }
 
     private void onPaginaSiguiente() {
-        if (paginaActual < totalPaginas) {
-            paginaActual++;
-            actualizarPaginacion();
-        }
+        // Método de paginación eliminado
     }
 
     @FXML
@@ -643,17 +516,7 @@ public class UsuariosController {
                             .hashPassword(rawPassword);
                     nuevo.setPasswordHash(hashedPassword);
                     nuevo.setRol("ADMIN".equals(formController.getRol()) ? Usuario.Rol.ADMIN : Usuario.Rol.VENDEDOR);
-                    String sucursalValue = formController.getSucursal();
-                    Long sucursalId = null;
-                    if (sucursalValue != null && sucursalValue.matches("^\\d+.*")) {
-                        String idStr = sucursalValue.split(" ", 2)[0];
-                        try {
-                            sucursalId = Long.parseLong(idStr);
-                        } catch (NumberFormatException ex2) {
-                            sucursalId = null;
-                        }
-                    }
-                    nuevo.setSucursalId(sucursalId);
+                    // ...existing code...
                     nuevo.setNombres(formController.getNombres());
                     nuevo.setApellidos(formController.getApellidos());
                     nuevo.setDni(formController.getDni());

@@ -124,8 +124,6 @@
                   </GridPane>
                      <Label styleClass="field-label" text="Tipo de Producto:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                      <Label fx:id="tipoProductoLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                     <Label styleClass="field-label" text="Sucursal (ID):" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                     <Label fx:id="sucursalIdLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                      <Label styleClass="section-title" text="🕓 Historial de Cambios" />
                      <!-- Historial como tabla, adaptado al diseño de Detalles de Producto -->
                      <TableView fx:id="historialTable" prefHeight="160" prefWidth="640" styleClass="historial-table" GridPane.columnSpan="2">

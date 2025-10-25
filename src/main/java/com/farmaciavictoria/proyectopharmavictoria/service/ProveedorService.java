@@ -206,10 +206,6 @@ public class ProveedorService {
             proveedorRepository.registrarCambioProveedor(nuevo.getId(), "observaciones", anterior.getObservaciones(),
                     nuevo.getObservaciones(), usuarioLogueado);
         }
-        if (!safeEquals(anterior.getSucursalId(), nuevo.getSucursalId())) {
-            proveedorRepository.registrarCambioProveedor(nuevo.getId(), "sucursal_id",
-                    String.valueOf(anterior.getSucursalId()), String.valueOf(nuevo.getSucursalId()), usuarioLogueado);
-        }
         if (!safeEquals(anterior.getTipoProducto(), nuevo.getTipoProducto())) {
             proveedorRepository.registrarCambioProveedor(nuevo.getId(), "tipo_producto", anterior.getTipoProducto(),
                     nuevo.getTipoProducto(), usuarioLogueado);

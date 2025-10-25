@@ -59,8 +59,7 @@
                             <TextField fx:id="txtBuscar" promptText="Buscar por nombre, apellido, DNI..." styleClass="search-field" />
                             <Label styleClass="filter-label" text="Rol:" />
                             <ComboBox fx:id="cmbRol" promptText="Rol" styleClass="filter-combo" />
-                            <Label styleClass="filter-label" text="Sucursal:" />
-                            <ComboBox fx:id="cmbSucursal" promptText="Sucursal" styleClass="filter-combo" />
+                            <!-- Eliminado filtro de sucursal -->
                             <Label styleClass="filter-label" text="Estado:" />
                             <ComboBox fx:id="cmbEstado" promptText="Estado" styleClass="filter-combo" />
                             <Region HBox.hgrow="ALWAYS" />
@@ -82,7 +81,7 @@
                             <TableColumn fx:id="colApellidos" prefWidth="120.0" text="Apellidos" />
                             <TableColumn fx:id="colDni" prefWidth="100.0" text="DNI" />
                             <TableColumn fx:id="colTelefono" prefWidth="110.0" text="Teléfono" />
-                            <TableColumn fx:id="colSucursal" prefWidth="100.0" text="Sucursal" />
+                            <!-- Eliminada columna sucursal -->
                             <TableColumn fx:id="colEstado" prefWidth="90.0" text="Estado" />
                             <!-- Columna Último Acceso eliminada para ahorrar espacio -->
                             <TableColumn fx:id="colAcciones" prefWidth="180.0" text="Acciones" />

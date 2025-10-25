@@ -12,21 +12,34 @@ import javafx.stage.FileChooser;
 import java.util.List;
 
 public class ExportarUsuariosPreviewController {
-    @FXML private ComboBox<String> cmbSucursal;
-    @FXML private ComboBox<String> cmbEstado;
-    @FXML private TextField txtBuscar;
-    @FXML private TableView<Usuario> tablePreview;
-    @FXML private TableColumn<Usuario, String> colUsuario;
-    @FXML private TableColumn<Usuario, String> colNombres;
-    @FXML private TableColumn<Usuario, String> colApellidos;
-    @FXML private TableColumn<Usuario, String> colDni;
-    @FXML private TableColumn<Usuario, String> colTelefono;
-    @FXML private TableColumn<Usuario, String> colEmail;
-    @FXML private TableColumn<Usuario, String> colRol;
-    @FXML private TableColumn<Usuario, String> colSucursal;
-    @FXML private TableColumn<Usuario, String> colEstado;
-    @FXML private Button btnExportarExcel;
-    @FXML private Button btnExportarPDF;
+    @FXML
+    private ComboBox<String> cmbSucursal;
+    @FXML
+    private ComboBox<String> cmbEstado;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private TableView<Usuario> tablePreview;
+    @FXML
+    private TableColumn<Usuario, String> colUsuario;
+    @FXML
+    private TableColumn<Usuario, String> colNombres;
+    @FXML
+    private TableColumn<Usuario, String> colApellidos;
+    @FXML
+    private TableColumn<Usuario, String> colDni;
+    @FXML
+    private TableColumn<Usuario, String> colTelefono;
+    @FXML
+    private TableColumn<Usuario, String> colEmail;
+    @FXML
+    private TableColumn<Usuario, String> colRol;
+    @FXML
+    private TableColumn<Usuario, String> colEstado;
+    @FXML
+    private Button btnExportarExcel;
+    @FXML
+    private Button btnExportarPDF;
 
     private UsuarioService usuarioService;
     private ObservableList<Usuario> usuariosFiltrados = FXCollections.observableArrayList();
@@ -41,9 +54,6 @@ public class ExportarUsuariosPreviewController {
     }
 
     private void cargarFiltros() {
-        cmbSucursal.getItems().add("Todas");
-        cmbSucursal.getItems().addAll(usuarioService.obtenerNombresSucursales());
-        cmbSucursal.getSelectionModel().select(0);
         cmbEstado.getItems().addAll("Todos", "Activo", "Inactivo");
         cmbEstado.getSelectionModel().select(0);
     }
@@ -61,39 +71,35 @@ public class ExportarUsuariosPreviewController {
             }
             return new javafx.beans.property.SimpleStringProperty("");
         });
-        colSucursal.setCellValueFactory(cellData -> {
-            String nombre = "";
-            if (cellData.getValue().getSucursalId() != null) {
-                nombre = usuarioService.obtenerNombreSucursal(cellData.getValue().getSucursalId());
-            }
-            return new javafx.beans.property.SimpleStringProperty(nombre);
-        });
-        colEstado.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().isActivo() ? "Activo" : "Inactivo"));
+        colEstado.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().isActivo() ? "Activo" : "Inactivo"));
     }
 
     private void setupActions() {
         btnExportarExcel.setOnAction(e -> exportar("excel"));
         btnExportarPDF.setOnAction(e -> exportar("pdf"));
-        cmbSucursal.setOnAction(e -> aplicarFiltros());
         cmbEstado.setOnAction(e -> aplicarFiltros());
         txtBuscar.setOnKeyReleased(e -> aplicarFiltros());
     }
 
     private void aplicarFiltros() {
-        String sucursal = cmbSucursal.getValue();
         String estado = cmbEstado.getValue();
         String texto = txtBuscar.getText().trim().toLowerCase();
         List<Usuario> usuarios = usuarioService.obtenerTodos();
         usuariosFiltrados.setAll(usuarios.stream()
-            .filter(u -> sucursal == null || sucursal.equals("Todas") || usuarioService.obtenerNombreSucursal(u.getSucursalId()).equalsIgnoreCase(sucursal))
-            .filter(u -> {
-                if (estado == null || estado.equals("Todos")) return true;
-                if (estado.equals("Activo")) return u.isActivo();
-                if (estado.equals("Inactivo")) return !u.isActivo();
-                return true;
-            })
-            .filter(u -> texto.isEmpty() || u.getNombres().toLowerCase().contains(texto) || u.getApellidos().toLowerCase().contains(texto) || u.getDni().toLowerCase().contains(texto) || u.getUsername().toLowerCase().contains(texto))
-            .toList());
+                .filter(u -> {
+                    if (estado == null || estado.equals("Todos"))
+                        return true;
+                    if (estado.equals("Activo"))
+                        return u.isActivo();
+                    if (estado.equals("Inactivo"))
+                        return !u.isActivo();
+                    return true;
+                })
+                .filter(u -> texto.isEmpty() || u.getNombres().toLowerCase().contains(texto)
+                        || u.getApellidos().toLowerCase().contains(texto) || u.getDni().toLowerCase().contains(texto)
+                        || u.getUsername().toLowerCase().contains(texto))
+                .toList());
         tablePreview.setItems(usuariosFiltrados);
     }
 

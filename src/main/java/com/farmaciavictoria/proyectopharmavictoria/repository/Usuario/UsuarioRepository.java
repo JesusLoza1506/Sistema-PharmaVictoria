@@ -159,20 +159,19 @@ public class UsuarioRepository {
      * Actualiza los datos de un usuario existente
      */
     public boolean update(Usuario usuario) {
-        String sql = "UPDATE usuarios SET username = ?, password_hash = ?, rol = ?, sucursal_id = ?, nombres = ?, apellidos = ?, dni = ?, telefono = ?, email = ?, activo = ? WHERE id = ?";
+        String sql = "UPDATE usuarios SET username = ?, password_hash = ?, rol = ?, nombres = ?, apellidos = ?, dni = ?, telefono = ?, email = ?, activo = ? WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, usuario.getUsername());
             stmt.setString(2, usuario.getPasswordHash());
             stmt.setString(3, usuario.getRol().name());
-            stmt.setLong(4, usuario.getSucursalId());
-            stmt.setString(5, usuario.getNombres());
-            stmt.setString(6, usuario.getApellidos());
-            stmt.setString(7, usuario.getDni());
-            stmt.setString(8, usuario.getTelefono());
-            stmt.setString(9, usuario.getEmail());
-            stmt.setBoolean(10, usuario.isActivo());
-            stmt.setLong(11, usuario.getId());
+            stmt.setString(4, usuario.getNombres());
+            stmt.setString(5, usuario.getApellidos());
+            stmt.setString(6, usuario.getDni());
+            stmt.setString(7, usuario.getTelefono());
+            stmt.setString(8, usuario.getEmail());
+            stmt.setBoolean(9, usuario.isActivo());
+            stmt.setLong(10, usuario.getId());
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
@@ -281,9 +280,9 @@ public class UsuarioRepository {
      * Guarda un nuevo usuario
      */
     public Usuario save(Usuario usuario) {
-        String sql = "INSERT INTO usuarios (username, password_hash, rol, sucursal_id, nombres, apellidos, dni, telefono, email, activo) "
+        String sql = "INSERT INTO usuarios (username, password_hash, rol, nombres, apellidos, dni, telefono, email, activo) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -291,13 +290,12 @@ public class UsuarioRepository {
             stmt.setString(1, usuario.getUsername());
             stmt.setString(2, usuario.getPasswordHash());
             stmt.setString(3, usuario.getRol().name());
-            stmt.setLong(4, usuario.getSucursalId());
-            stmt.setString(5, usuario.getNombres());
-            stmt.setString(6, usuario.getApellidos());
-            stmt.setString(7, usuario.getDni());
-            stmt.setString(8, usuario.getTelefono());
-            stmt.setString(9, usuario.getEmail());
-            stmt.setBoolean(10, usuario.isActivo());
+            stmt.setString(4, usuario.getNombres());
+            stmt.setString(5, usuario.getApellidos());
+            stmt.setString(6, usuario.getDni());
+            stmt.setString(7, usuario.getTelefono());
+            stmt.setString(8, usuario.getEmail());
+            stmt.setBoolean(9, usuario.isActivo());
 
             int affectedRows = stmt.executeUpdate();
 
@@ -398,7 +396,7 @@ public class UsuarioRepository {
         usuario.setUsername(rs.getString("username"));
         usuario.setPasswordHash(rs.getString("password_hash"));
         usuario.setRol(Usuario.Rol.valueOf(rs.getString("rol")));
-        usuario.setSucursalId(rs.getLong("sucursal_id"));
+        // Eliminado sucursalId
         usuario.setNombres(rs.getString("nombres"));
         usuario.setApellidos(rs.getString("apellidos"));
         usuario.setDni(rs.getString("dni"));
