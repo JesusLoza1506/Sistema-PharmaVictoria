@@ -37,7 +37,7 @@
                         <TableColumn fx:id="colTelefono" prefWidth="110.0" text="Teléfono" />
                         <TableColumn fx:id="colCondicionesPago" prefWidth="140.0" text="Condiciones Pago" />
                         <TableColumn fx:id="colEstado" prefWidth="90.0" text="Estado" />
-                        <TableColumn fx:id="colSucursalId" prefWidth="140.0" text="Sucursal" />
+                                <!-- Columna sucursal eliminada -->
                         <TableColumn fx:id="colTipoProducto" prefWidth="120.0" text="Tipo Producto" />
                     </columns>
                 </TableView>

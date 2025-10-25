@@ -99,9 +99,10 @@
                         <TableColumn fx:id="colContacto" prefWidth="140.0" text="Contacto" />
                         <TableColumn fx:id="colTelefono" prefWidth="110.0" text="Teléfono" />
                         <TableColumn fx:id="colEstado" prefWidth="90.0" text="Estado" />
-                        <TableColumn fx:id="colSucursalId" prefWidth="140.0" text="Sucursal" />
                         <!-- Acciones siempre al final -->
                         <TableColumn fx:id="colAcciones" prefWidth="200.0" text="Acciones" />
+                           <!-- Eliminado: columna sucursalId -->
+                           <!-- <TableColumn fx:id="colSucursalId" prefWidth="120.0" text="Sucursal" /> -->
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

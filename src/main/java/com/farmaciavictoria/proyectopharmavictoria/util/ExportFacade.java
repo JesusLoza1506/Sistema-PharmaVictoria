@@ -17,8 +17,7 @@ public class ExportFacade {
             List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario> usuarios, String nombreArchivo) {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Usuarios");
-            String[] headers = { "Usuario", "Nombres", "Apellidos", "DNI", "Teléfono", "Email", "Rol", "Sucursal",
-                    "Estado" };
+            String[] headers = { "Usuario", "Nombres", "Apellidos", "DNI", "Teléfono", "Email", "Rol", "Estado" };
             short verdeA = IndexedColors.BRIGHT_GREEN.getIndex();
             int logoRow = 0;
             try {
@@ -97,19 +96,7 @@ public class ExportFacade {
                 row.createCell(4).setCellValue(u.getTelefono() != null ? u.getTelefono() : "");
                 row.createCell(5).setCellValue(u.getEmail() != null ? u.getEmail() : "");
                 row.createCell(6).setCellValue(u.getRol() != null ? u.getRol().getDescripcion() : "");
-                String sucursalNombre = "";
-                if (u.getSucursalId() != null) {
-                    try {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                                .getInstance().getRepository(
-                                        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-                        sucursalNombre = sucursalRepo.findNombreById(u.getSucursalId().intValue());
-                    } catch (Exception ex) {
-                        sucursalNombre = "";
-                    }
-                }
-                row.createCell(7).setCellValue(sucursalNombre);
-                row.createCell(8).setCellValue(u.isActivo() ? "Activo" : "Inactivo");
+                row.createCell(7).setCellValue(u.isActivo() ? "Activo" : "Inactivo");
                 for (int j = 0; j < headers.length; j++) {
                     row.getCell(j).setCellStyle(cellStyle);
                 }
@@ -169,8 +156,7 @@ public class ExportFacade {
             document.add(title);
             document.add(new com.itextpdf.text.Paragraph(" "));
 
-            String[] headers = { "Usuario", "Nombres", "Apellidos", "DNI", "Teléfono", "Email", "Rol", "Sucursal",
-                    "Estado" };
+            String[] headers = { "Usuario", "Nombres", "Apellidos", "DNI", "Teléfono", "Email", "Rol", "Estado" };
             com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(headers.length);
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
@@ -206,18 +192,6 @@ public class ExportFacade {
                 table.addCell(new com.itextpdf.text.Phrase(u.getEmail() != null ? u.getEmail() : "", cellFont));
                 table.addCell(
                         new com.itextpdf.text.Phrase(u.getRol() != null ? u.getRol().getDescripcion() : "", cellFont));
-                String sucursalNombre = "";
-                if (u.getSucursalId() != null) {
-                    try {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                                .getInstance().getRepository(
-                                        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-                        sucursalNombre = sucursalRepo.findNombreById(u.getSucursalId().intValue());
-                    } catch (Exception ex) {
-                        sucursalNombre = "";
-                    }
-                }
-                table.addCell(new com.itextpdf.text.Phrase(sucursalNombre, cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(u.isActivo() ? "Activo" : "Inactivo", cellFont));
             }
             document.add(table);
@@ -454,8 +428,7 @@ public class ExportFacade {
             String nombreArchivo) {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Proveedores");
-            String[] headers = { "Razón Social", "RUC", "Contacto", "Teléfono", "Condiciones Pago", "Estado",
-                    "Sucursal" };
+            String[] headers = { "Razón Social", "RUC", "Contacto", "Teléfono", "Condiciones Pago", "Estado" };
             short verdeA = IndexedColors.BRIGHT_GREEN.getIndex();
             // Logo
             int logoRow = 0;
@@ -540,11 +513,6 @@ public class ExportFacade {
                     com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor::getRazonSocial,
                     java.text.Collator.getInstance()));
 
-            // Obtener nombres de sucursal
-            com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                    .getInstance()
-                    .getRepository(com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-
             for (int i = 0; i < proveedores.size(); i++) {
                 com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor p = proveedores.get(i);
                 Row row = sheet.createRow(logoRow + 3 + i);
@@ -554,11 +522,6 @@ public class ExportFacade {
                 row.createCell(3).setCellValue(p.getTelefono() != null ? p.getTelefono() : "");
                 row.createCell(4).setCellValue(p.getCondicionesPago() != null ? p.getCondicionesPago() : "");
                 row.createCell(5).setCellValue(p.getActivo() != null && p.getActivo() ? "Activo" : "Inactivo");
-                String sucursalNombre = "";
-                if (p.getSucursalId() != null) {
-                    sucursalNombre = sucursalRepo.findNombreById(p.getSucursalId());
-                }
-                row.createCell(6).setCellValue(sucursalNombre);
                 for (int j = 0; j < headers.length; j++) {
                     row.getCell(j).setCellStyle(cellStyle);
                 }
@@ -628,13 +591,12 @@ public class ExportFacade {
             document.add(new com.itextpdf.text.Paragraph(" "));
 
             // Tabla con cabecera estilizada
-            String[] headers = { "Razón Social", "RUC", "Contacto", "Teléfono", "Condiciones Pago", "Estado",
-                    "Sucursal" };
+            String[] headers = { "Razón Social", "RUC", "Contacto", "Teléfono", "Condiciones Pago", "Estado" };
             com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(headers.length);
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
-            float[] columnWidths = { 2.5f, 1.5f, 1.5f, 1.5f, 2f, 1.5f, 2f };
+            float[] columnWidths = { 2.5f, 1.5f, 1.5f, 1.5f, 2f, 1.5f };
             table.setWidths(columnWidths);
 
             com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA,
@@ -658,11 +620,6 @@ public class ExportFacade {
                     com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor::getRazonSocial,
                     java.text.Collator.getInstance()));
 
-            // Obtener nombres de sucursal
-            com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                    .getInstance()
-                    .getRepository(com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-
             for (com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor p : proveedores) {
                 table.addCell(
                         new com.itextpdf.text.Phrase(p.getRazonSocial() != null ? p.getRazonSocial() : "", cellFont));
@@ -673,11 +630,6 @@ public class ExportFacade {
                         cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(
                         p.getActivo() != null && p.getActivo() ? "Activo" : "Inactivo", cellFont));
-                String sucursalNombre = "";
-                if (p.getSucursalId() != null) {
-                    sucursalNombre = sucursalRepo.findNombreById(p.getSucursalId());
-                }
-                table.addCell(new com.itextpdf.text.Phrase(sucursalNombre, cellFont));
             }
             document.add(table);
             // Pie de página

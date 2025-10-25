@@ -6,17 +6,19 @@ import javafx.stage.Stage;
 
 public class UsuarioFormController {
     public void cargarUsuario(com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario) {
-        if (usuario == null) return;
+        if (usuario == null)
+            return;
         txtUsername.setText(usuario.getUsername());
         txtPassword.setText(""); // Por seguridad, no mostrar hash
         cmbRol.setValue(usuario.getRol() != null ? usuario.getRol().name() : null);
-        cmbSucursal.setValue(usuario.getSucursalId() != null ? usuario.getSucursalId() + "" : null);
+        // ...existing code...
         txtNombres.setText(usuario.getNombres());
         txtApellidos.setText(usuario.getApellidos());
         txtDni.setText(usuario.getDni());
         txtTelefono.setText(usuario.getTelefono());
         txtEmail.setText(usuario.getEmail());
     }
+
     @FXML
     public void guardarUsuario() {
         // Aquí puedes agregar la lógica de validación y registro
@@ -29,7 +31,7 @@ public class UsuarioFormController {
         txtUsername.clear();
         txtPassword.clear();
         cmbRol.getSelectionModel().clearSelection();
-        cmbSucursal.getSelectionModel().clearSelection();
+        // ...existing code...
         txtNombres.clear();
         txtApellidos.clear();
         txtDni.clear();
@@ -42,6 +44,7 @@ public class UsuarioFormController {
         registrado = false;
         cerrar();
     }
+
     public String getUsername() {
         return txtUsername.getText();
     }
@@ -54,9 +57,7 @@ public class UsuarioFormController {
         return cmbRol.getValue();
     }
 
-    public String getSucursal() {
-        return cmbSucursal.getValue();
-    }
+    // ...existing code...
 
     public String getNombres() {
         return txtNombres.getText();
@@ -77,29 +78,35 @@ public class UsuarioFormController {
     public String getEmail() {
         return txtEmail.getText();
     }
-    @FXML private TextField txtUsername;
-    @FXML private PasswordField txtPassword;
-    @FXML private ComboBox<String> cmbRol;
-    @FXML private ComboBox<String> cmbSucursal;
-    @FXML private TextField txtNombres;
-    @FXML private TextField txtApellidos;
-    @FXML private TextField txtDni;
-    @FXML private TextField txtTelefono;
-    @FXML private TextField txtEmail;
-    @FXML public Button btnGuardar;
-    @FXML public Button btnCancelar;
+
+    @FXML
+    private TextField txtUsername;
+    @FXML
+    private PasswordField txtPassword;
+    @FXML
+    private ComboBox<String> cmbRol;
+    // ...existing code...
+    @FXML
+    private TextField txtNombres;
+    @FXML
+    private TextField txtApellidos;
+    @FXML
+    private TextField txtDni;
+    @FXML
+    private TextField txtTelefono;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    public Button btnGuardar;
+    @FXML
+    public Button btnCancelar;
 
     private boolean registrado = false;
 
     @FXML
     public void initialize() {
         cmbRol.getItems().addAll("ADMIN", "VENDEDOR");
-        // Poblar sucursales reales desde la base de datos
-        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer.getInstance().getRepository(com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class);
-        java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Sucursal> sucursales = sucursalRepo.findAllActivas();
-        for (com.farmaciavictoria.proyectopharmavictoria.model.Sucursal suc : sucursales) {
-            cmbSucursal.getItems().add(suc.getId() + " - " + suc.getNombre());
-        }
+        // ...existing code...
         btnCancelar.setOnAction(e -> cerrar());
     }
 

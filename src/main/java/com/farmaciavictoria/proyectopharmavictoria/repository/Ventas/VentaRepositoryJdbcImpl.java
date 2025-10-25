@@ -42,7 +42,7 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
     @Override
     public void save(Venta venta) {
         // Guardar venta sin id manual, obtener id generado
-        String sql = "INSERT INTO ventas (cliente_id, usuario_id, sucursal_id, subtotal, descuento_monto, igv_monto, total, tipo_pago, tipo_comprobante, numero_boleta, serie, fecha_venta, estado, observaciones, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ventas (cliente_id, usuario_id, subtotal, descuento_monto, igv_monto, total, tipo_pago, tipo_comprobante, numero_boleta, serie, fecha_venta, estado, observaciones, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
                 PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             // cliente_id
@@ -57,25 +57,19 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
             } else {
                 stmt.setNull(2, java.sql.Types.INTEGER);
             }
-            // sucursal_id
-            if (venta.getSucursal() != null && venta.getSucursal().getId() != null) {
-                stmt.setInt(3, venta.getSucursal().getId());
-            } else {
-                stmt.setNull(3, java.sql.Types.INTEGER);
-            }
-            stmt.setBigDecimal(4, venta.getSubtotal());
-            stmt.setBigDecimal(5, venta.getDescuentoMonto());
-            stmt.setBigDecimal(6, venta.getIgvMonto());
-            stmt.setBigDecimal(7, venta.getTotal());
-            stmt.setString(8, venta.getTipoPago());
-            stmt.setString(9, venta.getTipoComprobante());
-            stmt.setString(10, venta.getNumeroBoleta());
-            stmt.setString(11, venta.getSerie());
-            stmt.setObject(12, venta.getFechaVenta());
-            stmt.setString(13, venta.getEstado());
-            stmt.setString(14, venta.getObservaciones());
-            stmt.setObject(15, venta.getCreatedAt());
-            stmt.setObject(16, venta.getUpdatedAt());
+            stmt.setBigDecimal(3, venta.getSubtotal());
+            stmt.setBigDecimal(4, venta.getDescuentoMonto());
+            stmt.setBigDecimal(5, venta.getIgvMonto());
+            stmt.setBigDecimal(6, venta.getTotal());
+            stmt.setString(7, venta.getTipoPago());
+            stmt.setString(8, venta.getTipoComprobante());
+            stmt.setString(9, venta.getNumeroBoleta());
+            stmt.setString(10, venta.getSerie());
+            stmt.setObject(11, venta.getFechaVenta());
+            stmt.setString(12, venta.getEstado());
+            stmt.setString(13, venta.getObservaciones());
+            stmt.setObject(14, venta.getCreatedAt());
+            stmt.setObject(15, venta.getUpdatedAt());
             stmt.executeUpdate();
 
             // Obtener el id generado
@@ -127,7 +121,7 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
 
     @Override
     public void update(Venta venta) {
-        String sql = "UPDATE ventas SET cliente_id=?, usuario_id=?, sucursal_id=?, subtotal=?, descuento_monto=?, igv_monto=?, total=?, tipo_pago=?, tipo_comprobante=?, numero_boleta=?, serie=?, fecha_venta=?, estado=?, observaciones=?, created_at=?, updated_at=? WHERE id=?";
+        String sql = "UPDATE ventas SET cliente_id=?, usuario_id=?, subtotal=?, descuento_monto=?, igv_monto=?, total=?, tipo_pago=?, tipo_comprobante=?, numero_boleta=?, serie=?, fecha_venta=?, estado=?, observaciones=?, created_at=?, updated_at=? WHERE id=?";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
                 PreparedStatement stmt = connection.prepareStatement(sql)) {
             // cliente_id
@@ -142,26 +136,20 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
             } else {
                 stmt.setNull(2, java.sql.Types.INTEGER);
             }
-            // sucursal_id
-            if (venta.getSucursal() != null && venta.getSucursal().getId() != null) {
-                stmt.setInt(3, venta.getSucursal().getId());
-            } else {
-                stmt.setNull(3, java.sql.Types.INTEGER);
-            }
-            stmt.setBigDecimal(4, venta.getSubtotal());
-            stmt.setBigDecimal(5, venta.getDescuentoMonto());
-            stmt.setBigDecimal(6, venta.getIgvMonto());
-            stmt.setBigDecimal(7, venta.getTotal());
-            stmt.setString(8, venta.getTipoPago());
-            stmt.setString(9, venta.getTipoComprobante());
-            stmt.setString(10, venta.getNumeroBoleta());
-            stmt.setString(11, venta.getSerie());
-            stmt.setObject(12, venta.getFechaVenta());
-            stmt.setString(13, venta.getEstado());
-            stmt.setString(14, venta.getObservaciones());
-            stmt.setObject(15, venta.getCreatedAt());
-            stmt.setObject(16, venta.getUpdatedAt());
-            stmt.setInt(17, venta.getId());
+            stmt.setBigDecimal(3, venta.getSubtotal());
+            stmt.setBigDecimal(4, venta.getDescuentoMonto());
+            stmt.setBigDecimal(5, venta.getIgvMonto());
+            stmt.setBigDecimal(6, venta.getTotal());
+            stmt.setString(7, venta.getTipoPago());
+            stmt.setString(8, venta.getTipoComprobante());
+            stmt.setString(9, venta.getNumeroBoleta());
+            stmt.setString(10, venta.getSerie());
+            stmt.setObject(11, venta.getFechaVenta());
+            stmt.setString(12, venta.getEstado());
+            stmt.setString(13, venta.getObservaciones());
+            stmt.setObject(14, venta.getCreatedAt());
+            stmt.setObject(15, venta.getUpdatedAt());
+            stmt.setInt(16, venta.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("[VENTA ERROR] Error al actualizar venta: " + e.getMessage());

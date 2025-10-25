@@ -11,17 +11,26 @@ import javafx.stage.Stage;
 import java.util.List;
 
 public class ExportarProveedoresController {
-    @FXML private TableView<Proveedor> tablePreview;
-    @FXML private TableColumn<Proveedor, String> colRazonSocial;
-    @FXML private TableColumn<Proveedor, String> colRuc;
-    @FXML private TableColumn<Proveedor, String> colContacto;
-    @FXML private TableColumn<Proveedor, String> colTelefono;
-    @FXML private TableColumn<Proveedor, String> colCondicionesPago;
-    @FXML private TableColumn<Proveedor, String> colTipoProducto;
-    @FXML private TableColumn<Proveedor, String> colSucursalId;
-    @FXML private TableColumn<Proveedor, String> colEstado;
-    @FXML private Button btnExportarExcel;
-    @FXML private Button btnExportarPDF;
+    @FXML
+    private TableView<Proveedor> tablePreview;
+    @FXML
+    private TableColumn<Proveedor, String> colRazonSocial;
+    @FXML
+    private TableColumn<Proveedor, String> colRuc;
+    @FXML
+    private TableColumn<Proveedor, String> colContacto;
+    @FXML
+    private TableColumn<Proveedor, String> colTelefono;
+    @FXML
+    private TableColumn<Proveedor, String> colCondicionesPago;
+    @FXML
+    private TableColumn<Proveedor, String> colTipoProducto;
+    @FXML
+    private TableColumn<Proveedor, String> colEstado;
+    @FXML
+    private Button btnExportarExcel;
+    @FXML
+    private Button btnExportarPDF;
 
     private ObservableList<Proveedor> proveedoresFiltrados = FXCollections.observableArrayList();
 
@@ -32,8 +41,8 @@ public class ExportarProveedoresController {
         colTelefono.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("telefono"));
         colCondicionesPago.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("condicionesPago"));
         colTipoProducto.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("tipoProducto"));
-        colSucursalId.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("sucursalNombre"));
-        colEstado.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getActivo() != null && cellData.getValue().getActivo() ? "Activo" : "Inactivo"));
+        colEstado.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().getActivo() != null && cellData.getValue().getActivo() ? "Activo" : "Inactivo"));
         tablePreview.setItems(proveedoresFiltrados);
         tablePreview.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         btnExportarExcel.setOnAction(e -> exportar("excel"));
@@ -62,16 +71,20 @@ public class ExportarProveedoresController {
             boolean exito = false;
             try {
                 if (tipo.equals("excel")) {
-                    ExportFacade.exportarProveedoresExcel(proveedoresFiltrados, file.getAbsolutePath().replace(".xlsx", ""));
+                    ExportFacade.exportarProveedoresExcel(proveedoresFiltrados,
+                            file.getAbsolutePath().replace(".xlsx", ""));
                 } else {
-                    ExportFacade.exportarProveedoresPDF(proveedoresFiltrados, file.getAbsolutePath().replace(".pdf", ""));
+                    ExportFacade.exportarProveedoresPDF(proveedoresFiltrados,
+                            file.getAbsolutePath().replace(".pdf", ""));
                 }
                 exito = true;
             } catch (Exception e) {
                 exito = false;
             }
-            mostrarMensaje(exito ? "Archivo exportado correctamente en:\n" + file.getAbsolutePath() : "Error al exportar el archivo. Intente nuevamente.");
-            if (exito) cerrar();
+            mostrarMensaje(exito ? "Archivo exportado correctamente en:\n" + file.getAbsolutePath()
+                    : "Error al exportar el archivo. Intente nuevamente.");
+            if (exito)
+                cerrar();
         }
     }
 
@@ -84,6 +97,7 @@ public class ExportarProveedoresController {
     }
 
     private void cerrar() {
-Stage stage = (Stage) btnExportarExcel.getScene().getWindow();        stage.close();
+        Stage stage = (Stage) btnExportarExcel.getScene().getWindow();
+        stage.close();
     }
 }

@@ -20,11 +20,12 @@ public class Proveedor {
     private LocalDateTime createdAt;
 
     // Constructor vacío
-        public Proveedor() {}
+    public Proveedor() {
+    }
 
     // Constructor completo
-    public Proveedor(String razonSocial, String ruc, String contacto, String telefono, 
-                    String email, String direccion, String condicionesPago, String observaciones) {
+    public Proveedor(String razonSocial, String ruc, String contacto, String telefono,
+            String email, String direccion, String condicionesPago, String observaciones) {
         this();
         this.razonSocial = razonSocial;
         this.ruc = ruc;
@@ -35,23 +36,27 @@ public class Proveedor {
         this.condicionesPago = condicionesPago;
         this.observaciones = observaciones;
     }
-        // Mejoras sugeridas
-        private Integer sucursalId;      // FK a sucursales (puede ser null)
-        private String tipoProducto;     // Opcional, para filtrar por tipo de producto
+    // Mejoras sugeridas
 
-        public Integer getSucursalId() { return sucursalId; }
-        public void setSucursalId(Integer sucursalId) { this.sucursalId = sucursalId; }
+    private String tipoProducto; // Opcional, para filtrar por tipo de producto
 
-        public String getTipoProducto() { return tipoProducto; }
-        public void setTipoProducto(String tipoProducto) { this.tipoProducto = tipoProducto; }
+    public String getTipoProducto() {
+        return tipoProducto;
+    }
+
+    public void setTipoProducto(String tipoProducto) {
+        this.tipoProducto = tipoProducto;
+    }
 
     // Getters y Setters
     public String getTipo() {
         return tipo;
     }
+
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
+
     public Integer getId() {
         return id;
     }
@@ -127,7 +132,7 @@ public class Proveedor {
     public Boolean getActivo() {
         return activo;
     }
-    
+
     public boolean isActivo() {
         return activo != null ? activo : false;
     }
@@ -151,8 +156,10 @@ public class Proveedor {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
         Proveedor proveedor = (Proveedor) obj;
         return ruc != null ? ruc.equals(proveedor.ruc) : proveedor.ruc == null;
     }

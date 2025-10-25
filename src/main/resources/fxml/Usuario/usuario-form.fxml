@@ -48,12 +48,7 @@
                                                 <ComboBox fx:id="cmbRol" promptText="Seleccionar rol" styleClass="field-combo" />
                                             </children>
                                         </VBox>
-                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
-                                            <children>
-                                                <Label styleClass="field-label" text="Sucursal *" />
-                                                <ComboBox fx:id="cmbSucursal" promptText="Seleccionar sucursal" styleClass="field-combo" />
-                                            </children>
-                                        </VBox>
+                                        <!-- Eliminado campo sucursal -->
                                     </children>
                                 </HBox>
                                 <!-- Nombres y Apellidos -->
