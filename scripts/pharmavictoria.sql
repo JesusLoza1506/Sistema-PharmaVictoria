@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Oct 24, 2025 at 02:55 AM
+-- Generation Time: Oct 25, 2025 at 05:05 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.26
 
@@ -11,8 +11,7 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
---MIRA ESTO GAAA
---AHORA MIRA ESTO !!!
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -228,7 +227,6 @@ CREATE TABLE `proveedores` (
   `activo` tinyint(1) DEFAULT '1',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `observaciones` text COLLATE utf8mb4_unicode_ci,
-  `sucursal_id` int DEFAULT NULL,
   `tipo_producto` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Proveedores de medicamentos y productos';
 
@@ -251,21 +249,6 @@ CREATE TABLE `proveedor_historial_cambio` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `sucursales`
---
-
-CREATE TABLE `sucursales` (
-  `id` int NOT NULL,
-  `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `direccion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `activa` tinyint(1) DEFAULT '1',
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tabla de sucursales de la farmacia';
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `usuarios`
 --
 
@@ -274,7 +257,6 @@ CREATE TABLE `usuarios` (
   `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `rol` enum('ADMIN','VENDEDOR') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sucursal_id` int NOT NULL,
   `nombres` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apellidos` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `dni` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -329,7 +311,6 @@ CREATE TABLE `ventas` (
   `id` int NOT NULL,
   `cliente_id` int DEFAULT NULL,
   `usuario_id` int NOT NULL,
-  `sucursal_id` int NOT NULL,
   `subtotal` decimal(10,2) NOT NULL,
   `descuento_monto` decimal(10,2) DEFAULT '0.00',
   `igv_monto` decimal(10,2) DEFAULT '0.00',
@@ -427,7 +408,6 @@ CREATE TABLE `vw_resumen_ventas` (
 ,`numero_boleta` varchar(20)
 ,`serie` varchar(10)
 ,`subtotal` decimal(10,2)
-,`sucursal` varchar(100)
 ,`tipo_pago` enum('EFECTIVO','TARJETA','TRANSFERENCIA','MIXTO')
 ,`total` decimal(10,2)
 ,`vendedor` varchar(201)
@@ -539,8 +519,7 @@ ALTER TABLE `proveedores`
   ADD UNIQUE KEY `ruc_3` (`ruc`),
   ADD KEY `idx_ruc` (`ruc`),
   ADD KEY `idx_razon_social` (`razon_social`),
-  ADD KEY `idx_activo` (`activo`),
-  ADD KEY `fk_proveedor_sucursal` (`sucursal_id`);
+  ADD KEY `idx_activo` (`activo`);
 
 --
 -- Indexes for table `proveedor_historial_cambio`
@@ -548,14 +527,6 @@ ALTER TABLE `proveedores`
 ALTER TABLE `proveedor_historial_cambio`
   ADD PRIMARY KEY (`id`),
   ADD KEY `proveedor_id` (`proveedor_id`);
-
---
--- Indexes for table `sucursales`
---
-ALTER TABLE `sucursales`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_nombre` (`nombre`),
-  ADD KEY `idx_activa` (`activa`);
 
 --
 -- Indexes for table `usuarios`
@@ -566,7 +537,6 @@ ALTER TABLE `usuarios`
   ADD UNIQUE KEY `dni` (`dni`),
   ADD KEY `idx_username` (`username`),
   ADD KEY `idx_rol` (`rol`),
-  ADD KEY `idx_sucursal` (`sucursal_id`),
   ADD KEY `idx_activo` (`activo`),
   ADD KEY `idx_dni` (`dni`);
 
@@ -588,8 +558,7 @@ ALTER TABLE `usuario_historial_cambio`
 ALTER TABLE `ventas`
   ADD PRIMARY KEY (`id`),
   ADD KEY `cliente_id` (`cliente_id`),
-  ADD KEY `usuario_id` (`usuario_id`),
-  ADD KEY `sucursal_id` (`sucursal_id`);
+  ADD KEY `usuario_id` (`usuario_id`);
 
 --
 -- Indexes for table `venta_alertas`
@@ -684,12 +653,6 @@ ALTER TABLE `proveedor_historial_cambio`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `sucursales`
---
-ALTER TABLE `sucursales`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -750,7 +713,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_resumen_ventas`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_resumen_ventas`  AS SELECT `v`.`id` AS `id`, `v`.`numero_boleta` AS `numero_boleta`, `v`.`serie` AS `serie`, `v`.`fecha_venta` AS `fecha_venta`, concat(ifnull(`c`.`nombres`,'SIN'),' ',ifnull(`c`.`apellidos`,'CLIENTE')) AS `cliente`, concat(`u`.`nombres`,' ',`u`.`apellidos`) AS `vendedor`, `s`.`nombre` AS `sucursal`, `v`.`subtotal` AS `subtotal`, `v`.`descuento_monto` AS `descuento_monto`, `v`.`total` AS `total`, `v`.`tipo_pago` AS `tipo_pago`, `v`.`estado` AS `estado` FROM (((`ventas` `v` left join `clientes` `c` on((`v`.`cliente_id` = `c`.`id`))) join `usuarios` `u` on((`v`.`usuario_id` = `u`.`id`))) join `sucursales` `s` on((`v`.`sucursal_id` = `s`.`id`))) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_resumen_ventas`  AS SELECT `v`.`id` AS `id`, `v`.`numero_boleta` AS `numero_boleta`, `v`.`serie` AS `serie`, `v`.`fecha_venta` AS `fecha_venta`, concat(ifnull(`c`.`nombres`,'SIN'),' ',ifnull(`c`.`apellidos`,'CLIENTE')) AS `cliente`, concat(`u`.`nombres`,' ',`u`.`apellidos`) AS `vendedor`, `v`.`subtotal` AS `subtotal`, `v`.`descuento_monto` AS `descuento_monto`, `v`.`total` AS `total`, `v`.`tipo_pago` AS `tipo_pago`, `v`.`estado` AS `estado` FROM ((`ventas` `v` left join `clientes` `c` on((`v`.`cliente_id` = `c`.`id`))) join `usuarios` `u` on((`v`.`usuario_id` = `u`.`id`))) ;
 
 --
 -- Constraints for dumped tables
@@ -806,30 +769,17 @@ ALTER TABLE `producto_historial_cambio`
   ADD CONSTRAINT `producto_historial_cambio_ibfk_1` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`);
 
 --
--- Constraints for table `proveedores`
---
-ALTER TABLE `proveedores`
-  ADD CONSTRAINT `fk_proveedor_sucursal` FOREIGN KEY (`sucursal_id`) REFERENCES `sucursales` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
---
 -- Constraints for table `proveedor_historial_cambio`
 --
 ALTER TABLE `proveedor_historial_cambio`
   ADD CONSTRAINT `proveedor_historial_cambio_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`sucursal_id`) REFERENCES `sucursales` (`id`) ON UPDATE CASCADE;
-
---
 -- Constraints for table `ventas`
 --
 ALTER TABLE `ventas`
   ADD CONSTRAINT `ventas_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`),
-  ADD CONSTRAINT `ventas_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`),
-  ADD CONSTRAINT `ventas_ibfk_3` FOREIGN KEY (`sucursal_id`) REFERENCES `sucursales` (`id`);
+  ADD CONSTRAINT `ventas_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 
 --
 -- Constraints for table `venta_alertas`
