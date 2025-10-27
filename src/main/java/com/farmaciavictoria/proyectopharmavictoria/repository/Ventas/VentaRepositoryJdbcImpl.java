@@ -40,7 +40,7 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
     }
 
     @Override
-    public void save(Venta venta) {
+    public Venta save(Venta venta) {
         // Guardar venta sin id manual, obtener id generado
         String sql = "INSERT INTO ventas (cliente_id, usuario_id, subtotal, descuento_monto, igv_monto, total, tipo_pago, tipo_comprobante, numero_boleta, serie, fecha_venta, estado, observaciones, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
@@ -78,11 +78,14 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
                     venta.setId(generatedKeys.getInt(1));
                 }
             }
+            return venta;
         } catch (SQLException e) {
             System.err.println("[VENTA ERROR] Error al guardar venta: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error al guardar venta", e);
         }
+        // Si ocurre error, nunca llega aquí, pero por seguridad:
+        // return venta;
     }
 
     @Override

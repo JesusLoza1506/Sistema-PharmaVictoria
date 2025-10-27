@@ -31,6 +31,30 @@ public class ComprobanteRepositoryJdbcImpl implements ComprobanteRepository {
         return ultimoNumero;
     }
 
+    /**
+     * Obtiene el último número de comprobante para una serie dada (FACTURA o
+     * BOLETA).
+     * Devuelve 0 si no hay comprobantes previos.
+     */
+    public int obtenerUltimoNumeroPorSerieYTipo(String serie, String tipo) {
+        int ultimoNumero = 0;
+        String sql = "SELECT MAX(CAST(numero AS UNSIGNED)) FROM comprobantes WHERE serie=? AND tipo=?";
+        try (Connection conn = DatabaseConfig.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, serie);
+            stmt.setString(2, tipo);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    ultimoNumero = rs.getInt(1);
+                }
+            }
+        } catch (Exception ex) {
+            System.err.println("Error obteniendo último número por serie y tipo: " + ex.getMessage());
+            ultimoNumero = 0;
+        }
+        return ultimoNumero;
+    }
+
     public ComprobanteRepositoryJdbcImpl() {
         // Sin argumentos, usa DatabaseConfig Singleton
     }

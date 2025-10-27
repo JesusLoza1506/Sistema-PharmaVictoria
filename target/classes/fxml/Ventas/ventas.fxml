@@ -87,6 +87,16 @@
                 <Label text="Cliente existente:" styleClass="cliente-label" />
                 <ComboBox fx:id="comboClientes" promptText="Seleccionar cliente" styleClass="combo-box" />
             </HBox>
+            <!-- Panel dinámico para datos de cliente -->
+            <HBox fx:id="panelDatosCliente" spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
+                <Label text="Tipo:" styleClass="cliente-label" />
+                <TextField fx:id="txtTipoCliente" promptText="Tipo de cliente" editable="false" styleClass="cliente-field" />
+                <Label text="Documento:" styleClass="cliente-label" />
+                <TextField fx:id="txtDocumento" promptText="DNI o RUC" editable="false" styleClass="cliente-field" />
+                <Label text="Nombre/Razón Social:" styleClass="cliente-label" />
+                <TextField fx:id="txtNombreRazon" promptText="Nombre completo o razón social" editable="false" styleClass="cliente-field" />
+            </HBox>
+            </HBox>
             <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
                 <Label text="Método de pago:" styleClass="pago-label" />
                 <ComboBox fx:id="comboPago" promptText="Seleccionar método de pago" styleClass="combo-box" />

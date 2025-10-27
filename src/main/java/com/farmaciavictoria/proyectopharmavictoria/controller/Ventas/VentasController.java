@@ -1,10 +1,12 @@
 package com.farmaciavictoria.proyectopharmavictoria.controller.Ventas;
 
+import com.farmaciavictoria.proyectopharmavictoria.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.layout.HBox;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta;
@@ -18,6 +20,14 @@ import java.net.URL;
 import java.util.*;
 
 public class VentasController implements Initializable {
+    @FXML
+    private TextField txtTipoCliente;
+    @FXML
+    private TextField txtDocumento;
+    @FXML
+    private TextField txtNombreRazon;
+    @FXML
+    private HBox panelDatosCliente;
     @FXML
     private TextField txtBuscarProducto;
     @FXML
@@ -141,8 +151,7 @@ public class VentasController implements Initializable {
                 btn.setPrefWidth(35);
                 btn.setPrefHeight(35);
                 btn.setOnAction(e -> {
-                    DetalleVenta detalle = getTableView().getItems().get(getIndex());
-                    tablaCarrito.getSelectionModel().select(detalle);
+                    tablaCarrito.getSelectionModel().select(getTableView().getItems().get(getIndex()));
                     editarCantidadProducto();
                     tablaCarrito.refresh();
                 });
@@ -154,6 +163,29 @@ public class VentasController implements Initializable {
                 setGraphic(empty ? null : btn);
             }
         });
+        // Listener para actualizar el panel dinámico de datos de cliente
+        comboClientes.getSelectionModel().selectedItemProperty().addListener((obs, oldCliente, newCliente) -> {
+            if (newCliente != null) {
+                String tipo = newCliente.getTipoCliente();
+                String doc = newCliente.getDocumento();
+                String nombre = ("EMPRESARIAL".equals(tipo)) ? newCliente.getRazonSocial()
+                        : newCliente.getNombreCompleto();
+                txtTipoCliente.setText(tipo != null ? tipo : "");
+                txtDocumento.setText(doc != null ? doc : "");
+                txtNombreRazon.setText(nombre != null ? nombre : "");
+                panelDatosCliente.setVisible(true);
+                panelDatosCliente.setManaged(true);
+            } else {
+                txtTipoCliente.clear();
+                txtDocumento.clear();
+                txtNombreRazon.clear();
+                panelDatosCliente.setVisible(false);
+                panelDatosCliente.setManaged(false);
+            }
+        });
+        // Inicialmente ocultar el panel de datos de cliente
+        panelDatosCliente.setVisible(false);
+        panelDatosCliente.setManaged(false);
         colEliminar.setCellFactory(tc -> new TableCell<DetalleVenta, Void>() {
             private final Button btn = new Button();
             {
@@ -181,15 +213,6 @@ public class VentasController implements Initializable {
                 setGraphic(empty ? null : btn);
             }
         });
-        // Mostrar todos los productos al hacer click en el buscador
-        txtBuscarProducto.setOnMouseClicked(e -> {
-            ObservableList<Producto> todos = FXCollections.observableArrayList(productos);
-            listSugerencias.setItems(todos);
-            listSugerencias.setVisible(!todos.isEmpty());
-            listSugerencias.setManaged(!todos.isEmpty());
-            btnAgregarProducto.setDisable(true);
-        });
-
         // Buscar productos al escribir
         txtBuscarProducto.textProperty().addListener((obs, oldText, newText) -> {
             if (newText == null || newText.isEmpty()) {
@@ -205,11 +228,15 @@ public class VentasController implements Initializable {
             listSugerencias.setItems(filtrados);
             listSugerencias.setVisible(!filtrados.isEmpty());
             listSugerencias.setManaged(!filtrados.isEmpty());
+            listSugerencias.setDisable(filtrados.isEmpty());
             // Habilitar el botón solo si el texto coincide exactamente con algún producto
             String texto = newText.trim().toLowerCase();
             boolean existe = productos.stream().anyMatch(
                     p -> p.getNombre().toLowerCase().equals(texto) || p.getCodigo().toLowerCase().equals(texto));
             btnAgregarProducto.setDisable(!existe);
+            if (filtrados.isEmpty()) {
+                listSugerencias.getSelectionModel().clearSelection();
+            }
         });
 
         // Resaltar ListView cuando está visible
@@ -272,15 +299,45 @@ public class VentasController implements Initializable {
         });
         // Seleccionar producto desde sugerencias
         listSugerencias.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
-            if (newSel != null) {
+            int idx = listSugerencias.getSelectionModel().getSelectedIndex();
+            ObservableList<Producto> items = listSugerencias.getItems();
+            if (items == null || items.isEmpty()) {
+                listSugerencias.getSelectionModel().clearSelection();
+                btnAgregarProducto.setDisable(true);
+                // Solo log en terminal, nunca en pantalla
+                System.err.println("[DEBUG ListView] Intento de selección con lista vacía. Selección cancelada.");
+                return;
+            }
+            if (newSel != null && idx >= 0 && idx < items.size()) {
                 txtBuscarProducto.setText(newSel.getNombre());
                 limpiarSugerencias();
                 btnAgregarProducto.setDisable(false);
             } else {
                 btnAgregarProducto.setDisable(true);
+                if (idx < 0 || idx >= items.size()) {
+                    // Solo log en terminal, nunca en pantalla
+                    System.err.println(
+                            "[DEBUG ListView] Índice de selección fuera de rango: " + idx + " Tamaño: " + items.size());
+                }
             }
         });
-        btnAgregarProducto.setDisable(true);
+        // Mostrar todos los productos al hacer click en el buscador
+        txtBuscarProducto.setOnMouseClicked(e -> {
+            ObservableList<Producto> todos = FXCollections.observableArrayList(productos);
+            if (todos.isEmpty()) {
+                listSugerencias.setItems(FXCollections.observableArrayList());
+                listSugerencias.setVisible(false);
+                listSugerencias.setManaged(false);
+                listSugerencias.getSelectionModel().clearSelection();
+                btnAgregarProducto.setDisable(true);
+                System.err.println("[DEBUG ListView] Click en buscador con lista vacía. No se permite selección.");
+                return;
+            }
+            listSugerencias.setItems(todos);
+            listSugerencias.setVisible(true);
+            listSugerencias.setManaged(true);
+        });
+
         // Mejorar visualización de tabla de carrito
         tablaCarrito.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tablaCarrito.setStyle("-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 8px;");
@@ -303,7 +360,8 @@ public class VentasController implements Initializable {
         btnAgregarProducto.setOnAction(e -> agregarProductoDesdeBuscador());
         actualizarTotales();
 
-        // Personalizar visualización de clientes en ComboBox: DNI - Nombres y Apellidos
+        // Personalizar visualización de clientes en ComboBox: tipo, documento y
+        // nombre/razón social
         comboClientes.setCellFactory(lv -> new ListCell<Cliente>() {
             @Override
             protected void updateItem(Cliente item, boolean empty) {
@@ -311,7 +369,10 @@ public class VentasController implements Initializable {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    setText(item.getDni() + " - " + item.getNombreCompleto());
+                    String tipo = item.getTipoCliente();
+                    String doc = item.getDocumento();
+                    String nombre = ("EMPRESARIAL".equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();
+                    setText((tipo != null ? tipo : "") + " | " + doc + " | " + nombre);
                 }
             }
         });
@@ -322,7 +383,10 @@ public class VentasController implements Initializable {
                 if (empty || item == null) {
                     setText("Seleccionar cliente");
                 } else {
-                    setText(item.getDni() + " - " + item.getNombreCompleto());
+                    String tipo = item.getTipoCliente();
+                    String doc = item.getDocumento();
+                    String nombre = ("EMPRESARIAL".equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();
+                    setText((tipo != null ? tipo : "") + " | " + doc + " | " + nombre);
                 }
             }
         });
@@ -335,6 +399,7 @@ public class VentasController implements Initializable {
         listSugerencias.setItems(FXCollections.observableArrayList());
         listSugerencias.setVisible(false);
         listSugerencias.setManaged(false);
+        btnAgregarProducto.setDisable(true);
     }
 
     private void cargarProductos() {
@@ -343,13 +408,17 @@ public class VentasController implements Initializable {
         listSugerencias.setItems(FXCollections.observableArrayList());
         listSugerencias.setVisible(false);
         listSugerencias.setManaged(false);
+        listSugerencias.getSelectionModel().clearSelection();
+        btnAgregarProducto.setDisable(true);
     }
 
     private void agregarProductoDesdeBuscador() {
         // Usar variable final para producto seleccionado
         final Producto seleccionado;
-        // Si hay selección en el ListView, usarla
-        if (!listSugerencias.getItems().isEmpty() && listSugerencias.getSelectionModel().getSelectedIndex() >= 0) {
+        // Si hay selección en el ListView, usarla solo si la lista no está vacía y el
+        // índice es válido
+        if (!listSugerencias.getItems().isEmpty() && listSugerencias.getSelectionModel().getSelectedIndex() >= 0
+                && listSugerencias.getSelectionModel().getSelectedIndex() < listSugerencias.getItems().size()) {
             seleccionado = listSugerencias.getSelectionModel().getSelectedItem();
         } else if (txtBuscarProducto.getText() != null && !txtBuscarProducto.getText().isEmpty()) {
             String texto = txtBuscarProducto.getText().trim().toLowerCase();
@@ -454,7 +523,7 @@ public class VentasController implements Initializable {
         comboClientes.getItems().clear();
         java.util.List<Cliente> clientes = clienteRepository.findAll(0, 100);
         // Filtrar cliente genérico por DNI o ID
-        clientes.removeIf(c -> "00000000".equals(c.getDni()) || c.getId() == 1);
+        clientes.removeIf(c -> "00000000".equals(c.getDocumento()) || c.getId() == 1);
         comboClientes.getItems().addAll(clientes);
     }
 
@@ -486,135 +555,14 @@ public class VentasController implements Initializable {
 
     // Obtiene el siguiente número de boleta para la serie dada
     private String obtenerSiguienteNumeroBoleta(String serie) {
-        // Delegar al repositorio de comprobantes
-        return comprobanteRepository.obtenerSiguienteNumeroBoleta(serie);
+        int ultimoNumero = comprobanteRepository.obtenerUltimoNumeroPorSerieYTipo(serie, "BOLETA");
+        return String.format("%06d", ultimoNumero + 1);
     }
 
-    private void confirmarVenta() {
-        final Cliente[] clienteRef = new Cliente[1];
-        clienteRef[0] = comboClientes.getValue();
-        final String metodoPago = comboPago.getValue();
-        if (metodoPago == null || carrito.isEmpty()) {
-            mostrarMensaje("Completa todos los datos y agrega productos al carrito.");
-            return;
-        }
-        // Si no hay cliente seleccionado, buscar cliente genérico por DNI en la BD
-        if (clienteRef[0] == null) {
-            com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository clienteRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository();
-            java.util.Optional<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> optGenerico = clienteRepo
-                    .findByDni("00000000");
-            if (optGenerico.isPresent()) {
-                clienteRef[0] = optGenerico.get();
-            } else {
-                mostrarMensaje(
-                        "No se encontró el cliente genérico en la base de datos. Verifique que exista el registro con DNI 00000000.");
-                return;
-            }
-        }
-
-        // Calcular totales antes de crear boleta y venta
-        final java.math.BigDecimal subtotal = carrito.stream()
-                .map(com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta::getSubtotal)
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-        final java.math.BigDecimal descuento = carrito.stream()
-                .map(com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta::getDescuento)
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-        final java.math.BigDecimal igv = subtotal.multiply(new java.math.BigDecimal("0.18"));
-        final java.math.BigDecimal total = subtotal.subtract(descuento).add(igv);
-
-        // Obtener usuario actual y sucursal activa
-        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
-                .getUsuarioActual();
-        com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository();
-        java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Sucursal> sucursales = sucursalRepo
-                .findAllActivas();
-        com.farmaciavictoria.proyectopharmavictoria.model.Sucursal sucursal = !sucursales.isEmpty() ? sucursales.get(0)
-                : null;
-
-        // Construir la boleta usando el BoletaBuilder
-        com.farmaciavictoria.proyectopharmavictoria.model.Comprobante.Boleta boleta = new com.farmaciavictoria.proyectopharmavictoria.model.Comprobante.BoletaBuilder()
-                .conCliente(clienteRef[0])
-                .conProductos(new java.util.ArrayList<>(carrito))
-                .conTotales(subtotal.doubleValue(), igv.doubleValue(), total.doubleValue())
-                .build();
-
-        // Lógica para obtener la serie y el siguiente número de boleta
-        String serie = "B001";
-        String numero = obtenerSiguienteNumeroBoleta(serie);
-
-        // Vista previa profesional con callback para imprimir y registrar
-        String nombreFarmacia = sucursal != null ? sucursal.getNombre() : "BOTICA PHARMAVICTORIA S.A.C.";
-        String ruc = "10468894501";
-        String direccion = sucursal != null ? sucursal.getDireccion() : "Jr. Lima N° 456 – Huancayo";
-        String cajero = usuarioActual != null ? usuarioActual.getNombres() + " " + usuarioActual.getApellidos()
-                : "[Cajero]";
-        String metodoPagoStr = metodoPago;
-        String montoEnLetras = convertirMontoALetras(total.doubleValue());
-        String fechaStr = java.time.LocalDate.now().toString();
-        String horaStr = java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("hh:mm a"));
-
-        com.farmaciavictoria.proyectopharmavictoria.view.BoletaPreviewDialog preview = new com.farmaciavictoria.proyectopharmavictoria.view.BoletaPreviewDialog.Builder()
-                .boleta(boleta)
-                .cajero(cajero)
-                .nombreFarmacia(nombreFarmacia)
-                .ruc(ruc)
-                .direccion(direccion)
-                .serie(serie)
-                .numero(numero)
-                .metodoPago(metodoPagoStr)
-                .montoEnLetras(montoEnLetras)
-                .fecha(fechaStr)
-                .hora(horaStr)
-                .onConfirm(b -> {
-                    try {
-                        String pdfPath = "boleta_temp.pdf";
-                        com.farmaciavictoria.proyectopharmavictoria.print.PdfPrintStrategy pdfGen = new com.farmaciavictoria.proyectopharmavictoria.print.PdfPrintStrategy();
-                        pdfGen.generarPDF(b, pdfPath, nombreFarmacia, ruc, direccion, serie, numero, cajero,
-                                metodoPagoStr, montoEnLetras, fechaStr, horaStr);
-                        pdfGen.imprimirPDF(pdfPath);
-                    } catch (Exception ex) {
-                        System.err.println("Error al imprimir PDF: " + ex.getMessage());
-                    }
-                    Venta venta = new Venta();
-                    venta.setCliente(clienteRef[0]);
-                    venta.setDetalles(new ArrayList<>(carrito));
-                    venta.setTipoPago(metodoPago);
-                    venta.setSubtotal(subtotal);
-                    venta.setDescuentoMonto(descuento);
-                    venta.setIgvMonto(igv);
-                    venta.setTotal(total);
-                    venta.setFechaVenta(java.time.LocalDateTime.now());
-                    venta.setCreatedAt(java.time.LocalDateTime.now());
-                    venta.setUpdatedAt(java.time.LocalDateTime.now());
-                    venta.setEstado("REALIZADA");
-                    venta.setTipoComprobante(comboComprobante.getValue());
-                    venta.setUsuario(usuarioActual);
-                    venta.setSucursal(sucursal);
-                    venta.setNumeroBoleta(numero);
-                    venta.setSerie(serie);
-                    // Crear comprobante y asignar serie/numero
-                    com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante comprobante = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante();
-                    comprobante.setTipo("BOLETA");
-                    comprobante.setSerie(serie);
-                    comprobante.setNumero(numero);
-                    comprobante.setEstadoSunat("GENERADO");
-                    comprobante.setFechaEmision(java.time.LocalDateTime.now());
-                    comprobante.setVenta(venta);
-                    venta.setComprobante(comprobante);
-                    try {
-                        ventaService.registrarVenta(venta);
-                        mostrarMensaje("Venta registrada e impresa correctamente.");
-                        carrito.clear();
-                        actualizarTotales();
-                    } catch (Exception ex) {
-                        mostrarMensaje("Error al registrar la venta: " + ex.getMessage());
-                    }
-                })
-                .build();
-        boolean confirmado = preview.mostrar();
-        if (!confirmado) {
-            mostrarMensaje("Venta cancelada antes de imprimir.");
-        }
+    private String obtenerSiguienteNumeroFactura(String serie) {
+        int ultimoNumero = comprobanteRepository.obtenerUltimoNumeroPorSerieYTipo(serie, "FACTURA");
+        int siguienteNumero = ultimoNumero + 1;
+        return String.format("%06d", siguienteNumero);
     }
 
     private void anularVenta() {
@@ -625,6 +573,13 @@ public class VentasController implements Initializable {
 
     private void mostrarMensaje(String msg) {
 
+        // Solo mostrar mensajes amigables, nunca logs técnicos ni errores de depuración
+        if (msg != null && (msg.startsWith("[DEBUG") || msg.startsWith("[ERROR") || msg.contains("Exception")
+                || msg.contains("IndexOutOfBounds"))) {
+            // Solo log en terminal
+            System.err.println(msg);
+            return;
+        }
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(msg);
         alert.showAndWait();
@@ -633,7 +588,7 @@ public class VentasController implements Initializable {
     // Convierte un monto numérico a letras en formato "CINCO CON 70/100 SOLES"
     private String convertirMontoALetras(double monto) {
         final String[] UNIDADES = { "", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE",
-                "DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISÉIS", "DIECISIETE", "DIECIOCHO",
+                "DIEZ", "ONCE", "DOCE", "TRECE", "CATORCE", "QUINCE", "DIECISEIS", "DIECISIETE", "DIECIOCHO",
                 "DIECINUEVE" };
         final String[] DECENAS = { "", "DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA",
                 "OCHENTA", "NOVENTA" };
@@ -667,4 +622,444 @@ public class VentasController implements Initializable {
         }
         return letras + String.format(" CON %02d/100 SOLES", parteDecimal);
     }
+
+    // Método principal para confirmar la venta y emitir comprobante electrónico
+    private void confirmarVenta() {
+        final Cliente clienteSeleccionado = comboClientes.getValue();
+        final String metodoPago = comboPago.getValue();
+        if (metodoPago == null || carrito.isEmpty()) {
+            mostrarMensaje("Completa todos los datos y agrega productos al carrito.");
+            return;
+        }
+        // Si no hay cliente seleccionado, buscar cliente genérico por DNI en la BD
+        final Cliente clienteActual;
+        if (clienteSeleccionado != null) {
+            clienteActual = clienteSeleccionado;
+        } else {
+            com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository clienteRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository();
+            java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> clientes = clienteRepo
+                    .findAll(0, 10);
+            java.util.Optional<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> optGenerico = clientes
+                    .stream()
+                    .filter(c -> "00000000".equals(c.getDocumento()))
+                    .findFirst();
+            if (optGenerico.isPresent()) {
+                clienteActual = optGenerico.get();
+            } else {
+                mostrarMensaje(
+                        "No se encontró el cliente genérico en la base de datos. Verifique que exista el registro con documento 00000000.");
+                return;
+            }
+        }
+        // Calcular totales antes de crear boleta y venta
+        final java.math.BigDecimal subtotal = carrito.stream().map(DetalleVenta::getSubtotal)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        final java.math.BigDecimal descuento = carrito.stream().map(DetalleVenta::getDescuento)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        final java.math.BigDecimal igv = subtotal.multiply(new java.math.BigDecimal("0.18"));
+        final java.math.BigDecimal total = subtotal.subtract(descuento).add(igv);
+        String tipoComprobante = comboComprobante.getValue();
+        if ("FACTURA".equalsIgnoreCase(tipoComprobante)) {
+            // --- FLUJO FACTURA ELECTRÓNICA SUNAT ---
+            // Si el cliente no tiene datos completos de RUC, pedirlos manualmente
+            class DatosRuc {
+                String ruc, razonSocial, direccion, email;
+            }
+            DatosRuc datosRuc = new DatosRuc();
+            try {
+                System.out.println("[DEBUG RUC Dialog] Iniciando carga de FXML ruc_completo_dialog.fxml");
+                javafx.fxml.FXMLLoader rucLoader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("/fxml/ruc_completo_dialog.fxml"));
+                System.out.println("[DEBUG RUC Dialog] FXMLLoader creado");
+                javafx.scene.control.DialogPane dialogPane = rucLoader.load();
+                System.out.println("[DEBUG RUC Dialog] DialogPane cargado");
+                com.farmaciavictoria.proyectopharmavictoria.RucCompletoDialogController rucController = rucLoader
+                        .getController();
+                System.out.println("[DEBUG RUC Dialog] Controlador obtenido: " + rucController);
+                javafx.scene.control.Dialog<Boolean> dialog = new javafx.scene.control.Dialog<>();
+                dialog.setDialogPane(dialogPane);
+                dialog.setTitle("Completar datos de cliente para FACTURA");
+                dialog.setHeaderText(
+                        "El cliente seleccionado no tiene datos completos de RUC. Completa todos los campos.");
+
+                // Validación antes de cerrar el diálogo
+                javafx.scene.control.Button okButton = null;
+                for (ButtonType bt : dialogPane.getButtonTypes()) {
+                    if (bt.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                        okButton = (javafx.scene.control.Button) dialogPane.lookupButton(bt);
+                        break;
+                    }
+                }
+                if (okButton != null) {
+                    okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                        String rucIngresado = rucController.getRuc();
+                        String razonIngresada = rucController.getRazonSocial();
+                        String direccionIngresada = rucController.getDireccion();
+                        String emailIngresado = rucController.getEmail();
+                        boolean datosValidos = true;
+                        if (rucIngresado == null || rucIngresado.trim().isEmpty() || rucIngresado.length() != 11) {
+                            rucController.showError("El RUC debe tener 11 dígitos.");
+                            System.err.println("[ERROR VALIDACIÓN RUC] RUC inválido: '" + rucIngresado + "'");
+                            event.consume();
+                            datosValidos = false;
+                        }
+                        if (razonIngresada == null || razonIngresada.trim().isEmpty()) {
+                            rucController.showError("La razón social es obligatoria.");
+                            System.err.println("[ERROR VALIDACIÓN RUC] Razón social vacía");
+                            event.consume();
+                            datosValidos = false;
+                        }
+                        if (direccionIngresada == null || direccionIngresada.trim().isEmpty()) {
+                            rucController.showError("La dirección es obligatoria.");
+                            System.err.println("[ERROR VALIDACIÓN RUC] Dirección vacía");
+                            event.consume();
+                            datosValidos = false;
+                        }
+                        if (datosValidos) {
+                            rucController.clearError();
+                            datosRuc.ruc = rucIngresado;
+                            datosRuc.razonSocial = razonIngresada;
+                            datosRuc.direccion = direccionIngresada;
+                            datosRuc.email = emailIngresado;
+                            System.out.println("[DEBUG VALIDACIÓN RUC] Datos válidos: RUC=" + rucIngresado
+                                    + ", Razón Social=" + razonIngresada + ", Dirección=" + direccionIngresada
+                                    + ", Email=" + emailIngresado);
+                        }
+                    });
+                } else {
+                    System.err.println(
+                            "[ERROR RUC Dialog] El botón OK no está disponible en el DialogPane. El diálogo se mostrará sin validación extra.");
+                }
+
+                dialog.setResultConverter(buttonType -> {
+                    // Leer los datos directamente del controlador y loguear el tipo de botón
+                    System.out.println("[DEBUG RUC Dialog] ResultConverter: buttonType=" + buttonType + " ("
+                            + (buttonType != null ? buttonType.getButtonData() : "null") + ")");
+                    if (buttonType != null
+                            && buttonType.getButtonData() == javafx.scene.control.ButtonBar.ButtonData.OK_DONE) {
+                        String rucIngresado = rucController.getRuc();
+                        String razonIngresada = rucController.getRazonSocial();
+                        String direccionIngresada = rucController.getDireccion();
+                        String emailIngresado = rucController.getEmail();
+                        boolean datosValidos = rucIngresado != null && razonIngresada != null
+                                && direccionIngresada != null && !rucIngresado.trim().isEmpty()
+                                && !razonIngresada.trim().isEmpty() && !direccionIngresada.trim().isEmpty()
+                                && rucIngresado.length() == 11;
+                        System.out.println("[DEBUG RUC Dialog] ResultConverter: ruc=" + rucIngresado + ", razon="
+                                + razonIngresada + ", direccion=" + direccionIngresada + ", email=" + emailIngresado
+                                + ", datosValidos=" + datosValidos);
+                        if (datosValidos) {
+                            datosRuc.ruc = rucIngresado;
+                            datosRuc.razonSocial = razonIngresada;
+                            datosRuc.direccion = direccionIngresada;
+                            datosRuc.email = emailIngresado;
+                            return true;
+                        } else {
+                            System.err.println(
+                                    "[ERROR RUC Dialog] Datos inválidos en ResultConverter aunque se presionó OK");
+                        }
+                    } else {
+                        System.out.println("[DEBUG RUC Dialog] ResultConverter: botón no es OK_DONE, se devuelve null");
+                    }
+                    return null;
+                });
+                System.out.println("[DEBUG RUC Dialog] Mostrando diálogo");
+                java.util.Optional<Boolean> result = dialog.showAndWait();
+                System.out.println("[DEBUG RUC Dialog] Result: " + result);
+                // Si el usuario presionó OK y los datos son válidos, continuar con la vista
+                // previa
+                if (!result.isPresent() || result.get() == null) {
+                    System.err.println(
+                            "[ERROR RUC Dialog] Optional vacío, null o datos incompletos (diálogo cerrado sin aceptar)");
+                    System.err.println("[ERROR RUC Dialog] Estado final: ruc='" + datosRuc.ruc + "', razonSocial='"
+                            + datosRuc.razonSocial + "', direccion='" + datosRuc.direccion + "', email='"
+                            + datosRuc.email + "'");
+                    mostrarMensaje("No se completaron los datos. No se puede emitir la factura.");
+                    return;
+                }
+                // Si todo está OK, continuar con la vista previa
+            } catch (Exception ex) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(ex.toString()).append("\n");
+                for (StackTraceElement ste : ex.getStackTrace()) {
+                    sb.append("    at ").append(ste.toString()).append("\n");
+                }
+                mostrarMensaje("Error mostrando diálogo de datos de RUC:\n" + sb.toString());
+                System.err.println("[ERROR RUC Dialog] " + sb.toString());
+                return;
+            }
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("/fxml/vista_previa_comprobante.fxml"));
+                javafx.scene.Parent root = loader.load();
+                VistaPreviaComprobanteController previewController = loader.getController();
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                stage.setTitle("Vista Previa de Factura Electrónica");
+                stage.setScene(new javafx.scene.Scene(root));
+                // Convertir Cliente y DetalleVenta locales a tipos PharmavictoriaApplication
+                com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.Cliente clienteJsonPreview = new com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.Cliente();
+                clienteJsonPreview.tipo_documento = "6";
+                clienteJsonPreview.numero_documento = datosRuc.ruc;
+                clienteJsonPreview.razon_social = datosRuc.razonSocial;
+                clienteJsonPreview.direccion = datosRuc.direccion;
+                // Si el modelo lo permite, también email
+                // clienteJsonPreview.email = email;
+                javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.DetalleVenta> detallesPreview = javafx.collections.FXCollections
+                        .observableArrayList();
+                for (DetalleVenta d : carrito) {
+                    com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.DetalleVenta det = new com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.DetalleVenta();
+                    det.unidad_de_medida = "NIU";
+                    det.codigo_producto = d.getProducto().getCodigo();
+                    det.descripcion = d.getProducto().getNombre();
+                    det.cantidad = d.getCantidad();
+                    det.valor_unitario = d.getPrecioUnitario().doubleValue();
+                    det.precio_unitario = d.getPrecioUnitario().doubleValue();
+                    det.subtotal = d.getSubtotal().doubleValue();
+                    det.tipo_de_igv = 1;
+                    double igvDetalle = d.getSubtotal().doubleValue() * 0.18;
+                    det.igv = igvDetalle;
+                    det.total = d.getSubtotal().doubleValue() + igvDetalle;
+                    detallesPreview.add(det);
+                }
+                // Obtener el siguiente número de factura para la serie
+                // Usar la serie demo permitida por NubeFacT
+                String serieFactura = "FFF1";
+                String numeroFactura = obtenerSiguienteNumeroFactura(serieFactura);
+                previewController.setDatos(clienteJsonPreview, "FACTURA", serieFactura, numeroFactura,
+                        total.toPlainString(), detallesPreview);
+                previewController.setStage(stage);
+                previewController.setOnConfirmar(() -> {
+                    try {
+                        // Armado de JSON igual al ejemplo de PharmavictoriaApplication.java
+                        java.util.LinkedHashMap<String, Object> factura = new java.util.LinkedHashMap<>();
+                        factura.put("operacion", "generar_comprobante");
+                        factura.put("tipo_de_comprobante", 1);
+                        factura.put("serie", serieFactura);
+                        factura.put("numero", Integer.parseInt(numeroFactura));
+                        factura.put("sunat_transaction", 1);
+                        factura.put("cliente_tipo_de_documento", 6);
+                        factura.put("cliente_numero_de_documento", datosRuc.ruc);
+                        factura.put("cliente_denominacion", datosRuc.razonSocial);
+                        factura.put("cliente_direccion", datosRuc.direccion);
+                        factura.put("cliente_email", datosRuc.email != null ? datosRuc.email : "");
+                        factura.put("cliente_email_1", "");
+                        factura.put("cliente_email_2", "");
+                        factura.put("fecha_de_emision", java.time.LocalDate.now().toString());
+                        factura.put("fecha_de_vencimiento", "");
+                        factura.put("moneda", 1);
+                        factura.put("tipo_de_cambio", "");
+                        factura.put("porcentaje_de_igv", 18.00);
+                        factura.put("descuento_global", "");
+                        factura.put("total_descuento", "");
+                        factura.put("total_anticipo", "");
+                        factura.put("total_gravada", subtotal.doubleValue());
+                        factura.put("total_inafecta", "");
+                        factura.put("total_exonerada", "");
+                        factura.put("total_igv", igv.doubleValue());
+                        factura.put("total_gratuita", "");
+                        factura.put("total_otros_cargos", "");
+                        factura.put("total", total.doubleValue());
+                        factura.put("percepcion_tipo", "");
+                        factura.put("percepcion_base_imponible", "");
+                        factura.put("total_percepcion", "");
+                        factura.put("total_incluido_percepcion", "");
+                        factura.put("retencion_tipo", "");
+                        factura.put("retencion_base_imponible", "");
+                        factura.put("total_retencion", "");
+                        factura.put("total_impuestos_bolsas", "");
+                        factura.put("detraccion", false);
+                        factura.put("observaciones", "");
+                        factura.put("documento_que_se_modifica_tipo", "");
+                        factura.put("documento_que_se_modifica_serie", "");
+                        factura.put("documento_que_se_modifica_numero", "");
+                        factura.put("tipo_de_nota_de_credito", "");
+                        factura.put("tipo_de_nota_de_debito", "");
+                        factura.put("enviar_automaticamente_a_la_sunat", true);
+                        factura.put("enviar_automaticamente_al_cliente", false);
+                        factura.put("condiciones_de_pago", "");
+                        factura.put("medio_de_pago", "");
+                        factura.put("placa_vehiculo", "");
+                        factura.put("orden_compra_servicio", "");
+                        factura.put("formato_de_pdf", "");
+                        factura.put("generado_por_contingencia", "");
+                        factura.put("bienes_region_selva", "");
+                        factura.put("servicios_region_selva", "");
+                        // Items
+                        java.util.List<java.util.Map<String, Object>> items = new java.util.ArrayList<>();
+                        for (DetalleVenta d : carrito) {
+                            java.util.LinkedHashMap<String, Object> item = new java.util.LinkedHashMap<>();
+                            item.put("unidad_de_medida", "NIU");
+                            item.put("codigo", d.getProducto().getCodigo());
+                            item.put("codigo_producto_sunat", "10000000"); // Si no tienes el código SUNAT, pon uno
+                                                                           // genérico
+                            item.put("descripcion", d.getProducto().getNombre());
+                            item.put("cantidad", d.getCantidad());
+                            // Precio unitario sin IGV
+                            double valorUnitario = d.getPrecioUnitario().doubleValue();
+                            item.put("valor_unitario", valorUnitario);
+                            // Precio unitario con IGV
+                            double precioUnitarioConIGV = Math.round(valorUnitario * 1.18 * 100.0) / 100.0;
+                            item.put("precio_unitario", precioUnitarioConIGV);
+                            item.put("descuento", "");
+                            item.put("subtotal", valorUnitario * d.getCantidad());
+                            item.put("tipo_de_igv", 1);
+                            double igvDetalle = Math.round(valorUnitario * d.getCantidad() * 0.18 * 100.0) / 100.0;
+                            item.put("igv", igvDetalle);
+                            // Total de la línea: cantidad × precio_unitario (con IGV)
+                            double totalLinea = Math.round(precioUnitarioConIGV * d.getCantidad() * 100.0) / 100.0;
+                            item.put("total", totalLinea);
+                            item.put("anticipo_regularizacion", false);
+                            item.put("anticipo_documento_serie", "");
+                            item.put("anticipo_documento_numero", "");
+                            items.add(item);
+                        }
+                        factura.put("items", items);
+                        // Guias (opcional)
+                        factura.put("guias", new java.util.ArrayList<>());
+                        // Venta al crédito (opcional)
+                        factura.put("venta_al_credito", new java.util.ArrayList<>());
+                        String jsonFactura = new com.google.gson.Gson().toJson(factura);
+                        System.out.println("[DEBUG JSON FACTURA] JSON generado para NubeFacT:\n" + jsonFactura);
+                        String apiUrl = "https://api.nubefact.com/api/v1/b1f7ac80-5d5e-4fd9-8c8d-7b00c2638da0";
+                        String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
+                        String respuesta = com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication
+                                .enviarFacturaNubeFact(jsonFactura, apiUrl, apiToken);
+                        String hashSunat = "";
+                        String estadoSunat = "";
+                        String pdfUrl = "";
+                        String xmlUrl = "";
+                        String cdrUrl = "";
+                        try {
+                            com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(respuesta)
+                                    .getAsJsonObject();
+                            hashSunat = json.has("hash") ? json.get("hash").getAsString() : "";
+                            estadoSunat = json.has("sunat_description")
+                                    ? json.get("sunat_description").getAsString()
+                                    : "";
+                            pdfUrl = json.has("enlace_pdf") ? json.get("enlace_pdf").getAsString() : "";
+                            xmlUrl = json.has("enlace_xml") ? json.get("enlace_xml").getAsString() : "";
+                            cdrUrl = json.has("enlace_cdr") ? json.get("enlace_cdr").getAsString() : "";
+                        } catch (Exception ex) {
+                            mostrarMensaje("Error procesando respuesta de NubeFacT: " + ex.getMessage());
+                            System.err.println("[ERROR NubeFacT] " + ex.getMessage());
+                            ex.printStackTrace();
+                        }
+                        // 1. Crear y guardar la venta antes de crear el comprobante
+                        Venta venta = new Venta();
+                        venta.setCliente(clienteActual);
+                        // Asignar el usuario logueado
+                        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
+                                .getUsuarioActual();
+                        venta.setUsuario(usuarioActual);
+                        venta.setSubtotal(subtotal);
+                        venta.setDescuentoMonto(descuento);
+                        venta.setIgvMonto(igv);
+                        venta.setTotal(total);
+                        venta.setTipoPago(metodoPago);
+                        venta.setTipoComprobante("FACTURA");
+                        venta.setNumeroBoleta(numeroFactura);
+                        venta.setSerie(serieFactura);
+                        venta.setFechaVenta(java.time.LocalDateTime.now());
+                        venta.setEstado("REALIZADA");
+                        venta.setObservaciones("");
+                        venta.setCreatedAt(java.time.LocalDateTime.now());
+                        venta.setUpdatedAt(java.time.LocalDateTime.now());
+                        venta.setDetalles(new java.util.ArrayList<>(carrito));
+                        // Guardar venta y recuperar el ID generado
+                        Venta ventaGuardada = ventaRepository.save(venta);
+                        if (ventaGuardada == null || ventaGuardada.getId() == 0) {
+                            mostrarMensaje("Error al guardar la venta. No se pudo obtener el ID generado.");
+                            return;
+                        }
+                        // Guardar cada detalle en la tabla detalle_ventas
+                        for (DetalleVenta detalle : ventaGuardada.getDetalles()) {
+                            // Asignar la venta con el ID correcto
+                            detalle.setVenta(ventaGuardada);
+                            try {
+                                detalleVentaRepository.save(detalle);
+                            } catch (Exception ex) {
+                                mostrarMensaje("Error al guardar detalle de venta: " + ex.getMessage());
+                                System.err.println("[ERROR DETALLE VENTA] " + ex.getMessage());
+                            }
+                            // Descontar stock de cada producto vendido
+                            var producto = detalle.getProducto();
+                            Integer cantidadVendida = detalle.getCantidad();
+                            if (producto != null && producto.getId() != null && cantidadVendida != null) {
+                                int stockActual = producto.getStockActual() != null ? producto.getStockActual() : 0;
+                                int nuevoStock = stockActual - cantidadVendida;
+                                if (nuevoStock < 0) {
+                                    mostrarMensaje("Error: El stock del producto '" + producto.getNombre()
+                                            + "' no puede ser negativo. Venta no registrada correctamente.");
+                                    System.err.println("[ERROR STOCK] Stock negativo para producto: "
+                                            + producto.getNombre() + " (ID: " + producto.getId() + ")");
+                                    // No descontar ni actualizar si el stock es negativo
+                                    continue;
+                                }
+                                producto.setStockActual(nuevoStock);
+                                try {
+                                    // Usar el método correcto del repositorio para actualizar el stock
+                                    productoRepository.updateStock(producto.getId(), nuevoStock);
+                                } catch (Exception ex) {
+                                    mostrarMensaje("Error al actualizar el stock de '" + producto.getNombre() + "': "
+                                            + ex.getMessage());
+                                    System.err.println("[ERROR STOCK] " + ex.getMessage());
+                                }
+                            }
+                        }
+                        // 2. Crear comprobante y asociar la venta guardada
+                        Comprobante comprobante = new Comprobante();
+                        comprobante.setTipo("FACTURA");
+                        comprobante.setSerie("FFF1");
+                        comprobante.setNumero(obtenerSiguienteNumeroFactura("FFF1"));
+                        comprobante.setHashSunat(hashSunat);
+                        comprobante.setEstadoSunat("GENERADO");
+                        comprobante.setFechaEmision(java.time.LocalDateTime.now());
+                        comprobante.setVenta(ventaGuardada);
+                        comprobanteRepository.save(comprobante);
+
+                        // Registrar historial de venta
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio historial = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio();
+                        historial.setVenta(ventaGuardada);
+                        historial.setTipoCambio("CREACION"); // ENUM correcto
+                        historial.setMotivo("Venta registrada");
+                        historial.setUsuario(usuarioActual);
+                        historial.setFecha(java.time.LocalDateTime.now());
+                        try {
+                            historialCambioRepository.save(historial);
+                        } catch (Exception ex) {
+                            mostrarMensaje("Error al registrar historial de venta: " + ex.getMessage());
+                            System.err.println("[ERROR HISTORIAL VENTA] " + ex.getMessage());
+                        }
+                        StringBuilder msg = new StringBuilder();
+                        msg.append("Factura electrónica enviada a SUNAT (demo)\n");
+                        msg.append("Estado SUNAT: ").append(estadoSunat).append("\n");
+                        if (!pdfUrl.isEmpty())
+                            msg.append("PDF: ").append(pdfUrl).append("\n");
+                        if (!xmlUrl.isEmpty())
+                            msg.append("XML: ").append(xmlUrl).append("\n");
+                        if (!cdrUrl.isEmpty())
+                            msg.append("CDR: ").append(cdrUrl).append("\n");
+                        mostrarMensaje(msg.toString());
+                        carrito.clear();
+                        actualizarTotales();
+                    } catch (Exception ex) {
+                        mostrarMensaje("Error en emisión de factura electrónica: " + ex.getMessage());
+                        System.err.println("[ERROR Emisión Factura] " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                });
+                stage.showAndWait();
+            } catch (Exception ex) {
+                mostrarMensaje("Error en emisión de factura electrónica: " + ex.getMessage());
+                System.err.println("[ERROR Emisión Factura] " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        } else if ("BOLETA".equalsIgnoreCase(tipoComprobante)) {
+            // Aquí puedes implementar el flujo de boleta si lo necesitas
+            // Por ejemplo, mostrar la vista previa y solo emitir tras confirmación
+        } else {
+            mostrarMensaje("Tipo de comprobante no soportado o no seleccionado.");
+        }
+    }
+
 }

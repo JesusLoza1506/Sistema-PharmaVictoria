@@ -354,6 +354,9 @@ public class LoginController implements Initializable {
     private void handleSuccessfulLogin(Usuario usuario) {
         logger.info("Login exitoso para usuario: {} ({})", usuario.getUsername(), usuario.getRol());
 
+        // Asignar usuario globalmente para toda la sesión
+        com.farmaciavictoria.proyectopharmavictoria.SessionManager.setUsuarioActual(usuario);
+
         Platform.runLater(() -> {
             showSuccess("¡Bienvenido " + usuario.getNombreCompleto() + "!");
 

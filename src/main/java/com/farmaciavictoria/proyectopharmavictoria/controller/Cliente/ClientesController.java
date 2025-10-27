@@ -62,7 +62,8 @@ public class ClientesController implements Initializable {
                     productoRepository);
             for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente cliente : clientes) {
                 try {
-                    if (cliente.getId() != null && (cliente.getDni() == null || !cliente.getDni().equals("00000000"))) {
+                    if (cliente.getId() != null
+                            && (cliente.getDocumento() == null || !cliente.getDocumento().equals("00000000"))) {
                         java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta> ventasCliente = ventaService
                                 .listarVentasPorCliente(cliente.getId());
                         System.out.println("[DASHBOARD] Cliente: " + cliente.getNombres() + " " + cliente.getApellidos()
@@ -152,7 +153,7 @@ public class ClientesController implements Initializable {
             javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtrados = javafx.collections.FXCollections
                     .observableArrayList();
             for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c : clientesList) {
-                if (Boolean.TRUE.equals(c.getEsFrecuente()) && (c.getDni() == null || !c.getDni().equals("00000000"))) {
+                if (c.isFrecuente() && (c.getDocumento() == null || !c.getDocumento().equals("00000000"))) {
                     filtrados.add(c);
                 }
             }
@@ -173,7 +174,7 @@ public class ClientesController implements Initializable {
             javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtrados = javafx.collections.FXCollections
                     .observableArrayList();
             for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c : clientesList) {
-                if (c.getDni() == null || !c.getDni().equals("00000000")) {
+                if (c.getDocumento() == null || !c.getDocumento().equals("00000000")) {
                     filtrados.add(c);
                 }
             }
@@ -183,9 +184,9 @@ public class ClientesController implements Initializable {
         javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtrados = javafx.collections.FXCollections
                 .observableArrayList();
         for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c : clientesList) {
-            if ("Frecuente".equalsIgnoreCase(filtro) && Boolean.TRUE.equals(c.getEsFrecuente())) {
+            if ("Frecuente".equalsIgnoreCase(filtro) && c.isFrecuente()) {
                 filtrados.add(c);
-            } else if ("No frecuente".equalsIgnoreCase(filtro) && !Boolean.TRUE.equals(c.getEsFrecuente())) {
+            } else if ("No frecuente".equalsIgnoreCase(filtro) && !c.isFrecuente()) {
                 filtrados.add(c);
             }
         }
@@ -206,20 +207,17 @@ public class ClientesController implements Initializable {
     @FXML
     private TableView<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> tablaClientes;
     @FXML
-    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colDni;
+    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colTipoCliente;
     @FXML
-    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colNombres;
+    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colDocumento;
     @FXML
-    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colApellidos;
+    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colNombreRazonSocial;
     @FXML
     private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colTelefono;
     @FXML
     private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colEmail;
     @FXML
     private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colDireccion;
-    @FXML
-    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, String> colFechaNacimiento;
-    // Columnas eliminadas: puntos, frecuente, creado, actualizado
     @FXML
     private TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente, Void> colAcciones;
     @FXML
@@ -247,6 +245,29 @@ public class ClientesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        colTipoCliente.setCellValueFactory(cellData -> {
+            String tipo = cellData.getValue().getTipoCliente();
+            System.out.println("[DEBUG TABLEVIEW] tipo_cliente recibido: '" + tipo + "'");
+            if (tipo != null && tipo.trim().replaceAll("\\s+", "").equalsIgnoreCase("Empresarial")) {
+                return new javafx.beans.property.SimpleStringProperty("🏢 Empresa");
+            } else if (tipo != null && tipo.trim().replaceAll("\\s+", "").equalsIgnoreCase("Natural")) {
+                return new javafx.beans.property.SimpleStringProperty("🧍 Natural");
+            } else {
+                return new javafx.beans.property.SimpleStringProperty("❓ Desconocido");
+            }
+        });
+        colDocumento.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDocumento()));
+        colNombreRazonSocial.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getNombreCompleto()));
+        colTelefono.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getTelefono()));
+        colEmail.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getEmail()));
+        colDireccion.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDireccion()));
+        // ...asignar acciones y demás columnas como ya estaban...
+
         inicializarDashboardGraficas();
         // No inicializar datos aquí, esperar a que se inyecte el servicio
         if (lblTotalClientes != null && clienteService != null) {
@@ -335,19 +356,8 @@ public class ClientesController implements Initializable {
             cbTipoBusqueda.getItems().addAll("DNI", "Nombre", "Apellidos", "Teléfono", "Email");
             cbTipoBusqueda.setValue("Nombre");
         }
-        colDni.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dni"));
-        colNombres.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nombres"));
-        colApellidos.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("apellidos"));
-        colTelefono.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("telefono"));
-        colEmail.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("email"));
-        colDireccion.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("direccion"));
-        // Formatear fechaNacimiento como dd/MM/yyyy
-        colFechaNacimiento.setCellValueFactory(cellData -> {
-            java.time.LocalDate fecha = cellData.getValue().getFechaNacimiento();
-            String texto = (fecha != null) ? fecha.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                    : "";
-            return new javafx.beans.property.SimpleStringProperty(texto);
-        });
+        // No sobrescribir cell value factories, solo configurar acciones y refrescar
+        // datos
         configurarColumnaAcciones();
         refrescarDatos();
     }
@@ -414,7 +424,7 @@ public class ClientesController implements Initializable {
 
     // Acción para activar/inactivar cliente y registrar en historial
     private void toggleActivoCliente(com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente cliente) {
-        boolean nuevoEstado = !Boolean.TRUE.equals(cliente.getEsFrecuente());
+        boolean nuevoEstado = !cliente.isFrecuente();
         cliente.setEsFrecuente(nuevoEstado);
         clienteService.actualizarCliente(cliente); // El service debe registrar el cambio en historial
         refrescarDatos();
@@ -572,7 +582,7 @@ public class ClientesController implements Initializable {
                 .observableArrayList();
         for (int i = desde; i < hasta; i++) {
             com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c = clientesList.get(i);
-            if (c.getDni() == null || !c.getDni().equals("00000000")) {
+            if (c.getDocumento() == null || !c.getDocumento().equals("00000000")) {
                 pagina.add(c);
             }
         }
@@ -640,26 +650,26 @@ public class ClientesController implements Initializable {
 
         // Filtrar por estado
         if ("Frecuente".equalsIgnoreCase(estado)) {
-            filtrados = filtrados.stream().filter(c -> Boolean.TRUE.equals(c.getEsFrecuente())).toList();
+            filtrados = filtrados.stream().filter(c -> c.isFrecuente()).toList();
         } else if ("No frecuente".equalsIgnoreCase(estado)) {
-            filtrados = filtrados.stream().filter(c -> !Boolean.TRUE.equals(c.getEsFrecuente())).toList();
+            filtrados = filtrados.stream().filter(c -> !c.isFrecuente()).toList();
         }
 
         // Filtrar por solo frecuentes
         if (soloFrecuentes) {
-            filtrados = filtrados.stream().filter(c -> Boolean.TRUE.equals(c.getEsFrecuente())).toList();
+            filtrados = filtrados.stream().filter(c -> c.isFrecuente()).toList();
         }
 
         // Filtrar cliente genérico
         java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtradosSinGenerico = filtrados
                 .stream()
-                .filter(c -> c.getDni() == null || !c.getDni().equals("00000000"))
+                .filter(c -> c.getDocumento() == null || !c.getDocumento().equals("00000000"))
                 .toList();
         tablaClientes.setItems(javafx.collections.FXCollections.observableArrayList(filtradosSinGenerico));
         // Mostrar total real de clientes en verde, igual que proveedores
         if (lblTotalClientes != null && clienteService != null) {
             int totalClientes = clienteService.obtenerTodos().stream()
-                    .filter(c -> c.getDni() == null || !c.getDni().equals("00000000"))
+                    .filter(c -> c.getDocumento() == null || !c.getDocumento().equals("00000000"))
                     .toList().size();
             lblTotalClientes.setText("Total: " + totalClientes + " clientes");
             lblTotalClientes.setStyle("-fx-text-fill: #1bb934; -fx-font-weight: bold;");
@@ -729,17 +739,35 @@ public class ClientesController implements Initializable {
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
             stage.setResizable(false);
 
-            // Opcional: puedes pasar un cliente vacío si el form lo requiere
-            // formController.setCliente(new Cliente());
+            // Inyectar lista de clientes para validaciones
+            formController.setClientesExistentes(clientesList);
+            // Inyectar callback para guardar y refrescar
+            formController.setOnClienteEditado(() -> {
+                Cliente nuevo = formController.getClienteFromForm();
+                try {
+                    if (nuevo != null && nuevo.getTipoCliente() != null && !nuevo.getTipoCliente().isEmpty()) {
+                        clienteService.guardarCliente(nuevo);
+                        refrescarDatos();
+                        javafx.scene.control.Alert ok = new javafx.scene.control.Alert(
+                                javafx.scene.control.Alert.AlertType.INFORMATION,
+                                "Cliente guardado correctamente.");
+                        ok.setTitle("Éxito");
+                        ok.setHeaderText(null);
+                        ok.showAndWait();
+                        // Cerrar el formulario
+                        javafx.stage.Stage s = (javafx.stage.Stage) root.getScene().getWindow();
+                        s.close();
+                    }
+                } catch (Exception ex) {
+                    javafx.scene.control.Alert error = new javafx.scene.control.Alert(
+                            javafx.scene.control.Alert.AlertType.ERROR, "Error al guardar cliente: " + ex.getMessage());
+                    error.setTitle("Error");
+                    error.setHeaderText(null);
+                    error.showAndWait();
+                }
+            });
 
             stage.showAndWait();
-
-            // Al cerrar, obtener el cliente si fue guardado
-            Cliente nuevo = formController.getClienteFromForm();
-            if (nuevo != null && nuevo.getNombres() != null && !nuevo.getNombres().trim().isEmpty()) {
-                clienteService.guardarCliente(nuevo);
-                refrescarDatos();
-            }
         } catch (Exception e) {
             e.printStackTrace();
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(

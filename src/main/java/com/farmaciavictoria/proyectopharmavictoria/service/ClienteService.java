@@ -37,8 +37,8 @@ public class ClienteService {
         if (cliente.getEmail() != null) {
             cliente.setEmail(cliente.getEmail().trim().toLowerCase());
         }
-        if (cliente.getDni() != null) {
-            cliente.setDni(cliente.getDni().trim());
+        if (cliente.getDocumento() != null) {
+            cliente.setDocumento(cliente.getDocumento().trim());
         }
         if (cliente.getPuntosTotales() == null) {
             cliente.setPuntosTotales(0);
@@ -46,9 +46,8 @@ public class ClienteService {
         if (cliente.getPuntosUsados() == null) {
             cliente.setPuntosUsados(0);
         }
-        if (cliente.getEsFrecuente() == null) {
-            cliente.setEsFrecuente(false);
-        }
+        // El campo frecuente ahora es booleano, inicializar si es null
+        // (Si el modelo lo permite, pero normalmente isFrecuente() es primitivo)
         if (cliente.getCreatedAt() == null) {
             cliente.setCreatedAt(LocalDateTime.now());
         }
@@ -57,6 +56,7 @@ public class ClienteService {
             cliente.setEsFrecuente(true);
         }
     }
+
     /**
      * Devuelve todos los clientes sin paginación
      */
@@ -70,13 +70,17 @@ public class ClienteService {
             return List.of();
         }
     }
+
     /**
      * Obtiene el historial de cambios para un cliente específico
      */
-    public List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio> obtenerHistorialDeCambios(Integer clienteId) {
-    if (clienteId == null || clienteId <= 0) return List.of();
-    return historialService.obtenerHistorialPorCliente(clienteId);
+    public List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio> obtenerHistorialDeCambios(
+            Integer clienteId) {
+        if (clienteId == null || clienteId <= 0)
+            return List.of();
+        return historialService.obtenerHistorialPorCliente(clienteId);
     }
+
     // Servicio de historial de cambios
     private final com.farmaciavictoria.proyectopharmavictoria.service.ClienteHistorialCambioService historialService = new com.farmaciavictoria.proyectopharmavictoria.service.ClienteHistorialCambioService();
 
@@ -105,7 +109,8 @@ public class ClienteService {
         }
         try (java.sql.Connection conn = DatabaseConfig.getInstance().getConnection()) {
             // Eliminar historial de cambios
-            try (java.sql.PreparedStatement stmt = conn.prepareStatement("DELETE FROM cliente_historial_cambio WHERE cliente_id = ?")) {
+            try (java.sql.PreparedStatement stmt = conn
+                    .prepareStatement("DELETE FROM cliente_historial_cambio WHERE cliente_id = ?")) {
                 stmt.setInt(1, id);
                 int rows = stmt.executeUpdate();
                 logger.info("Historial eliminado para cliente {}: {} registros", id, rows);
@@ -129,42 +134,42 @@ public class ClienteService {
             // Auditoría: registrar historial de eliminación
             String usuario = System.getProperty("user.name", "sistema");
             java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
-            historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
-                id, "ELIMINACION", clienteAnterior.getNombreCompleto(), null, usuario, ahora));
+            historialService.registrarCambio(
+                    new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                            id, "ELIMINACION", clienteAnterior.getNombreCompleto(), null, usuario, ahora));
             // Publicar evento solo si fue eliminado
             eventManager.publishEvent(SystemEvent.EventType.CLIENTE_ELIMINADO,
-                "Cliente eliminado ID: " + id,
-                this);
+                    "Cliente eliminado ID: " + id,
+                    this);
         } else {
             logger.warn("No se pudo eliminar el cliente ID: {}", id);
         }
         return eliminado;
     }
-    
+
     private static final Logger logger = LoggerFactory.getLogger(ClienteService.class);
-    
+
     // ✅ DEPENDENCY INJECTION
     private final ClienteRepository clienteRepository;
     private final SystemEventManager eventManager;
-    
+
     // ✅ PATRONES DE VALIDACIÓN
     private static final Pattern PATTERN_DNI = Pattern.compile("^\\d{8}$");
     private static final Pattern PATTERN_EMAIL = Pattern.compile(
-        "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-    );
+            "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     private static final Pattern PATTERN_TELEFONO = Pattern.compile("^\\d{7,15}$");
-    
+
     /**
      * ✅ DEPENDENCY INJECTION: Constructor
      */
     public ClienteService(ClienteRepository clienteRepository) {
-    this.clienteRepository = clienteRepository;
-    this.eventManager = SystemEventManager.getInstance();
-    logger.info("ClienteService inicializado");
+        this.clienteRepository = clienteRepository;
+        this.eventManager = SystemEventManager.getInstance();
+        logger.info("ClienteService inicializado");
     }
-    
+
     // ✅ OPERACIONES PRINCIPALES
-    
+
     /**
      * ✅ SERVICE LAYER: Obtener todos los clientes activos
      */
@@ -180,7 +185,7 @@ public class ClienteService {
             throw new RuntimeException("Error al obtener la lista de clientes", e);
         }
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Obtener cliente por ID
      */
@@ -196,26 +201,16 @@ public class ClienteService {
             throw e;
         }
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Buscar cliente por DNI
      */
     public Optional<Cliente> buscarPorDni(String dni) {
-        try {
-            if (dni == null || dni.trim().isEmpty()) {
-                return Optional.empty();
-            }
-            if (!PATTERN_DNI.matcher(dni.trim()).matches()) {
-                logger.warn("DNI con formato inválido: {}", dni);
-                return Optional.empty();
-            }
-            return clienteRepository.findByDni(dni.trim());
-        } catch (Exception e) {
-            logger.error("Error al buscar cliente por DNI {}: {}", dni, e.getMessage(), e);
-            return Optional.empty();
-        }
+        // Eliminado: buscarPorDni ya no es válido, usar buscarPorDocumento si se
+        // requiere
+        throw new UnsupportedOperationException("La búsqueda por DNI ha sido eliminada. Use buscarPorDocumento.");
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Buscar clientes por nombre
      */
@@ -234,6 +229,7 @@ public class ClienteService {
             return List.of();
         }
     }
+
     /**
      * Filtrar clientes por teléfono
      */
@@ -243,8 +239,8 @@ public class ClienteService {
                 return List.of();
             }
             return obtenerTodos(0, 1000).stream()
-                .filter(c -> telefono.equals(c.getTelefono()))
-                .collect(Collectors.toList());
+                    .filter(c -> telefono.equals(c.getTelefono()))
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error al buscar clientes por teléfono '{}': {}", telefono, e.getMessage(), e);
             return List.of();
@@ -260,8 +256,8 @@ public class ClienteService {
                 return List.of();
             }
             return obtenerTodos(0, 1000).stream()
-                .filter(c -> email.equalsIgnoreCase(c.getEmail()))
-                .collect(Collectors.toList());
+                    .filter(c -> email.equalsIgnoreCase(c.getEmail()))
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error al buscar clientes por email '{}': {}", email, e.getMessage(), e);
             return List.of();
@@ -274,8 +270,8 @@ public class ClienteService {
     public List<Cliente> buscarFrecuentes() {
         try {
             return obtenerTodos(0, 1000).stream()
-                .filter(c -> Boolean.TRUE.equals(c.getEsFrecuente()))
-                .collect(Collectors.toList());
+                    .filter(Cliente::isFrecuente)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error al buscar clientes frecuentes: {}", e.getMessage(), e);
             return List.of();
@@ -289,7 +285,7 @@ public class ClienteService {
         // Si se agrega campo activo/inactivo, aquí se implementa
         return List.of();
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Guardar cliente (crear o actualizar)
      */
@@ -312,47 +308,105 @@ public class ClienteService {
             String accion = esNuevo ? "creado" : "actualizado";
             logger.info("Cliente {} exitosamente: {}", accion, cliente.getNombreCompleto());
             // Auditoría: registrar historial de cambios siguiendo el patrón de proveedores
-            String usuario = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService.getUsuarioActual() != null ? com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService.getUsuarioActual().getUsername() : System.getProperty("user.name", "sistema");
+            String usuario = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
+                    .getUsuarioActual() != null
+                            ? com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
+                                    .getUsuarioActual().getUsername()
+                            : System.getProperty("user.name", "sistema");
             java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
             if (esNuevo) {
-                historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
-                    cliente.getId(), "CREACION", null, cliente.getNombreCompleto(), usuario, ahora));
+                historialService.registrarCambio(
+                        new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                cliente.getId(), "CREACION", null, cliente.getNombreCompleto(), usuario, ahora));
             } else if (clienteAnterior != null) {
                 // Comparar campos relevantes y registrar cada cambio individualmente
-                if (!safeEquals(clienteAnterior.getDni(), cliente.getDni()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "dni", clienteAnterior.getDni(), cliente.getDni(), usuario, ahora));
+                if (!safeEquals(clienteAnterior.getDocumento(), cliente.getDocumento()))
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "documento", clienteAnterior.getDocumento(),
+                                    cliente.getDocumento(), usuario,
+                                    ahora));
+                if (!safeEquals(clienteAnterior.getTipoCliente(), cliente.getTipoCliente()))
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "tipo_cliente", clienteAnterior.getTipoCliente(),
+                                    cliente.getTipoCliente(), usuario,
+                                    ahora));
+                if (!safeEquals(clienteAnterior.getRazonSocial(), cliente.getRazonSocial()))
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "razon_social", clienteAnterior.getRazonSocial(),
+                                    cliente.getRazonSocial(), usuario,
+                                    ahora));
                 if (!safeEquals(clienteAnterior.getNombres(), cliente.getNombres()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "nombres", clienteAnterior.getNombres(), cliente.getNombres(), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "nombres", clienteAnterior.getNombres(), cliente.getNombres(),
+                                    usuario, ahora));
                 if (!safeEquals(clienteAnterior.getApellidos(), cliente.getApellidos()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "apellidos", clienteAnterior.getApellidos(), cliente.getApellidos(), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "apellidos", clienteAnterior.getApellidos(),
+                                    cliente.getApellidos(), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getTelefono(), cliente.getTelefono()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "telefono", clienteAnterior.getTelefono(), cliente.getTelefono(), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "telefono", clienteAnterior.getTelefono(), cliente.getTelefono(),
+                                    usuario, ahora));
                 if (!safeEquals(clienteAnterior.getEmail(), cliente.getEmail()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "email", clienteAnterior.getEmail(), cliente.getEmail(), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "email", clienteAnterior.getEmail(), cliente.getEmail(), usuario,
+                                    ahora));
                 if (!safeEquals(clienteAnterior.getDireccion(), cliente.getDireccion()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "direccion", clienteAnterior.getDireccion(), cliente.getDireccion(), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "direccion", clienteAnterior.getDireccion(),
+                                    cliente.getDireccion(), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getFechaNacimiento(), cliente.getFechaNacimiento()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "fecha_nacimiento", safeToString(clienteAnterior.getFechaNacimiento()), safeToString(cliente.getFechaNacimiento()), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "fecha_nacimiento",
+                                    safeToString(clienteAnterior.getFechaNacimiento()),
+                                    safeToString(cliente.getFechaNacimiento()), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getPuntosTotales(), cliente.getPuntosTotales()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "puntos_totales", safeToString(clienteAnterior.getPuntosTotales()), safeToString(cliente.getPuntosTotales()), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "puntos_totales", safeToString(clienteAnterior.getPuntosTotales()),
+                                    safeToString(cliente.getPuntosTotales()), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getPuntosUsados(), cliente.getPuntosUsados()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "puntos_usados", safeToString(clienteAnterior.getPuntosUsados()), safeToString(cliente.getPuntosUsados()), usuario, ahora));
-                if (!safeEquals(clienteAnterior.getEsFrecuente(), cliente.getEsFrecuente()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "es_frecuente", safeToString(clienteAnterior.getEsFrecuente()), safeToString(cliente.getEsFrecuente()), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "puntos_usados", safeToString(clienteAnterior.getPuntosUsados()),
+                                    safeToString(cliente.getPuntosUsados()), usuario, ahora));
+                if (!safeEquals(clienteAnterior.isFrecuente(), cliente.isFrecuente()))
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "frecuente", safeToString(clienteAnterior.isFrecuente()),
+                                    safeToString(cliente.isFrecuente()), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getCreatedAt(), cliente.getCreatedAt()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "created_at", safeToString(clienteAnterior.getCreatedAt()), safeToString(cliente.getCreatedAt()), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "created_at", safeToString(clienteAnterior.getCreatedAt()),
+                                    safeToString(cliente.getCreatedAt()), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getUpdatedAt(), cliente.getUpdatedAt()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "updated_at", safeToString(clienteAnterior.getUpdatedAt()), safeToString(cliente.getUpdatedAt()), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "updated_at", safeToString(clienteAnterior.getUpdatedAt()),
+                                    safeToString(cliente.getUpdatedAt()), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getPuntosDisponibles(), cliente.getPuntosDisponibles()))
-                    historialService.registrarCambio(new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(cliente.getId(), "puntos_disponibles", safeToString(clienteAnterior.getPuntosDisponibles()), safeToString(cliente.getPuntosDisponibles()), usuario, ahora));
+                    historialService.registrarCambio(
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+                                    cliente.getId(), "puntos_disponibles",
+                                    safeToString(clienteAnterior.getPuntosDisponibles()),
+                                    safeToString(cliente.getPuntosDisponibles()), usuario, ahora));
             }
             // ✅ OBSERVER PATTERN: Publicar evento
-            SystemEvent.EventType tipoEvento = esNuevo ? 
-                SystemEvent.EventType.CLIENTE_CREADO : 
-                SystemEvent.EventType.CLIENTE_ACTUALIZADO;
+            SystemEvent.EventType tipoEvento = esNuevo ? SystemEvent.EventType.CLIENTE_CREADO
+                    : SystemEvent.EventType.CLIENTE_ACTUALIZADO;
             eventManager.publishEvent(tipoEvento,
-                "Cliente " + accion + ": " + cliente.getNombreCompleto(),
-                this);
+                    "Cliente " + accion + ": " + cliente.getNombreCompleto(),
+                    this);
             return cliente;
         } catch (Exception e) {
             logger.error("Error al guardar cliente: {}", e.getMessage(), e);
@@ -362,18 +416,21 @@ public class ClienteService {
 
     // Métodos auxiliares para comparación segura
     private boolean safeEquals(Object a, Object b) {
-        if (a == null && b == null) return true;
-        if (a == null || b == null) return false;
+        if (a == null && b == null)
+            return true;
+        if (a == null || b == null)
+            return false;
         return a.equals(b);
     }
+
     private String safeToString(Object o) {
         return o == null ? "" : o.toString();
     }
-    
+
     // Método desactivar eliminado: ahora eliminarCliente hace el borrado real
-    
+
     // ✅ SISTEMA DE PUNTOS
-    
+
     /**
      * ✅ SERVICE LAYER: Agregar puntos por compra
      */
@@ -385,18 +442,18 @@ public class ClienteService {
             // Calcular puntos (1 punto por cada S/ 10)
             int puntosAGanar = (int) (montoCompra / 10);
             if (puntosAGanar > 0) {
-                logger.info("Puntos agregados a cliente ID {}: {} puntos por compra de S/ {}", 
-                           clienteId, puntosAGanar, montoCompra);
+                logger.info("Puntos agregados a cliente ID {}: {} puntos por compra de S/ {}",
+                        clienteId, puntosAGanar, montoCompra);
                 // ✅ OBSERVER PATTERN: Publicar evento de puntos
                 eventManager.publishEvent(SystemEvent.EventType.CLIENTE_PUNTOS_AGREGADOS,
-                    String.format("Cliente ID %d ganó %d puntos", clienteId, puntosAGanar),
-                    this);
+                        String.format("Cliente ID %d ganó %d puntos", clienteId, puntosAGanar),
+                        this);
             }
         } catch (Exception e) {
             logger.error("Error al agregar puntos por compra: {}", e.getMessage(), e);
         }
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Redimir puntos del cliente
      */
@@ -405,24 +462,24 @@ public class ClienteService {
             if (clienteId == null || puntos == null || puntos <= 0) {
                 return false;
             }
-            
+
             logger.info("Puntos redimidos de cliente ID {}: {} puntos", clienteId, puntos);
-            
+
             // ✅ OBSERVER PATTERN: Publicar evento de redención
             eventManager.publishEvent(SystemEvent.EventType.CLIENTE_PUNTOS_REDIMIDOS,
-                String.format("Cliente ID %d redimió %d puntos", clienteId, puntos),
-                this);
-            
+                    String.format("Cliente ID %d redimió %d puntos", clienteId, puntos),
+                    this);
+
             return true;
-            
+
         } catch (Exception e) {
             logger.error("Error al redimir puntos: {}", e.getMessage(), e);
             return false;
         }
     }
-    
+
     // ✅ VALIDACIONES DE NEGOCIO
-    
+
     /**
      * ✅ SERVICE LAYER: Validaciones centralizadas de cliente
      */
@@ -430,40 +487,55 @@ public class ClienteService {
         if (cliente == null) {
             throw new IllegalArgumentException("Cliente no puede ser nulo");
         }
-        
-        // Validar DNI
-        if (cliente.getDni() == null || cliente.getDni().trim().isEmpty()) {
-            throw new IllegalArgumentException("DNI es obligatorio");
+
+        String tipo = cliente.getTipoCliente();
+        if ("Natural".equalsIgnoreCase(tipo)) {
+            // Validar documento (DNI)
+            if (cliente.getDocumento() == null || cliente.getDocumento().trim().isEmpty()) {
+                throw new IllegalArgumentException("DNI es obligatorio");
+            }
+            if (!PATTERN_DNI.matcher(cliente.getDocumento().trim()).matches()) {
+                throw new IllegalArgumentException("DNI debe tener exactamente 8 dígitos numéricos");
+            }
+            // Validar nombres
+            if (cliente.getNombres() == null || cliente.getNombres().trim().isEmpty()) {
+                throw new IllegalArgumentException("Nombres son obligatorios");
+            }
+            if (cliente.getNombres().trim().length() < 2) {
+                throw new IllegalArgumentException("Nombres deben tener al menos 2 caracteres");
+            }
+            // Validar apellidos
+            if (cliente.getApellidos() == null || cliente.getApellidos().trim().isEmpty()) {
+                throw new IllegalArgumentException("Apellidos son obligatorios");
+            }
+            if (cliente.getApellidos().trim().length() < 2) {
+                throw new IllegalArgumentException("Apellidos deben tener al menos 2 caracteres");
+            }
+        } else if ("Empresarial".equalsIgnoreCase(tipo)) {
+            // Validar documento (RUC)
+            if (cliente.getDocumento() == null || cliente.getDocumento().trim().isEmpty()) {
+                throw new IllegalArgumentException("RUC es obligatorio");
+            }
+            if (!cliente.getDocumento().trim().matches("\\d{11}")) {
+                throw new IllegalArgumentException("RUC debe tener exactamente 11 dígitos numéricos");
+            }
+            // Validar Razón Social
+            if (cliente.getRazonSocial() == null || cliente.getRazonSocial().trim().isEmpty()) {
+                throw new IllegalArgumentException("Razón Social es obligatoria");
+            }
+            if (cliente.getRazonSocial().trim().length() < 2) {
+                throw new IllegalArgumentException("Razón Social debe tener al menos 2 caracteres");
+            }
+        } else {
+            throw new IllegalArgumentException("Tipo de cliente inválido");
         }
-        
-        if (!PATTERN_DNI.matcher(cliente.getDni().trim()).matches()) {
-            throw new IllegalArgumentException("DNI debe tener exactamente 8 dígitos numéricos");
-        }
-        
-        // Validar nombres
-        if (cliente.getNombres() == null || cliente.getNombres().trim().isEmpty()) {
-            throw new IllegalArgumentException("Nombres son obligatorios");
-        }
-        
-        if (cliente.getNombres().trim().length() < 2) {
-            throw new IllegalArgumentException("Nombres deben tener al menos 2 caracteres");
-        }
-        
-        // Validar apellidos
-        if (cliente.getApellidos() == null || cliente.getApellidos().trim().isEmpty()) {
-            throw new IllegalArgumentException("Apellidos son obligatorios");
-        }
-        
-        if (cliente.getApellidos().trim().length() < 2) {
-            throw new IllegalArgumentException("Apellidos deben tener al menos 2 caracteres");
-        }
-        
+
         // Validaciones opcionales
         validarEmail(cliente.getEmail());
         validarTelefono(cliente.getTelefono());
         validarFechaNacimiento(cliente.getFechaNacimiento());
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Validar email
      */
@@ -474,7 +546,7 @@ public class ClienteService {
             }
         }
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Validar teléfono
      */
@@ -485,7 +557,7 @@ public class ClienteService {
             }
         }
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Validar fecha de nacimiento
      */
@@ -501,47 +573,47 @@ public class ClienteService {
             }
         }
     }
-    
+
     // ✅ CONSULTAS ESPECIALIZADAS
-    
+
     /**
      * ✅ SERVICE LAYER: Obtener clientes frecuentes
      */
     public List<Cliente> obtenerClientesFrecuentes() {
         try {
             return obtenerTodos().stream()
-                .filter(c -> Boolean.TRUE.equals(c.getEsFrecuente()))
-                .collect(Collectors.toList());
+                    .filter(Cliente::isFrecuente)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             logger.error("Error al obtener clientes frecuentes: {}", e.getMessage(), e);
             return List.of();
         }
     }
-    
+
     /**
      * ✅ SERVICE LAYER: Obtener estadísticas de clientes
      */
     public EstadisticasClientes obtenerEstadisticas() {
         try {
             List<Cliente> todos = obtenerTodos();
-            
+
             int totalActivos = todos.size();
             int frecuentes = (int) todos.stream()
-                .filter(c -> Boolean.TRUE.equals(c.getEsFrecuente()))
-                .count();
+                    .filter(Cliente::isFrecuente)
+                    .count();
             int nuevosDelMes = 0; // Por implementar con fecha_registro
             double promedioPuntos = todos.stream()
-                .mapToInt(c -> c.getPuntosDisponibles() != null ? c.getPuntosDisponibles() : 0)
-                .average()
-                .orElse(0.0);
-            
+                    .mapToInt(c -> c.getPuntosDisponibles() != null ? c.getPuntosDisponibles() : 0)
+                    .average()
+                    .orElse(0.0);
+
             return new EstadisticasClientes(totalActivos, frecuentes, nuevosDelMes, promedioPuntos);
         } catch (Exception e) {
             logger.error("Error al obtener estadísticas de clientes: {}", e.getMessage(), e);
             return new EstadisticasClientes(0, 0, 0, 0.0);
         }
     }
-    
+
     /**
      * ✅ CLASE PARA ESTADÍSTICAS
      */
@@ -550,17 +622,28 @@ public class ClienteService {
         private final int frecuentes;
         private final int nuevosDelMes;
         private final double promedioPuntos;
-        
+
         public EstadisticasClientes(int totalActivos, int frecuentes, int nuevosDelMes, double promedioPuntos) {
             this.totalActivos = totalActivos;
             this.frecuentes = frecuentes;
             this.nuevosDelMes = nuevosDelMes;
             this.promedioPuntos = promedioPuntos;
         }
-        
-        public int getTotalActivos() { return totalActivos; }
-        public int getFrecuentes() { return frecuentes; }
-        public int getNuevosDelMes() { return nuevosDelMes; }
-        public double getPromedioPuntos() { return promedioPuntos; }
+
+        public int getTotalActivos() {
+            return totalActivos;
+        }
+
+        public int getFrecuentes() {
+            return frecuentes;
+        }
+
+        public int getNuevosDelMes() {
+            return nuevosDelMes;
+        }
+
+        public double getPromedioPuntos() {
+            return promedioPuntos;
+        }
     }
 }
