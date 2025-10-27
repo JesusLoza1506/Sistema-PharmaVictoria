@@ -211,7 +211,8 @@ public class ExportFacade {
             List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> clientes, String nombreArchivo) {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Clientes");
-            String[] headers = { "DNI", "Nombres", "Apellidos", "Teléfono", "Email", "Dirección", "Fecha Nacimiento",
+            String[] headers = { "Documento", "Tipo", "Razón Social / Nombre", "Teléfono", "Email", "Dirección",
+                    "Fecha Nacimiento",
                     "Puntos Totales", "Puntos Usados", "Puntos Disponibles", "Frecuente" };
             short verdeA = IndexedColors.BRIGHT_GREEN.getIndex();
             // Logo
@@ -288,9 +289,10 @@ public class ExportFacade {
             for (int i = 0; i < clientes.size(); i++) {
                 com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c = clientes.get(i);
                 Row row = sheet.createRow(logoRow + 3 + i);
-                row.createCell(0).setCellValue(c.getDni() != null ? c.getDni() : "");
-                row.createCell(1).setCellValue(c.getNombres() != null ? c.getNombres() : "");
-                row.createCell(2).setCellValue(c.getApellidos() != null ? c.getApellidos() : "");
+                row.createCell(0).setCellValue(c.getDocumento() != null ? c.getDocumento() : "");
+                row.createCell(1).setCellValue(c.getTipoCliente() != null ? c.getTipoCliente() : "");
+                row.createCell(2).setCellValue(
+                        ("EMPRESARIAL".equals(c.getTipoCliente()) ? c.getRazonSocial() : c.getNombreCompleto()));
                 row.createCell(3).setCellValue(c.getTelefono() != null ? c.getTelefono() : "");
                 row.createCell(4).setCellValue(c.getEmail() != null ? c.getEmail() : "");
                 row.createCell(5).setCellValue(c.getDireccion() != null ? c.getDireccion() : "");
@@ -299,7 +301,7 @@ public class ExportFacade {
                 row.createCell(7).setCellValue(c.getPuntosTotales() != null ? c.getPuntosTotales() : 0);
                 row.createCell(8).setCellValue(c.getPuntosUsados() != null ? c.getPuntosUsados() : 0);
                 row.createCell(9).setCellValue(c.getPuntosDisponibles() != null ? c.getPuntosDisponibles() : 0);
-                row.createCell(10).setCellValue(Boolean.TRUE.equals(c.getEsFrecuente()) ? "Sí" : "No");
+                row.createCell(10).setCellValue(Boolean.TRUE.equals(c.isFrecuente()) ? "Sí" : "No");
                 for (int j = 0; j < headers.length; j++) {
                     row.getCell(j).setCellStyle(cellStyle);
                 }
@@ -362,7 +364,8 @@ public class ExportFacade {
             document.add(new com.itextpdf.text.Paragraph(" "));
 
             // Tabla con cabecera estilizada
-            String[] headers = { "DNI", "Nombres", "Apellidos", "Teléfono", "Email", "Dirección", "Fecha Nacimiento",
+            String[] headers = { "Documento", "Tipo", "Razón Social / Nombre", "Teléfono", "Email", "Dirección",
+                    "Fecha Nacimiento",
                     "Puntos Totales", "Puntos Usados", "Puntos Disponibles", "Frecuente" };
             com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(headers.length);
             table.setWidthPercentage(100);
@@ -394,9 +397,12 @@ public class ExportFacade {
                     com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente::getNombres,
                     java.text.Collator.getInstance()));
             for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c : clientes) {
-                table.addCell(new com.itextpdf.text.Phrase(c.getDni() != null ? c.getDni() : "", cellFont));
-                table.addCell(new com.itextpdf.text.Phrase(c.getNombres() != null ? c.getNombres() : "", cellFont));
-                table.addCell(new com.itextpdf.text.Phrase(c.getApellidos() != null ? c.getApellidos() : "", cellFont));
+                table.addCell(new com.itextpdf.text.Phrase(c.getDocumento() != null ? c.getDocumento() : "", cellFont));
+                table.addCell(
+                        new com.itextpdf.text.Phrase(c.getTipoCliente() != null ? c.getTipoCliente() : "", cellFont));
+                table.addCell(new com.itextpdf.text.Phrase(
+                        ("EMPRESARIAL".equals(c.getTipoCliente()) ? c.getRazonSocial() : c.getNombreCompleto()),
+                        cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(c.getTelefono() != null ? c.getTelefono() : "", cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(c.getEmail() != null ? c.getEmail() : "", cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(c.getDireccion() != null ? c.getDireccion() : "", cellFont));
@@ -409,7 +415,7 @@ public class ExportFacade {
                 table.addCell(new com.itextpdf.text.Phrase(
                         c.getPuntosDisponibles() != null ? c.getPuntosDisponibles().toString() : "0", cellFont));
                 table.addCell(
-                        new com.itextpdf.text.Phrase(Boolean.TRUE.equals(c.getEsFrecuente()) ? "Sí" : "No", cellFont));
+                        new com.itextpdf.text.Phrase(Boolean.TRUE.equals(c.isFrecuente()) ? "Sí" : "No", cellFont));
             }
             document.add(table);
             float[] columnWidths = { 1.5f, 2f, 1.5f, 1.5f, 2f, 2f, 1.3f, 1.3f, 1.3f, 1.3f, 1.2f };

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<DialogPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.RucCompletoDialogController">
+    <content>
+        <VBox spacing="10" alignment="CENTER">
+            <Label text="Completa los datos del cliente para FACTURA" />
+            <TextField fx:id="rucTextField" promptText="RUC (11 dígitos)" />
+            <TextField fx:id="razonSocialTextField" promptText="Razón Social" />
+            <TextField fx:id="direccionTextField" promptText="Dirección" />
+            <TextField fx:id="emailTextField" promptText="Email" />
+            <Label fx:id="errorLabel" textFill="red" visible="false" />
+        </VBox>
+    </content>
+    <buttonTypes>
+        <ButtonType text="Aceptar" buttonData="OK_DONE" />
+        <ButtonType text="Cancelar" buttonData="CANCEL_CLOSE" />
+    </buttonTypes>
+</DialogPane>

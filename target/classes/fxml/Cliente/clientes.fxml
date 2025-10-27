@@ -82,13 +82,12 @@
             <children>
                <TableView fx:id="tablaClientes" styleClass="clientes-table" VBox.vgrow="ALWAYS">
                   <columns>
-                     <TableColumn fx:id="colDni" minWidth="90.0" prefWidth="100.0" text="DNI" />
-                     <TableColumn fx:id="colNombres" minWidth="120.0" prefWidth="140.0" text="Nombres" />
-                     <TableColumn fx:id="colApellidos" minWidth="120.0" prefWidth="140.0" text="Apellidos" />
+                     <TableColumn fx:id="colTipoCliente" minWidth="90.0" prefWidth="110.0" text="Tipo" />
+                     <TableColumn fx:id="colDocumento" minWidth="120.0" prefWidth="140.0" text="Documento" />
+                     <TableColumn fx:id="colNombreRazonSocial" minWidth="180.0" prefWidth="220.0" text="Nombre / Razón social" />
                      <TableColumn fx:id="colTelefono" minWidth="100.0" prefWidth="120.0" text="Teléfono" />
                      <TableColumn fx:id="colEmail" minWidth="140.0" prefWidth="180.0" text="Email" />
                      <TableColumn fx:id="colDireccion" minWidth="140.0" prefWidth="180.0" text="Dirección" />
-                     <TableColumn fx:id="colFechaNacimiento" minWidth="110.0" prefWidth="130.0" text="F. Nacimiento" />
                      <TableColumn fx:id="colAcciones" minWidth="120.0" prefWidth="150.0" text="Acciones" />
                   </columns>
                   <columnResizePolicy>

@@ -144,9 +144,12 @@ public class BoletaPreviewDialog {
         boletaContent.getChildren().add(new Label(String.format("│ FECHA: %s   HORA: %s │", fecha, hora)));
         boletaContent.getChildren().add(new Label(String.format("│ CAJERO: %s │", cajero)));
         String cliente = boleta.getCliente() != null ? boleta.getCliente().getNombreCompleto() : "XXXXX";
-        String dni = boleta.getCliente() != null ? boleta.getCliente().getDni() : "XXXXX";
+        String tipoDoc = boleta.getCliente() != null && "EMPRESARIAL".equals(boleta.getCliente().getTipoCliente())
+                ? "RUC"
+                : "DNI";
+        String documento = boleta.getCliente() != null ? boleta.getCliente().getDocumento() : "XXXXX";
         boletaContent.getChildren().add(new Label(String.format("│ CLIENTE: %s │", cliente)));
-        boletaContent.getChildren().add(new Label(String.format("│ DNI: %s │", dni)));
+        boletaContent.getChildren().add(new Label(String.format("│ %s: %s │", tipoDoc, documento)));
         boletaContent.getChildren().add(new Label("│--------------------------------------------------------------│"));
         boletaContent.getChildren().add(new Label("│ CANT.  |  DESCRIPCIÓN                  | P.U.   | IMPORTE    │"));
         boletaContent.getChildren().add(new Label("│--------------------------------------------------------------│"));

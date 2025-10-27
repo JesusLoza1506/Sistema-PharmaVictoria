@@ -69,7 +69,7 @@ public class ExportarClientesController {
         colPuntosDisponibles.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
                 String.valueOf(cellData.getValue().getPuntosDisponibles())));
         colFrecuente.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
-                Boolean.TRUE.equals(cellData.getValue().getEsFrecuente()) ? "Sí" : "No"));
+                cellData.getValue().isFrecuente() ? "Sí" : "No"));
         tablePreview.setItems(clientesFiltrados);
         tablePreview.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         btnExportarExcel.setOnAction(e -> exportar("excel"));
@@ -79,7 +79,7 @@ public class ExportarClientesController {
     public void setClientesFiltrados(List<Cliente> lista) {
         // Filtrar cliente genérico (DNI '00000000')
         List<Cliente> listaSinGenerico = lista.stream()
-                .filter(c -> c.getDni() == null || !c.getDni().equals("00000000"))
+                .filter(c -> c.getDocumento() == null || !c.getDocumento().equals("00000000"))
                 .toList();
         clientesFiltrados.setAll(listaSinGenerico);
         tablePreview.setItems(clientesFiltrados);

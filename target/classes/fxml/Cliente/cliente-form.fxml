@@ -22,13 +22,31 @@
                         <!-- ===== SECCIÓN INFORMACIÓN BÁSICA ===== -->
                         <VBox spacing="15.0" styleClass="form-section">
                             <children>
-                                <Label styleClass="section-title" text=" INFORMACIÓN BÁSICA" />
+                                <Label styleClass="section-title" text=" INFORMACIÓN BÁSICA" />
+                                <HBox spacing="15.0">
+                                    <children>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Tipo de Cliente *" />
+                                                <ComboBox fx:id="comboTipoCliente" promptText="Selecciona tipo" styleClass="field-input">
+                                                    <!-- Los items se inicializan en el controlador -->
+                                                </ComboBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
                                 <HBox spacing="15.0">
                                     <children>
                                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <Label styleClass="field-label" text="DNI *" />
                                                 <TextField fx:id="txtDni" promptText="Ej: 12345678" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="RUC *" />
+                                                <TextField fx:id="txtRuc" promptText="Ej: 20123456789" styleClass="field-input" />
                                             </children>
                                         </VBox>
                                         <VBox spacing="5.0" HBox.hgrow="ALWAYS">
@@ -51,6 +69,12 @@
                                             <children>
                                                 <Label styleClass="field-label" text="Apellidos *" />
                                                 <TextField fx:id="txtApellidos" promptText="Ej: Pérez Gómez" styleClass="field-input" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label styleClass="field-label" text="Razón Social *" />
+                                                <TextField fx:id="txtRazonSocial" promptText="Ej: Empresa S.A.C." styleClass="field-input" />
                                             </children>
                                         </VBox>
                                     </children>

@@ -14,7 +14,7 @@ public class VentaHistorialCambioRepositoryJdbcImpl implements VentaHistorialCam
     public VentaHistorialCambio findById(int id) {
         String sql = "SELECT * FROM venta_historial_cambios WHERE id = ?";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+                PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -31,7 +31,7 @@ public class VentaHistorialCambioRepositoryJdbcImpl implements VentaHistorialCam
     public void delete(int id) {
         String sql = "DELETE FROM venta_historial_cambios WHERE id = ?";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+                PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -41,10 +41,10 @@ public class VentaHistorialCambioRepositoryJdbcImpl implements VentaHistorialCam
 
     @Override
     public void save(VentaHistorialCambio historial) {
-        // CORREGIDO: nombre de tabla debe ser 'venta_historial_cambio' (sin 's')
+        // El campo id es autoincremental, no se debe incluir en el INSERT
         String sql = "INSERT INTO venta_historial_cambio (venta_id, tipo_cambio, motivo, usuario_id, fecha) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+                PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, historial.getVenta() != null ? historial.getVenta().getId() : 0);
             stmt.setString(2, historial.getTipoCambio());
             stmt.setString(3, historial.getMotivo());
@@ -61,7 +61,7 @@ public class VentaHistorialCambioRepositoryJdbcImpl implements VentaHistorialCam
         List<VentaHistorialCambio> historialList = new ArrayList<>();
         String sql = "SELECT * FROM venta_historial_cambios WHERE venta_id = ? ORDER BY fecha DESC";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
-             PreparedStatement stmt = connection.prepareStatement(sql)) {
+                PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, ventaId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -78,11 +78,14 @@ public class VentaHistorialCambioRepositoryJdbcImpl implements VentaHistorialCam
     private VentaHistorialCambio mapFromResultSet(ResultSet rs) throws SQLException {
         VentaHistorialCambio h = new VentaHistorialCambio();
         h.setId(rs.getInt("id"));
-        // Solo se setea el ID de venta. Se recomienda cargar el objeto completo en el Service si se requiere.
-        // Venta venta = new Venta(); venta.setId(rs.getInt("venta_id")); h.setVenta(venta);
+        // Solo se setea el ID de venta. Se recomienda cargar el objeto completo en el
+        // Service si se requiere.
+        // Venta venta = new Venta(); venta.setId(rs.getInt("venta_id"));
+        // h.setVenta(venta);
         h.setTipoCambio(rs.getString("tipo_cambio"));
         h.setMotivo(rs.getString("motivo"));
-        // Usuario usuario = new Usuario(); usuario.setId(rs.getLong("usuario_id")); h.setUsuario(usuario);
+        // Usuario usuario = new Usuario(); usuario.setId(rs.getLong("usuario_id"));
+        // h.setUsuario(usuario);
         h.setFecha(rs.getTimestamp("fecha") != null ? rs.getTimestamp("fecha").toLocalDateTime() : null);
         return h;
     }
