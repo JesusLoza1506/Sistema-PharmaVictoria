@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 
 public class ClienteFormController {
-    // Callback para notificar edición instantánea
-    private Runnable onClienteEditado;
+    // Callback para notificar edición instantánea (ahora acepta el cliente editado)
+    private java.util.function.Consumer<Cliente> onClienteEditado;
 
-    public void setOnClienteEditado(Runnable callback) {
+    public void setOnClienteEditado(java.util.function.Consumer<Cliente> callback) {
         this.onClienteEditado = callback;
     }
 
@@ -56,6 +56,7 @@ public class ClienteFormController {
         this.cliente = cliente;
         if (cliente != null) {
             editMode = true;
+            comboTipoCliente.setValue(cliente.getTipoCliente());
             txtNombres.setText(cliente.getNombres());
             txtApellidos.setText(cliente.getApellidos());
             txtTelefono.setText(cliente.getTelefono());
@@ -65,37 +66,77 @@ public class ClienteFormController {
                 dpFechaNacimiento.setValue(cliente.getFechaNacimiento());
             }
             chkActivo.setSelected(Boolean.TRUE.equals(cliente.isFrecuente()));
-            // Mostrar documento según tipo
-            if ("NATURAL".equals(cliente.getTipoCliente())) {
-                txtDni.setText(cliente.getDocumento());
-            } else {
+            if ("Empresa".equals(cliente.getTipoCliente())) {
                 txtRuc.setText(cliente.getDocumento());
                 txtRazonSocial.setText(cliente.getRazonSocial());
+            } else {
+                txtDni.setText(cliente.getDocumento());
             }
         }
+        actualizarVisibilidadCampos();
     }
 
     @FXML
     public void initialize() {
-        comboTipoCliente.getItems().addAll("NATURAL", "EMPRESARIAL");
-        comboTipoCliente.setValue("NATURAL");
+        comboTipoCliente.getItems().addAll("Natural", "Empresa");
+        comboTipoCliente.setValue("Natural");
+        // Mostrar/ocultar campos según el tipo seleccionado
+        comboTipoCliente.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if ("Empresa".equalsIgnoreCase(newVal)) {
+                txtRuc.setDisable(false);
+                txtRuc.setVisible(true);
+                txtRazonSocial.setDisable(false);
+                txtRazonSocial.setVisible(true);
+                txtDni.setDisable(true);
+                txtDni.setVisible(false);
+            } else {
+                txtDni.setDisable(false);
+                txtDni.setVisible(true);
+                txtRuc.setDisable(true);
+                txtRuc.setVisible(false);
+                txtRazonSocial.setDisable(true);
+                txtRazonSocial.setVisible(false);
+            }
+        });
+        // Inicializar visibilidad al abrir el formulario
+        if ("Empresa".equalsIgnoreCase(comboTipoCliente.getValue())) {
+            txtRuc.setDisable(false);
+            txtRuc.setVisible(true);
+            txtRazonSocial.setDisable(false);
+            txtRazonSocial.setVisible(true);
+            txtDni.setDisable(true);
+            txtDni.setVisible(false);
+        } else {
+            txtDni.setDisable(false);
+            txtDni.setVisible(true);
+            txtRuc.setDisable(true);
+            txtRuc.setVisible(false);
+            txtRazonSocial.setDisable(true);
+            txtRazonSocial.setVisible(false);
+        }
         actualizarVisibilidadCampos();
         comboTipoCliente.valueProperty().addListener((obs, oldVal, newVal) -> actualizarVisibilidadCampos());
     }
 
     private void actualizarVisibilidadCampos() {
         String tipo = comboTipoCliente.getValue();
-        boolean esNatural = "NATURAL".equals(tipo);
+        boolean esEmpresa = "Empresa".equals(tipo);
+        boolean esNatural = "Natural".equals(tipo);
 
         // Campos para cliente natural
         txtDni.setVisible(esNatural);
         txtNombres.setVisible(esNatural);
+        txtNombres.setDisable(esEmpresa);
         txtApellidos.setVisible(esNatural);
+        txtApellidos.setDisable(esEmpresa);
         dpFechaNacimiento.setVisible(esNatural);
+        dpFechaNacimiento.setDisable(esEmpresa);
 
         // Campos para empresa
-        txtRuc.setVisible(!esNatural);
-        txtRazonSocial.setVisible(!esNatural);
+        txtRuc.setVisible(esEmpresa);
+        txtRuc.setDisable(!esEmpresa);
+        txtRazonSocial.setVisible(esEmpresa);
+        txtRazonSocial.setDisable(!esEmpresa);
 
         // Campos comunes (siempre visibles)
         txtTelefono.setVisible(true);
@@ -111,7 +152,7 @@ public class ClienteFormController {
         String telefono = txtTelefono.getText().trim();
         String email = txtEmail.getText().trim();
         clearError();
-        if ("NATURAL".equals(tipo)) {
+        if ("Natural".equals(tipo)) {
             String dni = txtDni.getText().trim();
             if (dni.isEmpty() || nombres.isEmpty()) {
                 showError("DNI y Nombres son obligatorios.");
@@ -128,7 +169,7 @@ public class ClienteFormController {
                 mostrarAlertaDatosIncompletos();
                 return;
             }
-        } else {
+        } else if ("Empresa".equals(tipo)) {
             String ruc = txtRuc.getText().trim();
             String razonSocial = txtRazonSocial.getText().trim();
             if (ruc.isEmpty() || razonSocial.isEmpty()) {
@@ -172,15 +213,26 @@ public class ClienteFormController {
             mostrarAlertaDatosIncompletos();
             return;
         }
-        getClienteFromForm();
-        if (!chkActivo.isSelected()) {
-            mostrarAlertaClienteInactivo();
+        try {
+            Cliente clienteGuardado = getClienteFromForm();
+            logger.info(
+                    "[GUARDAR] Intentando guardar cliente: tipo={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, es_frecuente={}",
+                    clienteGuardado.getTipoCliente(), clienteGuardado.getDocumento(), clienteGuardado.getRazonSocial(),
+                    clienteGuardado.getNombres(), clienteGuardado.getApellidos(), clienteGuardado.getTelefono(),
+                    clienteGuardado.getEmail(), clienteGuardado.getDireccion(), clienteGuardado.getFechaNacimiento(),
+                    clienteGuardado.isFrecuente());
+            if (!chkActivo.isSelected()) {
+                mostrarAlertaClienteInactivo();
+            }
+            mostrarNotificacionGuardado();
+            if (onClienteEditado != null) {
+                onClienteEditado.accept(clienteGuardado);
+            }
+            ((Stage) comboTipoCliente.getScene().getWindow()).close();
+        } catch (Exception e) {
+            logger.error("[ERROR GUARDAR CLIENTE] {}", e.getMessage(), e);
+            showError("Error al guardar el cliente: " + e.getMessage());
         }
-        mostrarNotificacionGuardado();
-        if (onClienteEditado != null) {
-            onClienteEditado.run();
-        }
-        ((Stage) comboTipoCliente.getScene().getWindow()).close();
     }
 
     // ALERTAS Y NOTIFICACIONES
@@ -220,9 +272,9 @@ public class ClienteFormController {
 
     private boolean existeClienteConDni(String dni) {
         if (editMode && cliente != null && dni.equals(cliente.getDocumento())
-                && "NATURAL".equals(cliente.getTipoCliente()))
+                && "Natural".equals(cliente.getTipoCliente()))
             return false;
-        return clientesExistentes.stream().anyMatch(c -> "NATURAL".equals(c.getTipoCliente())
+        return clientesExistentes.stream().anyMatch(c -> "Natural".equals(c.getTipoCliente())
                 && c.getDocumento() != null && c.getDocumento().equalsIgnoreCase(dni));
     }
 
@@ -252,9 +304,9 @@ public class ClienteFormController {
 
     private boolean existeClienteConRuc(String ruc) {
         if (editMode && cliente != null && ruc.equals(cliente.getDocumento())
-                && "EMPRESARIAL".equals(cliente.getTipoCliente()))
+                && "Empresa".equals(cliente.getTipoCliente()))
             return false;
-        return clientesExistentes.stream().anyMatch(c -> "EMPRESARIAL".equals(c.getTipoCliente())
+        return clientesExistentes.stream().anyMatch(c -> "Empresa".equals(c.getTipoCliente())
                 && c.getDocumento() != null && c.getDocumento().equalsIgnoreCase(ruc));
     }
 
@@ -263,12 +315,12 @@ public class ClienteFormController {
             cliente = new Cliente();
         String tipo = comboTipoCliente.getValue();
         cliente.setTipoCliente(tipo);
-        if ("NATURAL".equals(tipo)) {
-            cliente.setDocumento(txtDni.getText());
-            cliente.setRazonSocial("");
-        } else {
+        if ("Empresa".equals(tipo)) {
             cliente.setDocumento(txtRuc.getText());
             cliente.setRazonSocial(txtRazonSocial.getText());
+        } else {
+            cliente.setDocumento(txtDni.getText());
+            cliente.setRazonSocial("");
         }
         cliente.setNombres(txtNombres.getText());
         cliente.setApellidos(txtApellidos.getText());
@@ -279,6 +331,11 @@ public class ClienteFormController {
             cliente.setFechaNacimiento(dpFechaNacimiento.getValue());
         }
         cliente.setEsFrecuente(chkActivo.isSelected());
+        logger.info(
+                "[FORM] Datos del cliente a guardar: tipo_cliente={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, es_frecuente={}",
+                cliente.getTipoCliente(), cliente.getDocumento(), cliente.getRazonSocial(), cliente.getNombres(),
+                cliente.getApellidos(), cliente.getTelefono(), cliente.getEmail(), cliente.getDireccion(),
+                cliente.getFechaNacimiento(), cliente.isFrecuente());
         return cliente;
     }
 

@@ -1,7 +1,7 @@
 package com.farmaciavictoria.proyectopharmavictoria.controller.Cliente;
 
+import javafx.scene.control.TableCell;
 import javafx.collections.FXCollections;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Button;
@@ -245,17 +245,32 @@ public class ClientesController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        colTipoCliente.setCellValueFactory(cellData -> {
-            String tipo = cellData.getValue().getTipoCliente();
-            System.out.println("[DEBUG TABLEVIEW] tipo_cliente recibido: '" + tipo + "'");
-            if (tipo != null && tipo.trim().replaceAll("\\s+", "").equalsIgnoreCase("Empresarial")) {
-                return new javafx.beans.property.SimpleStringProperty("🏢 Empresa");
-            } else if (tipo != null && tipo.trim().replaceAll("\\s+", "").equalsIgnoreCase("Natural")) {
-                return new javafx.beans.property.SimpleStringProperty("🧍 Natural");
-            } else {
-                return new javafx.beans.property.SimpleStringProperty("❓ Desconocido");
+        colTipoCliente.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(String tipo, boolean empty) {
+                super.updateItem(tipo, empty);
+                if (empty || tipo == null) {
+                    setGraphic(null);
+                } else {
+                    String iconPath;
+                    if (tipo.trim().replaceAll("\\s+", "").equalsIgnoreCase("Empresa")) {
+                        iconPath = "/icons/empresa.png";
+                    } else {
+                        iconPath = "/icons/persona.png";
+                    }
+                    javafx.scene.image.ImageView imageView = new javafx.scene.image.ImageView();
+                    imageView.setImage(new javafx.scene.image.Image(getClass().getResourceAsStream(iconPath)));
+                    imageView.setFitWidth(20);
+                    imageView.setFitHeight(20);
+                    javafx.scene.layout.StackPane pane = new javafx.scene.layout.StackPane(imageView);
+                    pane.setPrefWidth(column.getWidth());
+                    pane.setAlignment(javafx.geometry.Pos.CENTER);
+                    setGraphic(pane);
+                }
             }
         });
+        colTipoCliente.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getTipoCliente()));
         colDocumento.setCellValueFactory(
                 cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDocumento()));
         colNombreRazonSocial.setCellValueFactory(
@@ -470,20 +485,25 @@ public class ClientesController implements Initializable {
     }
 
     private void editarCliente(com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente cliente) {
+        System.out.println("[EDITAR CLIENTE] Iniciando edición de cliente: tipo=" + cliente.getTipoCliente()
+                + " | documento=" + cliente.getDocumento() + " | razon_social=" + cliente.getRazonSocial());
         try {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/fxml/Cliente/cliente-form.fxml"));
             javafx.scene.Parent root = loader.load();
             ClienteFormController formController = loader.getController();
             formController.setCliente(cliente); // precargar datos
-            // Inyectar lista de clientes para validaciones
             formController.setClientesExistentes(clientesList);
-            // Inyectar callback para refrescar la tabla instantáneamente
-            formController.setOnClienteEditado(() -> {
-                // Guardar el cliente editado antes de refrescar
-                com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente editado = formController
-                        .getClienteFromForm();
-                if (editado != null && editado.getNombres() != null && !editado.getNombres().trim().isEmpty()) {
+            formController.setOnClienteEditado(editado -> {
+                if (editado != null) {
+                    if ("Empresa".equalsIgnoreCase(editado.getTipoCliente())) {
+                        System.out.println("[EDITAR CLIENTE EMPRESA] RUC=" + editado.getRuc() + " | Razón Social="
+                                + editado.getRazonSocial());
+                        if (editado.getRuc() == null || editado.getRazonSocial() == null
+                                || editado.getRazonSocial().trim().isEmpty()) {
+                            System.err.println("[ERROR EMPRESA] RUC o Razón Social vacíos al editar empresa");
+                        }
+                    }
                     clienteService.actualizarCliente(editado);
                 }
                 refrescarDatos();
@@ -497,11 +517,9 @@ public class ClientesController implements Initializable {
             stage.setResizable(false);
             stage.showAndWait();
         } catch (Exception e) {
-            e.printStackTrace();
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
-                    javafx.scene.control.Alert.AlertType.ERROR,
-                    "No se pudo abrir el formulario de edición: " + e.getMessage());
-            alert.showAndWait();
+            System.err.println("[ERROR FXML] No se pudo abrir el formulario de edición: " + e.getMessage());
+            System.err.println("[ERROR FXML] Stacktrace:");
+            e.printStackTrace(System.err);
         }
     }
 
@@ -742,8 +760,7 @@ public class ClientesController implements Initializable {
             // Inyectar lista de clientes para validaciones
             formController.setClientesExistentes(clientesList);
             // Inyectar callback para guardar y refrescar
-            formController.setOnClienteEditado(() -> {
-                Cliente nuevo = formController.getClienteFromForm();
+            formController.setOnClienteEditado(nuevo -> {
                 try {
                     if (nuevo != null && nuevo.getTipoCliente() != null && !nuevo.getTipoCliente().isEmpty()) {
                         clienteService.guardarCliente(nuevo);

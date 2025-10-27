@@ -13,6 +13,27 @@ import java.time.Period;
  * @version 1.0 (Tabla Básica)
  */
 public class Cliente {
+    // Métodos para compatibilidad con mapeo de documento (DNI/RUC)
+    public void setRuc(String ruc) {
+        if ("Empresa".equalsIgnoreCase(this.tipoCliente)) {
+            this.documento = ruc;
+        }
+    }
+
+    public String getRuc() {
+        return "Empresa".equalsIgnoreCase(this.tipoCliente) ? this.documento : "";
+    }
+
+    public void setDni(String dni) {
+        if (!"Empresa".equalsIgnoreCase(this.tipoCliente)) {
+            this.documento = dni;
+        }
+    }
+
+    public String getDni() {
+        return !"Empresa".equalsIgnoreCase(this.tipoCliente) ? this.documento : "";
+    }
+
     private String nombres;
 
     // Permite setear el nombre completo (divide en nombres y apellidos si es
@@ -49,9 +70,9 @@ public class Cliente {
     private String direccion;
     private LocalDate fechaNacimiento;
     // Soporte para clientes naturales y empresariales
-    private String tipoCliente; // "NATURAL" o "EMPRESARIAL"
-    private String razonSocial; // Solo para empresariales
-    private String documento; // DNI o RUC según tipoCliente
+    private String tipoCliente; // "NATURAL" o "EMPRESA"
+    private String razonSocial; // Solo para empresas
+    private String documento; // DNI (Natural) o RUC (Empresa) según tipoCliente
 
     // Sistema de puntos
     private Integer puntosTotales;
@@ -82,7 +103,7 @@ public class Cliente {
      * Obtiene el nombre completo o razón social del cliente
      */
     public String getNombreCompleto() {
-        if (tipoCliente != null && tipoCliente.equalsIgnoreCase("Empresarial")) {
+        if (tipoCliente != null && tipoCliente.equalsIgnoreCase("Empresa")) {
             if (razonSocial != null && !razonSocial.trim().isEmpty()) {
                 return razonSocial;
             }
