@@ -292,7 +292,7 @@ public class ExportFacade {
                 row.createCell(0).setCellValue(c.getDocumento() != null ? c.getDocumento() : "");
                 row.createCell(1).setCellValue(c.getTipoCliente() != null ? c.getTipoCliente() : "");
                 row.createCell(2).setCellValue(
-                        ("EMPRESARIAL".equals(c.getTipoCliente()) ? c.getRazonSocial() : c.getNombreCompleto()));
+                        ("EMPRESA".equals(c.getTipoCliente()) ? c.getRazonSocial() : c.getNombreCompleto()));
                 row.createCell(3).setCellValue(c.getTelefono() != null ? c.getTelefono() : "");
                 row.createCell(4).setCellValue(c.getEmail() != null ? c.getEmail() : "");
                 row.createCell(5).setCellValue(c.getDireccion() != null ? c.getDireccion() : "");
@@ -401,7 +401,7 @@ public class ExportFacade {
                 table.addCell(
                         new com.itextpdf.text.Phrase(c.getTipoCliente() != null ? c.getTipoCliente() : "", cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(
-                        ("EMPRESARIAL".equals(c.getTipoCliente()) ? c.getRazonSocial() : c.getNombreCompleto()),
+                        ("EMPRESA".equals(c.getTipoCliente()) ? c.getRazonSocial() : c.getNombreCompleto()),
                         cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(c.getTelefono() != null ? c.getTelefono() : "", cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(c.getEmail() != null ? c.getEmail() : "", cellFont));

@@ -32,6 +32,7 @@ com\farmaciavictoria\proyectopharmavictoria\controller\Cliente\ClienteFormContro
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ExportarInventarioController.class
 com\farmaciavictoria\proyectopharmavictoria\model\Proveedor\Proveedor.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\VistaPreviaComprobanteController.class
+com\farmaciavictoria\proyectopharmavictoria\controller\Cliente\ClientesController$2.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Proveedor\ContactarProveedoresController.class
 com\farmaciavictoria\proyectopharmavictoria\util\CreateAdminUser.class
 com\farmaciavictoria\proyectopharmavictoria\util\ExportFacade.class

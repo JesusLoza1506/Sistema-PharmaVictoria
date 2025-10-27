@@ -168,7 +168,7 @@ public class VentasController implements Initializable {
             if (newCliente != null) {
                 String tipo = newCliente.getTipoCliente();
                 String doc = newCliente.getDocumento();
-                String nombre = ("EMPRESARIAL".equals(tipo)) ? newCliente.getRazonSocial()
+                String nombre = ("EMPRESA".equals(tipo)) ? newCliente.getRazonSocial()
                         : newCliente.getNombreCompleto();
                 txtTipoCliente.setText(tipo != null ? tipo : "");
                 txtDocumento.setText(doc != null ? doc : "");
@@ -371,7 +371,7 @@ public class VentasController implements Initializable {
                 } else {
                     String tipo = item.getTipoCliente();
                     String doc = item.getDocumento();
-                    String nombre = ("EMPRESARIAL".equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();
+                    String nombre = ("EMPRESA".equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();
                     setText((tipo != null ? tipo : "") + " | " + doc + " | " + nombre);
                 }
             }
@@ -385,7 +385,7 @@ public class VentasController implements Initializable {
                 } else {
                     String tipo = item.getTipoCliente();
                     String doc = item.getDocumento();
-                    String nombre = ("EMPRESARIAL".equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();
+                    String nombre = ("EMPRESA".equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();
                     setText((tipo != null ? tipo : "") + " | " + doc + " | " + nombre);
                 }
             }

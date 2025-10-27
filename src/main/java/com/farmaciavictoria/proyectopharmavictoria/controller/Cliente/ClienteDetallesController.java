@@ -9,6 +9,14 @@ import javafx.stage.Stage;
 
 public class ClienteDetallesController {
         @FXML
+        private javafx.scene.layout.GridPane empresaContactoGrid;
+        @FXML
+        private javafx.scene.layout.GridPane empresaAdicionalGrid;
+        @FXML
+        private javafx.scene.layout.GridPane naturalContactoGrid;
+        @FXML
+        private javafx.scene.layout.GridPane naturalAdicionalGrid;
+        @FXML
         private javafx.scene.control.TableView<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio> historialTable;
         @FXML
         private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio, String> colFecha;
@@ -82,25 +90,96 @@ public class ClienteDetallesController {
         private Label fechaRegistroLabel;
         @FXML
         private Button btnCerrar;
+        @FXML
+        private javafx.scene.layout.GridPane naturalGrid;
+        @FXML
+        private javafx.scene.layout.GridPane empresaGrid;
+        @FXML
+        private Label rucLabel;
+        @FXML
+        private Label razonSocialLabel;
+        @FXML
+        private Label estadoEmpresaLabel;
+        @FXML
+        private Label telefonoEmpresaLabel;
+        @FXML
+        private Label emailEmpresaLabel;
+        @FXML
+        private Label direccionEmpresaLabel;
+        @FXML
+        private Label puntosEmpresaLabel;
+        @FXML
+        private Label frecuenteEmpresaLabel;
+        @FXML
+        private Label fechaRegistroEmpresaLabel;
 
         public void setCliente(Cliente cliente) {
-                dniLabel.setText(cliente.getDocumento());
-                nombresLabel.setText(cliente.getNombres());
-                apellidosLabel.setText(cliente.getApellidos());
-                estadoLabel.setText("ACTIVO"); // No hay campo activo en Cliente, por ahora siempre activo
-                estadoLabel.getStyleClass().clear();
-                estadoLabel.getStyleClass().add("estado-activo");
-                telefonoLabel.setText(cliente.getTelefono());
-                emailLabel.setText(cliente.getEmail());
-                direccionLabel.setText(cliente.getDireccion());
-                fechaNacimientoLabel
-                                .setText(cliente.getFechaNacimiento() != null ? cliente.getFechaNacimiento().toString()
-                                                : "-");
-                puntosTotalesLabel
-                                .setText(cliente.getPuntosTotales() != null ? String.valueOf(cliente.getPuntosTotales())
-                                                : "0");
-                frecuenteLabel.setText(cliente.isFrecuente() ? "Sí" : "No");
-                fechaRegistroLabel.setText(cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : "-");
+                String tipo = cliente.getTipoCliente();
+                if ("Empresa".equalsIgnoreCase(tipo)) {
+                        // Ocultar bloques de Natural
+                        naturalGrid.setVisible(false);
+                        naturalGrid.setManaged(false);
+                        naturalContactoGrid.setVisible(false);
+                        naturalContactoGrid.setManaged(false);
+                        naturalAdicionalGrid.setVisible(false);
+                        naturalAdicionalGrid.setManaged(false);
+                        // Mostrar bloques de Empresa
+                        empresaGrid.setVisible(true);
+                        empresaGrid.setManaged(true);
+                        empresaContactoGrid.setVisible(true);
+                        empresaContactoGrid.setManaged(true);
+                        empresaAdicionalGrid.setVisible(true);
+                        empresaAdicionalGrid.setManaged(true);
+                        // Asignar datos de Empresa
+                        rucLabel.setText(cliente.getDocumento());
+                        razonSocialLabel.setText(cliente.getRazonSocial());
+                        estadoEmpresaLabel.setText("ACTIVO");
+                        estadoEmpresaLabel.getStyleClass().clear();
+                        estadoEmpresaLabel.getStyleClass().add("estado-activo");
+                        telefonoEmpresaLabel.setText(cliente.getTelefono());
+                        emailEmpresaLabel.setText(cliente.getEmail());
+                        direccionEmpresaLabel.setText(cliente.getDireccion());
+                        puntosEmpresaLabel.setText(
+                                        cliente.getPuntosTotales() != null ? String.valueOf(cliente.getPuntosTotales())
+                                                        : "0");
+                        frecuenteEmpresaLabel.setText(cliente.isFrecuente() ? "Sí" : "No");
+                        fechaRegistroEmpresaLabel.setText(
+                                        cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : "-");
+                } else {
+                        // Ocultar bloques de Empresa
+                        empresaGrid.setVisible(false);
+                        empresaGrid.setManaged(false);
+                        empresaContactoGrid.setVisible(false);
+                        empresaContactoGrid.setManaged(false);
+                        empresaAdicionalGrid.setVisible(false);
+                        empresaAdicionalGrid.setManaged(false);
+                        // Mostrar bloques de Natural
+                        naturalGrid.setVisible(true);
+                        naturalGrid.setManaged(true);
+                        naturalContactoGrid.setVisible(true);
+                        naturalContactoGrid.setManaged(true);
+                        naturalAdicionalGrid.setVisible(true);
+                        naturalAdicionalGrid.setManaged(true);
+                        // Asignar datos de Natural
+                        dniLabel.setText(cliente.getDocumento());
+                        nombresLabel.setText(cliente.getNombres());
+                        apellidosLabel.setText(cliente.getApellidos());
+                        estadoLabel.setText("ACTIVO");
+                        estadoLabel.getStyleClass().clear();
+                        estadoLabel.getStyleClass().add("estado-activo");
+                        telefonoLabel.setText(cliente.getTelefono());
+                        emailLabel.setText(cliente.getEmail());
+                        direccionLabel.setText(cliente.getDireccion());
+                        fechaNacimientoLabel.setText(
+                                        cliente.getFechaNacimiento() != null ? cliente.getFechaNacimiento().toString()
+                                                        : "-");
+                        puntosTotalesLabel.setText(
+                                        cliente.getPuntosTotales() != null ? String.valueOf(cliente.getPuntosTotales())
+                                                        : "0");
+                        frecuenteLabel.setText(cliente.isFrecuente() ? "Sí" : "No");
+                        fechaRegistroLabel.setText(
+                                        cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : "-");
+                }
                 // Cargar historial de cambios
                 cargarHistorial(cliente.getId());
                 // Cargar historial de puntos

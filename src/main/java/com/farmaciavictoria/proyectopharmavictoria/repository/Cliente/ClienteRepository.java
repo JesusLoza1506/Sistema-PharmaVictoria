@@ -210,10 +210,15 @@ public class ClienteRepository {
         String sql = "INSERT INTO clientes (documento, tipo_cliente, razon_social, nombres, apellidos, telefono, email, direccion, fecha_nacimiento, puntos_totales, puntos_usados, es_frecuente, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            // Documento principal
-            String documento = cliente.getDocumento();
             String tipo = cliente.getTipoCliente();
-            String razonSocial = "Empresarial".equalsIgnoreCase(tipo) ? cliente.getRazonSocial() : null;
+            // Si es Empresa, usar ruc como documento; si es Natural, usar dni
+            String documento = "Empresa".equalsIgnoreCase(tipo) ? cliente.getRuc() : cliente.getDni();
+            String razonSocial = "Empresa".equalsIgnoreCase(tipo) ? cliente.getRazonSocial() : null;
+            logger.info(
+                    "[INSERT] Datos recibidos: documento={}, tipo_cliente={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, puntos_totales={}, puntos_usados={}, es_frecuente={}",
+                    documento, tipo, razonSocial, cliente.getNombres(), cliente.getApellidos(), cliente.getTelefono(),
+                    cliente.getEmail(), cliente.getDireccion(), cliente.getFechaNacimiento(),
+                    cliente.getPuntosTotales(), cliente.getPuntosUsados(), cliente.isFrecuente());
             stmt.setString(1, documento); // documento
             stmt.setString(2, tipo); // tipo_cliente
             if (razonSocial != null && !razonSocial.trim().isEmpty()) {
@@ -237,6 +242,7 @@ public class ClienteRepository {
             stmt.setTimestamp(13, new java.sql.Timestamp(System.currentTimeMillis()));
             stmt.setTimestamp(14, new java.sql.Timestamp(System.currentTimeMillis()));
             int rowsAffected = stmt.executeUpdate();
+            logger.info("[INSERT] Filas afectadas: {}", rowsAffected);
             if (rowsAffected > 0) {
                 try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
@@ -247,7 +253,10 @@ public class ClienteRepository {
                 return true;
             }
         } catch (SQLException e) {
-            logger.error("Error al crear cliente: {}", e.getMessage(), e);
+            logger.error("[INSERT][ERROR] Error al crear cliente: {}", e.getMessage(), e);
+            logger.error("[INSERT][ERROR] Stacktrace:", e);
+        } catch (Exception ex) {
+            logger.error("[INSERT][ERROR] Excepción inesperada: {}", ex.getMessage(), ex);
         }
         return false;
     }
@@ -260,10 +269,17 @@ public class ClienteRepository {
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             int idx = 1;
+            logger.info(
+                    "[UPDATE] Datos recibidos: documento={}, tipo_cliente={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, puntos_totales={}, puntos_usados={}, es_frecuente={}, id={}",
+                    cliente.getDocumento(), cliente.getTipoCliente(),
+                    "Empresa".equalsIgnoreCase(cliente.getTipoCliente()) ? cliente.getRazonSocial() : null,
+                    cliente.getNombres(), cliente.getApellidos(), cliente.getTelefono(), cliente.getEmail(),
+                    cliente.getDireccion(), cliente.getFechaNacimiento(), cliente.getPuntosTotales(),
+                    cliente.getPuntosUsados(), cliente.isFrecuente(), cliente.getId());
             stmt.setString(idx++, cliente.getDocumento());
             stmt.setString(idx++, cliente.getTipoCliente());
             String tipo = cliente.getTipoCliente();
-            String razonSocial = "Empresarial".equalsIgnoreCase(tipo) ? cliente.getRazonSocial() : null;
+            String razonSocial = "Empresa".equalsIgnoreCase(tipo) ? cliente.getRazonSocial() : null;
             if (razonSocial != null && !razonSocial.trim().isEmpty()) {
                 stmt.setString(idx++, razonSocial);
             } else {
@@ -284,12 +300,16 @@ public class ClienteRepository {
             stmt.setBoolean(idx++, cliente.isFrecuente());
             stmt.setInt(idx++, cliente.getId());
             int rowsAffected = stmt.executeUpdate();
+            logger.info("[UPDATE] Filas afectadas: {}", rowsAffected);
             if (rowsAffected > 0) {
                 logger.info("Cliente actualizado exitosamente: {}", cliente.getNombreCompleto());
                 return true;
             }
         } catch (SQLException e) {
-            logger.error("Error al actualizar cliente: {}", e.getMessage(), e);
+            logger.error("[UPDATE][ERROR] Error al actualizar cliente: {}", e.getMessage(), e);
+            logger.error("[UPDATE][ERROR] Stacktrace:", e);
+        } catch (Exception ex) {
+            logger.error("[UPDATE][ERROR] Excepción inesperada: {}", ex.getMessage(), ex);
         }
         return false;
     }
@@ -446,17 +466,31 @@ public class ClienteRepository {
             if (documentoRaw == null || documentoRaw.trim().isEmpty()) {
                 logger.warn("[ERROR] documento vacío o nulo en ResultSet");
             }
-            // Solo advertir si el tipo es Empresarial y razon_social está vacío
-            if ("Empresarial".equalsIgnoreCase(tipoRaw)
+            // Solo advertir si el tipo es Empresa y razon_social está vacío
+            if ("Empresa".equalsIgnoreCase(tipoRaw)
                     && (razonSocialRaw == null || razonSocialRaw.trim().isEmpty())) {
-                logger.warn("[ADVERTENCIA] razon_social vacío o nulo en ResultSet para cliente Empresarial");
+                logger.warn("[ADVERTENCIA] razon_social vacío o nulo en ResultSet para cliente Empresa");
             }
         } catch (Exception ex) {
             logger.error("[EXCEPCION] Error al leer campos RAW del ResultSet: {}", ex.getMessage(), ex);
         }
         Cliente cliente = new Cliente();
         cliente.setId(rs.getInt("id"));
-        cliente.setDocumento(rs.getString("documento"));
+        String documento = rs.getString("documento");
+        String tipoCliente = rs.getString("tipo_cliente");
+        cliente.setTipoCliente(tipoCliente);
+        // Mapeo correcto de documento según tipo
+        if ("Empresa".equalsIgnoreCase(tipoCliente)) {
+            cliente.setRuc(documento);
+            cliente.setDocumento(documento);
+            cliente.setRazonSocial(rs.getString("razon_social"));
+            cliente.setDni("");
+        } else {
+            cliente.setDni(documento);
+            cliente.setDocumento(documento);
+            cliente.setRazonSocial("");
+            cliente.setRuc("");
+        }
         cliente.setNombres(rs.getString("nombres"));
         cliente.setApellidos(rs.getString("apellidos"));
         cliente.setTelefono(rs.getString("telefono"));
@@ -475,14 +509,6 @@ public class ClienteRepository {
         Timestamp updated = rs.getTimestamp("updated_at");
         if (updated != null)
             cliente.setUpdatedAt(updated.toLocalDateTime());
-        String tipoCliente = rs.getString("tipo_cliente");
-        cliente.setTipoCliente(tipoCliente);
-        // Solo asignar razon_social si el tipo es Empresarial
-        if ("Empresarial".equalsIgnoreCase(tipoCliente)) {
-            cliente.setRazonSocial(rs.getString("razon_social"));
-        } else {
-            cliente.setRazonSocial("");
-        }
         logger.info("[MAPEO CLIENTE] tipo_cliente={} | documento={} | razon_social={}", cliente.getTipoCliente(),
                 cliente.getDocumento(), cliente.getRazonSocial());
         return cliente;

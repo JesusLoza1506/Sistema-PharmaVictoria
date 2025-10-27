@@ -48,7 +48,7 @@ public class PdfPrintStrategy implements PrintStrategy {
             sb.append(String.format("│ CLIENTE: %s │\n",
                     boleta.getCliente() != null ? boleta.getCliente().getNombreCompleto() : "XXXXX"));
             sb.append(String.format("│ %s: %s │\n",
-                    boleta.getCliente() != null && "EMPRESARIAL".equals(boleta.getCliente().getTipoCliente()) ? "RUC"
+                    boleta.getCliente() != null && "EMPRESA".equals(boleta.getCliente().getTipoCliente()) ? "RUC"
                             : "DNI",
                     boleta.getCliente() != null ? boleta.getCliente().getDocumento() : "XXXXX"));
             sb.append("│--------------------------------------------------------------│\n");
@@ -154,7 +154,7 @@ public class PdfPrintStrategy implements PrintStrategy {
             document.add(new com.itextpdf.text.Paragraph("Cliente: " + boleta.getCliente().getNombreCompleto()));
             document.add(new com.itextpdf.text.Paragraph(
                     (boleta.getCliente().getTipoCliente() != null
-                            && "EMPRESARIAL".equals(boleta.getCliente().getTipoCliente()) ? "RUC: " : "DNI: ")
+                            && "EMPRESA".equals(boleta.getCliente().getTipoCliente()) ? "RUC: " : "DNI: ")
                             + boleta.getCliente().getDocumento()));
             // Usar la fecha actual, ya que Boleta no tiene fecha
             document.add(new com.itextpdf.text.Paragraph("Fecha: " + java.time.LocalDate.now()));

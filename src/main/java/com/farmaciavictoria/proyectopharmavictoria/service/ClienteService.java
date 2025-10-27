@@ -511,7 +511,7 @@ public class ClienteService {
             if (cliente.getApellidos().trim().length() < 2) {
                 throw new IllegalArgumentException("Apellidos deben tener al menos 2 caracteres");
             }
-        } else if ("Empresarial".equalsIgnoreCase(tipo)) {
+        } else if ("Empresa".equalsIgnoreCase(tipo)) {
             // Validar documento (RUC)
             if (cliente.getDocumento() == null || cliente.getDocumento().trim().isEmpty()) {
                 throw new IllegalArgumentException("RUC es obligatorio");
