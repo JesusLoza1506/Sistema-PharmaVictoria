@@ -29,14 +29,12 @@
                 <Label styleClass="preview-label" text="Vista previa de exportación:" />
                 <TableView fx:id="tablePreview" styleClass="clientes-table" VBox.vgrow="ALWAYS">
                     <columns>
-                        <!-- Columna ID eliminada -->
-                        <TableColumn fx:id="colDni" prefWidth="100.0" text="DNI" />
-                        <TableColumn fx:id="colNombres" prefWidth="140.0" text="Nombres" />
-                        <TableColumn fx:id="colApellidos" prefWidth="140.0" text="Apellidos" />
+                        <TableColumn fx:id="colTipoCliente" prefWidth="90.0" text="Tipo" />
+                        <TableColumn fx:id="colDocumento" prefWidth="120.0" text="Documento" />
+                        <TableColumn fx:id="colNombreRazonSocial" prefWidth="220.0" text="Nombre / Razón social" />
                         <TableColumn fx:id="colTelefono" prefWidth="120.0" text="Teléfono" />
                         <TableColumn fx:id="colEmail" prefWidth="180.0" text="Email" />
                         <TableColumn fx:id="colDireccion" prefWidth="180.0" text="Dirección" />
-                        <TableColumn fx:id="colFechaNacimiento" prefWidth="130.0" text="F. Nacimiento" />
                         <TableColumn fx:id="colPuntosTotales" prefWidth="100.0" text="Puntos Totales" />
                         <TableColumn fx:id="colPuntosUsados" prefWidth="100.0" text="Puntos Usados" />
                         <TableColumn fx:id="colPuntosDisponibles" prefWidth="120.0" text="Puntos Disponibles" />

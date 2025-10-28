@@ -296,8 +296,12 @@ public class ClientesController implements Initializable {
         }
         if (cbTipoBusqueda != null) {
             cbTipoBusqueda.getItems().clear();
-            cbTipoBusqueda.getItems().addAll("DNI", "Nombre", "Apellidos", "Teléfono", "Email");
-            cbTipoBusqueda.setValue("Nombre");
+            cbTipoBusqueda.getItems().addAll(
+                    "Documento", // DNI o RUC
+                    "Nombre / Razón social",
+                    "Teléfono",
+                    "Email");
+            cbTipoBusqueda.setValue("Nombre / Razón social");
             cbTipoBusqueda.valueProperty().addListener((obs, oldVal, newVal) -> onBuscar());
         }
         if (cmbTamanoPagina != null) {
@@ -368,8 +372,12 @@ public class ClientesController implements Initializable {
         // Eliminada llamada a mostrarAlertasClientes();
         if (cbTipoBusqueda != null) {
             cbTipoBusqueda.getItems().clear();
-            cbTipoBusqueda.getItems().addAll("DNI", "Nombre", "Apellidos", "Teléfono", "Email");
-            cbTipoBusqueda.setValue("Nombre");
+            cbTipoBusqueda.getItems().addAll(
+                    "Documento", // DNI o RUC
+                    "Nombre / Razón social",
+                    "Teléfono",
+                    "Email");
+            cbTipoBusqueda.setValue("Nombre / Razón social");
         }
         // No sobrescribir cell value factories, solo configurar acciones y refrescar
         // datos
@@ -637,11 +645,14 @@ public class ClientesController implements Initializable {
         String estado = cmbEstado != null && cmbEstado.getValue() != null ? cmbEstado.getValue() : "Todos";
         boolean soloFrecuentes = chkFrecuentes != null && chkFrecuentes.isSelected();
 
-        // Selección de estrategia profesional
+        // Estrategia unificada para Documento y Nombre/Razón social
         com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.ClienteFilterStrategy strategy;
         switch (tipo) {
-            case "DNI":
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorDni();
+            case "Documento":
+                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorDocumento();
+                break;
+            case "Nombre / Razón social":
+                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorNombreRazonSocial();
                 break;
             case "Email":
                 strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorEmail();
@@ -649,15 +660,8 @@ public class ClientesController implements Initializable {
             case "Teléfono":
                 strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorTelefono();
                 break;
-            case "Apellidos":
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorNombre(); // FiltroPorNombre
-                                                                                                               // ya
-                                                                                                               // incluye
-                                                                                                               // apellidos
-                break;
-            case "Nombre":
             default:
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorNombre();
+                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.FiltroPorNombreRazonSocial();
                 break;
         }
 

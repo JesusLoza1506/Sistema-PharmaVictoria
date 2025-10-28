@@ -279,10 +279,28 @@ public class ClienteFormController {
     }
 
     private boolean existeClienteConNombre(String nombre) {
-        if (editMode && cliente != null && nombre.equals(cliente.getNombres()))
-            return false;
-        return clientesExistentes.stream()
-                .anyMatch(c -> c.getNombres() != null && c.getNombres().equalsIgnoreCase(nombre));
+        if (editMode && cliente != null) {
+            if ("Empresa".equals(cliente.getTipoCliente())) {
+                String razonSocial = txtRazonSocial.getText().trim();
+                if (razonSocial.equalsIgnoreCase(cliente.getRazonSocial()))
+                    return false;
+                return clientesExistentes.stream().anyMatch(c -> "Empresa".equals(c.getTipoCliente())
+                        && c.getRazonSocial() != null && c.getRazonSocial().equalsIgnoreCase(razonSocial));
+            } else {
+                if (nombre.equalsIgnoreCase(cliente.getNombres()))
+                    return false;
+                return clientesExistentes.stream().anyMatch(c -> "Natural".equals(c.getTipoCliente())
+                        && c.getNombres() != null && c.getNombres().equalsIgnoreCase(nombre));
+            }
+        }
+        if ("Empresa".equals(comboTipoCliente.getValue())) {
+            String razonSocial = txtRazonSocial.getText().trim();
+            return clientesExistentes.stream().anyMatch(c -> "Empresa".equals(c.getTipoCliente())
+                    && c.getRazonSocial() != null && c.getRazonSocial().equalsIgnoreCase(razonSocial));
+        } else {
+            return clientesExistentes.stream().anyMatch(c -> "Natural".equals(c.getTipoCliente())
+                    && c.getNombres() != null && c.getNombres().equalsIgnoreCase(nombre));
+        }
     }
 
     private boolean existeClienteConEmail(String email) {
