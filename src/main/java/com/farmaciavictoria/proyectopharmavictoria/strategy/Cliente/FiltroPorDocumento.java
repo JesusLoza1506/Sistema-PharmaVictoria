@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 
-public class FiltroPorDni implements ClienteFilterStrategy {
+public class FiltroPorDocumento implements ClienteFilterStrategy {
     @Override
     public List<Cliente> filtrar(List<Cliente> clientes, String criterio) {
         if (criterio == null || criterio.isBlank())

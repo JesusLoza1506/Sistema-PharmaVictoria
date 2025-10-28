@@ -14,19 +14,17 @@ public class ExportarClientesController {
     @FXML
     private TableView<Cliente> tablePreview;
     @FXML
-    private TableColumn<Cliente, String> colDni;
+    private TableColumn<Cliente, String> colTipoCliente;
     @FXML
-    private TableColumn<Cliente, String> colNombres;
+    private TableColumn<Cliente, String> colDocumento;
     @FXML
-    private TableColumn<Cliente, String> colApellidos;
+    private TableColumn<Cliente, String> colNombreRazonSocial;
     @FXML
     private TableColumn<Cliente, String> colTelefono;
     @FXML
     private TableColumn<Cliente, String> colEmail;
     @FXML
     private TableColumn<Cliente, String> colDireccion;
-    @FXML
-    private TableColumn<Cliente, String> colFechaNacimiento;
     @FXML
     private TableColumn<Cliente, String> colPuntosTotales;
     @FXML
@@ -47,21 +45,18 @@ public class ExportarClientesController {
     public void initialize() {
         if (cmbTipoFiltro != null) {
             cmbTipoFiltro.getItems().clear();
-            cmbTipoFiltro.getItems().addAll("DNI", "Nombre", "Apellidos", "Teléfono", "Email");
-            cmbTipoFiltro.setValue("Nombre");
+            cmbTipoFiltro.getItems().addAll("Documento", "Nombre / Razón social", "Teléfono", "Email");
+            cmbTipoFiltro.setValue("Nombre / Razón social");
         }
-        colDni.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("dni"));
-        colNombres.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nombres"));
-        colApellidos.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("apellidos"));
+        colTipoCliente.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getTipoCliente()));
+        colDocumento.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getDocumento()));
+        colNombreRazonSocial.setCellValueFactory(
+                cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getNombreCompleto()));
         colTelefono.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("telefono"));
         colEmail.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("email"));
         colDireccion.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("direccion"));
-        colFechaNacimiento.setCellValueFactory(cellData -> {
-            java.time.LocalDate fecha = cellData.getValue().getFechaNacimiento();
-            String texto = (fecha != null) ? fecha.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                    : "";
-            return new javafx.beans.property.SimpleStringProperty(texto);
-        });
         colPuntosTotales.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
                 String.valueOf(cellData.getValue().getPuntosTotales())));
         colPuntosUsados.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(

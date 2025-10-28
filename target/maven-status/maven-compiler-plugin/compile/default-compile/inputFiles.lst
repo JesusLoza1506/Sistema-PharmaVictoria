@@ -31,6 +31,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Proveedor\ExportarProveedoresController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\VentasController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\UsuariosController.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Cliente\FiltroPorNombreRazonSocial.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\ProductoService.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Comprobante\BoletaBuilder.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Proveedor\ProveedorAuditoria.java
@@ -55,7 +56,6 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Cliente\FiltroPorTelefono.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Proveedor\ProveedoresController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\TransaccionPuntos.java
-C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Cliente\FiltroPorDni.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\ExportarUsuariosPreviewController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\VentaHistorialCambioRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\Ventas\VentaHistorialCambioService.java
@@ -70,11 +70,11 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Usuario\FiltroPorEstado.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Usuario\UsuarioFilterStrategy.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\ProveedorRepository.java
-C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Cliente\FiltroPorNombre.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Usuario\FiltroPorApellido.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\print\PrintStrategy.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Inventario\SearchByProveedorStrategy.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\config\DatabaseConfig.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Cliente\FiltroPorDocumento.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\util\DatabaseUpdater.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\util\ExportFacade.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Cliente\ClienteHistorialCambioRepository.java
