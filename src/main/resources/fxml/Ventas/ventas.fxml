@@ -96,7 +96,6 @@
                 <Label text="Nombre/Razón Social:" styleClass="cliente-label" />
                 <TextField fx:id="txtNombreRazon" promptText="Nombre completo o razón social" editable="false" styleClass="cliente-field" />
             </HBox>
-            </HBox>
             <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
                 <Label text="Método de pago:" styleClass="pago-label" />
                 <ComboBox fx:id="comboPago" promptText="Seleccionar método de pago" styleClass="combo-box" />

@@ -5,8 +5,10 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
-import com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.Cliente;
-import com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.DetalleVenta;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils.Cliente;
+import com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils.DetalleVenta;
 
 public class VistaPreviaComprobanteController {
     @FXML
@@ -41,6 +43,9 @@ public class VistaPreviaComprobanteController {
     private Button btnCancelar;
     @FXML
     private Label lblAdvertencia;
+
+    @FXML
+    private ImageView logoSunat;
 
     private Runnable onConfirmar;
     private Stage stage;
@@ -85,5 +90,13 @@ public class VistaPreviaComprobanteController {
             if (stage != null)
                 stage.close();
         });
+
+        // Cargar el logo de SUNAT
+        try {
+            Image sunatImg = new Image(getClass().getResource("/icons/sunat.png").toExternalForm());
+            logoSunat.setImage(sunatImg);
+        } catch (Exception ex) {
+            // Si no se encuentra la imagen, no hacer nada
+        }
     }
 }

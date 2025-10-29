@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.HBox;
+import com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta;
@@ -660,134 +661,16 @@ public class VentasController implements Initializable {
         final java.math.BigDecimal total = subtotal.subtract(descuento).add(igv);
         String tipoComprobante = comboComprobante.getValue();
         if ("FACTURA".equalsIgnoreCase(tipoComprobante)) {
-            // --- FLUJO FACTURA ELECTRÓNICA SUNAT ---
-            // Si el cliente no tiene datos completos de RUC, pedirlos manualmente
-            class DatosRuc {
-                String ruc, razonSocial, direccion, email;
-            }
-            DatosRuc datosRuc = new DatosRuc();
-            try {
-                System.out.println("[DEBUG RUC Dialog] Iniciando carga de FXML ruc_completo_dialog.fxml");
-                javafx.fxml.FXMLLoader rucLoader = new javafx.fxml.FXMLLoader(
-                        getClass().getResource("/fxml/ruc_completo_dialog.fxml"));
-                System.out.println("[DEBUG RUC Dialog] FXMLLoader creado");
-                javafx.scene.control.DialogPane dialogPane = rucLoader.load();
-                System.out.println("[DEBUG RUC Dialog] DialogPane cargado");
-                com.farmaciavictoria.proyectopharmavictoria.RucCompletoDialogController rucController = rucLoader
-                        .getController();
-                System.out.println("[DEBUG RUC Dialog] Controlador obtenido: " + rucController);
-                javafx.scene.control.Dialog<Boolean> dialog = new javafx.scene.control.Dialog<>();
-                dialog.setDialogPane(dialogPane);
-                dialog.setTitle("Completar datos de cliente para FACTURA");
-                dialog.setHeaderText(
-                        "El cliente seleccionado no tiene datos completos de RUC. Completa todos los campos.");
-
-                // Validación antes de cerrar el diálogo
-                javafx.scene.control.Button okButton = null;
-                for (ButtonType bt : dialogPane.getButtonTypes()) {
-                    if (bt.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                        okButton = (javafx.scene.control.Button) dialogPane.lookupButton(bt);
-                        break;
-                    }
-                }
-                if (okButton != null) {
-                    okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-                        String rucIngresado = rucController.getRuc();
-                        String razonIngresada = rucController.getRazonSocial();
-                        String direccionIngresada = rucController.getDireccion();
-                        String emailIngresado = rucController.getEmail();
-                        boolean datosValidos = true;
-                        if (rucIngresado == null || rucIngresado.trim().isEmpty() || rucIngresado.length() != 11) {
-                            rucController.showError("El RUC debe tener 11 dígitos.");
-                            System.err.println("[ERROR VALIDACIÓN RUC] RUC inválido: '" + rucIngresado + "'");
-                            event.consume();
-                            datosValidos = false;
-                        }
-                        if (razonIngresada == null || razonIngresada.trim().isEmpty()) {
-                            rucController.showError("La razón social es obligatoria.");
-                            System.err.println("[ERROR VALIDACIÓN RUC] Razón social vacía");
-                            event.consume();
-                            datosValidos = false;
-                        }
-                        if (direccionIngresada == null || direccionIngresada.trim().isEmpty()) {
-                            rucController.showError("La dirección es obligatoria.");
-                            System.err.println("[ERROR VALIDACIÓN RUC] Dirección vacía");
-                            event.consume();
-                            datosValidos = false;
-                        }
-                        if (datosValidos) {
-                            rucController.clearError();
-                            datosRuc.ruc = rucIngresado;
-                            datosRuc.razonSocial = razonIngresada;
-                            datosRuc.direccion = direccionIngresada;
-                            datosRuc.email = emailIngresado;
-                            System.out.println("[DEBUG VALIDACIÓN RUC] Datos válidos: RUC=" + rucIngresado
-                                    + ", Razón Social=" + razonIngresada + ", Dirección=" + direccionIngresada
-                                    + ", Email=" + emailIngresado);
-                        }
-                    });
-                } else {
-                    System.err.println(
-                            "[ERROR RUC Dialog] El botón OK no está disponible en el DialogPane. El diálogo se mostrará sin validación extra.");
-                }
-
-                dialog.setResultConverter(buttonType -> {
-                    // Leer los datos directamente del controlador y loguear el tipo de botón
-                    System.out.println("[DEBUG RUC Dialog] ResultConverter: buttonType=" + buttonType + " ("
-                            + (buttonType != null ? buttonType.getButtonData() : "null") + ")");
-                    if (buttonType != null
-                            && buttonType.getButtonData() == javafx.scene.control.ButtonBar.ButtonData.OK_DONE) {
-                        String rucIngresado = rucController.getRuc();
-                        String razonIngresada = rucController.getRazonSocial();
-                        String direccionIngresada = rucController.getDireccion();
-                        String emailIngresado = rucController.getEmail();
-                        boolean datosValidos = rucIngresado != null && razonIngresada != null
-                                && direccionIngresada != null && !rucIngresado.trim().isEmpty()
-                                && !razonIngresada.trim().isEmpty() && !direccionIngresada.trim().isEmpty()
-                                && rucIngresado.length() == 11;
-                        System.out.println("[DEBUG RUC Dialog] ResultConverter: ruc=" + rucIngresado + ", razon="
-                                + razonIngresada + ", direccion=" + direccionIngresada + ", email=" + emailIngresado
-                                + ", datosValidos=" + datosValidos);
-                        if (datosValidos) {
-                            datosRuc.ruc = rucIngresado;
-                            datosRuc.razonSocial = razonIngresada;
-                            datosRuc.direccion = direccionIngresada;
-                            datosRuc.email = emailIngresado;
-                            return true;
-                        } else {
-                            System.err.println(
-                                    "[ERROR RUC Dialog] Datos inválidos en ResultConverter aunque se presionó OK");
-                        }
-                    } else {
-                        System.out.println("[DEBUG RUC Dialog] ResultConverter: botón no es OK_DONE, se devuelve null");
-                    }
-                    return null;
-                });
-                System.out.println("[DEBUG RUC Dialog] Mostrando diálogo");
-                java.util.Optional<Boolean> result = dialog.showAndWait();
-                System.out.println("[DEBUG RUC Dialog] Result: " + result);
-                // Si el usuario presionó OK y los datos son válidos, continuar con la vista
-                // previa
-                if (!result.isPresent() || result.get() == null) {
-                    System.err.println(
-                            "[ERROR RUC Dialog] Optional vacío, null o datos incompletos (diálogo cerrado sin aceptar)");
-                    System.err.println("[ERROR RUC Dialog] Estado final: ruc='" + datosRuc.ruc + "', razonSocial='"
-                            + datosRuc.razonSocial + "', direccion='" + datosRuc.direccion + "', email='"
-                            + datosRuc.email + "'");
-                    mostrarMensaje("No se completaron los datos. No se puede emitir la factura.");
-                    return;
-                }
-                // Si todo está OK, continuar con la vista previa
-            } catch (Exception ex) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(ex.toString()).append("\n");
-                for (StackTraceElement ste : ex.getStackTrace()) {
-                    sb.append("    at ").append(ste.toString()).append("\n");
-                }
-                mostrarMensaje("Error mostrando diálogo de datos de RUC:\n" + sb.toString());
-                System.err.println("[ERROR RUC Dialog] " + sb.toString());
+            // Validar que el cliente seleccionado tenga datos completos de empresa
+            if (clienteActual == null || clienteActual.getRuc() == null || clienteActual.getRazonSocial() == null
+                    || clienteActual.getDireccion() == null || clienteActual.getEmail() == null
+                    || clienteActual.getRuc().isEmpty() || clienteActual.getRazonSocial().isEmpty()
+                    || clienteActual.getDireccion().isEmpty()) {
+                mostrarMensaje(
+                        "Para emitir factura electrónica, selecciona un cliente tipo Empresa con RUC, razón social y dirección.");
                 return;
             }
+            // Ir directo a la vista previa usando los datos del cliente seleccionado
             try {
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                         getClass().getResource("/fxml/vista_previa_comprobante.fxml"));
@@ -797,17 +680,16 @@ public class VentasController implements Initializable {
                 stage.setTitle("Vista Previa de Factura Electrónica");
                 stage.setScene(new javafx.scene.Scene(root));
                 // Convertir Cliente y DetalleVenta locales a tipos PharmavictoriaApplication
-                com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.Cliente clienteJsonPreview = new com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.Cliente();
+                ComprobanteUtils.Cliente clienteJsonPreview = new ComprobanteUtils.Cliente();
                 clienteJsonPreview.tipo_documento = "6";
-                clienteJsonPreview.numero_documento = datosRuc.ruc;
-                clienteJsonPreview.razon_social = datosRuc.razonSocial;
-                clienteJsonPreview.direccion = datosRuc.direccion;
-                // Si el modelo lo permite, también email
-                // clienteJsonPreview.email = email;
-                javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.DetalleVenta> detallesPreview = javafx.collections.FXCollections
+                clienteJsonPreview.numero_documento = clienteActual.getRuc();
+                clienteJsonPreview.razon_social = clienteActual.getRazonSocial();
+                clienteJsonPreview.direccion = clienteActual.getDireccion();
+                clienteJsonPreview.direccion = clienteActual.getEmail();
+                javafx.collections.ObservableList<ComprobanteUtils.DetalleVenta> detallesPreview = javafx.collections.FXCollections
                         .observableArrayList();
                 for (DetalleVenta d : carrito) {
-                    com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.DetalleVenta det = new com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication.DetalleVenta();
+                    ComprobanteUtils.DetalleVenta det = new ComprobanteUtils.DetalleVenta();
                     det.unidad_de_medida = "NIU";
                     det.codigo_producto = d.getProducto().getCodigo();
                     det.descripcion = d.getProducto().getNombre();
@@ -822,7 +704,6 @@ public class VentasController implements Initializable {
                     detallesPreview.add(det);
                 }
                 // Obtener el siguiente número de factura para la serie
-                // Usar la serie demo permitida por NubeFacT
                 String serieFactura = "FFF1";
                 String numeroFactura = obtenerSiguienteNumeroFactura(serieFactura);
                 previewController.setDatos(clienteJsonPreview, "FACTURA", serieFactura, numeroFactura,
@@ -838,10 +719,10 @@ public class VentasController implements Initializable {
                         factura.put("numero", Integer.parseInt(numeroFactura));
                         factura.put("sunat_transaction", 1);
                         factura.put("cliente_tipo_de_documento", 6);
-                        factura.put("cliente_numero_de_documento", datosRuc.ruc);
-                        factura.put("cliente_denominacion", datosRuc.razonSocial);
-                        factura.put("cliente_direccion", datosRuc.direccion);
-                        factura.put("cliente_email", datosRuc.email != null ? datosRuc.email : "");
+                        factura.put("cliente_numero_de_documento", clienteActual.getRuc());
+                        factura.put("cliente_denominacion", clienteActual.getRazonSocial());
+                        factura.put("cliente_direccion", clienteActual.getDireccion());
+                        factura.put("cliente_email", clienteActual.getEmail() != null ? clienteActual.getEmail() : "");
                         factura.put("cliente_email_1", "");
                         factura.put("cliente_email_2", "");
                         factura.put("fecha_de_emision", java.time.LocalDate.now().toString());
@@ -890,14 +771,11 @@ public class VentasController implements Initializable {
                             java.util.LinkedHashMap<String, Object> item = new java.util.LinkedHashMap<>();
                             item.put("unidad_de_medida", "NIU");
                             item.put("codigo", d.getProducto().getCodigo());
-                            item.put("codigo_producto_sunat", "10000000"); // Si no tienes el código SUNAT, pon uno
-                                                                           // genérico
+                            item.put("codigo_producto_sunat", "10000000");
                             item.put("descripcion", d.getProducto().getNombre());
                             item.put("cantidad", d.getCantidad());
-                            // Precio unitario sin IGV
                             double valorUnitario = d.getPrecioUnitario().doubleValue();
                             item.put("valor_unitario", valorUnitario);
-                            // Precio unitario con IGV
                             double precioUnitarioConIGV = Math.round(valorUnitario * 1.18 * 100.0) / 100.0;
                             item.put("precio_unitario", precioUnitarioConIGV);
                             item.put("descuento", "");
@@ -905,7 +783,6 @@ public class VentasController implements Initializable {
                             item.put("tipo_de_igv", 1);
                             double igvDetalle = Math.round(valorUnitario * d.getCantidad() * 0.18 * 100.0) / 100.0;
                             item.put("igv", igvDetalle);
-                            // Total de la línea: cantidad × precio_unitario (con IGV)
                             double totalLinea = Math.round(precioUnitarioConIGV * d.getCantidad() * 100.0) / 100.0;
                             item.put("total", totalLinea);
                             item.put("anticipo_regularizacion", false);
@@ -914,16 +791,13 @@ public class VentasController implements Initializable {
                             items.add(item);
                         }
                         factura.put("items", items);
-                        // Guias (opcional)
                         factura.put("guias", new java.util.ArrayList<>());
-                        // Venta al crédito (opcional)
                         factura.put("venta_al_credito", new java.util.ArrayList<>());
                         String jsonFactura = new com.google.gson.Gson().toJson(factura);
                         System.out.println("[DEBUG JSON FACTURA] JSON generado para NubeFacT:\n" + jsonFactura);
                         String apiUrl = "https://api.nubefact.com/api/v1/b1f7ac80-5d5e-4fd9-8c8d-7b00c2638da0";
                         String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
-                        String respuesta = com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication
-                                .enviarFacturaNubeFact(jsonFactura, apiUrl, apiToken);
+                        String respuesta = ComprobanteUtils.enviarFacturaNubeFact(jsonFactura, apiUrl, apiToken);
                         String hashSunat = "";
                         String estadoSunat = "";
                         String pdfUrl = "";
@@ -936,44 +810,56 @@ public class VentasController implements Initializable {
                             estadoSunat = json.has("sunat_description")
                                     ? json.get("sunat_description").getAsString()
                                     : "";
-                            pdfUrl = json.has("enlace_pdf") ? json.get("enlace_pdf").getAsString() : "";
+                            pdfUrl = json.has("enlace_del_pdf") ? json.get("enlace_del_pdf").getAsString() : "";
                             xmlUrl = json.has("enlace_xml") ? json.get("enlace_xml").getAsString() : "";
                             cdrUrl = json.has("enlace_cdr") ? json.get("enlace_cdr").getAsString() : "";
+                            System.out.println("[DEBUG] Respuesta NubeFacT: " + respuesta);
+                            System.out.println("[DEBUG] pdfUrl extraído: " + pdfUrl);
                         } catch (Exception ex) {
                             mostrarMensaje("Error procesando respuesta de NubeFacT: " + ex.getMessage());
                             System.err.println("[ERROR NubeFacT] " + ex.getMessage());
                             ex.printStackTrace();
                         }
                         // 1. Crear y guardar la venta antes de crear el comprobante
-                        Venta venta = new Venta();
-                        venta.setCliente(clienteActual);
-                        // Asignar el usuario logueado
+                        // 1. Crear comprobante usando Factory
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.ComprobanteFactory comprobanteFactory = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.FacturaFactory();
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante comprobante = comprobanteFactory
+                                .crearComprobante();
+                        comprobante.setSerie(serieFactura);
+                        comprobante.setNumero(numeroFactura);
+                        comprobante.setHashSunat(hashSunat);
+                        comprobante.setEstadoSunat("GENERADO");
+                        comprobante.setFechaEmision(java.time.LocalDateTime.now());
+
+                        // 2. Construir venta usando Builder
                         com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
                                 .getUsuarioActual();
-                        venta.setUsuario(usuarioActual);
-                        venta.setSubtotal(subtotal);
-                        venta.setDescuentoMonto(descuento);
-                        venta.setIgvMonto(igv);
-                        venta.setTotal(total);
-                        venta.setTipoPago(metodoPago);
-                        venta.setTipoComprobante("FACTURA");
-                        venta.setNumeroBoleta(numeroFactura);
-                        venta.setSerie(serieFactura);
-                        venta.setFechaVenta(java.time.LocalDateTime.now());
-                        venta.setEstado("REALIZADA");
-                        venta.setObservaciones("");
-                        venta.setCreatedAt(java.time.LocalDateTime.now());
-                        venta.setUpdatedAt(java.time.LocalDateTime.now());
-                        venta.setDetalles(new java.util.ArrayList<>(carrito));
-                        // Guardar venta y recuperar el ID generado
+                        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder ventaBuilder = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder()
+                                .conCliente(clienteActual)
+                                .conUsuario(usuarioActual)
+                                .conSubtotal(subtotal)
+                                .conDescuentoMonto(descuento)
+                                .conIgvMonto(igv)
+                                .conTotal(total)
+                                .conTipoPago(metodoPago)
+                                .conTipoComprobante("FACTURA")
+                                .conNumeroBoleta(numeroFactura)
+                                .conSerie(serieFactura)
+                                .conFechaVenta(now)
+                                .conEstado("REALIZADA")
+                                .conDetalles(new java.util.ArrayList<>(carrito))
+                                .conComprobante(comprobante)
+                                .conObservaciones("")
+                                .conCreatedAt(now)
+                                .conUpdatedAt(now);
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta venta = ventaBuilder.build();
                         Venta ventaGuardada = ventaRepository.save(venta);
                         if (ventaGuardada == null || ventaGuardada.getId() == 0) {
                             mostrarMensaje("Error al guardar la venta. No se pudo obtener el ID generado.");
                             return;
                         }
-                        // Guardar cada detalle en la tabla detalle_ventas
                         for (DetalleVenta detalle : ventaGuardada.getDetalles()) {
-                            // Asignar la venta con el ID correcto
                             detalle.setVenta(ventaGuardada);
                             try {
                                 detalleVentaRepository.save(detalle);
@@ -981,7 +867,6 @@ public class VentasController implements Initializable {
                                 mostrarMensaje("Error al guardar detalle de venta: " + ex.getMessage());
                                 System.err.println("[ERROR DETALLE VENTA] " + ex.getMessage());
                             }
-                            // Descontar stock de cada producto vendido
                             var producto = detalle.getProducto();
                             Integer cantidadVendida = detalle.getCantidad();
                             if (producto != null && producto.getId() != null && cantidadVendida != null) {
@@ -992,7 +877,6 @@ public class VentasController implements Initializable {
                                             + "' no puede ser negativo. Venta no registrada correctamente.");
                                     System.err.println("[ERROR STOCK] Stock negativo para producto: "
                                             + producto.getNombre() + " (ID: " + producto.getId() + ")");
-                                    // No descontar ni actualizar si el stock es negativo
                                     continue;
                                 }
                                 producto.setStockActual(nuevoStock);
@@ -1007,13 +891,6 @@ public class VentasController implements Initializable {
                             }
                         }
                         // 2. Crear comprobante y asociar la venta guardada
-                        Comprobante comprobante = new Comprobante();
-                        comprobante.setTipo("FACTURA");
-                        comprobante.setSerie("FFF1");
-                        comprobante.setNumero(obtenerSiguienteNumeroFactura("FFF1"));
-                        comprobante.setHashSunat(hashSunat);
-                        comprobante.setEstadoSunat("GENERADO");
-                        comprobante.setFechaEmision(java.time.LocalDateTime.now());
                         comprobante.setVenta(ventaGuardada);
                         comprobanteRepository.save(comprobante);
 
@@ -1040,8 +917,107 @@ public class VentasController implements Initializable {
                         if (!cdrUrl.isEmpty())
                             msg.append("CDR: ").append(cdrUrl).append("\n");
                         mostrarMensaje(msg.toString());
+                        // Abrir ventana de acciones con PDF y datos del cliente (FACTURA)
+                        try {
+                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
+                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
+                            javafx.scene.Parent accionesRoot = accionesLoader.load();
+                            ComprobanteAccionesController accionesController = accionesLoader.getController();
+                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
+                                    clienteActual.getEmail(), clienteActual.getTelefono());
+                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
+                            accionesController.setStage(accionesStage);
+                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
+                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
+                            accionesStage.show();
+                        } catch (Exception ex) {
+                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                        }
+                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
+                        System.err.println("[LOG BOLETA] Intentando abrir ventana de acciones con PDF: " + pdfUrl);
+                        try {
+                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
+                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
+                            javafx.scene.Parent accionesRoot = accionesLoader.load();
+                            ComprobanteAccionesController accionesController = accionesLoader.getController();
+                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
+                                    clienteActual.getEmail(), clienteActual.getTelefono());
+                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
+                            accionesController.setStage(accionesStage);
+                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
+                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
+                            accionesStage.show();
+                            System.err.println("[LOG BOLETA] Ventana de acciones abierta correctamente");
+                        } catch (Exception ex) {
+                            System.err.println(
+                                    "[ERROR BOLETA] No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                        }
+                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
+                        try {
+                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
+                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
+                            javafx.scene.Parent accionesRoot = accionesLoader.load();
+                            ComprobanteAccionesController accionesController = accionesLoader.getController();
+                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
+                                    clienteActual.getEmail(), clienteActual.getTelefono());
+                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
+                            accionesController.setStage(accionesStage);
+                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
+                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
+                            accionesStage.show();
+                        } catch (Exception ex) {
+                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                        }
+                        try {
+                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
+                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
+                            javafx.scene.Parent accionesRoot = accionesLoader.load();
+                            ComprobanteAccionesController accionesController = accionesLoader.getController();
+                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
+                                    clienteActual.getEmail(), clienteActual.getTelefono());
+                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
+                            accionesController.setStage(accionesStage);
+                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
+                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
+                            accionesStage.show();
+                        } catch (Exception ex) {
+                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                        }
                         carrito.clear();
                         actualizarTotales();
+                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
+                        try {
+                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
+                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
+                            javafx.scene.Parent accionesRoot = accionesLoader.load();
+                            ComprobanteAccionesController accionesController = accionesLoader.getController();
+                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
+                                    clienteActual.getEmail(), clienteActual.getTelefono());
+                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
+                            accionesController.setStage(accionesStage);
+                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
+                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
+                            accionesStage.show();
+                        } catch (Exception ex) {
+                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                        }
+                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
+                        try {
+                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
+                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
+                            javafx.scene.Parent accionesRoot = accionesLoader.load();
+                            ComprobanteAccionesController accionesController = accionesLoader.getController();
+                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
+                                    clienteActual.getEmail(), clienteActual.getTelefono());
+                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
+                            accionesController.setStage(accionesStage);
+                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
+                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
+                            accionesStage.show();
+                        } catch (Exception ex) {
+                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                        }
                     } catch (Exception ex) {
                         mostrarMensaje("Error en emisión de factura electrónica: " + ex.getMessage());
                         System.err.println("[ERROR Emisión Factura] " + ex.getMessage());
@@ -1055,8 +1031,301 @@ public class VentasController implements Initializable {
                 ex.printStackTrace();
             }
         } else if ("BOLETA".equalsIgnoreCase(tipoComprobante)) {
-            // Aquí puedes implementar el flujo de boleta si lo necesitas
-            // Por ejemplo, mostrar la vista previa y solo emitir tras confirmación
+            // Validar que el cliente seleccionado sea NATURAL y tenga datos completos
+            if (clienteActual == null || clienteActual.getDni() == null || clienteActual.getNombreCompleto() == null
+                    || clienteActual.getDireccion() == null || clienteActual.getDni().isEmpty()
+                    || clienteActual.getNombreCompleto().isEmpty() || clienteActual.getDireccion().isEmpty()) {
+                mostrarMensaje(
+                        "Para emitir boleta electrónica, selecciona un cliente tipo NATURAL con DNI, nombre y dirección.");
+                return;
+            }
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                        getClass().getResource("/fxml/vista_previa_comprobante.fxml"));
+                javafx.scene.Parent root = loader.load();
+                VistaPreviaComprobanteController previewController = loader.getController();
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                stage.setTitle("Vista Previa de Boleta Electrónica");
+                stage.setScene(new javafx.scene.Scene(root));
+                // Convertir Cliente y DetalleVenta locales a tipos PharmavictoriaApplication
+                ComprobanteUtils.Cliente clienteJsonPreview = new ComprobanteUtils.Cliente();
+                clienteJsonPreview.tipo_documento = "1";
+                clienteJsonPreview.numero_documento = clienteActual.getDni();
+                clienteJsonPreview.razon_social = clienteActual.getNombreCompleto();
+                clienteJsonPreview.direccion = clienteActual.getDireccion();
+                clienteJsonPreview.direccion = clienteActual.getEmail();
+                javafx.collections.ObservableList<ComprobanteUtils.DetalleVenta> detallesPreview = javafx.collections.FXCollections
+                        .observableArrayList();
+                for (DetalleVenta d : carrito) {
+                    ComprobanteUtils.DetalleVenta det = new ComprobanteUtils.DetalleVenta();
+                    det.unidad_de_medida = "NIU";
+                    det.codigo_producto = d.getProducto().getCodigo();
+                    det.descripcion = d.getProducto().getNombre();
+                    det.cantidad = d.getCantidad();
+                    det.valor_unitario = d.getPrecioUnitario().doubleValue();
+                    det.precio_unitario = d.getPrecioUnitario().doubleValue();
+                    det.subtotal = d.getSubtotal().doubleValue();
+                    det.tipo_de_igv = 1;
+                    double igvDetalle = d.getSubtotal().doubleValue() * 0.18;
+                    det.igv = igvDetalle;
+                    det.total = d.getSubtotal().doubleValue() + igvDetalle;
+                    detallesPreview.add(det);
+                }
+                // Obtener el siguiente número de boleta para la serie
+                String serieBoleta = "BBB1";
+                String numeroBoleta = obtenerSiguienteNumeroBoleta(serieBoleta);
+                previewController.setDatos(clienteJsonPreview, "BOLETA", serieBoleta, numeroBoleta,
+                        total.toPlainString(), detallesPreview);
+                previewController.setStage(stage);
+                previewController.setOnConfirmar(() -> {
+                    try {
+                        // Armado de JSON igual al ejemplo de PharmavictoriaApplication.java
+                        java.util.LinkedHashMap<String, Object> boleta = new java.util.LinkedHashMap<>();
+                        boleta.put("operacion", "generar_comprobante");
+                        boleta.put("tipo_de_comprobante", 2);
+                        boleta.put("serie", serieBoleta);
+                        boleta.put("numero", Integer.parseInt(numeroBoleta));
+                        boleta.put("sunat_transaction", 1);
+                        boleta.put("cliente_tipo_de_documento", 1);
+                        boleta.put("cliente_numero_de_documento", clienteActual.getDni());
+                        boleta.put("cliente_denominacion", clienteActual.getNombreCompleto());
+                        boleta.put("cliente_direccion", clienteActual.getDireccion());
+                        boleta.put("cliente_email", clienteActual.getEmail() != null ? clienteActual.getEmail() : "");
+                        boleta.put("cliente_email_1", "");
+                        boleta.put("cliente_email_2", "");
+                        boleta.put("fecha_de_emision", java.time.LocalDate.now().toString());
+                        boleta.put("fecha_de_vencimiento", "");
+                        boleta.put("moneda", 1);
+                        boleta.put("tipo_de_cambio", "");
+                        boleta.put("porcentaje_de_igv", 18.00);
+                        boleta.put("descuento_global", "");
+                        boleta.put("total_descuento", "");
+                        boleta.put("total_anticipo", "");
+                        boleta.put("total_gravada", subtotal.doubleValue());
+                        boleta.put("total_inafecta", "");
+                        boleta.put("total_exonerada", "");
+                        boleta.put("total_igv", igv.doubleValue());
+                        boleta.put("total_gratuita", "");
+                        boleta.put("total_otros_cargos", "");
+                        boleta.put("total", total.doubleValue());
+                        boleta.put("percepcion_tipo", "");
+                        boleta.put("percepcion_base_imponible", "");
+                        boleta.put("total_percepcion", "");
+                        boleta.put("total_incluido_percepcion", "");
+                        boleta.put("retencion_tipo", "");
+                        boleta.put("retencion_base_imponible", "");
+                        boleta.put("total_retencion", "");
+                        boleta.put("total_impuestos_bolsas", "");
+                        boleta.put("detraccion", false);
+                        boleta.put("observaciones", "");
+                        boleta.put("documento_que_se_modifica_tipo", "");
+                        boleta.put("documento_que_se_modifica_serie", "");
+                        boleta.put("documento_que_se_modifica_numero", "");
+                        boleta.put("tipo_de_nota_de_credito", "");
+                        boleta.put("tipo_de_nota_de_debito", "");
+                        boleta.put("enviar_automaticamente_a_la_sunat", true);
+                        boleta.put("enviar_automaticamente_al_cliente", false);
+                        boleta.put("condiciones_de_pago", "");
+                        boleta.put("medio_de_pago", "");
+                        boleta.put("placa_vehiculo", "");
+                        boleta.put("orden_compra_servicio", "");
+                        boleta.put("formato_de_pdf", "");
+                        boleta.put("generado_por_contingencia", "");
+                        boleta.put("bienes_region_selva", "");
+                        boleta.put("servicios_region_selva", "");
+                        // Items
+                        java.util.List<java.util.Map<String, Object>> items = new java.util.ArrayList<>();
+                        for (DetalleVenta d : carrito) {
+                            java.util.LinkedHashMap<String, Object> item = new java.util.LinkedHashMap<>();
+                            item.put("unidad_de_medida", "NIU");
+                            item.put("codigo", d.getProducto().getCodigo());
+                            item.put("codigo_producto_sunat", "10000000");
+                            item.put("descripcion", d.getProducto().getNombre());
+                            item.put("cantidad", d.getCantidad());
+                            double valorUnitario = d.getPrecioUnitario().doubleValue();
+                            item.put("valor_unitario", valorUnitario);
+                            double precioUnitarioConIGV = Math.round(valorUnitario * 1.18 * 100.0) / 100.0;
+                            item.put("precio_unitario", precioUnitarioConIGV);
+                            item.put("descuento", "");
+                            item.put("subtotal", valorUnitario * d.getCantidad());
+                            item.put("tipo_de_igv", 1);
+                            double igvDetalle = Math.round(valorUnitario * d.getCantidad() * 0.18 * 100.0) / 100.0;
+                            item.put("igv", igvDetalle);
+                            double totalLinea = Math.round(precioUnitarioConIGV * d.getCantidad() * 100.0) / 100.0;
+                            item.put("total", totalLinea);
+                            item.put("anticipo_regularizacion", false);
+                            item.put("anticipo_documento_serie", "");
+                            item.put("anticipo_documento_numero", "");
+                            items.add(item);
+                        }
+                        boleta.put("items", items);
+                        boleta.put("guias", new java.util.ArrayList<>());
+                        boleta.put("venta_al_credito", new java.util.ArrayList<>());
+                        String jsonBoleta = new com.google.gson.Gson().toJson(boleta);
+                        System.out.println("[DEBUG JSON BOLETA] JSON generado para NubeFacT:\n" + jsonBoleta);
+                        String apiUrl = "https://api.nubefact.com/api/v1/b1f7ac80-5d5e-4fd9-8c8d-7b00c2638da0";
+                        String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
+                        String respuesta = com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils
+                                .enviarFacturaNubeFact(jsonBoleta, apiUrl, apiToken);
+                        String hashSunat = "";
+                        String estadoSunat = "";
+                        String pdfUrl = "";
+                        String xmlUrl = "";
+                        String cdrUrl = "";
+                        try {
+                            com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(respuesta)
+                                    .getAsJsonObject();
+                            if (json != null && !json.isJsonNull()) {
+                                hashSunat = json.has("hash") && !json.get("hash").isJsonNull()
+                                        ? json.get("hash").getAsString()
+                                        : "";
+                                estadoSunat = json.has("sunat_description")
+                                        && !json.get("sunat_description").isJsonNull()
+                                                ? json.get("sunat_description").getAsString()
+                                                : "";
+                                pdfUrl = json.has("enlace_del_pdf") && !json.get("enlace_del_pdf").isJsonNull()
+                                        ? json.get("enlace_del_pdf").getAsString()
+                                        : "";
+                                xmlUrl = json.has("enlace_xml") && !json.get("enlace_xml").isJsonNull()
+                                        ? json.get("enlace_xml").getAsString()
+                                        : "";
+                                cdrUrl = json.has("enlace_cdr") && !json.get("enlace_cdr").isJsonNull()
+                                        ? json.get("enlace_cdr").getAsString()
+                                        : "";
+                                System.out.println("[DEBUG] Respuesta NubeFacT: " + respuesta);
+                                System.out.println("[DEBUG] pdfUrl extraído: " + pdfUrl);
+                            } else {
+                                mostrarMensaje("Boleta registrada, pero no se recibió respuesta completa de NubeFacT.");
+                            }
+                        } catch (Exception ex) {
+                            mostrarMensaje("Boleta registrada, pero no se recibió respuesta completa de NubeFacT.");
+                            System.err.println("[ERROR NubeFacT] " + ex.getMessage());
+                        }
+                        // 1. Crear comprobante usando Factory
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.ComprobanteFactory comprobanteFactory = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.BoletaFactory();
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante comprobante = comprobanteFactory
+                                .crearComprobante();
+                        comprobante.setSerie(serieBoleta);
+                        comprobante.setNumero(numeroBoleta);
+                        comprobante.setHashSunat(hashSunat);
+                        comprobante.setEstadoSunat("GENERADO");
+                        comprobante.setFechaEmision(java.time.LocalDateTime.now());
+
+                        // 2. Construir venta usando Builder
+                        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
+                                .getUsuarioActual();
+                        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder ventaBuilder = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder()
+                                .conCliente(clienteActual)
+                                .conUsuario(usuarioActual)
+                                .conSubtotal(subtotal)
+                                .conDescuentoMonto(descuento)
+                                .conIgvMonto(igv)
+                                .conTotal(total)
+                                .conTipoPago(metodoPago)
+                                .conTipoComprobante("BOLETA")
+                                .conNumeroBoleta(numeroBoleta)
+                                .conSerie(serieBoleta)
+                                .conFechaVenta(now)
+                                .conEstado("REALIZADA")
+                                .conDetalles(new java.util.ArrayList<>(carrito))
+                                .conComprobante(comprobante)
+                                .conObservaciones("")
+                                .conCreatedAt(now)
+                                .conUpdatedAt(now);
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta venta = ventaBuilder.build();
+                        Venta ventaGuardada = ventaRepository.save(venta);
+                        if (ventaGuardada == null || ventaGuardada.getId() == 0) {
+                            mostrarMensaje("Error al guardar la venta. No se pudo obtener el ID generado.");
+                            return;
+                        }
+                        for (DetalleVenta detalle : ventaGuardada.getDetalles()) {
+                            detalle.setVenta(ventaGuardada);
+                            try {
+                                detalleVentaRepository.save(detalle);
+                            } catch (Exception ex) {
+                                mostrarMensaje("Error al guardar detalle de venta: " + ex.getMessage());
+                                System.err.println("[ERROR DETALLE VENTA] " + ex.getMessage());
+                            }
+                            var producto = detalle.getProducto();
+                            Integer cantidadVendida = detalle.getCantidad();
+                            if (producto != null && producto.getId() != null && cantidadVendida != null) {
+                                int stockActual = producto.getStockActual() != null ? producto.getStockActual() : 0;
+                                int nuevoStock = stockActual - cantidadVendida;
+                                if (nuevoStock < 0) {
+                                    mostrarMensaje("Error: El stock del producto '" + producto.getNombre()
+                                            + "' no puede ser negativo. Venta no registrada correctamente.");
+                                    System.err.println("[ERROR STOCK] Stock negativo para producto: "
+                                            + producto.getNombre() + " (ID: " + producto.getId() + ")");
+                                    continue;
+                                }
+                                producto.setStockActual(nuevoStock);
+                                try {
+                                    productoRepository.updateStock(producto.getId(), nuevoStock);
+                                } catch (Exception ex) {
+                                    mostrarMensaje("Error al actualizar el stock de '" + producto.getNombre() + "': "
+                                            + ex.getMessage());
+                                    System.err.println("[ERROR STOCK] " + ex.getMessage());
+                                }
+                            }
+                        }
+                        comprobante.setVenta(ventaGuardada);
+                        comprobanteRepository.save(comprobante);
+
+                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio historial = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio();
+                        historial.setVenta(ventaGuardada);
+                        historial.setTipoCambio("CREACION");
+                        historial.setMotivo("Venta registrada");
+                        historial.setUsuario(usuarioActual);
+                        historial.setFecha(java.time.LocalDateTime.now());
+                        try {
+                            historialCambioRepository.save(historial);
+                        } catch (Exception ex) {
+                            mostrarMensaje("Error al registrar historial de venta: " + ex.getMessage());
+                            System.err.println("[ERROR HISTORIAL VENTA] " + ex.getMessage());
+                        }
+                        StringBuilder msg = new StringBuilder();
+                        msg.append("Boleta electrónica enviada a SUNAT (demo)\n");
+                        msg.append("Estado SUNAT: ").append(estadoSunat).append("\n");
+                        if (!pdfUrl.isEmpty())
+                            msg.append("PDF: ").append(pdfUrl).append("\n");
+                        if (!xmlUrl.isEmpty())
+                            msg.append("XML: ").append(xmlUrl).append("\n");
+                        if (!cdrUrl.isEmpty())
+                            msg.append("CDR: ").append(cdrUrl).append("\n");
+                        mostrarMensaje(msg.toString());
+                        carrito.clear();
+                        actualizarTotales();
+                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
+                        try {
+                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
+                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
+                            javafx.scene.Parent accionesRoot = accionesLoader.load();
+                            ComprobanteAccionesController accionesController = accionesLoader.getController();
+                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
+                                    clienteActual.getEmail(), clienteActual.getTelefono());
+                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
+                            accionesController.setStage(accionesStage);
+                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
+                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
+                            accionesStage.show();
+                        } catch (Exception ex) {
+                            System.err.println(
+                                    "[ERROR BOLETA] No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
+                        }
+                    } catch (Exception ex) {
+                        mostrarMensaje("Error en emisión de boleta electrónica: " + ex.getMessage());
+                        System.err.println("[ERROR Emisión Boleta] " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                });
+                stage.showAndWait();
+            } catch (Exception ex) {
+                mostrarMensaje("Error en emisión de boleta electrónica: " + ex.getMessage());
+                System.err.println("[ERROR Emisión Boleta] " + ex.getMessage());
+                ex.printStackTrace();
+            }
         } else {
             mostrarMensaje("Tipo de comprobante no soportado o no seleccionado.");
         }
