@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.VistaPreviaComprobanteController" spacing="10" alignment="CENTER" style="-fx-padding: 20;">
-    <Label text="Vista Previa de Comprobante Electrónico" style="-fx-font-size: 18; -fx-font-weight: bold;" />
-    <GridPane hgap="10" vgap="10">
-        <Label text="Cliente:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-        <Label fx:id="lblCliente" GridPane.rowIndex="0" GridPane.columnIndex="1" />
-        <Label text="RUC/DNI:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-        <Label fx:id="lblDocumento" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-        <Label text="Dirección:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-        <Label fx:id="lblDireccion" GridPane.rowIndex="2" GridPane.columnIndex="1" />
-        <Label text="Tipo de Comprobante:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-        <Label fx:id="lblTipoComprobante" GridPane.rowIndex="3" GridPane.columnIndex="1" />
-        <Label text="Serie:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-        <Label fx:id="lblSerie" GridPane.rowIndex="4" GridPane.columnIndex="1" />
-        <Label text="Número:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
-        <Label fx:id="lblNumero" GridPane.rowIndex="5" GridPane.columnIndex="1" />
-        <Label text="Total:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
-        <Label fx:id="lblTotal" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+<?import javafx.scene.image.ImageView?>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.VistaPreviaComprobanteController" spacing="18" alignment="CENTER" stylesheets="/css/vista_previa_comprobante.css" styleClass="vista-previa-root">
+    <HBox alignment="TOP_RIGHT" spacing="10">
+        <Label text="Vista Previa de Comprobante Electrónico" styleClass="vista-previa-titulo" />
+        <Pane styleClass="vista-previa-logo" minWidth="60" minHeight="60">
+            <!-- Aquí puedes colocar el logo de SUNAT como ImageView -->
+            <ImageView fx:id="logoSunat" fitWidth="48" fitHeight="48" />
+        </Pane>
+    </HBox>
+    <GridPane hgap="12" vgap="10" styleClass="vista-previa-grid">
+        <Label text="Cliente:" styleClass="vista-previa-label" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <Label fx:id="lblCliente" styleClass="vista-previa-label" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+        <Label text="RUC/DNI:" styleClass="vista-previa-label" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <Label fx:id="lblDocumento" styleClass="vista-previa-label" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+        <Label text="Dirección:" styleClass="vista-previa-label" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <Label fx:id="lblDireccion" styleClass="vista-previa-label" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+        <Label text="Tipo de Comprobante:" styleClass="vista-previa-label" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+        <Label fx:id="lblTipoComprobante" styleClass="vista-previa-label" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        <Label text="Serie:" styleClass="vista-previa-label" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+        <Label fx:id="lblSerie" styleClass="vista-previa-label" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+        <Label text="Número:" styleClass="vista-previa-label" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+        <Label fx:id="lblNumero" styleClass="vista-previa-label" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+        <Label text="Total:" styleClass="vista-previa-total-label" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+        <Label fx:id="lblTotal" styleClass="vista-previa-total-label" GridPane.rowIndex="6" GridPane.columnIndex="1" />
     </GridPane>
-    <TableView fx:id="tableDetalles" prefHeight="200" prefWidth="500">
+    <TableView fx:id="tableDetalles" prefHeight="200" prefWidth="500" styleClass="vista-previa-table">
         <columns>
             <TableColumn text="Cantidad" fx:id="colCantidad" />
             <TableColumn text="Descripción" fx:id="colDescripcion" />
@@ -28,9 +35,9 @@
             <TableColumn text="Total" fx:id="colTotal" />
         </columns>
     </TableView>
-    <HBox spacing="15" alignment="CENTER">
-        <Button text="Emitir comprobante electrónico" fx:id="btnEmitir" />
-        <Button text="Cancelar" fx:id="btnCancelar" />
+    <HBox spacing="18" alignment="CENTER">
+        <Button text="Emitir comprobante electrónico" fx:id="btnEmitir" styleClass="vista-previa-btn" />
+        <Button text="Cancelar" fx:id="btnCancelar" styleClass="vista-previa-btn-cancelar" />
     </HBox>
-    <Label fx:id="lblAdvertencia" text="Al confirmar, se enviará el comprobante a SUNAT y no podrá modificarse." style="-fx-text-fill: red;" />
+    <Label fx:id="lblAdvertencia" text="Al confirmar, se enviará el comprobante a SUNAT y no podrá modificarse." styleClass="vista-previa-advertencia" />
 </VBox>

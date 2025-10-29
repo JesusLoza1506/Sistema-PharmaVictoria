@@ -6,8 +6,10 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Ventas\DetalleVenta.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Proveedor\ProveedorDetallesController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Ventas\Comprobante.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Ventas\BoletaFactory.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Usuario\UsuarioHistorialAcceso.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Cliente\ClientesController.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Ventas\ComprobanteFactory.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\util\CreateAdminUser.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ProductoDetallesController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Comprobante\Boleta.java
@@ -83,6 +85,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\CodigoGeneratorService.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Inventario\ProductSearchStrategy.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\VentaRepository.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Ventas\FacturaFactory.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\DetalleVentaRepositoryJdbcImpl.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Inventario\Producto.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\AuthenticationService.java
@@ -90,6 +93,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Usuario\UsuarioPermisoRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Comprobante\ComprobanteFactory.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\ClienteExportAuditService.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\util\ComprobanteUtils.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Usuario\UsuarioRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\strategy\Proveedor\ProveedorFilterStrategy.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Ventas\VentaHistorialCambio.java
@@ -99,6 +103,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Usuario\UsuarioAlerta.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Usuario\UsuarioAlertaRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\NotificationService.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\ComprobanteAccionesController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\ComprobanteRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\ComprobanteRepositoryJdbcImpl.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\DetalleVentaRepository.java
