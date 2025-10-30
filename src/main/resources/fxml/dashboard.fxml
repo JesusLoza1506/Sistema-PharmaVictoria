@@ -320,7 +320,7 @@
                                    <TableColumn fx:id="colFechaHora" text="Fecha y hora" prefWidth="150" />
                                    <TableColumn fx:id="colCliente" text="Cliente" prefWidth="220" />
                                    <TableColumn fx:id="colTotal" text="Total" prefWidth="100" />
-                                   <TableColumn fx:id="colMetodoPago" text="Método de pago" prefWidth="150" />
+                                   <TableColumn fx:id="colMetodoPago" text="Comprobante/Serie" prefWidth="150" />
                                        </columns>
                                        <VBox.vgrow>ALWAYS</VBox.vgrow>
                                     </TableView>

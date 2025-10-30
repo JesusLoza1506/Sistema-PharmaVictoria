@@ -13,8 +13,6 @@
             <children>
                 <HBox spacing="24.0" alignment="CENTER_LEFT" styleClass="modal-filter-bar">
                     <children>
-                        <Label styleClass="filter-label" text="Filtrar por sucursal:" />
-                        <ComboBox fx:id="cmbSucursal" prefWidth="160.0" promptText="Todas" styleClass="filter-combo" />
                         <Label styleClass="filter-label" text="Estado:" />
                         <ComboBox fx:id="cmbEstado" prefWidth="120.0" promptText="Todos" styleClass="filter-combo" />
                         <Label styleClass="filter-label" text="Buscar:" />
@@ -31,7 +29,6 @@
                         <TableColumn fx:id="colTelefono" text="Teléfono" />
                         <TableColumn fx:id="colEmail" text="Email" />
                         <TableColumn fx:id="colRol" text="Rol" />
-                        <TableColumn fx:id="colSucursal" text="Sucursal" />
                         <TableColumn fx:id="colEstado" text="Estado" />
                     </columns>
                 </TableView>

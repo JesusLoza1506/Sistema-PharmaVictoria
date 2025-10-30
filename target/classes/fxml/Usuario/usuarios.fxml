@@ -38,7 +38,7 @@
                                 </graphic>
                                 <text>Nuevo Usuario</text>
                             </Button>
-                            <Button fx:id="btnExportar" mnemonicParsing="false" styleClass="productos-header-btn-green">
+                            <Button fx:id="btnExportar" mnemonicParsing="false" styleClass="productos-header-btn-green" onAction="#onExportar">
                                 <graphic>
                                     <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
                                         <image>
