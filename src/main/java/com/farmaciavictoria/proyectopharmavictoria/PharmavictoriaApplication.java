@@ -43,6 +43,10 @@ public class PharmavictoriaApplication extends Application {
         }
     }
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
     private void configurePrimaryStage(Stage primaryStage) {
         primaryStage.setTitle(APP_TITLE);
         primaryStage.setMinWidth(MIN_WIDTH);

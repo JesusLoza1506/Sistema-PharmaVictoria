@@ -420,7 +420,7 @@ public class DashboardController implements Initializable, SystemEventObserver {
                     data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTotal()));
         if (colMetodoPago != null)
             colMetodoPago.setCellValueFactory(
-                    data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getMetodoPago()));
+                    data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getComprobanteSerie()));
 
         // ✅ CORRECCIÓN: Unificar la carga de datos inicial en una sola llamada
         // y asegurarla en el hilo de la UI.
@@ -722,8 +722,8 @@ public class DashboardController implements Initializable, SystemEventObserver {
      * Obtener lista de últimas ventas
      */
     private List<String> obtenerUltimasVentasDesdeBD() {
-        // Consulta: fecha, cliente_id, total, boleta (máx 5)
-        String sql = "SELECT fecha_venta, cliente_id, total, numero_boleta FROM ventas WHERE estado = 'REALIZADA' ORDER BY fecha_venta DESC LIMIT 5";
+        // Consulta: fecha, cliente_id, total, tipo_comprobante, numero_boleta (máx 5)
+        String sql = "SELECT fecha_venta, cliente_id, total, tipo_comprobante, numero_boleta FROM ventas WHERE estado = 'REALIZADA' ORDER BY fecha_venta DESC LIMIT 5";
         java.util.List<String> ventas = new java.util.ArrayList<>();
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
                 PreparedStatement stmt = connection.prepareStatement(sql);
@@ -732,7 +732,8 @@ public class DashboardController implements Initializable, SystemEventObserver {
                 String fecha = rs.getString("fecha_venta");
                 int clienteId = rs.getInt("cliente_id");
                 double total = rs.getDouble("total");
-                String boleta = rs.getString("numero_boleta");
+                String tipoComprobante = rs.getString("tipo_comprobante");
+                String numeroBoleta = rs.getString("numero_boleta");
                 String clienteNombre = "";
                 // Buscar nombre del cliente
                 try {
@@ -745,7 +746,9 @@ public class DashboardController implements Initializable, SystemEventObserver {
                 } catch (Exception ex) {
                     clienteNombre = "-";
                 }
-                String resumen = String.format("%s | %s | S/ %.2f | Boleta: %s", fecha, clienteNombre, total, boleta);
+                String comprobanteBoleta = tipoComprobante + " - " + numeroBoleta;
+                String resumen = String.format("%s | %s | S/ %.2f | %s", fecha, clienteNombre, total,
+                        comprobanteBoleta);
                 ventas.add(resumen);
             }
         } catch (SQLException e) {
@@ -884,13 +887,13 @@ public class DashboardController implements Initializable, SystemEventObserver {
         private final String fechaHora;
         private final String cliente;
         private final String total;
-        private final String metodoPago;
+        private final String comprobanteSerie;
 
-        public VentaReciente(String fechaHora, String cliente, String total, String metodoPago) {
+        public VentaReciente(String fechaHora, String cliente, String total, String comprobanteSerie) {
             this.fechaHora = fechaHora;
             this.cliente = cliente;
             this.total = total;
-            this.metodoPago = metodoPago;
+            this.comprobanteSerie = comprobanteSerie;
         }
 
         public String getFechaHora() {
@@ -905,8 +908,8 @@ public class DashboardController implements Initializable, SystemEventObserver {
             return total;
         }
 
-        public String getMetodoPago() {
-            return metodoPago;
+        public String getComprobanteSerie() {
+            return comprobanteSerie;
         }
     }
 

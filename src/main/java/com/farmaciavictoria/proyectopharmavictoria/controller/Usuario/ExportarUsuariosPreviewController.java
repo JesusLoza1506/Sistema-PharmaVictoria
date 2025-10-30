@@ -13,8 +13,6 @@ import java.util.List;
 
 public class ExportarUsuariosPreviewController {
     @FXML
-    private ComboBox<String> cmbSucursal;
-    @FXML
     private ComboBox<String> cmbEstado;
     @FXML
     private TextField txtBuscar;

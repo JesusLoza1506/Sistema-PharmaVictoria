@@ -44,7 +44,7 @@ public class UsuariosController {
     @FXML
     private Button btnNuevoUsuario;
     @FXML
-    private Button btnExportarPDF;
+    private Button btnExportar;
     @FXML
     private Button btnAjustesVista;
     @FXML
@@ -79,8 +79,12 @@ public class UsuariosController {
         // Paginación eliminada
         // Dashboard eliminado: no se actualizan estadísticas ni gráficas
         btnNuevoUsuario.setOnAction(e -> onNuevoUsuario());
-        if (btnExportarPDF != null)
-            btnExportarPDF.setOnAction(e -> exportarUsuariosPDF());
+        // La acción de btnExportar se define en el FXML con onAction="#onExportar"
+    }
+
+    // Método vinculado al botón Exportar en el FXML
+    public void onExportar(javafx.event.ActionEvent event) {
+        exportarUsuariosExcel(); // Ahora abre la ventana de vista previa de exportación
     }
 
     // Método para recibir el usuario autenticado desde el DashboardController
@@ -114,7 +118,7 @@ public class UsuariosController {
         fileChooser.setInitialFileName("usuarios.pdf");
         fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter("Archivo PDF", "*.pdf"));
         fileChooser.setTitle("Exportar listado de usuarios");
-        javafx.stage.Stage stage = (javafx.stage.Stage) btnExportarPDF.getScene().getWindow();
+        javafx.stage.Stage stage = (javafx.stage.Stage) btnExportar.getScene().getWindow();
         java.io.File file = fileChooser.showSaveDialog(stage);
         if (file != null) {
             try {

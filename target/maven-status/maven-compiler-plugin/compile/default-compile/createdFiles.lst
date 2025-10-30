@@ -58,7 +58,6 @@ com\farmaciavictoria\proyectopharmavictoria\service\Ventas\VentaHistorialCambioS
 com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\UsuarioDetallesController.class
 com\farmaciavictoria\proyectopharmavictoria\model\Usuario\Usuario$Rol.class
 com\farmaciavictoria\proyectopharmavictoria\model\Inventario\InventarioCommand.class
-com\farmaciavictoria\proyectopharmavictoria\demo\ClientesDemoApp.class
 com\farmaciavictoria\proyectopharmavictoria\service\ClienteHistorialCambioService.class
 com\farmaciavictoria\proyectopharmavictoria\util\PasswordUtil.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\VentasController$1.class
@@ -123,7 +122,6 @@ com\farmaciavictoria\proyectopharmavictoria\strategy\Usuario\FiltroPorRol.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\HistorialInventarioController.class
 com\farmaciavictoria\proyectopharmavictoria\model\Inventario\InventarioAuditoria.class
 com\farmaciavictoria\proyectopharmavictoria\model\Proveedor\ProveedorAuditoria.class
-com\farmaciavictoria\proyectopharmavictoria\tools\TestHistorial.class
 com\farmaciavictoria\proyectopharmavictoria\model\Comprobante\Comprobante.class
 com\farmaciavictoria\proyectopharmavictoria\RucDialogController.class
 com\farmaciavictoria\proyectopharmavictoria\service\ClienteExportAuditService.class

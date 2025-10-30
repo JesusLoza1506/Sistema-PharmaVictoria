@@ -161,7 +161,7 @@ public class ExportFacade {
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
-            float[] columnWidths = { 1.5f, 2f, 2f, 1.5f, 1.5f, 2f, 1.5f, 2f, 1.2f };
+            float[] columnWidths = { 1.5f, 2f, 2f, 1.5f, 1.5f, 2f, 1.5f, 2f };
             table.setWidths(columnWidths);
 
             com.itextpdf.text.Font headerFont = new com.itextpdf.text.Font(com.itextpdf.text.Font.FontFamily.HELVETICA,
