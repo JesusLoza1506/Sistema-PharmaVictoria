@@ -7,11 +7,16 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
 
 import java.io.FileOutputStream;
+import java.io.File;
+import com.farmaciavictoria.proyectopharmavictoria.reportes.export.ReporteTipo;
+import java.io.File;
+import com.farmaciavictoria.proyectopharmavictoria.reportes.export.ReporteTipo;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class ExportFacade {
+
     // Exportar usuarios a Excel
     public static void exportarUsuariosExcel(
             List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario> usuarios, String nombreArchivo) {
@@ -881,5 +886,14 @@ public class ExportFacade {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    // Exportar ventas usando Factory para reportes avanzados
+    public static void exportarReporteVentasAvanzado(String tipo,
+            java.util.List<com.farmaciavictoria.proyectopharmavictoria.reportes.dto.VentaReporteDTO> ventas,
+            String nombreArchivo) {
+        com.farmaciavictoria.proyectopharmavictoria.reportes.export.ExportadorReporte exportador = com.farmaciavictoria.proyectopharmavictoria.reportes.export.ExportadorReporteFactory
+                .getExportador(tipo, ReporteTipo.VENTAS);
+        exportador.exportar(ventas, new File(nombreArchivo));
     }
 }

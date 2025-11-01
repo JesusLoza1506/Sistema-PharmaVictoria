@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Oct 25, 2025 at 05:05 AM
+-- Generation Time: Nov 01, 2025 at 04:06 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.26
 
@@ -24,47 +24,15 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `audit_log`
---
-
-CREATE TABLE `audit_log` (
-  `id` int NOT NULL,
-  `usuario_id` int DEFAULT NULL,
-  `accion` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tabla_afectada` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `registro_id` int DEFAULT NULL,
-  `valores_anteriores` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `valores_nuevos` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text COLLATE utf8mb4_unicode_ci,
-  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP
-) ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `carrito_ventas`
---
-
-CREATE TABLE `carrito_ventas` (
-  `id` int NOT NULL,
-  `usuario_id` int NOT NULL,
-  `productos` json NOT NULL,
-  `fecha_creacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `estado` enum('PENDIENTE','COMPLETADO','CANCELADO') COLLATE utf8mb4_general_ci DEFAULT 'PENDIENTE'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `clientes`
 --
 
 CREATE TABLE `clientes` (
   `id` int NOT NULL,
-  `dni` varchar(8) COLLATE utf8mb4_general_ci NOT NULL,
+  `dni` varchar(8) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `nombres` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `apellidos` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `razon_social` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `telefono` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `email` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `direccion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -74,7 +42,9 @@ CREATE TABLE `clientes` (
   `puntos_disponibles` int GENERATED ALWAYS AS ((`puntos_totales` - `puntos_usados`)) STORED,
   `es_frecuente` tinyint(1) DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `tipo_cliente` enum('Natural','Empresa') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Natural',
+  `documento` varchar(20) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -329,21 +299,6 @@ CREATE TABLE `ventas` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `venta_alertas`
---
-
-CREATE TABLE `venta_alertas` (
-  `id` int NOT NULL,
-  `venta_id` int NOT NULL,
-  `tipo_alerta` enum('STOCK_BAJO','VENCIMIENTO_PROXIMO','SIN_STOCK') COLLATE utf8mb4_general_ci NOT NULL,
-  `producto_id` int NOT NULL,
-  `mensaje` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `venta_historial_cambio`
 --
 
@@ -363,20 +318,20 @@ CREATE TABLE `venta_historial_cambio` (
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_busqueda_productos` (
-`categoria` enum('ANALGESICOS','ANTIBIOTICOS','ANTIINFLAMATORIOS','VITAMINAS','ANTIACIDOS','ANTIHISTAMINICOS','ANTIHIPERTENSIVOS','DIABETES','RESPIRATORIO','DERMATOLOGIA','HIGIENE','OTROS')
+`id` int
 ,`codigo` varchar(20)
-,`codigo_nombre` varchar(173)
-,`concentracion` varchar(50)
-,`descripcion` text
-,`forma_farmaceutica` varchar(20)
-,`id` int
 ,`nombre` varchar(150)
-,`precio_venta` decimal(10,2)
+,`descripcion` text
 ,`principio_activo` varchar(100)
-,`requiere_receta` tinyint(1)
+,`concentracion` varchar(50)
+,`forma_farmaceutica` varchar(20)
+,`precio_venta` decimal(10,2)
 ,`stock_actual` int
-,`texto_busqueda` varchar(302)
+,`categoria` enum('ANALGESICOS','ANTIBIOTICOS','ANTIINFLAMATORIOS','VITAMINAS','ANTIACIDOS','ANTIHISTAMINICOS','ANTIHIPERTENSIVOS','DIABETES','RESPIRATORIO','DERMATOLOGIA','HIGIENE','OTROS')
 ,`ubicacion` varchar(20)
+,`requiere_receta` tinyint(1)
+,`codigo_nombre` varchar(173)
+,`texto_busqueda` varchar(302)
 );
 
 -- --------------------------------------------------------
@@ -386,11 +341,11 @@ CREATE TABLE `vw_busqueda_productos` (
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_inventario_alertas` (
-`fecha_vencimiento` date
-,`id_producto` int
+`id_producto` int
 ,`nombre_producto` varchar(150)
 ,`stock_actual` int
 ,`stock_minimo` int
+,`fecha_vencimiento` date
 );
 
 -- --------------------------------------------------------
@@ -400,39 +355,22 @@ CREATE TABLE `vw_inventario_alertas` (
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_resumen_ventas` (
-`cliente` varchar(201)
-,`descuento_monto` decimal(10,2)
-,`estado` enum('REALIZADA','ANULADA','PENDIENTE')
-,`fecha_venta` datetime
-,`id` int
+`id` int
 ,`numero_boleta` varchar(20)
 ,`serie` varchar(10)
-,`subtotal` decimal(10,2)
-,`tipo_pago` enum('EFECTIVO','TARJETA','TRANSFERENCIA','MIXTO')
-,`total` decimal(10,2)
+,`fecha_venta` datetime
+,`cliente` varchar(201)
 ,`vendedor` varchar(201)
+,`subtotal` decimal(10,2)
+,`descuento_monto` decimal(10,2)
+,`total` decimal(10,2)
+,`tipo_pago` enum('EFECTIVO','TARJETA','TRANSFERENCIA','MIXTO')
+,`estado` enum('REALIZADA','ANULADA','PENDIENTE')
 );
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `audit_log`
---
-ALTER TABLE `audit_log`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_usuario` (`usuario_id`),
-  ADD KEY `idx_timestamp` (`timestamp`),
-  ADD KEY `idx_tabla` (`tabla_afectada`),
-  ADD KEY `idx_accion` (`accion`);
-
---
--- Indexes for table `carrito_ventas`
---
-ALTER TABLE `carrito_ventas`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_id` (`usuario_id`);
 
 --
 -- Indexes for table `clientes`
@@ -561,14 +499,6 @@ ALTER TABLE `ventas`
   ADD KEY `usuario_id` (`usuario_id`);
 
 --
--- Indexes for table `venta_alertas`
---
-ALTER TABLE `venta_alertas`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `venta_id` (`venta_id`),
-  ADD KEY `producto_id` (`producto_id`);
-
---
 -- Indexes for table `venta_historial_cambio`
 --
 ALTER TABLE `venta_historial_cambio`
@@ -579,18 +509,6 @@ ALTER TABLE `venta_historial_cambio`
 --
 -- AUTO_INCREMENT for dumped tables
 --
-
---
--- AUTO_INCREMENT for table `audit_log`
---
-ALTER TABLE `audit_log`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `carrito_ventas`
---
-ALTER TABLE `carrito_ventas`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `clientes`
@@ -677,12 +595,6 @@ ALTER TABLE `ventas`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `venta_alertas`
---
-ALTER TABLE `venta_alertas`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `venta_historial_cambio`
 --
 ALTER TABLE `venta_historial_cambio`
@@ -718,18 +630,6 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `audit_log`
---
-ALTER TABLE `audit_log`
-  ADD CONSTRAINT `audit_log_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
---
--- Constraints for table `carrito_ventas`
---
-ALTER TABLE `carrito_ventas`
-  ADD CONSTRAINT `carrito_ventas_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 
 --
 -- Constraints for table `cliente_historial_cambio`
@@ -780,13 +680,6 @@ ALTER TABLE `proveedor_historial_cambio`
 ALTER TABLE `ventas`
   ADD CONSTRAINT `ventas_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`),
   ADD CONSTRAINT `ventas_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
-
---
--- Constraints for table `venta_alertas`
---
-ALTER TABLE `venta_alertas`
-  ADD CONSTRAINT `venta_alertas_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `venta_alertas_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`);
 
 --
 -- Constraints for table `venta_historial_cambio`
