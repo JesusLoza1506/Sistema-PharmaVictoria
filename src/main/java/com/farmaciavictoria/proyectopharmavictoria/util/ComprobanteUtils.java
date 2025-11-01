@@ -30,6 +30,10 @@ public class ComprobanteUtils {
     // Método para enviar el JSON de factura a la API de NubeFacT
     public static String enviarFacturaNubeFact(String jsonFactura, String apiUrl, String apiToken) {
         try {
+            // Mostrar el JSON que se va a enviar
+            System.out.println("[NubeFacT] JSON enviado:");
+            System.out.println(jsonFactura);
+
             java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
             java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
                     .uri(java.net.URI.create(apiUrl))

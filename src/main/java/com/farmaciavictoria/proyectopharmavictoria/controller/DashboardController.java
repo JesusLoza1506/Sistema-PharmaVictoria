@@ -559,7 +559,7 @@ public class DashboardController implements Initializable, SystemEventObserver {
     @FXML
     private void showReportes() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/reportes.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/reportes/reportes.fxml"));
             Parent reportesView = loader.load();
             try {
                 String css = getClass().getResource("/css/reportes.css").toExternalForm();
@@ -575,7 +575,9 @@ public class DashboardController implements Initializable, SystemEventObserver {
                 mostrarError("Error", "No se pudo mostrar el módulo de Reportes.");
             }
         } catch (Exception e) {
-            mostrarError("En desarrollo", "El módulo Reportes aún no está disponible.");
+            logger.error("Error al mostrar el módulo de Reportes: {}", e.getMessage(), e);
+            mostrarError("Error",
+                    "No se pudo mostrar el módulo de Reportes. Verifica la estructura y los archivos FXML.");
         }
     }
 

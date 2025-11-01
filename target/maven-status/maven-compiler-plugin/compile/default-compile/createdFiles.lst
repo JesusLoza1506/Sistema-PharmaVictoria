@@ -1,5 +1,6 @@
 com\farmaciavictoria\proyectopharmavictoria\repository\SucursalRepository.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\EdicionMasivaWizardController$2.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\strategy\ReporteVentasStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\model\Inventario\Producto.class
 com\farmaciavictoria\proyectopharmavictoria\util\DatabaseUpdater.class
 com\farmaciavictoria\proyectopharmavictoria\model\Usuario\Usuario.class
@@ -10,14 +11,17 @@ com\farmaciavictoria\proyectopharmavictoria\controller\Proveedor\ProveedorFormCo
 com\farmaciavictoria\proyectopharmavictoria\controller\ForgotPasswordDialogController.class
 com\farmaciavictoria\proyectopharmavictoria\service\ClienteService.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ProductosController$3.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\export\ReporteTipo.class
 com\farmaciavictoria\proyectopharmavictoria\service\Ventas\VentaService.class
 com\farmaciavictoria\proyectopharmavictoria\model\TransaccionPuntos.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\VentasController$7.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\export\ExportadorReporte.class
 com\farmaciavictoria\proyectopharmavictoria\model\Sucursal.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Cliente\ClienteRepository.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Cliente\ClientesController$1.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Inventario\ProductoHistorialCambioRepository$HistorialCambioDTO.class
 com\farmaciavictoria\proyectopharmavictoria\events\SystemEventManager.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\strategy\ReporteVentasResumenStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\service\AuthenticationService.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ProductosController$4.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Proveedor\ProveedorDetallesController.class
@@ -54,8 +58,10 @@ com\farmaciavictoria\proyectopharmavictoria\model\Usuario\UsuarioAcceso.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\VentaRepositoryJdbcImpl.class
 com\farmaciavictoria\proyectopharmavictoria\controller\LoginController$3.class
 com\farmaciavictoria\proyectopharmavictoria\model\Ventas\Venta.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\export\ExportadorPDFReporte.class
 com\farmaciavictoria\proyectopharmavictoria\service\Ventas\VentaHistorialCambioService.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\UsuarioDetallesController.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\dto\ProductoDetalleDTO.class
 com\farmaciavictoria\proyectopharmavictoria\model\Usuario\Usuario$Rol.class
 com\farmaciavictoria\proyectopharmavictoria\model\Inventario\InventarioCommand.class
 com\farmaciavictoria\proyectopharmavictoria\service\ClienteHistorialCambioService.class
@@ -77,6 +83,7 @@ com\farmaciavictoria\proyectopharmavictoria\print\PdfPrintStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Inventario\SearchByVencimientoStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ProductoDetallesController.class
 com\farmaciavictoria\proyectopharmavictoria\service\ClienteService$EstadisticasClientes.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\strategy\ReporteVentasDetalleStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\DetalleVentaRepositoryJdbcImpl.class
 com\farmaciavictoria\proyectopharmavictoria\util\IconLoader.class
 com\farmaciavictoria\proyectopharmavictoria\repository\ProveedorRepository.class
@@ -115,6 +122,7 @@ com\farmaciavictoria\proyectopharmavictoria\service\EmailService$1.class
 com\farmaciavictoria\proyectopharmavictoria\util\ComprobanteUtils$Cliente.class
 com\farmaciavictoria\proyectopharmavictoria\model\Ventas\ComprobanteFactory.class
 com\farmaciavictoria\proyectopharmavictoria\model\Comprobante\BoletaBuilder.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\view\ReporteVentasCardController.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Inventario\ProductoRepository$ProductoRepositoryException.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\VentasController$4.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\UsuariosController.class
@@ -142,6 +150,7 @@ com\farmaciavictoria\proyectopharmavictoria\RucCompletoDialogController.class
 com\farmaciavictoria\proyectopharmavictoria\view\BoletaPreviewDialog.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Proveedor\FiltroPorRazonSocial.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\ComprobanteAccionesController.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\export\ExportadorExcelReporte.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Usuario\UsuarioFilterStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\VentaHistorialCambioRepository.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Usuario\FiltroPorEstado.class
@@ -149,13 +158,17 @@ com\farmaciavictoria\proyectopharmavictoria\strategy\Cliente\FiltroPorDocumento.
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ProductosController$2.class
 com\farmaciavictoria\proyectopharmavictoria\service\UsuarioService.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\UsuariosController$1.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\view\ReporteVentasDetalleController.class
 com\farmaciavictoria\proyectopharmavictoria\util\HashGenerator.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Inventario\SearchByProveedorStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ProductosController$4$1.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Usuario\UsuarioPermisoRepository.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\dto\VentaReporteDTO.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\view\ReportesController.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\ComprobanteRepository.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Cliente\FiltroPorTelefono.class
 com\farmaciavictoria\proyectopharmavictoria\model\Usuario\UsuarioHistorialAcceso.class
+com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\VentasController$8.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Cliente\ClienteExportAuditRepository.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Inventario\SearchByLoteStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\ComprobanteAccionesController$1.class
@@ -168,6 +181,7 @@ com\farmaciavictoria\proyectopharmavictoria\controller\Proveedor\ProveedoresCont
 com\farmaciavictoria\proyectopharmavictoria\events\SystemEvent.class
 com\farmaciavictoria\proyectopharmavictoria\view\BoletaPreviewDialog$Builder.class
 com\farmaciavictoria\proyectopharmavictoria\controller\ResetPasswordController.class
+com\farmaciavictoria\proyectopharmavictoria\reportes\export\ExportadorReporteFactory.class
 com\farmaciavictoria\proyectopharmavictoria\strategy\Inventario\ProductSearchStrategy.class
 com\farmaciavictoria\proyectopharmavictoria\controller\DashboardController.class
 com\farmaciavictoria\proyectopharmavictoria\service\Ventas\DetalleVentaService.class
