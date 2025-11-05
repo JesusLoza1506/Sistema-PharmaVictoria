@@ -15,6 +15,7 @@ com\farmaciavictoria\proyectopharmavictoria\reportes\export\ReporteTipo.class
 com\farmaciavictoria\proyectopharmavictoria\service\Ventas\VentaService.class
 com\farmaciavictoria\proyectopharmavictoria\model\TransaccionPuntos.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Ventas\VentasController$7.class
+com\farmaciavictoria\proyectopharmavictoria\command\RestablecerStockCommand.class
 com\farmaciavictoria\proyectopharmavictoria\reportes\export\ExportadorReporte.class
 com\farmaciavictoria\proyectopharmavictoria\model\Sucursal.class
 com\farmaciavictoria\proyectopharmavictoria\repository\Cliente\ClienteRepository.class
@@ -186,6 +187,7 @@ com\farmaciavictoria\proyectopharmavictoria\strategy\Inventario\ProductSearchStr
 com\farmaciavictoria\proyectopharmavictoria\controller\DashboardController.class
 com\farmaciavictoria\proyectopharmavictoria\service\Ventas\DetalleVentaService.class
 com\farmaciavictoria\proyectopharmavictoria\service\EmailService.class
+com\farmaciavictoria\proyectopharmavictoria\command\Command.class
 com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\ExportarUsuariosPreviewController.class
 com\farmaciavictoria\proyectopharmavictoria\model\Ventas\VentaHistorialCambio.class
 com\farmaciavictoria\proyectopharmavictoria\model\Usuario\UsuarioAlerta.class

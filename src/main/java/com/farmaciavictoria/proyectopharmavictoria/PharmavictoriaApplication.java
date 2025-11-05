@@ -2,6 +2,7 @@ package com.farmaciavictoria.proyectopharmavictoria;
 
 import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
 import com.farmaciavictoria.proyectopharmavictoria.util.DatabaseUpdater;
+import com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository;
 import javafx.application.Application;
 import javafx.animation.FadeTransition;
 import javafx.scene.Scene;
@@ -31,6 +32,8 @@ public class PharmavictoriaApplication extends Application {
                 showDatabaseErrorAndExit();
                 return;
             }
+            // TransaccionPuntosRepository repo = new TransaccionPuntosRepository();
+            // repo.sincronizarPuntosClientes(); // Eliminado, ya no es necesario
             DatabaseUpdater.updateProductsTable();
             DatabaseUpdater.updateProveedoresTable();
             DatabaseUpdater.ensureUsuarioHistorialTables();

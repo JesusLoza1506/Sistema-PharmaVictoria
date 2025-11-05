@@ -114,6 +114,17 @@ public class VentaServiceImpl implements VentaService {
         if (venta != null) {
             venta.setEstado("ANULADA");
             ventaRepository.update(venta);
+
+            // Restablecer stock de cada producto vendido
+            if (venta.getDetalles() != null) {
+                for (com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta detalle : venta
+                        .getDetalles()) {
+                    com.farmaciavictoria.proyectopharmavictoria.command.RestablecerStockCommand cmd = new com.farmaciavictoria.proyectopharmavictoria.command.RestablecerStockCommand(
+                            productoRepository, detalle);
+                    cmd.execute();
+                }
+            }
+
             // Registrar en historial de cambios
             VentaHistorialCambio historial = new VentaHistorialCambio();
             historial.setVenta(venta);

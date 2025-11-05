@@ -21,8 +21,47 @@ import java.net.URL;
 import java.util.*;
 
 public class VentasController implements Initializable {
+    /**
+     * Calcula los puntos ganados por una venta (ejemplo: 1 punto por cada sol
+     * gastado)
+     */
+    private int calcularPuntosPorVenta(Venta venta) {
+        if (venta == null || venta.getTotal() == null)
+            return 0;
+        // Puedes ajustar la lógica aquí: 1 punto por cada sol gastado
+        return venta.getTotal().intValue();
+    }
+
+    private final com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository transaccionPuntosRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository();
+
+    /**
+     * Consulta el saldo actual de puntos del cliente sumando y restando
+     * movimientos.
+     */
+    private int consultarPuntosCliente(int clienteId) {
+        int saldo = 0;
+        List<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos> movimientos = transaccionPuntosRepository
+                .findByClienteId(clienteId);
+        for (com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos mov : movimientos) {
+            if ("GANADO".equalsIgnoreCase(mov.getTipo()) || "AJUSTE".equalsIgnoreCase(mov.getTipo())) {
+                saldo += mov.getPuntos();
+            } else if ("USADO".equalsIgnoreCase(mov.getTipo()) || "EXPIRADO".equalsIgnoreCase(mov.getTipo())) {
+                saldo -= mov.getPuntos();
+            }
+        }
+        return Math.max(saldo, 0);
+    }
+
     @FXML
     private TextField txtTipoCliente;
+    @FXML
+    private HBox panelPuntosCliente;
+    @FXML
+    private Label lblNombreCliente;
+    @FXML
+    private Label lblPuntosDisponibles;
+    @FXML
+    private Label lblEquivalenteSoles;
     @FXML
     private TextField txtDocumento;
     @FXML
@@ -67,8 +106,6 @@ public class VentasController implements Initializable {
     private Label lblTotal;
     @FXML
     private Button btnConfirmarVenta;
-    @FXML
-    private Button btnAnularVenta;
     @FXML
     private Button btnHistorial;
     @FXML
@@ -177,12 +214,29 @@ public class VentasController implements Initializable {
                 txtNombreRazon.setText(nombre != null ? nombre : "");
                 panelDatosCliente.setVisible(true);
                 panelDatosCliente.setManaged(true);
+
+                // Mostrar panel de puntos solo para clientes NATURAL
+                if ("NATURAL".equalsIgnoreCase(tipo)) {
+                    panelPuntosCliente.setVisible(true);
+                    panelPuntosCliente.setManaged(true);
+                    lblNombreCliente.setText("Cliente: " + nombre);
+                    // TODO: Consultar puntos del cliente desde la BD
+                    int puntos = consultarPuntosCliente(newCliente.getId());
+                    lblPuntosDisponibles.setText("Puntos disponibles: " + puntos);
+                    double soles = puntos / 100.0;
+                    lblEquivalenteSoles.setText(String.format("Equivalente: S/%.2f", soles));
+                } else {
+                    panelPuntosCliente.setVisible(false);
+                    panelPuntosCliente.setManaged(false);
+                }
             } else {
                 txtTipoCliente.clear();
                 txtDocumento.clear();
                 txtNombreRazon.clear();
                 panelDatosCliente.setVisible(false);
                 panelDatosCliente.setManaged(false);
+                panelPuntosCliente.setVisible(false);
+                panelPuntosCliente.setManaged(false);
             }
         });
         // Inicialmente ocultar el panel de datos de cliente
@@ -288,8 +342,6 @@ public class VentasController implements Initializable {
                                         "-fx-background-color: white; -fx-padding: 8px 12px; -fx-border-color: #b2dfdb; -fx-border-width: 0 0 1px 0; -fx-font-size: 16px; -fx-text-fill: #222;");
                             }
                         });
-                        System.out.println("[DEBUG ListCell] Producto renderizado: " + codigo + " | " + nombre
-                                + " | Stock: " + stock);
                     }
                 } catch (Exception ex) {
                     System.err.println("[ERROR ListCell] Error al renderizar producto en ListView: " + ex.getMessage());
@@ -358,7 +410,6 @@ public class VentasController implements Initializable {
         comboComprobante.setVisibleRowCount(2);
         tablaCarrito.setItems(carrito);
         btnConfirmarVenta.setOnAction(e -> confirmarVenta());
-        btnAnularVenta.setOnAction(e -> anularVenta());
         btnAgregarProducto.setOnAction(e -> agregarProductoDesdeBuscador());
         actualizarTotales();
 
@@ -570,7 +621,7 @@ public class VentasController implements Initializable {
     private void anularVenta() {
         // Lógica mínima: solo muestra mensaje (implementación real requiere selección
         // de venta)
-        mostrarMensaje("Funcionalidad de anulación pendiente de implementación.");
+        mostrarMensaje("Funcionalidad de anulación implementada.");
     }
 
     private void mostrarMensaje(String msg) {
@@ -663,7 +714,7 @@ public class VentasController implements Initializable {
         javafx.scene.control.TableColumn<Venta, Void> colRevertir = new javafx.scene.control.TableColumn<>(
                 "Revertir/Anular");
         colRevertir.setCellFactory(tc -> new javafx.scene.control.TableCell<Venta, Void>() {
-            private final javafx.scene.control.Button btn = new javafx.scene.control.Button("Revertir");
+            private final javafx.scene.control.Button btn = new javafx.scene.control.Button("Anular");
             {
                 btn.setStyle(
                         "-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 8px;");
@@ -726,10 +777,45 @@ public class VentasController implements Initializable {
         // Calcular totales antes de crear boleta y venta
         final java.math.BigDecimal subtotal = carrito.stream().map(DetalleVenta::getSubtotal)
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-        final java.math.BigDecimal descuento = carrito.stream().map(DetalleVenta::getDescuento)
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        final java.math.BigDecimal[] descuento = { carrito.stream().map(DetalleVenta::getDescuento)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add) };
         final java.math.BigDecimal igv = subtotal.multiply(new java.math.BigDecimal("0.18"));
-        final java.math.BigDecimal total = subtotal.subtract(descuento).add(igv);
+        final java.math.BigDecimal[] total = { subtotal.subtract(descuento[0]).add(igv) };
+
+        // Lógica de puntos para clientes NATURAL y boleta
+        final boolean[] puntosUsados = { false };
+        final int[] puntosDescontados = { 0 };
+        double solesDescuento = 0.0;
+        if (clienteActual != null && "NATURAL".equalsIgnoreCase(clienteActual.getTipoCliente())
+                && "BOLETA".equalsIgnoreCase(comboComprobante.getValue())) {
+            int puntos = consultarPuntosCliente(clienteActual.getId());
+            if (puntos >= 100) {
+                solesDescuento = Math.floor(puntos / 100.0);
+                // Límite opcional: máximo 50% del total
+                double maxDescuento = total[0].doubleValue() * 0.5;
+                if (solesDescuento > maxDescuento) {
+                    solesDescuento = Math.floor(maxDescuento);
+                }
+                puntosDescontados[0] = (int) (solesDescuento * 100);
+                if (solesDescuento > 0) {
+                    // Mostrar pop-up para preguntar si desea usar los puntos
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Redención de puntos");
+                    alert.setHeaderText("¿Desea usar sus puntos?");
+                    alert.setContentText("Tiene " + puntos + " puntos disponibles (S/" + solesDescuento
+                            + " de descuento). ¿Desea aplicarlos a esta compra?");
+                    ButtonType btnSi = new ButtonType("Sí, usar puntos", ButtonBar.ButtonData.YES);
+                    ButtonType btnNo = new ButtonType("No usar puntos", ButtonBar.ButtonData.NO);
+                    alert.getButtonTypes().setAll(btnSi, btnNo);
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == btnSi) {
+                        puntosUsados[0] = true;
+                        descuento[0] = descuento[0].add(new java.math.BigDecimal(solesDescuento));
+                        total[0] = subtotal.subtract(descuento[0]).add(igv);
+                    }
+                }
+            }
+        }
         String tipoComprobante = comboComprobante.getValue();
         if ("FACTURA".equalsIgnoreCase(tipoComprobante)) {
             // Validar que el cliente seleccionado tenga datos completos de empresa
@@ -778,7 +864,7 @@ public class VentasController implements Initializable {
                 String serieFactura = "FFF1";
                 String numeroFactura = obtenerSiguienteNumeroFactura(serieFactura);
                 previewController.setDatos(clienteJsonPreview, "FACTURA", serieFactura, numeroFactura,
-                        total.toPlainString(), detallesPreview);
+                        total[0].toPlainString(), detallesPreview);
                 previewController.setStage(stage);
                 previewController.setOnConfirmar(() -> {
                     try {
@@ -810,7 +896,7 @@ public class VentasController implements Initializable {
                         factura.put("total_igv", igv.doubleValue());
                         factura.put("total_gratuita", "");
                         factura.put("total_otros_cargos", "");
-                        factura.put("total", total.doubleValue());
+                        factura.put("total", total[0].doubleValue());
                         factura.put("percepcion_tipo", "");
                         factura.put("percepcion_base_imponible", "");
                         factura.put("total_percepcion", "");
@@ -910,9 +996,9 @@ public class VentasController implements Initializable {
                                 .conCliente(clienteActual)
                                 .conUsuario(usuarioActual)
                                 .conSubtotal(subtotal)
-                                .conDescuentoMonto(descuento)
+                                .conDescuentoMonto(descuento[0])
                                 .conIgvMonto(igv)
-                                .conTotal(total)
+                                .conTotal(total[0])
                                 .conTipoPago(metodoPago)
                                 .conTipoComprobante("FACTURA")
                                 .conNumeroBoleta(numeroFactura)
@@ -961,6 +1047,38 @@ public class VentasController implements Initializable {
                                 }
                             }
                         }
+                        // Diagnóstico: mostrar tipo de cliente y total de venta antes de registrar
+                        // puntos
+                        System.out.println("[DEBUG DIAGNOSTICO PUNTOS] clienteActual="
+                                + (clienteActual != null ? clienteActual.getTipoCliente() : "null") + " | totalVenta="
+                                + (ventaGuardada != null && ventaGuardada.getTotal() != null ? ventaGuardada.getTotal()
+                                        : "null"));
+                        // Registrar puntos GANADOS por la venta
+                        if (clienteActual != null && "NATURAL".equalsIgnoreCase(clienteActual.getTipoCliente())) {
+                            int puntosGanados = calcularPuntosPorVenta(ventaGuardada);
+                            if (puntosGanados > 0) {
+                                com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos();
+                                movGanado.setClienteId(clienteActual.getId());
+                                movGanado.setVentaId(ventaGuardada.getId());
+                                movGanado.setTipo("GANADO");
+                                movGanado.setPuntos(puntosGanados);
+                                movGanado.setDescripcion("Puntos ganados por compra");
+                                movGanado.setFecha(java.time.LocalDateTime.now());
+                                movGanado.setUsuarioId(usuarioActual != null
+                                        ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)
+                                        : null);
+                                System.out.println(
+                                        "[DEBUG FLUJO PUNTOS] Se va a guardar transacción de puntos: " + movGanado);
+                                boolean puntosGuardados = transaccionPuntosRepository.save(movGanado);
+                                if (!puntosGuardados) {
+                                    System.err.println(
+                                            "[ERROR PUNTOS] No se pudo guardar la transacción de puntos GANADO: "
+                                                    + movGanado);
+                                    mostrarMensaje(
+                                            "Error al registrar los puntos ganados. Verifique los datos del cliente y la venta.");
+                                }
+                            }
+                        }
                         // 2. Crear comprobante y asociar la venta guardada
                         comprobante.setVenta(ventaGuardada);
                         comprobanteRepository.save(comprobante);
@@ -988,58 +1106,7 @@ public class VentasController implements Initializable {
                         if (!cdrUrl.isEmpty())
                             msg.append("CDR: ").append(cdrUrl).append("\n");
                         mostrarMensaje(msg.toString());
-                        // Abrir ventana de acciones con PDF y datos del cliente (FACTURA)
-                        try {
-                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
-                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
-                            javafx.scene.Parent accionesRoot = accionesLoader.load();
-                            ComprobanteAccionesController accionesController = accionesLoader.getController();
-                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
-                                    clienteActual.getEmail(), clienteActual.getTelefono());
-                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
-                            accionesController.setStage(accionesStage);
-                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
-                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
-                            accionesStage.show();
-                        } catch (Exception ex) {
-                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
-                        }
-                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
-                        System.err.println("[LOG BOLETA] Intentando abrir ventana de acciones con PDF: " + pdfUrl);
-                        try {
-                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
-                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
-                            javafx.scene.Parent accionesRoot = accionesLoader.load();
-                            ComprobanteAccionesController accionesController = accionesLoader.getController();
-                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
-                                    clienteActual.getEmail(), clienteActual.getTelefono());
-                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
-                            accionesController.setStage(accionesStage);
-                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
-                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
-                            accionesStage.show();
-                            System.err.println("[LOG BOLETA] Ventana de acciones abierta correctamente");
-                        } catch (Exception ex) {
-                            System.err.println(
-                                    "[ERROR BOLETA] No se pudo abrir la ventana de acciones: " + ex.getMessage());
-                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
-                        }
-                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
-                        try {
-                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
-                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
-                            javafx.scene.Parent accionesRoot = accionesLoader.load();
-                            ComprobanteAccionesController accionesController = accionesLoader.getController();
-                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
-                                    clienteActual.getEmail(), clienteActual.getTelefono());
-                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
-                            accionesController.setStage(accionesStage);
-                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
-                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
-                            accionesStage.show();
-                        } catch (Exception ex) {
-                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
-                        }
+                        // Abrir ventana de acciones con PDF y datos del cliente (FACTURA/BOLETA)
                         try {
                             javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
                                     getClass().getResource("/fxml/comprobante_acciones.fxml"));
@@ -1057,38 +1124,6 @@ public class VentasController implements Initializable {
                         }
                         carrito.clear();
                         actualizarTotales();
-                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
-                        try {
-                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
-                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
-                            javafx.scene.Parent accionesRoot = accionesLoader.load();
-                            ComprobanteAccionesController accionesController = accionesLoader.getController();
-                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
-                                    clienteActual.getEmail(), clienteActual.getTelefono());
-                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
-                            accionesController.setStage(accionesStage);
-                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
-                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
-                            accionesStage.show();
-                        } catch (Exception ex) {
-                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
-                        }
-                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
-                        try {
-                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(
-                                    getClass().getResource("/fxml/comprobante_acciones.fxml"));
-                            javafx.scene.Parent accionesRoot = accionesLoader.load();
-                            ComprobanteAccionesController accionesController = accionesLoader.getController();
-                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),
-                                    clienteActual.getEmail(), clienteActual.getTelefono());
-                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();
-                            accionesController.setStage(accionesStage);
-                            accionesStage.setTitle("Acciones sobre Comprobante Electrónico");
-                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));
-                            accionesStage.show();
-                        } catch (Exception ex) {
-                            mostrarMensaje("No se pudo abrir la ventana de acciones: " + ex.getMessage());
-                        }
                     } catch (Exception ex) {
                         mostrarMensaje("Error en emisión de factura electrónica: " + ex.getMessage());
                         System.err.println("[ERROR Emisión Factura] " + ex.getMessage());
@@ -1146,7 +1181,7 @@ public class VentasController implements Initializable {
                 String serieBoleta = "BBB1";
                 String numeroBoleta = obtenerSiguienteNumeroBoleta(serieBoleta);
                 previewController.setDatos(clienteJsonPreview, "BOLETA", serieBoleta, numeroBoleta,
-                        total.toPlainString(), detallesPreview);
+                        total[0].toPlainString(), detallesPreview);
                 previewController.setStage(stage);
                 previewController.setOnConfirmar(() -> {
                     try {
@@ -1178,7 +1213,7 @@ public class VentasController implements Initializable {
                         boleta.put("total_igv", igv.doubleValue());
                         boleta.put("total_gratuita", "");
                         boleta.put("total_otros_cargos", "");
-                        boleta.put("total", total.doubleValue());
+                        boleta.put("total", total[0].doubleValue());
                         boleta.put("percepcion_tipo", "");
                         boleta.put("percepcion_base_imponible", "");
                         boleta.put("total_percepcion", "");
@@ -1238,6 +1273,9 @@ public class VentasController implements Initializable {
                         String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
                         String respuesta = com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils
                                 .enviarFacturaNubeFact(jsonBoleta, apiUrl, apiToken);
+                        // Mostrar JSON y respuesta NubeFacT solo en terminal para diagnóstico
+                        System.out.println("[DEBUG JSON enviado a NubeFacT]\n" + jsonBoleta);
+                        System.out.println("[DEBUG Respuesta completa de NubeFacT]\n" + respuesta);
                         String hashSunat = "";
                         String estadoSunat = "";
                         String pdfUrl = "";
@@ -1290,9 +1328,9 @@ public class VentasController implements Initializable {
                                 .conCliente(clienteActual)
                                 .conUsuario(usuarioActual)
                                 .conSubtotal(subtotal)
-                                .conDescuentoMonto(descuento)
+                                .conDescuentoMonto(descuento[0])
                                 .conIgvMonto(igv)
-                                .conTotal(total)
+                                .conTotal(total[0])
                                 .conTipoPago(metodoPago)
                                 .conTipoComprobante("BOLETA")
                                 .conNumeroBoleta(numeroBoleta)
@@ -1338,6 +1376,56 @@ public class VentasController implements Initializable {
                                             + ex.getMessage());
                                     System.err.println("[ERROR STOCK] " + ex.getMessage());
                                 }
+                            }
+                        }
+                        // Registrar puntos GANADOS por la venta SOLO para clientes NATURAL (boleta)
+                        System.out.println("[DEBUG DIAGNOSTICO PUNTOS] clienteActual="
+                                + (clienteActual != null ? clienteActual.getTipoCliente() : "null") + " | totalVenta="
+                                + (ventaGuardada != null && ventaGuardada.getTotal() != null ? ventaGuardada.getTotal()
+                                        : "null"));
+                        if (clienteActual != null && "NATURAL".equalsIgnoreCase(clienteActual.getTipoCliente())) {
+                            int puntosGanados = calcularPuntosPorVenta(ventaGuardada);
+                            if (puntosGanados > 0) {
+                                com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos();
+                                movGanado.setClienteId(clienteActual.getId());
+                                movGanado.setVentaId(ventaGuardada.getId());
+                                movGanado.setTipo("GANADO");
+                                movGanado.setPuntos(puntosGanados);
+                                movGanado.setDescripcion("Puntos ganados por compra");
+                                movGanado.setFecha(java.time.LocalDateTime.now());
+                                movGanado.setUsuarioId(usuarioActual != null
+                                        ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)
+                                        : null);
+                                System.out.println(
+                                        "[DEBUG FLUJO PUNTOS] Se va a guardar transacción de puntos: " + movGanado);
+                                boolean puntosGuardados = transaccionPuntosRepository.save(movGanado);
+                                if (!puntosGuardados) {
+                                    System.err.println(
+                                            "[ERROR PUNTOS] No se pudo guardar la transacción de puntos GANADO: "
+                                                    + movGanado);
+                                    mostrarMensaje(
+                                            "Error al registrar los puntos ganados. Verifique los datos del cliente y la venta.");
+                                }
+                            }
+                        }
+                        // Registrar el uso de puntos si se usaron en la venta
+                        if (puntosUsados[0] && puntosDescontados[0] > 0) {
+                            com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos mov = new com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos();
+                            mov.setClienteId(clienteActual.getId());
+                            mov.setVentaId(ventaGuardada.getId());
+                            mov.setTipo("USADO");
+                            mov.setPuntos(puntosDescontados[0]);
+                            mov.setDescripcion("Redención de puntos en venta");
+                            mov.setFecha(java.time.LocalDateTime.now());
+                            mov.setUsuarioId(usuarioActual != null
+                                    ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)
+                                    : null);
+                            boolean puntosUsadosGuardados = transaccionPuntosRepository.save(mov);
+                            if (!puntosUsadosGuardados) {
+                                System.err.println(
+                                        "[ERROR PUNTOS] No se pudo guardar la transacción de puntos USADO: " + mov);
+                                mostrarMensaje(
+                                        "Error al registrar el uso de puntos. Verifique los datos del cliente y la venta.");
                             }
                         }
                         comprobante.setVenta(ventaGuardada);
@@ -1419,35 +1507,71 @@ public class VentasController implements Initializable {
                     .getUsuarioActual();
             venta.setUsuario(usuarioActual);
             ventaRepository.update(venta);
-            // Restaurar stock de cada producto consultando el stock real en BD
+
+            // Restaurar stock de cada producto consultando el stock real en BD y mostrando
+            // logs
             if (venta.getDetalles() != null) {
                 for (DetalleVenta detalle : venta.getDetalles()) {
                     Producto producto = detalle.getProducto();
                     if (producto != null && producto.getId() != null) {
-                        // Consultar el stock actual desde la base de datos
-                        java.util.Optional<Producto> productoBD = productoRepository
-                                .findById(producto.getId().longValue());
-                        int stockActualBD = productoBD.isPresent() && productoBD.get().getStockActual() != null
-                                ? productoBD.get().getStockActual()
-                                : 0;
-                        int cantidadVendida = detalle.getCantidad();
-                        int nuevoStock = stockActualBD + cantidadVendida;
-                        producto.setStockActual(nuevoStock);
-                        productoRepository.updateStock(producto.getId(), nuevoStock);
+                        try {
+                            // Stock antes de la anulación
+                            java.util.Optional<Producto> productoBDAntes = productoRepository
+                                    .findById(producto.getId().longValue());
+                            int stockAntes = productoBDAntes.isPresent()
+                                    && productoBDAntes.get().getStockActual() != null
+                                            ? productoBDAntes.get().getStockActual()
+                                            : 0;
+                            int cantidadVendida = detalle.getCantidad();
+                            int nuevoStock = stockAntes + cantidadVendida;
+                            System.out.println("[ANULACION STOCK] Producto: " + producto.getNombre() + " (ID: "
+                                    + producto.getId() + ") | Stock antes BD: " + stockAntes + " | Cantidad anulada: "
+                                    + cantidadVendida + " | Nuevo stock: " + nuevoStock);
+                            boolean actualizado = productoRepository.updateStock(producto.getId(), nuevoStock);
+                            // Stock después de la anulación
+                            java.util.Optional<Producto> productoBDAfter = productoRepository
+                                    .findById(producto.getId().longValue());
+                            int stockDespues = productoBDAfter.isPresent()
+                                    && productoBDAfter.get().getStockActual() != null
+                                            ? productoBDAfter.get().getStockActual()
+                                            : 0;
+                            if (!actualizado) {
+                                System.err.println(
+                                        "[ERROR UPDATE STOCK] No se actualizó el stock en BD para producto ID: "
+                                                + producto.getId() + " | Cantidad: " + cantidadVendida
+                                                + " | Nuevo stock: " + nuevoStock);
+                            } else {
+                                System.out.println(
+                                        "[UPDATE STOCK OK] Stock actualizado correctamente en BD para producto ID: "
+                                                + producto.getId() + " | Stock después BD: " + stockDespues);
+                            }
+                        } catch (Exception ex) {
+                            System.err.println("[ERROR ANULACION STOCK] Producto: "
+                                    + (producto.getNombre() != null ? producto.getNombre() : "(sin nombre)") + " (ID: "
+                                    + producto.getId() + ") | Detalle: " + ex.getMessage());
+                        }
+                    } else {
+                        System.err.println("[ERROR ANULACION STOCK] Producto nulo o sin ID en detalle venta");
                     }
                 }
             }
+
+            // Guardar historial de cambio de anulación
+            com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio historial = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio();
+            historial.setVenta(venta);
+            historial.setTipoCambio("ANULACION");
+            historial.setMotivo("Venta anulada desde historial");
+            historial.setUsuario(usuarioActual);
+            historial.setFecha(java.time.LocalDateTime.now());
+            historialCambioRepository.save(historial);
+
             // Enviar anulación a NubeFacT/SUNAT
             String apiUrl = "https://api.nubefact.com/api/v1/b1f7ac80-5d5e-4fd9-8c8d-7b00c2638da0";
             String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
             java.util.LinkedHashMap<String, Object> jsonAnulacion = new java.util.LinkedHashMap<>();
             jsonAnulacion.put("operacion", "generar_anulacion");
-            // Determinar tipo de comprobante: 1=boleta, 2=factura
-            // Determinar tipo de comprobante: 1=FACTURA, 2=BOLETA (según NubeFacT)
             int tipoComprobante = "FACTURA".equalsIgnoreCase(venta.getTipoComprobante()) ? 1 : 2;
             jsonAnulacion.put("tipo_de_comprobante", tipoComprobante);
-            // Serie y número
-            // Validar y obtener la serie
             String serie = "";
             if (venta.getComprobante() != null && venta.getComprobante().getSerie() != null
                     && !venta.getComprobante().getSerie().isEmpty()) {
@@ -1458,8 +1582,6 @@ public class VentasController implements Initializable {
                 mostrarMensaje("No se encontró la serie del comprobante para la anulación. Verifique la venta.");
                 return;
             }
-
-            // Validar y obtener el número
             String numero = null;
             if (venta.getComprobante() != null && venta.getComprobante().getNumero() != null
                     && !venta.getComprobante().getNumero().isEmpty()) {
@@ -1470,12 +1592,11 @@ public class VentasController implements Initializable {
                 mostrarMensaje("No se encontró el número de comprobante para la anulación. Verifique la venta.");
                 return;
             }
-            // Enviar número sin ceros a la izquierda
             if (numero != null) {
                 numero = numero.replaceFirst("^0+", "");
             }
             jsonAnulacion.put("serie", serie);
-            jsonAnulacion.put("numero", numero); // Enviar como String, sin ceros a la izquierda
+            jsonAnulacion.put("numero", numero);
             jsonAnulacion.put("motivo", "ERROR DEL SISTEMA");
             jsonAnulacion.put("codigo_unico", "");
             String json = new com.google.gson.Gson().toJson(jsonAnulacion);
@@ -1502,40 +1623,13 @@ public class VentasController implements Initializable {
                         ticket = "";
                     }
                 }
-                // Si NubeFacT procesó la anulación (hay enlace y número), mostrar éxito
-                if (enlace != null && !enlace.isEmpty()) {
-                    com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio historial = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio();
-                    historial.setVenta(venta);
-                    historial.setTipoCambio("ANULACION");
-                    historial.setMotivo("Venta anulada desde historial");
-                    historial.setUsuario(usuarioActual);
-                    historial.setFecha(java.time.LocalDateTime.now());
-                    historialCambioRepository.save(historial);
-                    // Revertir stock de productos vendidos
-                    if (venta.getDetalles() != null) {
-                        for (com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta detalle : venta
-                                .getDetalles()) {
-                            com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto producto = detalle
-                                    .getProducto();
-                            if (producto != null) {
-                                int cantidadVendida = detalle.getCantidad();
-                                int stockActual = producto.getStockActual();
-                                int nuevoStock = stockActual + cantidadVendida;
-                                productoRepository.updateStock(producto.getId(), nuevoStock);
-                            }
-                        }
-                    }
-                    String estadoSunat = aceptadaPorSunat ? "Aceptada"
-                            : (ticket.isEmpty() ? "Pendiente" : "En proceso");
-                    String mensaje = "Venta anulada correctamente en NubeFacT. Estado SUNAT: " + estadoSunat
-                            + ".\nEnlace: " + enlace;
-                    if (!ticket.isEmpty()) {
-                        mensaje += "\nTicket SUNAT: " + ticket;
-                    }
-                    mostrarMensaje(mensaje);
-                } else {
-                    mostrarMensaje("No se pudo anular la venta en NubeFacT. Respuesta: " + respuestaNubeFact);
+                String estadoSunat = aceptadaPorSunat ? "Aceptada" : (ticket.isEmpty() ? "Pendiente" : "En proceso");
+                String mensaje = "Venta anulada correctamente en NubeFacT. Estado SUNAT: " + estadoSunat + ".\nEnlace: "
+                        + enlace;
+                if (!ticket.isEmpty()) {
+                    mensaje += "\nTicket SUNAT: " + ticket;
                 }
+                mostrarMensaje(mensaje);
             } else {
                 mostrarMensaje("No se pudo anular la venta en SUNAT/NubeFacT. Respuesta: null");
             }

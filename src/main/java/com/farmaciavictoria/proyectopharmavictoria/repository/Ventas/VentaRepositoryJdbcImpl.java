@@ -114,7 +114,10 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                ventas.add(mapVentaFromResultSet(rs));
+                Venta venta = mapVentaFromResultSet(rs);
+                // Poblar detalles de la venta
+                venta.setDetalles(obtenerDetallesVenta(connection, venta.getId()));
+                ventas.add(venta);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error al listar ventas", e);
@@ -189,5 +192,86 @@ public class VentaRepositoryJdbcImpl implements VentaRepository {
         venta.setUpdatedAt(
                 rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime() : null);
         return venta;
+    }
+
+    // Nuevo método para poblar detalles y productos
+    private List<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta> obtenerDetallesVenta(
+            Connection connection, int ventaId) {
+        List<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta> detalles = new ArrayList<>();
+        String sql = "SELECT dv.*, p.* FROM detalle_ventas dv JOIN productos p ON dv.producto_id = p.id WHERE dv.venta_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, ventaId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta detalle = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta();
+                    detalle.setId(rs.getInt("id"));
+                    detalle.setCantidad(rs.getInt("cantidad"));
+                    detalle.setPrecioUnitario(rs.getBigDecimal("precio_unitario"));
+                    detalle.setDescuento(rs.getBigDecimal("descuento"));
+                    detalle.setSubtotal(rs.getBigDecimal("subtotal"));
+                    // Poblar producto completo
+                    com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto producto = new com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto();
+                    producto.setId(rs.getInt("producto_id"));
+                    producto.setCodigo(rs.getString("codigo"));
+                    producto.setNombre(rs.getString("nombre"));
+                    producto.setDescripcion(rs.getString("descripcion"));
+                    producto.setPrincipioActivo(rs.getString("principio_activo"));
+                    producto.setConcentracion(rs.getString("concentracion"));
+                    // Convertir String a enum FormaFarmaceutica
+                    String formaStr = rs.getString("forma_farmaceutica");
+                    com.farmaciavictoria.proyectopharmavictoria.model.Inventario.FormaFarmaceutica formaEnum = null;
+                    for (com.farmaciavictoria.proyectopharmavictoria.model.Inventario.FormaFarmaceutica f : com.farmaciavictoria.proyectopharmavictoria.model.Inventario.FormaFarmaceutica
+                            .values()) {
+                        if (f.getDescripcion().equalsIgnoreCase(formaStr)) {
+                            formaEnum = f;
+                            break;
+                        }
+                    }
+                    producto.setFormaFarmaceutica(formaEnum != null ? formaEnum
+                            : com.farmaciavictoria.proyectopharmavictoria.model.Inventario.FormaFarmaceutica.OTRO);
+                    producto.setPrecioCompra(rs.getBigDecimal("precio_compra"));
+                    producto.setPrecioVenta(rs.getBigDecimal("precio_venta"));
+                    producto.setStockActual(rs.getInt("stock_actual"));
+                    producto.setStockMinimo(rs.getInt("stock_minimo"));
+                    producto.setStockMaximo(rs.getInt("stock_maximo"));
+                    // Convertir String a enum CategoriaProducto
+                    String catStr = rs.getString("categoria");
+                    com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto catEnum = null;
+                    for (com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto c : com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto
+                            .values()) {
+                        if (c.getDescripcion().equalsIgnoreCase(catStr)) {
+                            catEnum = c;
+                            break;
+                        }
+                    }
+                    producto.setCategoria(catEnum != null ? catEnum
+                            : com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto.OTROS);
+                    producto.setUbicacion(rs.getString("ubicacion"));
+                    producto.setLote(rs.getString("lote"));
+                    producto.setFechaVencimiento(
+                            rs.getDate("fecha_vencimiento") != null ? rs.getDate("fecha_vencimiento").toLocalDate()
+                                    : null);
+                    producto.setRequiereReceta(rs.getBoolean("requiere_receta"));
+                    producto.setEsControlado(rs.getBoolean("es_controlado"));
+                    producto.setActivo(rs.getBoolean("activo"));
+                    producto.setCreatedAt(
+                            rs.getTimestamp("created_at") != null ? rs.getTimestamp("created_at").toLocalDateTime()
+                                    : null);
+                    producto.setUpdatedAt(
+                            rs.getTimestamp("updated_at") != null ? rs.getTimestamp("updated_at").toLocalDateTime()
+                                    : null);
+                    producto.setLaboratorio(rs.getString("laboratorio"));
+                    producto.setFechaFabricacion(
+                            rs.getDate("fecha_fabricacion") != null ? rs.getDate("fecha_fabricacion").toLocalDate()
+                                    : null);
+                    detalle.setProducto(producto);
+                    detalles.add(detalle);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[ERROR DETALLE VENTA] " + e.getMessage());
+            e.printStackTrace();
+        }
+        return detalles;
     }
 }

@@ -94,6 +94,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Ventas\DetalleVentaRepositoryJdbcImpl.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Inventario\Producto.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\AuthenticationService.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\command\Command.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\ForgotPasswordDialogController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Usuario\UsuarioPermisoRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Comprobante\ComprobanteFactory.java
@@ -134,6 +135,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\UsuarioDetallesController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Ventas\VentaBuilder.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\ProductosController.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\command\RestablecerStockCommand.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Cliente\ClienteFormController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Inventario\ProductoHistorialCambioRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Inventario\EdicionMasivaWizardController.java
