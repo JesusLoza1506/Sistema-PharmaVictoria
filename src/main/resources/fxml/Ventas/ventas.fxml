@@ -87,6 +87,12 @@
                 <Label text="Cliente existente:" styleClass="cliente-label" />
                 <ComboBox fx:id="comboClientes" promptText="Seleccionar cliente" styleClass="combo-box" />
             </HBox>
+            <!-- Panel de puntos del cliente -->
+            <HBox fx:id="panelPuntosCliente" spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
+                <Label fx:id="lblNombreCliente" text="Cliente: ---" styleClass="puntos-nombre-label" />
+                <Label fx:id="lblPuntosDisponibles" text="Puntos disponibles: 0" styleClass="puntos-label" />
+                <Label fx:id="lblEquivalenteSoles" text="Equivalente: S/0.00" styleClass="puntos-label" />
+            </HBox>
             <!-- Panel dinámico para datos de cliente -->
             <HBox fx:id="panelDatosCliente" spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
                 <Label text="Tipo:" styleClass="cliente-label" />
@@ -112,7 +118,6 @@
             </HBox>
             <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 16px 0 0 0;">
                 <Button fx:id="btnConfirmarVenta" text="Confirmar venta" styleClass="btn-confirmar" />
-                <Button fx:id="btnAnularVenta" text="Anular venta" styleClass="btn-anular" />
                 <Button fx:id="btnHistorial" text="Ver historial de ventas" styleClass="btn-historial" />
             </HBox>
         </children>
