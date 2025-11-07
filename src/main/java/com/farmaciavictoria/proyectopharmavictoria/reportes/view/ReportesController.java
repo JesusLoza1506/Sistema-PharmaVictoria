@@ -27,15 +27,30 @@ public class ReportesController {
 
     private void cargarCardsReportes() {
         try {
-            // Solo el card de ventas por ahora
+            // Card de ventas por periodo
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/reportes/ReporteVentasCard.fxml"));
             AnchorPane cardVentas = loader.load();
-            // Manejar click en el card para abrir el detalle
             cardVentas.setOnMouseClicked(event -> abrirDetalleReporteVentas(event));
             cardsPane.getChildren().add(cardVentas);
-        } catch (IOException e) {
-            mostrarError("Error", "No se pudo cargar el card de reporte de ventas: " + e.getMessage());
+
+            // Card de ventas por producto
+            FXMLLoader loaderProducto = new FXMLLoader(
+                    getClass().getResource("/fxml/reportes/ReporteVentasPorProductoCard.fxml"));
+            AnchorPane cardProducto = loaderProducto.load();
+            // El controlador del card ya maneja el evento de abrir detalle
+            cardsPane.getChildren().add(cardProducto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarError("Error",
+                    "No se pudo cargar los cards de reportes: " + e.getMessage() + "\n" + getStackTrace(e));
         }
+    }
+
+    private String getStackTrace(Throwable t) {
+        java.io.StringWriter sw = new java.io.StringWriter();
+        java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+        t.printStackTrace(pw);
+        return sw.toString();
     }
 
     private void abrirDetalleReporteVentas(MouseEvent event) {

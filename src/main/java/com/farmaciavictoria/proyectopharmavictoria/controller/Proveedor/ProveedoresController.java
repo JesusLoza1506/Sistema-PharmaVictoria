@@ -5,7 +5,6 @@ import com.farmaciavictoria.proyectopharmavictoria.service.ProveedorService;
 import com.farmaciavictoria.proyectopharmavictoria.service.NotificationService;
 import com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer;
 import com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor;
-import com.farmaciavictoria.proyectopharmavictoria.util.IconLoader;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

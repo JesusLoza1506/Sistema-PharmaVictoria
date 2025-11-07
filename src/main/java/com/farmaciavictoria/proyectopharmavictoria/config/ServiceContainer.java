@@ -88,15 +88,7 @@ public class ServiceContainer {
         repositories.put(ProductoRepository.class, new ProductoRepository());
         repositories.put(ClienteRepository.class, new ClienteRepository());
 
-        // SucursalRepository: obtener conexiones por método (evitar conexiones
-        // persistentes)
-        try {
-            com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository sucursalRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository();
-            repositories.put(com.farmaciavictoria.proyectopharmavictoria.repository.SucursalRepository.class,
-                    sucursalRepo);
-        } catch (Exception e) {
-            logger.error("Error al registrar SucursalRepository: {}", e.getMessage(), e);
-        }
+        // Eliminado registro de SucursalRepository
 
         logger.debug("Repositories registrados: {}", repositories.size());
     }

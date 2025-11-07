@@ -8,14 +8,11 @@ public class ReporteVentasCardController {
     @FXML
     private Label lblTitulo;
     @FXML
-    private Label lblMonto;
-    @FXML
     private Label lblDetalle;
 
     // Método para inicializar el card con datos
-    public void setDatos(String titulo, String monto) {
+    public void setDatos(String titulo) {
         lblTitulo.setText(titulo);
-        lblMonto.setText(monto);
     }
 
     @FXML

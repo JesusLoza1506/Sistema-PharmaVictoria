@@ -49,6 +49,7 @@
         <artifactId>poi-ooxml</artifactId>
         <version>5.2.3</version>
     </dependency>
+        <!-- Jakarta Mail implementación (NO incluir la API por separado) -->
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
@@ -58,7 +59,6 @@
             <groupId>com.sun.activation</groupId>
             <artifactId>jakarta.activation</artifactId>
             <version>2.0.1</version>
-        <!-- Eliminada dependencia duplicada jakarta.mail -->
         </dependency>
         <!-- JavaFX Dependencies -->
         <dependency>

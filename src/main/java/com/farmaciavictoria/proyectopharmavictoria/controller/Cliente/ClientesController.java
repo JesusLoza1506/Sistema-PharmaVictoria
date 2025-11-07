@@ -62,12 +62,14 @@ public class ClientesController implements Initializable {
                     productoRepository);
             for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente cliente : clientes) {
                 try {
+                    // Incluir tanto clientes NATURAL como EMPRESA, excluyendo solo los genéricos
+                    // (documento 00000000)
                     if (cliente.getId() != null
                             && (cliente.getDocumento() == null || !cliente.getDocumento().equals("00000000"))) {
                         java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta> ventasCliente = ventaService
                                 .listarVentasPorCliente(cliente.getId());
                         System.out.println("[DASHBOARD] Cliente: " + cliente.getNombres() + " " + cliente.getApellidos()
-                                + " | Compras: " + ventasCliente.size());
+                                + " | Tipo: " + cliente.getTipoCliente() + " | Compras: " + ventasCliente.size());
                         comprasPorCliente.put(cliente.getId(), ventasCliente.size());
                         clientesMap.put(cliente.getId(), cliente);
                     }
@@ -96,9 +98,20 @@ public class ClientesController implements Initializable {
         series.setName("Compras realizadas");
         for (java.util.Map.Entry<Integer, Integer> entry : top) {
             com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente cliente = clientesMap.get(entry.getKey());
-            String nombre = cliente != null && cliente.getNombres() != null
-                    ? (cliente.getNombres() + " " + (cliente.getApellidos() != null ? cliente.getApellidos() : ""))
-                    : ("Cliente " + entry.getKey());
+            String nombre;
+            if (cliente != null) {
+                if ("Empresa".equalsIgnoreCase(cliente.getTipoCliente())) {
+                    nombre = cliente.getRazonSocial() != null && !cliente.getRazonSocial().trim().isEmpty()
+                            ? cliente.getRazonSocial()
+                            : (cliente.getNombres() != null ? cliente.getNombres() : "") + " "
+                                    + (cliente.getApellidos() != null ? cliente.getApellidos() : "");
+                } else {
+                    nombre = (cliente.getNombres() != null ? cliente.getNombres() : "") + " "
+                            + (cliente.getApellidos() != null ? cliente.getApellidos() : "");
+                }
+            } else {
+                nombre = "Cliente " + entry.getKey();
+            }
             javafx.scene.chart.XYChart.Data<String, Number> data = new javafx.scene.chart.XYChart.Data<>(nombre.trim(),
                     entry.getValue());
             series.getData().add(data);
@@ -337,6 +350,7 @@ public class ClientesController implements Initializable {
                     .obtenerTodos();
             int r18_25 = 0, r26_35 = 0, r36_50 = 0, r51 = 0;
             for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c : clientes) {
+                // Incluir ambos tipos de clientes en la estadística de edad
                 Integer edad = c.getEdad();
                 if (edad == null)
                     continue;
@@ -692,7 +706,7 @@ public class ClientesController implements Initializable {
         if (lblTotalClientes != null && clienteService != null) {
             int totalClientes = clienteService.obtenerTodos().stream()
                     .filter(c -> c.getDocumento() == null || !c.getDocumento().equals("00000000"))
-                    .toList().size();
+                    .toList().size(); // Incluye NATURAL y EMPRESA
             lblTotalClientes.setText("Total: " + totalClientes + " clientes");
             lblTotalClientes.setStyle("-fx-text-fill: #1bb934; -fx-font-weight: bold;");
         }

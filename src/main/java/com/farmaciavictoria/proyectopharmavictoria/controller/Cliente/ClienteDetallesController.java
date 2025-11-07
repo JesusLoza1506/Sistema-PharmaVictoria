@@ -56,8 +56,7 @@ public class ClienteDetallesController {
         private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraEstado;
         @FXML
         private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraPago;
-        @FXML
-        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraSucursal;
+        // Columna de sucursal eliminada
         @FXML
         private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraObs;
 
@@ -275,9 +274,7 @@ public class ClienteDetallesController {
                                 data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getEstado()));
                 colCompraPago.setCellValueFactory(
                                 data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTipoPago()));
-                colCompraSucursal.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
-                                data.getValue().getSucursal() != null ? data.getValue().getSucursal().getNombre()
-                                                : ""));
+                // Lógica de sucursal eliminada
                 colCompraObs.setCellValueFactory(
                                 data -> new javafx.beans.property.SimpleStringProperty(
                                                 data.getValue().getObservaciones()));

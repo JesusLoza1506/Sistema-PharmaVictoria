@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.reportes.view.ReporteVentasPorProductoDetalleController" prefWidth="900" prefHeight="600">
+    <top>
+        <HBox spacing="16" alignment="CENTER_LEFT" style="-fx-padding: 16; -fx-background-color: #FF9800;">
+            <children>
+                <Label text="Reporte de Ventas por Producto" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnExportarPDF" styleClass="exportar-pdf-btn" onAction="#onExportarPDF">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@/icons/pdf download.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btnExportarExcel" styleClass="exportar-excel-btn" onAction="#onExportarExcel">
+                    <graphic>
+                        <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                            <image>
+                                <Image url="@/icons/excel download.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="12" style="-fx-padding: 16;">
+            <children>
+                <HBox spacing="8">
+                    <children>
+                        <Label text="Desde:" />
+                        <DatePicker fx:id="dateInicio" />
+                        <Label text="Hasta:" />
+                        <DatePicker fx:id="dateFin" />
+                        <Button fx:id="btnFiltrar" text="Filtrar" onAction="#onFiltrar" />
+                    </children>
+                </HBox>
+                <TableView fx:id="tableProductos" prefHeight="500">
+                    <columns>
+                        <TableColumn fx:id="colProducto" text="Producto" />
+                        <TableColumn fx:id="colCantidad" text="Cantidad Vendida" />
+                        <TableColumn fx:id="colTotal" text="Total Vendido" />
+                    </columns>
+                </TableView>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

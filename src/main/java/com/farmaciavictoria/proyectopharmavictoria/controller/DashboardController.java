@@ -600,7 +600,9 @@ public class DashboardController implements Initializable, SystemEventObserver {
                 mostrarError("Error", "No se pudo mostrar el módulo de Configuración.");
             }
         } catch (Exception e) {
-            mostrarError("En desarrollo", "El módulo Configuración aún no está disponible.");
+            logger.error("Error técnico al cargar módulo Configuración:", e);
+            mostrarError("Error técnico",
+                    "No se pudo mostrar el módulo de Configuración.\n\nDetalles: " + e.getMessage());
         }
     }
 
