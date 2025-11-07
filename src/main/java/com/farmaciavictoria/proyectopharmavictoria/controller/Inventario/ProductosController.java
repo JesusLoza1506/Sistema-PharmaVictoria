@@ -405,9 +405,15 @@ public class ProductosController implements Initializable, SystemEventObserver {
                         row.getStyleClass().add("row-sin-stock");
                     } else if (newProducto.getStockActual() <= newProducto.getStockMinimo()) {
                         row.getStyleClass().add("row-stock-bajo");
-                    } else if (newProducto.getFechaVencimiento() != null &&
-                            newProducto.getFechaVencimiento().isBefore(LocalDate.now().plusDays(30))) {
-                        row.getStyleClass().add("row-proximo-vencer");
+                    } else if (newProducto.getFechaVencimiento() != null) {
+                        int dias = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService
+                                .getDiasVencimientoAlerta();
+                        java.time.LocalDate hoy = java.time.LocalDate.now();
+                        java.time.LocalDate limite = hoy.plusDays(dias);
+                        if (!newProducto.getFechaVencimiento().isBefore(hoy) &&
+                                !newProducto.getFechaVencimiento().isAfter(limite)) {
+                            row.getStyleClass().add("row-proximo-vencer");
+                        }
                     }
                 }
             });
@@ -633,6 +639,8 @@ public class ProductosController implements Initializable, SystemEventObserver {
                 break;
         }
 
+        int diasVencimiento = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService
+                .getDiasVencimientoAlerta();
         List<Producto> filtrados = strategy.buscar(productos, textoBusqueda)
                 .stream()
                 .filter(producto -> mostrarInactivos || producto.getActivo())
@@ -649,7 +657,10 @@ public class ProductosController implements Initializable, SystemEventObserver {
                         return producto.getStockActual() <= producto.getStockMinimo();
                     if ("Próximos a Vencer".equals(estadoSeleccionado))
                         return producto.getFechaVencimiento() != null
-                                && producto.getFechaVencimiento().isBefore(LocalDate.now().plusDays(30));
+                                && producto.getFechaVencimiento().isAfter(LocalDate.now())
+                                && (producto.getFechaVencimiento().isEqual(LocalDate.now().plusDays(diasVencimiento))
+                                        || producto.getFechaVencimiento()
+                                                .isBefore(LocalDate.now().plusDays(diasVencimiento)));
                     if ("Sin Stock".equals(estadoSeleccionado))
                         return producto.getStockActual() == 0;
                     if ("Productos Vencidos".equals(estadoSeleccionado))
@@ -720,10 +731,15 @@ public class ProductosController implements Initializable, SystemEventObserver {
         Platform.runLater(() -> {
             // Usar productosFiltrados (total filtrado), no solo la página actual
             List<Producto> lista = productosFiltrados;
+            int diasVencimiento = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService
+                    .getDiasVencimientoAlerta();
             int productosActivos = (int) lista.stream().filter(Producto::getActivo).count();
             int stockBajo = (int) lista.stream().filter(p -> p.getStockActual() <= p.getStockMinimo()).count();
             int proximosVencer = (int) lista.stream().filter(p -> p.getFechaVencimiento() != null
-                    && p.getFechaVencimiento().isBefore(LocalDate.now().plusDays(30))).count();
+                    && p.getFechaVencimiento().isAfter(LocalDate.now())
+                    && (p.getFechaVencimiento().isEqual(LocalDate.now().plusDays(diasVencimiento))
+                            || p.getFechaVencimiento().isBefore(LocalDate.now().plusDays(diasVencimiento))))
+                    .count();
             BigDecimal valorInventario = lista.stream()
                     .filter(Producto::getActivo)
                     .map(p -> p.getPrecioVenta().multiply(BigDecimal.valueOf(p.getStockActual())))

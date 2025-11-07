@@ -18,13 +18,18 @@ public class ConfiguracionController {
 
     private void cargarCardsConfiguracion() {
         try {
-            FXMLLoader loader = new FXMLLoader(
+            FXMLLoader loaderCorreo = new FXMLLoader(
                     getClass().getResource("/fxml/configuracion/NotificacionesCorreoCard.fxml"));
-            AnchorPane cardCorreo = loader.load();
+            AnchorPane cardCorreo = loaderCorreo.load();
             cardsPane.getChildren().add(cardCorreo);
+
+            FXMLLoader loaderVencimiento = new FXMLLoader(
+                    getClass().getResource("/fxml/configuracion/VencimientoAlertaCard.fxml"));
+            AnchorPane cardVencimiento = loaderVencimiento.load();
+            cardsPane.getChildren().add(cardVencimiento);
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarError("Error", "No se pudo cargar el card de notificaciones: " + e.getMessage());
+            mostrarError("Error", "No se pudo cargar los cards de configuración: " + e.getMessage());
         }
     }
 

@@ -238,6 +238,24 @@ public class DashboardController implements Initializable, SystemEventObserver {
             cargarProductosStockBajo();
             cargarVentasRecientes();
 
+            // Ocultar módulos para VENDEDOR
+            if (usuarioLogueado != null && usuarioLogueado.isVendedor()) {
+                Button btnReportes = (Button) fechaHoraLabel.getScene().lookup("#btnReportes");
+                Button btnConfiguracion = (Button) fechaHoraLabel.getScene().lookup("#btnConfiguracion");
+                Button btnUsuarios = (Button) fechaHoraLabel.getScene().lookup("#btnUsuarios");
+                if (btnReportes != null) {
+                    btnReportes.setVisible(false);
+                    btnReportes.setManaged(false);
+                }
+                if (btnConfiguracion != null) {
+                    btnConfiguracion.setVisible(false);
+                    btnConfiguracion.setManaged(false);
+                }
+                if (btnUsuarios != null) {
+                    btnUsuarios.setVisible(false);
+                    btnUsuarios.setManaged(false);
+                }
+            }
         } catch (Exception e) {
             logger.error("Error configurando valores iniciales: {}", e.getMessage(), e);
         }
