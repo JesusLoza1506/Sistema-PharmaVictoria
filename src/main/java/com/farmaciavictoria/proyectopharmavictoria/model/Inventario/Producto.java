@@ -304,7 +304,10 @@ public class Producto {
     public boolean isProximoVencer() {
         if (fechaVencimiento == null)
             return false;
-        return fechaVencimiento.isBefore(LocalDate.now().plusDays(30));
+        int dias = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService.getDiasVencimientoAlerta();
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        java.time.LocalDate limite = hoy.plusDays(dias);
+        return (fechaVencimiento.isAfter(hoy.minusDays(1)) && fechaVencimiento.isBefore(limite.plusDays(1)));
     }
 
     public boolean isVencido() {

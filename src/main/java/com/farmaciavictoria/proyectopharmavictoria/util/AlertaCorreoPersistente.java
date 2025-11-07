@@ -8,6 +8,14 @@ import java.util.Set;
  * Persistencia de productos notificados por correo entre sesiones.
  */
 public class AlertaCorreoPersistente {
+    /**
+     * Elimina la marca de notificado de vencimiento para un producto específico
+     */
+    public static void eliminarNotificadoVencimiento(String producto) {
+        productosVencimiento.remove(producto);
+        guardar(VENCIMIENTO_FILE, productosVencimiento);
+    }
+
     private static final String STOCK_FILE = "notificados_stock.ser";
     private static final String VENCIMIENTO_FILE = "notificados_vencimiento.ser";
 

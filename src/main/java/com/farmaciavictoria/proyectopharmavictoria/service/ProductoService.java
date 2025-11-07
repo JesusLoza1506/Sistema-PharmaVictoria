@@ -97,7 +97,46 @@ public class ProductoService {
     // Constantes de negocio
     private static final int STOCK_MINIMO_DEFAULT = 5;
     private static final int STOCK_MAXIMO_DEFAULT = 100;
-    private static final int DIAS_VENCIMIENTO_ALERTA = 30;
+    private static int DIAS_VENCIMIENTO_ALERTA = cargarDiasVencimientoAlerta();
+
+    private static int cargarDiasVencimientoAlerta() {
+        try {
+            java.util.Properties prop = new java.util.Properties();
+            java.io.InputStream input = ProductoService.class.getClassLoader()
+                    .getResourceAsStream("alerta-config.properties");
+            if (input != null) {
+                prop.load(input);
+                String valor = prop.getProperty("alerta.vencimiento.dias");
+                if (valor != null && !valor.isEmpty()) {
+                    return Integer.parseInt(valor);
+                }
+            }
+        } catch (Exception e) {
+            // Si falla, usar el valor por defecto
+        }
+        return 30;
+    }
+
+    // Permite cambiar el valor en tiempo real desde la UI
+    public static void setDiasVencimientoAlerta(int dias) {
+        DIAS_VENCIMIENTO_ALERTA = dias;
+        // Guardar en archivo de configuración
+        try {
+            java.util.Properties prop = new java.util.Properties();
+            prop.setProperty("alerta.vencimiento.dias", String.valueOf(dias));
+            java.io.OutputStream output = new java.io.FileOutputStream("src/main/resources/alerta-config.properties");
+            prop.store(output, null);
+            output.close();
+        } catch (Exception e) {
+            // Silenciar error de guardado
+        }
+        // Limpiar todas las marcas de notificación de vencimiento
+        com.farmaciavictoria.proyectopharmavictoria.util.AlertaCorreoPersistente.limpiar();
+    }
+
+    public static int getDiasVencimientoAlerta() {
+        return DIAS_VENCIMIENTO_ALERTA;
+    }
 
     public ProductoService(ProductoRepository productoRepository, CodigoGeneratorService codigoGeneratorService) {
         this.productoRepository = productoRepository;
@@ -274,6 +313,14 @@ public class ProductoService {
             // Mantener fecha de creación
             producto.setCreatedAt(existente.getCreatedAt());
             producto.setUpdatedAt(LocalDateTime.now());
+
+            // Si la fecha de vencimiento cambió, eliminar la marca de notificado
+            if (producto.getFechaVencimiento() != null && existente.getFechaVencimiento() != null
+                    && !producto.getFechaVencimiento().isEqual(existente.getFechaVencimiento())) {
+                com.farmaciavictoria.proyectopharmavictoria.util.AlertaCorreoPersistente
+                        .eliminarNotificadoVencimiento(producto.getNombre());
+            }
+
             // Actualizar en base de datos
             boolean actualizado = productoRepository.update(producto);
             if (!actualizado) {
@@ -510,6 +557,7 @@ public class ProductoService {
      * ✅ OBSERVER PATTERN: Verificar alertas de stock y vencimiento
      */
     private void verificarAlertas(List<Producto> productos) {
+        int diasVencimientoAlerta = DIAS_VENCIMIENTO_ALERTA;
         for (Producto producto : productos) {
             // Alerta de stock bajo
             if (producto.getStockActual() <= producto.getStockMinimo()) {
@@ -520,8 +568,11 @@ public class ProductoService {
 
             // Alerta de vencimiento próximo
             if (producto.getFechaVencimiento() != null) {
-                LocalDate fechaLimite = LocalDate.now().plusDays(DIAS_VENCIMIENTO_ALERTA);
-                if (producto.getFechaVencimiento().isBefore(fechaLimite)) {
+                LocalDate hoy = LocalDate.now();
+                LocalDate fechaLimite = hoy.plusDays(diasVencimientoAlerta);
+                if (producto.getFechaVencimiento().isAfter(hoy) &&
+                        (producto.getFechaVencimiento().isEqual(fechaLimite)
+                                || producto.getFechaVencimiento().isBefore(fechaLimite))) {
                     eventManager.publishEvent(SystemEvent.EventType.PRODUCTO_VENCIMIENTO_PROXIMO,
                             "Producto próximo a vencer: " + producto.getNombre(),
                             this);
@@ -551,7 +602,8 @@ public class ProductoService {
     public List<Producto> obtenerProductosProximosVencer() {
         try {
             logger.debug("Obteniendo productos próximos a vencer");
-            List<Producto> productos = productoRepository.findProximosVencer();
+            int dias = getDiasVencimientoAlerta();
+            List<Producto> productos = productoRepository.findProximosVencer(dias);
             logger.info("Productos próximos a vencer: {}", productos.size());
             return productos;
         } catch (Exception e) {
