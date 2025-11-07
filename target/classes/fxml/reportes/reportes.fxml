@@ -4,8 +4,7 @@
 <?import javafx.geometry.Insets?>
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.reportes.view.ReportesController" prefWidth="900" prefHeight="600" style="-fx-background-color: #f5f5f5;">
     <children>
-        <Label text="Reportes" layoutX="40" layoutY="30" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #333;" />
-        <FlowPane fx:id="cardsPane" layoutX="40" layoutY="80" prefWidth="820" prefHeight="480" hgap="24" vgap="24" style="-fx-background-color: transparent;">
+    <FlowPane fx:id="cardsPane" layoutX="40" layoutY="30" prefWidth="820" prefHeight="480" hgap="24" vgap="24" style="-fx-background-color: transparent;">
             <!-- Aquí se cargarán los cards dinámicamente -->
         </FlowPane>
     </children>

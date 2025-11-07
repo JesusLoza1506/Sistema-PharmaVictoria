@@ -8,7 +8,6 @@ import com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer;
 import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventObserver;
 import com.farmaciavictoria.proyectopharmavictoria.events.SystemEvent;
 import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager;
-import com.farmaciavictoria.proyectopharmavictoria.util.IconLoader;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleObjectProperty;

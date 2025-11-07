@@ -36,9 +36,12 @@ public class EmailService {
         message.setFrom(new InternetAddress(username));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
         message.setSubject(subject);
+
+        String htmlBody = generarHtmlCorreo(subject, text);
+
         if (adjunto != null) {
             MimeBodyPart textoPart = new MimeBodyPart();
-            textoPart.setText(text);
+            textoPart.setContent(htmlBody, "text/html; charset=utf-8");
             MimeBodyPart adjuntoPart = new MimeBodyPart();
             adjuntoPart.setDataHandler(new DataHandler(new FileDataSource(adjunto)));
             adjuntoPart.setFileName(adjunto.getName());
@@ -47,8 +50,24 @@ public class EmailService {
             multipart.addBodyPart(adjuntoPart);
             message.setContent(multipart);
         } else {
-            message.setText(text);
+            message.setContent(htmlBody, "text/html; charset=utf-8");
         }
         Transport.send(message);
+    }
+
+    /**
+     * Genera el cuerpo HTML con mejor diseño para el correo de alerta.
+     */
+    private String generarHtmlCorreo(String subject, String mensaje) {
+        String color = subject.contains("Stock Bajo") ? "#ff9800" : "#e53935";
+        String icono = subject.contains("Stock Bajo") ? "&#9888;" : "&#128308;";
+        return "<div style='font-family:Arial,sans-serif;background:#f9f9f9;padding:24px;border-radius:12px;border:1px solid #eee;max-width:480px;margin:auto;'>"
+                + "<h2 style='color:" + color + ";margin-bottom:8px;'>" + icono + " " + subject + "</h2>"
+                + "<div style='font-size:16px;color:#333;margin-bottom:16px;'>" + mensaje + "</div>"
+                + "<hr style='border:none;border-top:1px solid #eee;margin:16px 0;'>"
+                + "<div style='font-size:13px;color:#888;'>"
+                + "Este correo fue generado automáticamente por el sistema <b>PharmaVictoria</b>."
+                + "</div>"
+                + "</div>";
     }
 }

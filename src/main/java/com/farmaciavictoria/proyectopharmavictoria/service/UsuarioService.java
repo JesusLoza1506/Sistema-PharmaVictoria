@@ -123,7 +123,6 @@ public class UsuarioService {
     private final UsuarioHistorialAccesoRepository historialAccesoRepository;
     private final UsuarioAlertaRepository alertaRepository;
     private final UsuarioPermisoRepository permisoRepository;
-    private final SucursalRepository sucursalRepository;
     private static UsuarioService instance;
 
     private UsuarioService() {
@@ -132,12 +131,8 @@ public class UsuarioService {
         this.historialAccesoRepository = new UsuarioHistorialAccesoRepository();
         this.alertaRepository = new UsuarioAlertaRepository();
         this.permisoRepository = new UsuarioPermisoRepository();
-        try {
-            this.sucursalRepository = new SucursalRepository();
-        } catch (Exception ex) {
-            throw new RuntimeException("No se pudo inicializar SucursalRepository", ex);
-        }
     }
+    // Eliminada inicialización de SucursalRepository
 
     public static UsuarioService getInstance() {
         if (instance == null) {
@@ -280,17 +275,9 @@ public class UsuarioService {
     // Devuelve lista de nombres de sucursales activas
     public List<String> obtenerNombresSucursales() {
         List<String> nombres = new java.util.ArrayList<>();
-        for (com.farmaciavictoria.proyectopharmavictoria.model.Sucursal s : sucursalRepository.findAllActivas()) {
-            nombres.add(s.getNombre());
-        }
-        return nombres;
-    }
 
-    // Devuelve el nombre de la sucursal por su ID
-    public String obtenerNombreSucursal(Long sucursalId) {
-        if (sucursalId == null)
-            return "";
-        return sucursalRepository.findNombreById(sucursalId.intValue());
+        // Método obtenerNombresSucursales eliminado
+        return nombres;
     }
 
     // Devuelve todos los usuarios

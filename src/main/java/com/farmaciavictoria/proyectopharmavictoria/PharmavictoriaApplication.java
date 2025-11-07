@@ -37,6 +37,30 @@ public class PharmavictoriaApplication extends Application {
             DatabaseUpdater.updateProductsTable();
             DatabaseUpdater.updateProveedoresTable();
             DatabaseUpdater.ensureUsuarioHistorialTables();
+
+            // === SUSCRIBIR OBSERVADOR DE CORREO PARA STOCK BAJO Y VENCIMIENTO (DINÁMICO)
+            // ===
+            try {
+                com.farmaciavictoria.proyectopharmavictoria.configuracion.EmailConfig emailConfig = com.farmaciavictoria.proyectopharmavictoria.configuracion.EmailConfigService
+                        .cargarConfig();
+                if (emailConfig.getSmtpUser() != null && !emailConfig.getSmtpUser().isEmpty()
+                        && emailConfig.getSmtpPassword() != null && !emailConfig.getSmtpPassword().isEmpty()
+                        && emailConfig.getDestinatario() != null && !emailConfig.getDestinatario().isEmpty()) {
+                    com.farmaciavictoria.proyectopharmavictoria.service.EmailService emailService = new com.farmaciavictoria.proyectopharmavictoria.service.EmailService(
+                            emailConfig.getSmtpUser(), emailConfig.getSmtpPassword());
+                    com.farmaciavictoria.proyectopharmavictoria.observers.StockVencimientoEmailObserver emailObserver = new com.farmaciavictoria.proyectopharmavictoria.observers.StockVencimientoEmailObserver(
+                            emailService, emailConfig.getDestinatario());
+                    com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager.getInstance()
+                            .subscribe(emailObserver);
+                } else {
+                    System.out.println(
+                            "[INFO] Configuración de correo incompleta. No se suscribió el observador de alertas por email.");
+                }
+            } catch (Exception ex) {
+                System.err.println("[ERROR] No se pudo cargar la configuración de correo: " + ex.getMessage());
+            }
+            // === FIN SUSCRIPCIÓN ===
+
             Parent root = loadLoginScreenWithFade(primaryStage);
             primaryStage.show();
         } catch (Exception e) {

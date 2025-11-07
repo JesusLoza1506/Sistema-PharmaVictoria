@@ -1,0 +1,18 @@
+/* Estilos básicos para la pantalla de configuración */
+.root {
+    -fx-background-color: #f5f5f5;
+}
+.label {
+    -fx-font-size: 14px;
+}
+.button {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.text-field, .password-field {
+    -fx-background-color: #fff;
+    -fx-border-color: #bdbdbd;
+    -fx-border-radius: 4;
+    -fx-padding: 6 8 6 8;
+}

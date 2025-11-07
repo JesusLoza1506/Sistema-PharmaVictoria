@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
-import com.farmaciavictoria.proyectopharmavictoria.model.Sucursal;
+// import eliminado: Sucursal
 import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta;
 import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante;
 
@@ -13,7 +13,7 @@ public class Venta {
     private int id;
     private Cliente cliente;
     private Usuario usuario;
-    private Sucursal sucursal;
+    // private Sucursal sucursal; // Eliminado
     private BigDecimal subtotal;
     private BigDecimal descuentoMonto;
     private BigDecimal igvMonto;
@@ -32,59 +32,149 @@ public class Venta {
     private Comprobante comprobante;
 
     // Getters y setters
-    public List<DetalleVenta> getDetalles() { return detalles; }
-    public void setDetalles(List<DetalleVenta> detalles) { this.detalles = detalles; }
+    public List<DetalleVenta> getDetalles() {
+        return detalles;
+    }
 
-    public Comprobante getComprobante() { return comprobante; }
-    public void setComprobante(Comprobante comprobante) { this.comprobante = comprobante; }
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public void setDetalles(List<DetalleVenta> detalles) {
+        this.detalles = detalles;
+    }
 
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public Comprobante getComprobante() {
+        return comprobante;
+    }
 
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public void setComprobante(Comprobante comprobante) {
+        this.comprobante = comprobante;
+    }
 
-    public Sucursal getSucursal() { return sucursal; }
-    public void setSucursal(Sucursal sucursal) { this.sucursal = sucursal; }
+    public int getId() {
+        return id;
+    }
 
-    public BigDecimal getSubtotal() { return subtotal; }
-    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public BigDecimal getDescuentoMonto() { return descuentoMonto; }
-    public void setDescuentoMonto(BigDecimal descuentoMonto) { this.descuentoMonto = descuentoMonto; }
+    public Cliente getCliente() {
+        return cliente;
+    }
 
-    public BigDecimal getIgvMonto() { return igvMonto; }
-    public void setIgvMonto(BigDecimal igvMonto) { this.igvMonto = igvMonto; }
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
 
-    public BigDecimal getTotal() { return total; }
-    public void setTotal(BigDecimal total) { this.total = total; }
+    public Usuario getUsuario() {
+        return usuario;
+    }
 
-    public String getTipoPago() { return tipoPago; }
-    public void setTipoPago(String tipoPago) { this.tipoPago = tipoPago; }
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 
-    public String getTipoComprobante() { return tipoComprobante; }
-    public void setTipoComprobante(String tipoComprobante) { this.tipoComprobante = tipoComprobante; }
+    // Métodos get/set de sucursal eliminados
 
-    public String getNumeroBoleta() { return numeroBoleta; }
-    public void setNumeroBoleta(String numeroBoleta) { this.numeroBoleta = numeroBoleta; }
+    public BigDecimal getSubtotal() {
+        return subtotal;
+    }
 
-    public String getSerie() { return serie; }
-    public void setSerie(String serie) { this.serie = serie; }
+    public void setSubtotal(BigDecimal subtotal) {
+        this.subtotal = subtotal;
+    }
 
-    public LocalDateTime getFechaVenta() { return fechaVenta; }
-    public void setFechaVenta(LocalDateTime fechaVenta) { this.fechaVenta = fechaVenta; }
+    public BigDecimal getDescuentoMonto() {
+        return descuentoMonto;
+    }
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setDescuentoMonto(BigDecimal descuentoMonto) {
+        this.descuentoMonto = descuentoMonto;
+    }
 
-    public String getObservaciones() { return observaciones; }
-    public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
+    public BigDecimal getIgvMonto() {
+        return igvMonto;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setIgvMonto(BigDecimal igvMonto) {
+        this.igvMonto = igvMonto;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public String getTipoPago() {
+        return tipoPago;
+    }
+
+    public void setTipoPago(String tipoPago) {
+        this.tipoPago = tipoPago;
+    }
+
+    public String getTipoComprobante() {
+        return tipoComprobante;
+    }
+
+    public void setTipoComprobante(String tipoComprobante) {
+        this.tipoComprobante = tipoComprobante;
+    }
+
+    public String getNumeroBoleta() {
+        return numeroBoleta;
+    }
+
+    public void setNumeroBoleta(String numeroBoleta) {
+        this.numeroBoleta = numeroBoleta;
+    }
+
+    public String getSerie() {
+        return serie;
+    }
+
+    public void setSerie(String serie) {
+        this.serie = serie;
+    }
+
+    public LocalDateTime getFechaVenta() {
+        return fechaVenta;
+    }
+
+    public void setFechaVenta(LocalDateTime fechaVenta) {
+        this.fechaVenta = fechaVenta;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
