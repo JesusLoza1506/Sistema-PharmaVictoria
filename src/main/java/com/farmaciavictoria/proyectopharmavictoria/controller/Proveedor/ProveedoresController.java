@@ -35,6 +35,12 @@ import java.util.Optional;
  */
 public class ProveedoresController implements Initializable {
     @FXML
+    private Button btnNuevoProveedor;
+    @FXML
+    private Label lblGraficoTopProveedores;
+    @FXML
+    private Label lblGraficoEstadoProveedores;
+    @FXML
     private Button btnContactarProveedores;
 
     @FXML
@@ -364,8 +370,6 @@ public class ProveedoresController implements Initializable {
     @FXML
     private Button btnLimpiar;
     @FXML
-    private Button btnNuevoProveedor;
-    @FXML
     private Button btnHistorial;
 
     // FXML Elements - Filters
@@ -405,7 +409,45 @@ public class ProveedoresController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // ...existing code...
+        // Control de visibilidad por rol
+        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                .getInstance().getAuthenticationService().getUsuarioActual();
+        boolean esAdmin = usuario != null && usuario.isAdmin();
+        boolean esVendedor = usuario != null && usuario.isVendedor();
+
+        // Control de visibilidad por rol (extendido)
+        if (btnNuevoProveedor != null) {
+            btnNuevoProveedor.setVisible(esAdmin);
+            btnNuevoProveedor.setManaged(esAdmin);
+        }
+        if (lblGraficoTopProveedores != null) {
+            lblGraficoTopProveedores.setVisible(esAdmin);
+            lblGraficoTopProveedores.setManaged(esAdmin);
+        }
+        if (lblGraficoEstadoProveedores != null) {
+            lblGraficoEstadoProveedores.setVisible(esAdmin);
+            lblGraficoEstadoProveedores.setManaged(esAdmin);
+        }
+
+        // Botones principales
+        if (btnContactarProveedores != null) {
+            btnContactarProveedores.setVisible(esAdmin);
+            btnContactarProveedores.setManaged(esAdmin);
+        }
+        if (btnExportar != null) {
+            btnExportar.setVisible(esAdmin || esVendedor);
+            btnExportar.setManaged(esAdmin || esVendedor);
+        }
+
+        // Gráficos (dashboard)
+        if (barChartTopProveedores != null) {
+            barChartTopProveedores.setVisible(esAdmin);
+            barChartTopProveedores.setManaged(esAdmin);
+        }
+        if (pieChartEstadoProveedores != null) {
+            pieChartEstadoProveedores.setVisible(esAdmin);
+            pieChartEstadoProveedores.setManaged(esAdmin);
+        }
         // Configurar ComboBox de tipo de búsqueda avanzada
         if (cmbTipoFiltro != null) {
             cmbTipoFiltro.setItems(FXCollections.observableArrayList(
@@ -495,12 +537,8 @@ public class ProveedoresController implements Initializable {
                     }
                 }
             };
-            // Doble clic para editar
+            // Solo click derecho para historial de cambios
             row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && !row.isEmpty()) {
-                    editarProveedor(row.getItem());
-                }
-                // Click derecho para historial de cambios
                 if (event.isSecondaryButtonDown() && !row.isEmpty()) {
                     mostrarHistorialProveedor(row.getItem());
                 }
@@ -636,10 +674,20 @@ public class ProveedoresController implements Initializable {
                 if (empty) {
                     setGraphic(null);
                 } else {
+                    // Lógica de visibilidad por rol
+                    com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                            .getInstance().getAuthenticationService().getUsuarioActual();
+                    boolean esAdmin = usuario != null && usuario.isAdmin();
+                    boolean esVendedor = usuario != null && usuario.isVendedor();
+                    btnEditar.setVisible(esAdmin);
+                    btnEditar.setManaged(esAdmin);
+                    btnToggleEstado.setVisible(esAdmin);
+                    btnToggleEstado.setManaged(esAdmin);
+                    btnEliminar.setVisible(esAdmin);
+                    btnEliminar.setManaged(esAdmin);
+                    btnVer.setVisible(true);
+                    btnVer.setManaged(true);
                     Proveedor proveedor = getTableView().getItems().get(getIndex());
-                    HBox box = new HBox(6, btnEditar, btnVer, btnToggleEstado, btnEliminar);
-                    box.setAlignment(javafx.geometry.Pos.CENTER);
-                    // Ajustar el texto/estilo del toggle según el estado
                     if (proveedor != null && proveedor.getActivo()) {
                         btnToggleEstado.setText("⏸");
                         btnToggleEstado.setTooltip(new Tooltip("Inactivar proveedor"));
@@ -649,6 +697,9 @@ public class ProveedoresController implements Initializable {
                         btnToggleEstado.setTooltip(new Tooltip("Activar proveedor"));
                         btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-inactive");
                     }
+                    HBox box = esAdmin ? new HBox(6, btnEditar, btnVer, btnToggleEstado, btnEliminar)
+                            : new HBox(6, btnVer);
+                    box.setAlignment(javafx.geometry.Pos.CENTER);
                     setGraphic(box);
                 }
             }

@@ -59,7 +59,7 @@
                   </GridPane>
                </VBox>
                <!-- Información de Contacto -->
-               <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12px; -fx-padding: 25px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+               <VBox fx:id="comprasVBoxReal" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12px; -fx-padding: 25px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
                   <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" text="📞 INFORMACIÓN DE CONTACTO" />
                   <Separator style="-fx-background-color: #E8E8E8;" />
                   <!-- Bloque para Cliente Empresa: Teléfono, Email, Dirección -->
@@ -123,8 +123,8 @@
                   </GridPane>
                </VBox>
                <!-- Historial de Cambios / Auditoría -->
-               <VBox styleClass="info-card" spacing="10">
-                  <Label styleClass="section-title" text="🕑 HISTORIAL DE CAMBIOS / AUDITORÍA" />
+               <VBox fx:id="cambiosVBox" styleClass="info-card" spacing="10">
+                  <Label fx:id="cambiosLabel" styleClass="section-title" text="🕑 HISTORIAL DE CAMBIOS / AUDITORÍA" />
                   <Separator styleClass="section-separator" />
                   <TableView fx:id="historialTable" prefHeight="180" styleClass="historial-table">
                      <columns>
@@ -137,7 +137,7 @@
                   </TableView>
                </VBox>
                <!-- Historial de Puntos -->
-               <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12px; -fx-padding: 25px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+               <VBox fx:id="comprasVBox" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12px; -fx-padding: 25px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
                   <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" text="⭐ HISTORIAL DE PUNTOS" />
                   <Separator style="-fx-background-color: #E8E8E8;" />
                   <TableView fx:id="puntosTable" prefHeight="180" styleClass="puntos-table">
@@ -150,8 +150,8 @@
                   </TableView>
                </VBox>
                <!-- Historial de Compras -->
-               <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12px; -fx-padding: 25px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
-                  <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" text="🛒 HISTORIAL DE COMPRAS" />
+               <VBox fx:id="comprasVBoxVentas" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 12px; -fx-padding: 25px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 3);">
+                  <Label fx:id="comprasLabel" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" text="🛒 HISTORIAL DE COMPRAS" />
                   <Separator style="-fx-background-color: #E8E8E8;" />
                   <TableView fx:id="comprasTable" prefHeight="180" styleClass="compras-table">
                      <columns>
@@ -161,8 +161,6 @@
                         <TableColumn fx:id="colCompraTotal" text="Total" prefWidth="100" />
                         <TableColumn fx:id="colCompraEstado" text="Estado" prefWidth="90" />
                         <TableColumn fx:id="colCompraPago" text="Pago" prefWidth="90" />
-                        <TableColumn fx:id="colCompraSucursal" text="Sucursal" prefWidth="120" />
-                        <TableColumn fx:id="colCompraObs" text="Observaciones" prefWidth="180" />
                      </columns>
                   </TableView>
                </VBox>

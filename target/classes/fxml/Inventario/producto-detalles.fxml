@@ -156,7 +156,7 @@
                </VBox>
             <!-- Historial de Cambios -->
             <VBox spacing="10" alignment="CENTER" styleClass="historial-pane">
-               <Label text="Historial de Cambios de Producto" styleClass="historial-title" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
+               <Label fx:id="lblHistorialCambios" text="Historial de Cambios de Producto" styleClass="historial-title" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;" />
                <TableView fx:id="tableHistorial" prefHeight="300" prefWidth="700" styleClass="historial-table">
                   <columns>
                      <TableColumn fx:id="colFecha" text="Fecha" prefWidth="120" />

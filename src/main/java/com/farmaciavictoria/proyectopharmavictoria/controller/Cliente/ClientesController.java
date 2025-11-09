@@ -298,6 +298,21 @@ public class ClientesController implements Initializable {
 
         inicializarDashboardGraficas();
         // No inicializar datos aquí, esperar a que se inyecte el servicio
+        // Control de visibilidad del botón 'Nuevo Cliente' según el rol
+        javafx.application.Platform.runLater(() -> {
+            com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                    .getInstance()
+                    .getAuthenticationService().getUsuarioActual();
+            boolean esAdmin = usuario != null && usuario.isAdmin();
+            if (tablaClientes != null && tablaClientes.getScene() != null) {
+                javafx.scene.control.Button btnNuevoCliente = (javafx.scene.control.Button) tablaClientes.getScene()
+                        .lookup("#btnNuevoCliente");
+                if (btnNuevoCliente != null) {
+                    btnNuevoCliente.setVisible(esAdmin);
+                    btnNuevoCliente.setManaged(esAdmin);
+                }
+            }
+        });
         if (lblTotalClientes != null && clienteService != null) {
             int totalClientes = clienteService.obtenerTodos().size();
             lblTotalClientes.setText("Total: " + totalClientes + " clientes");
@@ -452,6 +467,17 @@ public class ClientesController implements Initializable {
                         if (empty) {
                             setGraphic(null);
                         } else {
+                            // Control de visibilidad por rol
+                            com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                                    .getInstance()
+                                    .getAuthenticationService().getUsuarioActual();
+                            boolean esAdmin = usuario != null && usuario.isAdmin();
+                            btnEditar.setVisible(esAdmin);
+                            btnEditar.setManaged(esAdmin);
+                            btnEliminar.setVisible(esAdmin);
+                            btnEliminar.setManaged(esAdmin);
+                            btnVer.setVisible(true);
+                            btnVer.setManaged(true);
                             setGraphic(box);
                             btnEliminar.setDisable(false); // Habilita siempre al refrescar
                         }

@@ -133,7 +133,7 @@
             <children>
                 <!-- Gráfica de barras: Top proveedores -->
                 <VBox spacing="18.0" alignment="CENTER" prefWidth="650.0">
-                    <Label text="Top Proveedores con más productos" styleClass="dashboard-title" />
+                    <Label fx:id="lblGraficoTopProveedores" text="Top Proveedores con más productos" styleClass="dashboard-title" />
                     <BarChart fx:id="barChartTopProveedores" prefWidth="600.0" prefHeight="270.0">
                         <xAxis>
                             <CategoryAxis label="Proveedor" />
@@ -145,7 +145,7 @@
                 </VBox>
                 <!-- Gráfica de pastel: Estado proveedores -->
                 <VBox spacing="18.0" alignment="CENTER" prefWidth="400.0">
-                    <Label text="Distribución por Estado" styleClass="dashboard-title" />
+                    <Label fx:id="lblGraficoEstadoProveedores" text="Distribución por Estado" styleClass="dashboard-title" />
                     <PieChart fx:id="pieChartEstadoProveedores" prefWidth="350.0" prefHeight="270.0" />
                 </VBox>
             </children>

@@ -8,8 +8,10 @@ import javafx.stage.Stage;
 import java.time.format.DateTimeFormatter;
 
 import com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor;
+import com.farmaciavictoria.proyectopharmavictoria.SessionManager;
 
 public class ProveedorDetallesController {
+
     @FXML
     private javafx.scene.control.TableView<com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto> tablaProductos;
     @FXML
@@ -60,12 +62,34 @@ public class ProveedorDetallesController {
     @FXML
     private Label observacionesLabel;
     @FXML
+    private javafx.scene.layout.VBox historialCambiosVBox;
+    @FXML
+    private Label historialCambiosLabel;
+    @FXML
     private Label fechaRegistroLabel;
     private Proveedor proveedor;
     private Stage stage;
 
     public void initialize() {
-        // Inicialización si es necesaria
+        // Ocultar historial de cambios para vendedores al inicializar
+        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = SessionManager
+                .getUsuarioActual();
+        if (usuarioActual != null && usuarioActual.isVendedor()) {
+            if (historialCambiosVBox != null) {
+                historialCambiosVBox.setVisible(false);
+                historialCambiosVBox.setManaged(false);
+            }
+            if (historialTable != null) {
+                historialTable.getItems().clear();
+                historialTable.setVisible(false);
+                historialTable.setManaged(false);
+            }
+            if (historialCambiosLabel != null) {
+                historialCambiosLabel.setVisible(false);
+                historialCambiosLabel.setManaged(false);
+            }
+            System.out.println("[DEBUG] Historial de cambios oculto para vendedor");
+        }
     }
 
     public void setProveedor(Proveedor proveedor) {
@@ -78,6 +102,25 @@ public class ProveedorDetallesController {
     }
 
     private void cargarDatosProveedor() {
+        // Ocultar historial de cambios para vendedores
+        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = SessionManager
+                .getUsuarioActual();
+        if (usuarioActual != null && usuarioActual.isVendedor()) {
+            if (historialCambiosVBox != null) {
+                historialCambiosVBox.setVisible(false);
+                historialCambiosVBox.setManaged(false);
+            }
+            if (historialTable != null) {
+                historialTable.getItems().clear();
+                historialTable.setVisible(false);
+                historialTable.setManaged(false);
+            }
+            if (historialCambiosLabel != null) {
+                historialCambiosLabel.setVisible(false);
+                historialCambiosLabel.setManaged(false);
+            }
+            System.out.println("[DEBUG] Historial de cambios oculto para vendedor (cargarDatosProveedor)");
+        }
         if (tablaProductos != null && proveedor != null) {
             tablaProductos.getStyleClass().add("proveedor-productos-table");
             colNombreProducto.setCellValueFactory(
