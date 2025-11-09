@@ -1,6 +1,11 @@
+// ...
+// ...
+// ...
 package com.farmaciavictoria.proyectopharmavictoria.controller.Cliente;
 
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
+
+import com.farmaciavictoria.proyectopharmavictoria.SessionManager;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -8,6 +13,19 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 public class ClienteDetallesController {
+        @FXML
+        private javafx.scene.layout.VBox comprasVBoxVentas;
+        @FXML
+        private javafx.scene.layout.VBox comprasVBox;
+        @FXML
+        private javafx.scene.layout.VBox cambiosVBox;
+        @FXML
+        private javafx.scene.layout.VBox comprasVBoxReal;
+        @FXML
+        private Label comprasLabel;
+        @FXML
+        private Label cambiosLabel;
+        private com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual;
         @FXML
         private javafx.scene.layout.GridPane empresaContactoGrid;
         @FXML
@@ -58,7 +76,6 @@ public class ClienteDetallesController {
         private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraPago;
         // Columna de sucursal eliminada
         @FXML
-        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraObs;
 
         private final com.farmaciavictoria.proyectopharmavictoria.service.ClienteService clienteService = new com.farmaciavictoria.proyectopharmavictoria.service.ClienteService(
                         new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository());
@@ -113,6 +130,8 @@ public class ClienteDetallesController {
         private Label fechaRegistroEmpresaLabel;
 
         public void setCliente(Cliente cliente) {
+                // Obtener usuario actual (ajusta según tu método de sesión)
+                usuarioActual = SessionManager.getUsuarioActual();
                 String tipo = cliente.getTipoCliente();
                 if ("Empresa".equalsIgnoreCase(tipo)) {
                         // Ocultar bloques de Natural
@@ -179,11 +198,51 @@ public class ClienteDetallesController {
                         fechaRegistroLabel.setText(
                                         cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : "-");
                 }
-                // Cargar historial de cambios
+                // Control de visibilidad por rol
+                if (usuarioActual != null && usuarioActual.isVendedor()) {
+                        // Ocultar historial de compras y cambios
+                        // Ocultar historial de compras (ventas) y cambios
+                        if (comprasVBoxVentas != null) {
+                                comprasVBoxVentas.setVisible(false);
+                                comprasVBoxVentas.setManaged(false);
+                        }
+                        if (cambiosVBox != null) {
+                                cambiosVBox.setVisible(false);
+                                cambiosVBox.setManaged(false);
+                        }
+                        // Mostrar solo historial de puntos
+                        if (comprasVBox != null) {
+                                comprasVBox.setVisible(true);
+                                comprasVBox.setManaged(true);
+                        }
+                        // Ocultar títulos (busca los Label en FXML y agrégalos como @FXML)
+                        try {
+                                java.lang.reflect.Field comprasLabelField = this.getClass()
+                                                .getDeclaredField("comprasLabel");
+                                comprasLabelField.setAccessible(true);
+                                Label comprasLabel = (Label) comprasLabelField.get(this);
+                                comprasLabel.setVisible(false);
+                                comprasLabel.setManaged(false);
+                        } catch (Exception e) {
+                        }
+                        try {
+                                java.lang.reflect.Field cambiosLabelField = this.getClass()
+                                                .getDeclaredField("cambiosLabel");
+                                cambiosLabelField.setAccessible(true);
+                                Label cambiosLabel = (Label) cambiosLabelField.get(this);
+                                cambiosLabel.setVisible(false);
+                                cambiosLabel.setManaged(false);
+                        } catch (Exception e) {
+                        }
+                }
+                // Siempre mostrar historial de puntos
+                if (puntosTable != null) {
+                        puntosTable.setVisible(true);
+                        puntosTable.setManaged(true);
+                }
+                // Cargar datos
                 cargarHistorial(cliente.getId());
-                // Cargar historial de puntos
                 cargarHistorialPuntos(cliente.getId());
-                // Cargar historial de compras
                 cargarHistorialCompras(cliente.getId());
         }
 
@@ -274,10 +333,7 @@ public class ClienteDetallesController {
                                 data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getEstado()));
                 colCompraPago.setCellValueFactory(
                                 data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTipoPago()));
-                // Lógica de sucursal eliminada
-                colCompraObs.setCellValueFactory(
-                                data -> new javafx.beans.property.SimpleStringProperty(
-                                                data.getValue().getObservaciones()));
+
                 comprasTable.setItems(items);
         }
 

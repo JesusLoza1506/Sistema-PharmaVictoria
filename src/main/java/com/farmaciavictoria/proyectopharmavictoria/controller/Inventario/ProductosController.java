@@ -156,6 +156,27 @@ public class ProductosController implements Initializable, SystemEventObserver {
         eventManager.subscribe(this);
 
         mostrarNotificacionesInventario();
+
+        // Ocultar botones principales según el rol
+        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                .getInstance()
+                .getAuthenticationService().getUsuarioActual();
+        boolean esAdmin = usuario != null && usuario.isAdmin();
+        boolean esVendedor = usuario != null && usuario.isVendedor();
+        if (btnNuevoProducto != null) {
+            btnNuevoProducto.setVisible(esAdmin);
+            btnNuevoProducto.setManaged(esAdmin);
+        }
+        if (btnEdicionMasiva != null) {
+            btnEdicionMasiva.setVisible(esAdmin);
+            btnEdicionMasiva.setManaged(esAdmin);
+        }
+        // Exportar: visible para ambos, pero puedes condicionar aquí si lo deseas
+        // Estadística: valor inventario solo para admin
+        if (lblValorInventario != null) {
+            lblValorInventario.setVisible(esAdmin);
+            lblValorInventario.setManaged(esAdmin);
+        }
     }
 
     @FXML
@@ -522,6 +543,19 @@ public class ProductosController implements Initializable, SystemEventObserver {
                             setGraphic(null);
                         } else {
                             Producto producto = getTableView().getItems().get(getIndex());
+                            com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                                    .getInstance()
+                                    .getAuthenticationService().getUsuarioActual();
+                            boolean esAdmin = usuario != null && usuario.isAdmin();
+                            // Acciones por producto según rol
+                            btnEditar.setVisible(esAdmin);
+                            btnEditar.setManaged(esAdmin);
+                            btnToggleEstado.setVisible(esAdmin);
+                            btnToggleEstado.setManaged(esAdmin);
+                            btnEliminar.setVisible(esAdmin);
+                            btnEliminar.setManaged(esAdmin);
+                            btnVer.setVisible(true);
+                            btnVer.setManaged(true);
                             if (producto.getActivo()) {
                                 btnToggleEstado.setText("⏸");
                                 btnToggleEstado.setTooltip(new Tooltip("Inactivar producto"));

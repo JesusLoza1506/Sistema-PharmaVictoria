@@ -37,31 +37,36 @@
                      </columns>
                   </TableView>
                </VBox>
-               <!-- Información Básica -->
-               <VBox styleClass="info-card">
+               <!-- Información Básica + Historial de Cambios -->
+               <VBox fx:id="historialCambiosVBox" styleClass="info-card">
                   <Label styleClass="section-title" text="📋 INFORMACIÓN BÁSICA" />
                   <Separator styleClass="section-separator" />
-                  
                   <GridPane styleClass="info-grid">
                      <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" prefWidth="150.0" />
                         <ColumnConstraints hgrow="ALWAYS" minWidth="300.0" />
                      </columnConstraints>
-                     
                      <Label styleClass="field-label" text="Razón Social:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                      <Label fx:id="razonSocialLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                     
                      <Label styleClass="field-label" text="RUC:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                      <Label fx:id="rucLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                     
                      <Label styleClass="field-label" text="Tipo:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                      <Label fx:id="tipoLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                     
                      <Label styleClass="field-label" text="Estado:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                      <HBox alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="3">
                         <Label fx:id="estadoLabel" styleClass="estado-activo" text="ACTIVO" />
                      </HBox>
                   </GridPane>
+                  <Label fx:id="historialCambiosLabel" styleClass="section-title" text="🕓 Historial de Cambios" />
+                  <TableView fx:id="historialTable" prefHeight="160" prefWidth="640" styleClass="historial-table">
+                     <columns>
+                        <TableColumn fx:id="colHistFecha" text="Fecha" prefWidth="140" />
+                        <TableColumn fx:id="colHistUsuario" text="Usuario" prefWidth="180" />
+                        <TableColumn fx:id="colHistCampo" text="Campo" prefWidth="120" />
+                        <TableColumn fx:id="colHistAnterior" text="Anterior" prefWidth="100" />
+                        <TableColumn fx:id="colHistNuevo" text="Nuevo" prefWidth="100" />
+                     </columns>
+                  </TableView>
                </VBox>
                
                <!-- Información de Contacto -->
@@ -124,17 +129,7 @@
                   </GridPane>
                      <Label styleClass="field-label" text="Tipo de Producto:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                      <Label fx:id="tipoProductoLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                     <Label styleClass="section-title" text="🕓 Historial de Cambios" />
                      <!-- Historial como tabla, adaptado al diseño de Detalles de Producto -->
-                     <TableView fx:id="historialTable" prefHeight="160" prefWidth="640" styleClass="historial-table" GridPane.columnSpan="2">
-                        <columns>
-                           <TableColumn fx:id="colHistFecha" text="Fecha" prefWidth="140" />
-                           <TableColumn fx:id="colHistUsuario" text="Usuario" prefWidth="180" />
-                           <TableColumn fx:id="colHistCampo" text="Campo" prefWidth="120" />
-                           <TableColumn fx:id="colHistAnterior" text="Anterior" prefWidth="100" />
-                           <TableColumn fx:id="colHistNuevo" text="Nuevo" prefWidth="100" />
-                        </columns>
-                     </TableView>
                </VBox>
                
             </VBox>

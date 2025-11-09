@@ -98,19 +98,6 @@
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
-               <contextMenu>
-                  <ContextMenu>
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#onVerDetalles" text="Ver Detalles" />
-                      <MenuItem mnemonicParsing="false" onAction="#onEditarProducto" text="Editar" />
-                      <SeparatorMenuItem />
-                      <MenuItem mnemonicParsing="false" onAction="#onAjustarStock" text="Ajustar Stock" />
-                      <MenuItem mnemonicParsing="false" onAction="#onCambiarUbicacion" text="Cambiar Ubicación" />
-                      <SeparatorMenuItem />
-                      <MenuItem mnemonicParsing="false" onAction="#onEliminarProducto" text="Eliminar" />
-                    </items>
-                  </ContextMenu>
-               </contextMenu>
             </TableView>
             <!-- Separador visual correctamente ubicado -->
             <Region minHeight="18.0" maxHeight="24.0" VBox.vgrow="NEVER" />
