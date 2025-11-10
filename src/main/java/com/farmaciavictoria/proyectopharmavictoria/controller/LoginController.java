@@ -408,14 +408,33 @@ public class LoginController implements Initializable {
     private void navigateToDashboard(Usuario usuario) {
         try {
             logger.info("[NAV] Navegando al dashboard principal");
+            String fxmlPath;
+            boolean esVendedor = false;
+            if (usuario.getRol() != null) {
+                String rol = usuario.getRol().name().toLowerCase();
+                esVendedor = rol.contains("vendedor");
+            }
+            if (esVendedor) {
+                fxmlPath = "/fxml/dashboard-vendedor.fxml";
+            } else {
+                fxmlPath = "/fxml/dashboard.fxml";
+            }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
-            DashboardController dashboardController = loader.getController();
-            if (dashboardController != null) {
-                dashboardController.setUsuario(usuario);
-                logger.debug("[NAV] Usuario establecido en dashboard: {}", usuario.getNombreCompleto());
+            if (esVendedor) {
+                DashboardVendedorController dashboardVendedorController = loader.getController();
+                if (dashboardVendedorController != null) {
+                    dashboardVendedorController.setUsuario(usuario);
+                    logger.debug("[NAV] Usuario establecido en dashboard vendedor: {}", usuario.getNombreCompleto());
+                }
+            } else {
+                DashboardController dashboardController = loader.getController();
+                if (dashboardController != null) {
+                    dashboardController.setUsuario(usuario);
+                    logger.debug("[NAV] Usuario establecido en dashboard: {}", usuario.getNombreCompleto());
+                }
             }
 
             Scene scene = new Scene(root);
