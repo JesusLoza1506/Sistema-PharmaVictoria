@@ -1,55 +1,181 @@
-# Sistema-PharmaVictoria
+💊 Sistema PharmaVictoria
 
-Sistema de gestión para farmacia, desarrollado en JavaFX. Permite administrar ventas, inventario, clientes, proveedores y usuarios, con interfaz moderna y funcionalidades avanzadas para el sector farmacéutico.
+Sistema integral de gestión para farmacias, desarrollado en JavaFX, orientado a optimizar todos los procesos clave del negocio farmacéutico.
+Cuenta con una interfaz moderna, lógica modular y control de accesos según roles, garantizando eficiencia, seguridad y trazabilidad en las operaciones diarias.
 
-## Características principales
+🧠 Descripción general
 
-- Gestión de ventas y comprobantes electrónicos
-- Control de inventario y stock bajo
-- Administración de clientes y proveedores
-- Módulo de usuarios y permisos
-- Notificaciones por correo
-- Reportes y estadísticas
+PharmaVictoria permite administrar inventarios, ventas, clientes, proveedores y usuarios, además de generar reportes detallados y configuraciones personalizadas.
+Cada módulo está diseñado para ofrecer una experiencia fluida, con controles visuales, validaciones y auditorías de acciones.
 
-## Requisitos
+El sistema diferencia los permisos y vistas según el rol del usuario:
 
-- Java 21
-- Maven
-- MySQL
+🧑‍💼 Administrador: acceso completo a todos los módulos y funciones.
 
-## Instalación
+👩‍🔬 Vendedor: acceso restringido a ventas, inventario y clientes.
 
-1. Clona el repositorio:
-   ```
-   git clone https://github.com/JesusLoza1506/Sistema-PharmaVictoria.git
-   ```
-2. Configura la base de datos MySQL y actualiza los parámetros en `src/main/resources/application.properties`.
-3. Instala las dependencias:
-   ```
-   mvn clean compile
-   mvn dependency:copy-dependencies
-   ```
+🔐 Login y Roles
 
-## Ejecución
+Inicio de sesión con validación de credenciales (administrador o vendedor).
 
-Puedes iniciar la aplicación con el script:
+Recuperación de contraseña mediante envío de código a Gmail.
 
-```
-run-pharmavictoria.bat
-```
+Gestión segura de contraseñas con BCrypt.
 
-O manualmente:
+🏠 Dashboard (Menú Principal)
 
-```
-mvn javafx:run
-```
+Administrador:
 
-## Uso
+Cards con ventas del día, total de productos y total de clientes.
 
-Accede con usuario administrador para configurar y comenzar a operar el sistema.
+Vista de últimas ventas y productos con stock bajo.
 
-## Contacto
+Vendedor:
 
-Desarrollado por Jesus Loza
-Email: lozayataco@gmail.com
-Repositorio: [GitHub](https://github.com/JesusLoza1506/Sistema-PharmaVictoria)
+Cards personalizadas de mis ventas.
+
+Vista simplificada centrada en su actividad diaria.
+
+🧾 Módulo Inventario
+
+Gestión completa y detallada del inventario farmacéutico.
+
+Agregar, editar, ver, activar/inactivar y eliminar productos.
+
+Historial de auditoría por producto.
+
+Exportación del inventario a PDF o Excel.
+
+Edición masiva de múltiples productos.
+
+Cards de resumen: total de productos, stock bajo y próximos a vencer.
+
+Búsquedas y filtros por nombre, categoría, etc.
+
+Paginación dinámica para grandes volúmenes.
+
+Restricción para vendedores: solo pueden visualizar detalles de productos.
+
+🚚 Módulo Proveedores
+
+Gestión integral de proveedores y análisis de sus productos.
+
+Agregar, editar, ver, activar/inactivar y eliminar proveedores.
+
+Historial de auditoría y contacto directo por correo.
+
+Exportación a PDF o Excel.
+
+Dashboard con:
+
+Gráfico de proveedores con más productos.
+
+Gráfico de pastel por estado.
+
+Filtros avanzados de búsqueda y paginación.
+
+Restricción para vendedores: solo pueden ver detalles.
+
+👥 Módulo Clientes
+
+Control y seguimiento de clientes naturales y empresariales.
+
+Agregar, editar, ver, y eliminar clientes.
+
+Historial de auditoría por cliente.
+
+Exportación de lista de clientes.
+
+Búsqueda avanzada y filtros por tipo o nombre.
+
+Gráficos de pastel y Top 3 clientes con más compras.
+
+Paginación eficiente.
+
+Restricción para vendedores: solo visualización de detalles y gráficos.
+
+👤 Módulo Usuarios
+
+Administración completa de usuarios del sistema.
+
+Agregar, editar, ver, y eliminar usuarios (según rol).
+
+Historial de auditoría por usuario.
+
+Exportación de registros.
+
+Búsqueda avanzada y paginación.
+
+Contraseñas cifradas con BCrypt.
+
+Acceso exclusivo del administrador.
+
+💳 Módulo Punto de Ventas
+
+Diseñado para registrar ventas de forma rápida, precisa y automatizada.
+
+Búsqueda de productos con aviso de stock bajo o vencimiento próximo.
+
+Cálculo automático del total, selección de cliente y método de pago.
+
+Emisión de boleta o factura electrónica (integración con NubeFact – SUNAT).
+
+Vista previa del comprobante antes de confirmar la venta.
+
+Al confirmar, se muestra un diálogo con opciones para ver PDF, imprimir comprobante, enviar por WhatsApp o por correo electrónico.
+
+Anulación de ventas disponible dentro de las 24 horas posteriores a la transacción.
+
+Descuento automático de stock al realizar una venta; reversión automática al anularla.
+
+Sistema de puntos integrado: por cada S/ 1.00 en compras, el cliente acumula 1 punto.
+Al alcanzar 100 puntos, podrá canjearlos como S/ 1.00 de descuento en futuras compras, incentivando la fidelidad del cliente.
+
+Accesible tanto para administradores como vendedores.
+
+📊 Módulo Reportes
+
+Análisis visual de ventas y rendimiento.
+
+Cards de ventas totales y productos más vendidos.
+
+Reportes por intervalo de tiempo o por producto.
+
+Exportación de resultados en PDF y Excel.
+
+Gráficos estadísticos y resúmenes dinámicos.
+
+Acceso exclusivo del administrador.
+
+⚙️ Módulo Configuración
+
+Permite personalizar el comportamiento del sistema y las alertas automáticas.
+
+Cards de configuración visuales.
+
+Notificaciones por correo: el usuario puede ingresar su Gmail y contraseña de aplicación para recibir alertas de stock bajo o productos próximos a vencer.
+
+Alertas de vencimiento: configuración del intervalo de tiempo para recibir notificaciones anticipadas.
+
+Acceso exclusivo del administrador.
+
+🖥️ Tecnologías utilizadas
+
+Lenguaje: Java 21
+
+Framework: JavaFX
+
+Gestor de dependencias: Maven
+
+Base de datos: MySQL
+
+Integraciones: NubeFact (SUNAT), Gmail API (notificaciones)
+
+Seguridad: BCrypt (encriptación de contraseñas)
+
+👨‍💻 Desarrollador
+
+Desarrollado por: Jesus Loza
+📧 Correo: lozayataco@gmail.com
+
+💻 Repositorio: GitHub – Sistema PharmaVictoria
