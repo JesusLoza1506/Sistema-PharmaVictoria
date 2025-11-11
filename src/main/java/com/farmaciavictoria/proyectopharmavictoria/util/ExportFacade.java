@@ -4,13 +4,12 @@ import javafx.collections.ObservableList;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export.ReporteTipo;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
 
 import java.io.FileOutputStream;
 import java.io.File;
-import com.farmaciavictoria.proyectopharmavictoria.reportes.export.ReporteTipo;
 import java.io.File;
-import com.farmaciavictoria.proyectopharmavictoria.reportes.export.ReporteTipo;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -890,9 +889,9 @@ public class ExportFacade {
 
     // Exportar ventas usando Factory para reportes avanzados
     public static void exportarReporteVentasAvanzado(String tipo,
-            java.util.List<com.farmaciavictoria.proyectopharmavictoria.reportes.dto.VentaReporteDTO> ventas,
+            java.util.List<com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO> ventas,
             String nombreArchivo) {
-        com.farmaciavictoria.proyectopharmavictoria.reportes.export.ExportadorReporte exportador = com.farmaciavictoria.proyectopharmavictoria.reportes.export.ExportadorReporteFactory
+        com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export.ExportadorReporte exportador = com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export.ExportadorReporteFactory
                 .getExportador(tipo, ReporteTipo.VENTAS);
         exportador.exportar(ventas, new File(nombreArchivo));
     }

@@ -7,7 +7,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.FormaFarmaceutica;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;

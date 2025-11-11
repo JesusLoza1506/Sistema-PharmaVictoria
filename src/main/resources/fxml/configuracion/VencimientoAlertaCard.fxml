@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-<AnchorPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.configuracion.VencimientoAlertaCardController" prefWidth="280" prefHeight="180" style="-fx-background-color: #222222; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8,0,0,2);">
+<AnchorPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.VencimientoAlertaCardController" prefWidth="280" prefHeight="180" style="-fx-background-color: #222222; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8,0,0,2);">
     <children>
         <ImageView fx:id="imgIcono" layoutX="110" layoutY="18" fitWidth="60" fitHeight="60" preserveRatio="true">
             <image>

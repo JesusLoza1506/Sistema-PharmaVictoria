@@ -1,7 +1,6 @@
 package com.farmaciavictoria.proyectopharmavictoria.repository.Inventario;
 
 import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
-import com.farmaciavictoria.proyectopharmavictoria.model.*; // Assuming CategoriaProducto and FormaFarmaceutica are here
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.FormaFarmaceutica;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;

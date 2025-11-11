@@ -1,7 +1,8 @@
 package com.farmaciavictoria.proyectopharmavictoria.repository;
 
-import com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos;
 import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos;
+
 import java.sql.*;
 import java.util.*;
 

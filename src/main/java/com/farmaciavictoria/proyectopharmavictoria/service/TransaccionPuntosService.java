@@ -1,6 +1,6 @@
 package com.farmaciavictoria.proyectopharmavictoria.service;
 
-import com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos;
+import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos;
 import com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository;
 import java.util.List;
 
