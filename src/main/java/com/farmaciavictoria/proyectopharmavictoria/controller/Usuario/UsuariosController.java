@@ -1,7 +1,5 @@
 package com.farmaciavictoria.proyectopharmavictoria.controller.Usuario;
 
-// Estrategia de filtrado de usuarios
-// Estrategias importadas desde strategy/Usuario
 import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.UsuarioFilterStrategy;
 import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorNombre;
 import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorApellido;
@@ -17,9 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import javafx.scene.layout.HBox;
-
 import java.util.List;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.VBox;

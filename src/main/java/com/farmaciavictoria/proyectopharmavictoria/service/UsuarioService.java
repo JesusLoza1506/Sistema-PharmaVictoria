@@ -2,7 +2,6 @@ package com.farmaciavictoria.proyectopharmavictoria.service;
 
 import java.time.LocalDateTime;
 
-import com.farmaciavictoria.proyectopharmavictoria.model.*;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioAlerta;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialAcceso;

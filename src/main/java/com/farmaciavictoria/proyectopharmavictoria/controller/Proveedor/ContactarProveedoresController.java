@@ -12,9 +12,12 @@ import java.io.File;
 import java.util.List;
 
 public class ContactarProveedoresController {
-    @FXML private ListView<String> listHistorial;
-    @FXML private ComboBox<String> cmbPlantillas;
-    private ObservableList<String> plantillas = FXCollections.observableArrayList("Solicitud de cotización", "Aviso de pago", "Mensaje personalizado");
+    @FXML
+    private ListView<String> listHistorial;
+    @FXML
+    private ComboBox<String> cmbPlantillas;
+    private ObservableList<String> plantillas = FXCollections.observableArrayList("Solicitud de cotización",
+            "Aviso de pago", "Mensaje personalizado");
     private ObservableList<String> historialMensajes = FXCollections.observableArrayList();
 
     // Inicializar plantillas y historial correctamente
@@ -28,18 +31,29 @@ public class ContactarProveedoresController {
     private void guardarHistorial(String destinatario, String asunto, String mensaje) {
         historialMensajes.add("A: " + destinatario + " | Asunto: " + asunto + " | " + mensaje);
     }
-    @FXML private TableView<Proveedor> tableSeleccionProveedores;
-    @FXML private TableColumn<Proveedor, CheckBox> colSeleccion;
+
+    @FXML
+    private TableView<Proveedor> tableSeleccionProveedores;
+    @FXML
+    private TableColumn<Proveedor, CheckBox> colSeleccion;
     // Mapa para saber qué proveedor está seleccionado
     private java.util.Map<Proveedor, CheckBox> seleccionMap = new java.util.HashMap<>();
-    @FXML private TableColumn<Proveedor, String> colRazonSocial;
-    @FXML private TableColumn<Proveedor, String> colCorreo;
-    @FXML private TextField txtAsunto;
-    @FXML private TextArea txtMensaje;
-    @FXML private Button btnAdjuntar;
-    @FXML private Label lblArchivoAdjunto;
-    @FXML private Button btnEnviar;
-    @FXML private Button btnCancelar;
+    @FXML
+    private TableColumn<Proveedor, String> colRazonSocial;
+    @FXML
+    private TableColumn<Proveedor, String> colCorreo;
+    @FXML
+    private TextField txtAsunto;
+    @FXML
+    private TextArea txtMensaje;
+    @FXML
+    private Button btnAdjuntar;
+    @FXML
+    private Label lblArchivoAdjunto;
+    @FXML
+    private Button btnEnviar;
+    @FXML
+    private Button btnCancelar;
 
     private File archivoAdjunto;
 
@@ -54,7 +68,8 @@ public class ContactarProveedoresController {
         });
 
         // Cargar proveedores reales desde el ServiceContainer
-        List<Proveedor> proveedores = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer.getInstance().getProveedorService().obtenerTodos();
+        List<Proveedor> proveedores = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer.getInstance()
+                .getProveedorService().obtenerTodos();
         ObservableList<Proveedor> data = FXCollections.observableArrayList(proveedores);
         tableSeleccionProveedores.setItems(data);
 
@@ -93,7 +108,8 @@ public class ContactarProveedoresController {
             java.io.InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties");
             config.load(input);
         } catch (Exception ex) {
-            mostrarAlerta("Error de configuración SMTP", "No se pudo leer application.properties", Alert.AlertType.ERROR);
+            mostrarAlerta("Error de configuración SMTP", "No se pudo leer application.properties",
+                    Alert.AlertType.ERROR);
             return;
         }
         String smtpUser = config.getProperty("mail.smtp.user", "");

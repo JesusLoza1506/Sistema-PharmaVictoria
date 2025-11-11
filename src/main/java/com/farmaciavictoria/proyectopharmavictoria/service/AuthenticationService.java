@@ -27,6 +27,7 @@ public class AuthenticationService {
 
     /**
      * Autentica un usuario con username y password
+     * 
      * @param username Nombre de usuario
      * @param password Contraseña en texto plano
      * @return Usuario autenticado o null si las credenciales son incorrectas
@@ -78,8 +79,10 @@ public class AuthenticationService {
                 } catch (Exception e) {
                     ip = "127.0.0.1";
                 }
-                String userAgent = System.getProperty("user.name") + " - " + System.getProperty("os.name") + " " + System.getProperty("os.version");
-                com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService.getInstance().registrarAcceso(usuario.getId(), true, ip, userAgent, null);
+                String userAgent = System.getProperty("user.name") + " - " + System.getProperty("os.name") + " "
+                        + System.getProperty("os.version");
+                com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService.getInstance()
+                        .registrarAcceso(usuario.getId(), true, ip, userAgent, null);
             } catch (Exception ex) {
                 logger.warn("No se pudo registrar el acceso en el historial via UsuarioService: {}", ex.getMessage());
             }
@@ -98,11 +101,11 @@ public class AuthenticationService {
     public static Usuario getUsuarioActual() {
         return usuarioActual;
     }
-    
+
     /**
      * Verifica si una contraseña en texto plano coincide con el hash almacenado
      * 
-     * @param plainPassword Contraseña en texto plano
+     * @param plainPassword  Contraseña en texto plano
      * @param hashedPassword Hash almacenado en la base de datos
      * @return true si la contraseña es correcta, false en caso contrario
      */
@@ -111,16 +114,16 @@ public class AuthenticationService {
             if (plainPassword == null || hashedPassword == null) {
                 return false;
             }
-            
+
             // Verificar usando BCrypt
             return BCrypt.checkpw(plainPassword, hashedPassword);
-            
+
         } catch (Exception e) {
             logger.error("Error al verificar contraseña: {}", e.getMessage(), e);
             return false;
         }
     }
-    
+
     /**
      * Genera un hash de contraseña usando BCrypt
      * 
@@ -132,16 +135,16 @@ public class AuthenticationService {
             if (plainPassword == null || plainPassword.isEmpty()) {
                 throw new IllegalArgumentException("La contraseña no puede estar vacía");
             }
-            
+
             // Generar salt y hash con BCrypt (factor de trabajo 12)
             return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
-            
+
         } catch (Exception e) {
             logger.error("Error al generar hash de contraseña: {}", e.getMessage(), e);
             throw new RuntimeException("Error al procesar contraseña", e);
         }
     }
-    
+
     /**
      * Valida la fortaleza de una contraseña
      * 
@@ -152,15 +155,15 @@ public class AuthenticationService {
         if (password == null || password.length() < 8) {
             return false;
         }
-        
+
         boolean hasUpper = password.chars().anyMatch(Character::isUpperCase);
         boolean hasLower = password.chars().anyMatch(Character::isLowerCase);
         boolean hasDigit = password.chars().anyMatch(Character::isDigit);
         boolean hasSpecial = password.chars().anyMatch(ch -> "!@#$%^&*()_+-=[]{}|;:,.<>?".indexOf(ch) >= 0);
-        
+
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }
-    
+
     /**
      * Verifica si un usuario tiene permisos de administrador
      * 
@@ -170,7 +173,7 @@ public class AuthenticationService {
     public boolean isAdmin(Usuario usuario) {
         return usuario != null && usuario.getRol() == Usuario.Rol.ADMIN;
     }
-    
+
     /**
      * Verifica si un usuario tiene permisos de vendedor
      * 
@@ -180,11 +183,11 @@ public class AuthenticationService {
     public boolean isVendedor(Usuario usuario) {
         return usuario != null && usuario.getRol() == Usuario.Rol.VENDEDOR;
     }
-    
+
     /**
      * Verifica si una sesión de usuario sigue siendo válida
      * 
-     * @param usuario Usuario de la sesión
+     * @param usuario              Usuario de la sesión
      * @param maxInactivityMinutes Minutos máximos de inactividad permitidos
      * @return true si la sesión es válida
      */
@@ -192,32 +195,32 @@ public class AuthenticationService {
         if (usuario == null || usuario.getLastLogin() == null) {
             return false;
         }
-        
+
         LocalDateTime lastActivity = usuario.getLastLogin();
         LocalDateTime now = LocalDateTime.now();
-        
+
         return lastActivity.plusMinutes(maxInactivityMinutes).isAfter(now);
     }
-    
+
     /**
      * Registra un intento de login fallido
      * 
      * @param username Usuario que intentó hacer login
-     * @param reason Razón del fallo
+     * @param reason   Razón del fallo
      */
     public void logFailedLogin(String username, String reason) {
-        logger.warn("Login fallido - Usuario: {}, Razón: {}, Timestamp: {}", 
-                   username, reason, LocalDateTime.now());
+        logger.warn("Login fallido - Usuario: {}, Razón: {}, Timestamp: {}",
+                username, reason, LocalDateTime.now());
     }
-    
+
     /**
      * Registra un login exitoso
      * 
      * @param usuario Usuario que hizo login exitosamente
      */
     public void logSuccessfulLogin(Usuario usuario) {
-        logger.info("Login exitoso - Usuario: {}, Rol: {}, Timestamp: {}", 
-                   usuario.getUsername(), usuario.getRol(), LocalDateTime.now());
+        logger.info("Login exitoso - Usuario: {}, Rol: {}, Timestamp: {}",
+                usuario.getUsername(), usuario.getRol(), LocalDateTime.now());
     }
 
     // ...existing code...

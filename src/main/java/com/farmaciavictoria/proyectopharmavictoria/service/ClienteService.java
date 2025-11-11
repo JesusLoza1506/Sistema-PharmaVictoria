@@ -15,14 +15,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * ✅ SERVICE LAYER PATTERN - Servicio de Clientes
- * Versión simplificada que trabaja con la tabla básica de clientes
- * Mantiene todos los patrones enterprise
- * 
- * @author PHARMAVICTORIA Development Team
- * @version 1.0 (Tabla Básica)
- */
 public class ClienteService {
     /**
      * Normaliza y prepara los datos del cliente antes de guardar

@@ -2,7 +2,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.configuracion.ConfiguracionController" prefWidth="900" prefHeight="600" style="-fx-background-color: #f5f5f5;">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.ConfiguracionController" prefWidth="900" prefHeight="600" style="-fx-background-color: #f5f5f5;">
     <children>
         <FlowPane fx:id="cardsPane" layoutX="40" layoutY="30" prefWidth="820" prefHeight="480" hgap="24" vgap="24" style="-fx-background-color: transparent;">
             <!-- Aquí se cargarán los cards dinámicamente -->

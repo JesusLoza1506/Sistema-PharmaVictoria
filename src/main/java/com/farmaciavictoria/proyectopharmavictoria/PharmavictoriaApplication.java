@@ -41,14 +41,14 @@ public class PharmavictoriaApplication extends Application {
             // === SUSCRIBIR OBSERVADOR DE CORREO PARA STOCK BAJO Y VENCIMIENTO (DINÁMICO)
             // ===
             try {
-                com.farmaciavictoria.proyectopharmavictoria.configuracion.EmailConfig emailConfig = com.farmaciavictoria.proyectopharmavictoria.configuracion.EmailConfigService
+                com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.EmailConfig emailConfig = com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.EmailConfigService
                         .cargarConfig();
                 if (emailConfig.getSmtpUser() != null && !emailConfig.getSmtpUser().isEmpty()
                         && emailConfig.getSmtpPassword() != null && !emailConfig.getSmtpPassword().isEmpty()
                         && emailConfig.getDestinatario() != null && !emailConfig.getDestinatario().isEmpty()) {
                     com.farmaciavictoria.proyectopharmavictoria.service.EmailService emailService = new com.farmaciavictoria.proyectopharmavictoria.service.EmailService(
                             emailConfig.getSmtpUser(), emailConfig.getSmtpPassword());
-                    com.farmaciavictoria.proyectopharmavictoria.observers.StockVencimientoEmailObserver emailObserver = new com.farmaciavictoria.proyectopharmavictoria.observers.StockVencimientoEmailObserver(
+                    com.farmaciavictoria.proyectopharmavictoria.util.StockVencimientoEmailObserver emailObserver = new com.farmaciavictoria.proyectopharmavictoria.util.StockVencimientoEmailObserver(
                             emailService, emailConfig.getDestinatario());
                     com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager.getInstance()
                             .subscribe(emailObserver);

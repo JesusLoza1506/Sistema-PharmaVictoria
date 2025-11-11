@@ -1,12 +1,7 @@
-// ...
-// ...
-// ...
 package com.farmaciavictoria.proyectopharmavictoria.controller.Cliente;
 
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
-
 import com.farmaciavictoria.proyectopharmavictoria.SessionManager;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -49,15 +44,15 @@ public class ClienteDetallesController {
 
         // Tabla de historial de puntos
         @FXML
-        private javafx.scene.control.TableView<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos> puntosTable;
+        private javafx.scene.control.TableView<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos> puntosTable;
         @FXML
-        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos, String> colPuntosFecha;
+        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, String> colPuntosFecha;
         @FXML
-        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos, String> colPuntosTipo;
+        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, String> colPuntosTipo;
         @FXML
-        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos, Integer> colPuntosValor;
+        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, Integer> colPuntosValor;
         @FXML
-        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos, String> colPuntosDescripcion;
+        private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, String> colPuntosDescripcion;
 
         // Tabla de historial de compras (ahora con modelo Venta)
         @FXML
@@ -288,9 +283,9 @@ public class ClienteDetallesController {
 
         private void cargarHistorialPuntos(Integer clienteId) {
                 com.farmaciavictoria.proyectopharmavictoria.service.TransaccionPuntosService puntosService = new com.farmaciavictoria.proyectopharmavictoria.service.TransaccionPuntosService();
-                java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos> movimientos = puntosService
+                java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos> movimientos = puntosService
                                 .obtenerHistorialPuntosPorCliente(clienteId);
-                javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos> items = javafx.collections.FXCollections
+                javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos> items = javafx.collections.FXCollections
                                 .observableArrayList(movimientos);
                 colPuntosFecha.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
                                 data.getValue().getFecha() != null ? data.getValue().getFecha().toString() : ""));

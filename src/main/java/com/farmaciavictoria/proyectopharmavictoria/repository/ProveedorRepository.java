@@ -2,20 +2,13 @@ package com.farmaciavictoria.proyectopharmavictoria.repository;
 
 import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
 import com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor;
-
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Repository para gestión de proveedores en la base de datos
- */
 public class ProveedorRepository {
 
-    /**
-     * Obtener todos los proveedores activos
-     */
     public List<Proveedor> findAll() {
         List<Proveedor> proveedores = new ArrayList<>();
         String sql = "SELECT * FROM proveedores WHERE activo = TRUE ORDER BY id ASC";
@@ -33,9 +26,6 @@ public class ProveedorRepository {
         return proveedores;
     }
 
-    /**
-     * Buscar proveedores por texto
-     */
     public List<Proveedor> buscarProveedores(String texto) {
         List<Proveedor> proveedores = new ArrayList<>();
         String sql = """
@@ -68,9 +58,6 @@ public class ProveedorRepository {
         return proveedores;
     }
 
-    /**
-     * Obtener proveedor por ID
-     */
     public Proveedor findById(Integer id) {
         String sql = "SELECT * FROM proveedores WHERE id = ?";
 
@@ -90,9 +77,6 @@ public class ProveedorRepository {
         return null;
     }
 
-    /**
-     * Obtener proveedor por RUC
-     */
     public Proveedor findByRuc(String ruc) {
         String sql = "SELECT * FROM proveedores WHERE ruc = ?";
 
@@ -112,9 +96,6 @@ public class ProveedorRepository {
         return null;
     }
 
-    /**
-     * Guardar proveedor (insertar o actualizar)
-     */
     public boolean save(Proveedor proveedor) {
         if (proveedor.getId() == null) {
             return insert(proveedor);
@@ -123,9 +104,6 @@ public class ProveedorRepository {
         }
     }
 
-    /**
-     * Insertar nuevo proveedor
-     */
     private boolean insert(Proveedor proveedor) {
         String sql = """
                     INSERT INTO proveedores (razon_social, ruc, contacto, telefono, email,
@@ -159,9 +137,6 @@ public class ProveedorRepository {
         return false;
     }
 
-    /**
-     * Actualizar proveedor existente
-     */
     public boolean update(Proveedor proveedor) {
         String sql = """
                     UPDATE proveedores SET razon_social=?, ruc=?, contacto=?, telefono=?,
@@ -188,9 +163,6 @@ public class ProveedorRepository {
         return false;
     }
 
-    /**
-     * Eliminar proveedor (marcar como inactivo)
-     */
     public boolean delete(Integer id) {
         String sql = "UPDATE proveedores SET activo = FALSE WHERE id = ?";
 
@@ -205,9 +177,6 @@ public class ProveedorRepository {
         return false;
     }
 
-    /**
-     * Mapear ResultSet a objeto Proveedor
-     */
     private Proveedor mapResultSetToProveedor(ResultSet rs) throws SQLException {
         Proveedor proveedor = new Proveedor();
         proveedor.setId(rs.getInt("id"));
@@ -291,10 +260,6 @@ public class ProveedorRepository {
         }
     }
 
-    /**
-     * ✅ ELIMINACIÓN DEFINITIVA: Hard delete del proveedor (IRREVERSIBLE)
-     * ⚠️ USAR CON PRECAUCIÓN: Esta operación elimina físicamente el registro
-     */
     public boolean deleteDefinitivamente(Integer id) {
         String sql = "DELETE FROM proveedores WHERE id = ?";
 
@@ -313,9 +278,6 @@ public class ProveedorRepository {
         return false;
     }
 
-    /**
-     * Obtener todos los proveedores incluyendo inactivos
-     */
     public List<Proveedor> findAllIncludingInactive() {
         List<Proveedor> proveedores = new ArrayList<>();
         String sql = "SELECT * FROM proveedores ORDER BY id ASC";
@@ -333,10 +295,6 @@ public class ProveedorRepository {
         return proveedores;
     }
 
-    /**
-     * Verifica si existe un proveedor con la misma razón social (excluyendo el id
-     * si se indica)
-     */
     public boolean existePorRazonSocial(String razonSocial, Integer idExcluir) {
         String sql = "SELECT COUNT(*) FROM proveedores WHERE LOWER(razon_social) = LOWER(?)"
                 + (idExcluir != null ? " AND id <> ?" : "");

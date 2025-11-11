@@ -40,9 +40,9 @@ public class VentasController implements Initializable {
      */
     private int consultarPuntosCliente(int clienteId) {
         int saldo = 0;
-        List<com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos> movimientos = transaccionPuntosRepository
+        List<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos> movimientos = transaccionPuntosRepository
                 .findByClienteId(clienteId);
-        for (com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos mov : movimientos) {
+        for (com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos mov : movimientos) {
             if ("GANADO".equalsIgnoreCase(mov.getTipo()) || "AJUSTE".equalsIgnoreCase(mov.getTipo())) {
                 saldo += mov.getPuntos();
             } else if ("USADO".equalsIgnoreCase(mov.getTipo()) || "EXPIRADO".equalsIgnoreCase(mov.getTipo())) {
@@ -1057,7 +1057,7 @@ public class VentasController implements Initializable {
                         if (clienteActual != null && "NATURAL".equalsIgnoreCase(clienteActual.getTipoCliente())) {
                             int puntosGanados = calcularPuntosPorVenta(ventaGuardada);
                             if (puntosGanados > 0) {
-                                com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos();
+                                com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();
                                 movGanado.setClienteId(clienteActual.getId());
                                 movGanado.setVentaId(ventaGuardada.getId());
                                 movGanado.setTipo("GANADO");
@@ -1386,7 +1386,7 @@ public class VentasController implements Initializable {
                         if (clienteActual != null && "NATURAL".equalsIgnoreCase(clienteActual.getTipoCliente())) {
                             int puntosGanados = calcularPuntosPorVenta(ventaGuardada);
                             if (puntosGanados > 0) {
-                                com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos();
+                                com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();
                                 movGanado.setClienteId(clienteActual.getId());
                                 movGanado.setVentaId(ventaGuardada.getId());
                                 movGanado.setTipo("GANADO");
@@ -1410,7 +1410,7 @@ public class VentasController implements Initializable {
                         }
                         // Registrar el uso de puntos si se usaron en la venta
                         if (puntosUsados[0] && puntosDescontados[0] > 0) {
-                            com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos mov = new com.farmaciavictoria.proyectopharmavictoria.model.TransaccionPuntos();
+                            com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos mov = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();
                             mov.setClienteId(clienteActual.getId());
                             mov.setVentaId(ventaGuardada.getId());
                             mov.setTipo("USADO");

@@ -12,12 +12,18 @@ import javafx.stage.FileChooser;
 import java.util.List;
 
 public class ExportarInventarioController {
-    @FXML private ComboBox<String> cmbCategoria;
-    @FXML private ComboBox<String> cmbEstado;
-    @FXML private TextField txtBuscar;
-    @FXML private TableView<Producto> tablePreview;
-    @FXML private Button btnExportarExcel;
-    @FXML private Button btnExportarPDF;
+    @FXML
+    private ComboBox<String> cmbCategoria;
+    @FXML
+    private ComboBox<String> cmbEstado;
+    @FXML
+    private TextField txtBuscar;
+    @FXML
+    private TableView<Producto> tablePreview;
+    @FXML
+    private Button btnExportarExcel;
+    @FXML
+    private Button btnExportarPDF;
 
     private ProductoService productoService;
     private ObservableList<Producto> productosFiltrados = FXCollections.observableArrayList();
@@ -39,7 +45,8 @@ public class ExportarInventarioController {
         cmbCategoria.getItems().addAll(productoService.obtenerCategorias());
         cmbCategoria.getItems().add(0, "Todas las categorías");
         cmbCategoria.getSelectionModel().select(0);
-        cmbEstado.getItems().addAll("Todos", "Activo", "Inactivo", "Stock Bajo", "Próximos a Vencer", "Sin Stock", "Productos Vencidos");
+        cmbEstado.getItems().addAll("Todos", "Activo", "Inactivo", "Stock Bajo", "Próximos a Vencer", "Sin Stock",
+                "Productos Vencidos");
         cmbEstado.getSelectionModel().select(0);
     }
 
@@ -47,18 +54,24 @@ public class ExportarInventarioController {
         for (TableColumn<Producto, ?> col : tablePreview.getColumns()) {
             col.setCellValueFactory(null);
         }
-        ((TableColumn<Producto, String>) tablePreview.getColumns().get(0)).setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("codigo"));
-        ((TableColumn<Producto, String>) tablePreview.getColumns().get(1)).setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nombre"));
-        ((TableColumn<Producto, java.math.BigDecimal>) tablePreview.getColumns().get(2)).setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("precioVenta"));
-        ((TableColumn<Producto, Integer>) tablePreview.getColumns().get(3)).setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("stockActual"));
+        ((TableColumn<Producto, String>) tablePreview.getColumns().get(0))
+                .setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("codigo"));
+        ((TableColumn<Producto, String>) tablePreview.getColumns().get(1))
+                .setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("nombre"));
+        ((TableColumn<Producto, java.math.BigDecimal>) tablePreview.getColumns().get(2))
+                .setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("precioVenta"));
+        ((TableColumn<Producto, Integer>) tablePreview.getColumns().get(3))
+                .setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("stockActual"));
         ((TableColumn<Producto, String>) tablePreview.getColumns().get(4)).setCellValueFactory(cellData -> {
             if (cellData.getValue().getFechaVencimiento() != null) {
-                return new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFechaVencimiento().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                return new javafx.beans.property.SimpleStringProperty(cellData.getValue().getFechaVencimiento()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             }
             return new javafx.beans.property.SimpleStringProperty("");
         });
         ((TableColumn<Producto, String>) tablePreview.getColumns().get(5)).setCellValueFactory(cellData -> {
-            return new javafx.beans.property.SimpleStringProperty(cellData.getValue().getActivo() ? "Activo" : "Inactivo");
+            return new javafx.beans.property.SimpleStringProperty(
+                    cellData.getValue().getActivo() ? "Activo" : "Inactivo");
         });
     }
 
@@ -76,19 +89,31 @@ public class ExportarInventarioController {
         String texto = txtBuscar.getText().trim().toLowerCase();
         List<Producto> productos = productoService.obtenerTodos();
         productosFiltrados.setAll(productos.stream()
-            .filter(p -> categoria == null || categoria.equals("Todas las categorías") || p.getCategoria().getNombre().equalsIgnoreCase(categoria))
-            .filter(p -> {
-                if (estado == null || estado.equals("Todos")) return true;
-                if (estado.equals("Activo")) return p.getActivo();
-                if (estado.equals("Inactivo")) return !p.getActivo();
-                if (estado.equals("Stock Bajo")) return p.getStockActual() <= p.getStockMinimo();
-                if (estado.equals("Próximos a Vencer")) return p.getFechaVencimiento() != null && p.getFechaVencimiento().isBefore(java.time.LocalDate.now().plusDays(30));
-                if (estado.equals("Sin Stock")) return p.getStockActual() == 0;
-                if (estado.equals("Productos Vencidos")) return p.getFechaVencimiento() != null && p.getFechaVencimiento().isBefore(java.time.LocalDate.now());
-                return true;
-            })
-            .filter(p -> texto.isEmpty() || p.getNombre().toLowerCase().contains(texto) || p.getLaboratorio().toLowerCase().contains(texto) || p.getLote().toLowerCase().contains(texto))
-            .toList());
+                .filter(p -> categoria == null || categoria.equals("Todas las categorías")
+                        || p.getCategoria().getNombre().equalsIgnoreCase(categoria))
+                .filter(p -> {
+                    if (estado == null || estado.equals("Todos"))
+                        return true;
+                    if (estado.equals("Activo"))
+                        return p.getActivo();
+                    if (estado.equals("Inactivo"))
+                        return !p.getActivo();
+                    if (estado.equals("Stock Bajo"))
+                        return p.getStockActual() <= p.getStockMinimo();
+                    if (estado.equals("Próximos a Vencer"))
+                        return p.getFechaVencimiento() != null
+                                && p.getFechaVencimiento().isBefore(java.time.LocalDate.now().plusDays(30));
+                    if (estado.equals("Sin Stock"))
+                        return p.getStockActual() == 0;
+                    if (estado.equals("Productos Vencidos"))
+                        return p.getFechaVencimiento() != null
+                                && p.getFechaVencimiento().isBefore(java.time.LocalDate.now());
+                    return true;
+                })
+                .filter(p -> texto.isEmpty() || p.getNombre().toLowerCase().contains(texto)
+                        || p.getLaboratorio().toLowerCase().contains(texto)
+                        || p.getLote().toLowerCase().contains(texto))
+                .toList());
     }
 
     private void exportar(String tipo) {

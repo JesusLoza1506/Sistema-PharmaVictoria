@@ -119,7 +119,7 @@ public class VentaServiceImpl implements VentaService {
             if (venta.getDetalles() != null) {
                 for (com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta detalle : venta
                         .getDetalles()) {
-                    com.farmaciavictoria.proyectopharmavictoria.command.RestablecerStockCommand cmd = new com.farmaciavictoria.proyectopharmavictoria.command.RestablecerStockCommand(
+                    com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.command.RestablecerStockCommand cmd = new com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.command.RestablecerStockCommand(
                             productoRepository, detalle);
                     cmd.execute();
                 }

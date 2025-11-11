@@ -17,14 +17,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
-/**
- * ✅ MVC CONTROLLER PATTERN - Controlador de Clientes
- * Implementa el patrón MVC con inyección de dependencias
- * Maneja la interfaz de usuario para gestión de clientes
- * 
- * @author PHARMAVICTORIA Development Team
- * @version 1.0
- */
 public class ClientesController implements Initializable {
     // Dashboard: Gráficas
     @FXML

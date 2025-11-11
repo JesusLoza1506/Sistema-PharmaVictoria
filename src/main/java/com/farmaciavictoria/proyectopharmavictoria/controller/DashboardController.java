@@ -12,7 +12,6 @@ import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager;
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -32,7 +31,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -46,11 +44,6 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * ✅ ENTERPRISE CONTROLLER - Dashboard refactorizado
- * Aplica Service Layer Pattern, Dependency Injection y Observer Pattern
- * Panel principal con actualizaciones en tiempo real
- */
 public class DashboardController implements Initializable, SystemEventObserver {
 
     private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
