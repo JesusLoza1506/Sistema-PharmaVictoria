@@ -41,6 +41,19 @@ public class ProveedoresController implements Initializable {
     private Label lblGraficoEstadoProveedores;
     @FXML
     private Button btnContactarProveedores;
+    @FXML
+    private Button btnExportar;
+
+    // Permisos granulares del vendedor para Proveedores
+    private boolean permisoNuevoProveedor = false;
+    private boolean permisoExportar = false;
+    private boolean permisoContactar = false;
+    private boolean permisoEditar = false;
+    private boolean permisoVer = false;
+    private boolean permisoToggleEstado = false;
+    private boolean permisoEliminar = false;
+    private boolean permisoDashboardTop = false;
+    private boolean permisoDashboardEstado = false;
 
     @FXML
     private void onContactarProveedores() {
@@ -190,9 +203,6 @@ public class ProveedoresController implements Initializable {
     public void onExportarProveedores(javafx.event.ActionEvent event) {
         exportar();
     }
-
-    @FXML
-    private Button btnExportar;
 
     @FXML
     private void exportar() {
@@ -392,7 +402,7 @@ public class ProveedoresController implements Initializable {
     private TableColumn<Proveedor, String> colTelefono;
     @FXML
     private TableColumn<Proveedor, String> colEmail;
-    // Columna 'Condiciones de Pago' eliminada por petición de UI
+    // CoNOlumna 'Condiciones de Pago' eliminada por petición de UI
     @FXML
     private TableColumn<Proveedor, String> colTipoProducto;
     @FXML
@@ -414,38 +424,52 @@ public class ProveedoresController implements Initializable {
         boolean esAdmin = usuario != null && usuario.isAdmin();
         boolean esVendedor = usuario != null && usuario.isVendedor();
 
-        // Control de visibilidad por rol (extendido)
-        if (btnNuevoProveedor != null) {
-            btnNuevoProveedor.setVisible(esAdmin);
-            btnNuevoProveedor.setManaged(esAdmin);
-        }
-        if (lblGraficoTopProveedores != null) {
-            lblGraficoTopProveedores.setVisible(esAdmin);
-            lblGraficoTopProveedores.setManaged(esAdmin);
-        }
-        if (lblGraficoEstadoProveedores != null) {
-            lblGraficoEstadoProveedores.setVisible(esAdmin);
-            lblGraficoEstadoProveedores.setManaged(esAdmin);
+        // Cargar permisos granulares del vendedor para Proveedores
+        if (esVendedor) {
+            var usuarioService = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer.getInstance()
+                    .getUsuarioService();
+            permisoNuevoProveedor = usuarioService.tienePermiso(usuario.getId(), "proveedores", "nuevo");
+            permisoExportar = usuarioService.tienePermiso(usuario.getId(), "proveedores", "exportar");
+            permisoContactar = usuarioService.tienePermiso(usuario.getId(), "proveedores", "contactar");
+            permisoEditar = usuarioService.tienePermiso(usuario.getId(), "proveedores", "editar");
+            // El permiso "ver" SIEMPRE debe estar habilitado para vendedores
+            permisoVer = true;
+            permisoToggleEstado = usuarioService.tienePermiso(usuario.getId(), "proveedores", "activar_inactivar");
+            permisoEliminar = usuarioService.tienePermiso(usuario.getId(), "proveedores", "eliminar");
+            permisoDashboardTop = usuarioService.tienePermiso(usuario.getId(), "proveedores", "dashboard_top");
+            permisoDashboardEstado = usuarioService.tienePermiso(usuario.getId(), "proveedores", "dashboard_estado");
         }
 
-        // Botones principales
-        if (btnContactarProveedores != null) {
-            btnContactarProveedores.setVisible(esAdmin);
-            btnContactarProveedores.setManaged(esAdmin);
+        // Control de visibilidad por permisos
+        if (btnNuevoProveedor != null) {
+            btnNuevoProveedor.setVisible(esAdmin || permisoNuevoProveedor);
+            btnNuevoProveedor.setManaged(esAdmin || permisoNuevoProveedor);
         }
         if (btnExportar != null) {
-            btnExportar.setVisible(esAdmin || esVendedor);
-            btnExportar.setManaged(esAdmin || esVendedor);
+            // Solo mostrar si el permiso está habilitado para el vendedor
+            boolean mostrarExportar = esAdmin || (esVendedor && permisoExportar);
+            btnExportar.setVisible(mostrarExportar);
+            btnExportar.setManaged(mostrarExportar);
         }
-
-        // Gráficos (dashboard)
+        if (btnContactarProveedores != null) {
+            btnContactarProveedores.setVisible(esAdmin || permisoContactar);
+            btnContactarProveedores.setManaged(esAdmin || permisoContactar);
+        }
         if (barChartTopProveedores != null) {
-            barChartTopProveedores.setVisible(esAdmin);
-            barChartTopProveedores.setManaged(esAdmin);
+            barChartTopProveedores.setVisible(esAdmin || permisoDashboardTop);
+            barChartTopProveedores.setManaged(esAdmin || permisoDashboardTop);
+        }
+        if (lblGraficoTopProveedores != null) {
+            lblGraficoTopProveedores.setVisible(esAdmin || permisoDashboardTop);
+            lblGraficoTopProveedores.setManaged(esAdmin || permisoDashboardTop);
         }
         if (pieChartEstadoProveedores != null) {
-            pieChartEstadoProveedores.setVisible(esAdmin);
-            pieChartEstadoProveedores.setManaged(esAdmin);
+            pieChartEstadoProveedores.setVisible(esAdmin || permisoDashboardEstado);
+            pieChartEstadoProveedores.setManaged(esAdmin || permisoDashboardEstado);
+        }
+        if (lblGraficoEstadoProveedores != null) {
+            lblGraficoEstadoProveedores.setVisible(esAdmin || permisoDashboardEstado);
+            lblGraficoEstadoProveedores.setManaged(esAdmin || permisoDashboardEstado);
         }
         // Configurar ComboBox de tipo de búsqueda avanzada
         if (cmbTipoFiltro != null) {
@@ -673,36 +697,55 @@ public class ProveedoresController implements Initializable {
                 if (empty) {
                     setGraphic(null);
                 } else {
-                    // Lógica de visibilidad por rol
                     com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
                             .getInstance().getAuthenticationService().getUsuarioActual();
                     boolean esAdmin = usuario != null && usuario.isAdmin();
                     boolean esVendedor = usuario != null && usuario.isVendedor();
-                    btnEditar.setVisible(esAdmin);
-                    btnEditar.setManaged(esAdmin);
-                    btnToggleEstado.setVisible(esAdmin);
-                    btnToggleEstado.setManaged(esAdmin);
-                    btnEliminar.setVisible(esAdmin);
-                    btnEliminar.setManaged(esAdmin);
-                    btnVer.setVisible(true);
-                    btnVer.setManaged(true);
-                    Proveedor proveedor = getTableView().getItems().get(getIndex());
-                    if (proveedor != null && proveedor.getActivo()) {
-                        btnToggleEstado.setText("⏸");
-                        btnToggleEstado.setTooltip(new Tooltip("Inactivar proveedor"));
-                        btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-active");
-                    } else {
-                        btnToggleEstado.setText("▶");
-                        btnToggleEstado.setTooltip(new Tooltip("Activar proveedor"));
-                        btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-inactive");
+
+                    boolean mostrarEditar = esAdmin || (esVendedor && permisoEditar);
+                    boolean mostrarToggle = esAdmin || (esVendedor && permisoToggleEstado);
+                    boolean mostrarEliminar = esAdmin || (esVendedor && permisoEliminar);
+                    // El botón Ver SIEMPRE debe mostrarse para vendedores
+                    boolean mostrarVer = esAdmin || esVendedor;
+
+                    btnEditar.setVisible(mostrarEditar);
+                    btnEditar.setManaged(mostrarEditar);
+                    btnToggleEstado.setVisible(mostrarToggle);
+                    btnToggleEstado.setManaged(mostrarToggle);
+                    btnEliminar.setVisible(mostrarEliminar);
+                    btnEliminar.setManaged(mostrarEliminar);
+                    btnVer.setVisible(mostrarVer);
+                    btnVer.setManaged(mostrarVer);
+
+                    // Estado visual del botón toggle
+                    if (mostrarToggle) {
+                        Proveedor proveedor = getTableView().getItems().get(getIndex());
+                        if (proveedor != null && proveedor.getActivo()) {
+                            btnToggleEstado.setText("⏸");
+                            btnToggleEstado.setTooltip(new Tooltip("Inactivar proveedor"));
+                            btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-active");
+                        } else {
+                            btnToggleEstado.setText("▶");
+                            btnToggleEstado.setTooltip(new Tooltip("Activar proveedor"));
+                            btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-inactive");
+                        }
                     }
-                    HBox box = esAdmin ? new HBox(6, btnEditar, btnVer, btnToggleEstado, btnEliminar)
-                            : new HBox(6, btnVer);
-                    box.setAlignment(javafx.geometry.Pos.CENTER);
-                    setGraphic(box);
+
+                    HBox hbox = new HBox(7);
+                    hbox.setAlignment(javafx.geometry.Pos.CENTER);
+                    if (mostrarEditar)
+                        hbox.getChildren().add(btnEditar);
+                    if (mostrarVer)
+                        hbox.getChildren().add(btnVer);
+                    if (mostrarToggle)
+                        hbox.getChildren().add(btnToggleEstado);
+                    if (mostrarEliminar)
+                        hbox.getChildren().add(btnEliminar);
+                    setGraphic(hbox);
                 }
             }
         });
+
     }
 
     /**
@@ -745,6 +788,17 @@ public class ProveedoresController implements Initializable {
 
                 // Actualizar dashboard de gráficas
                 inicializarDashboardGraficas();
+
+                // Refuerza visibilidad del botón Exportar cada vez que se cargan proveedores
+                com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                        .getInstance().getAuthenticationService().getUsuarioActual();
+                boolean esAdmin = usuario != null && usuario.isAdmin();
+                boolean esVendedor = usuario != null && usuario.isVendedor();
+                boolean mostrarExportar = esAdmin || (esVendedor && permisoExportar);
+                if (btnExportar != null) {
+                    btnExportar.setVisible(mostrarExportar);
+                    btnExportar.setManaged(mostrarExportar);
+                }
 
                 System.out.println("Proveedores cargados: " + proveedores.size());
             });
@@ -1045,7 +1099,7 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    // MÉTODOS DE UTILIDAD
+    // MÉjesus 123456TODOS DE UTILIDAD
 
     /**
      * Mostrar diálogo de error

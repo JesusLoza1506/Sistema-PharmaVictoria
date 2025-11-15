@@ -18,14 +18,26 @@ public class UsuarioPermisoRepository {
     }
 
     public void save(UsuarioPermiso permiso) {
-        String sql = "INSERT INTO usuario_permisos (usuario_id, permiso, valor, fecha_asignacion) VALUES (?, ?, ?, ?)";
-        try (Connection conn = databaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setLong(1, permiso.getUsuarioId());
-            stmt.setString(2, permiso.getPermiso());
-            stmt.setBoolean(3, permiso.isValor());
-            stmt.setTimestamp(4, Timestamp.valueOf(permiso.getFechaAsignacion()));
-            stmt.executeUpdate();
+        // Primero intentar actualizar, si no existe, insertar
+        String updateSql = "UPDATE usuario_permisos SET valor = ?, fecha_asignacion = ? WHERE usuario_id = ? AND permiso = ?";
+        String insertSql = "INSERT INTO usuario_permisos (usuario_id, permiso, valor, fecha_asignacion) VALUES (?, ?, ?, ?)";
+        try (Connection conn = databaseConfig.getConnection()) {
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+                updateStmt.setBoolean(1, permiso.isValor());
+                updateStmt.setTimestamp(2, Timestamp.valueOf(permiso.getFechaAsignacion()));
+                updateStmt.setLong(3, permiso.getUsuarioId());
+                updateStmt.setString(4, permiso.getPermiso());
+                int rows = updateStmt.executeUpdate();
+                if (rows == 0) {
+                    try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+                        insertStmt.setLong(1, permiso.getUsuarioId());
+                        insertStmt.setString(2, permiso.getPermiso());
+                        insertStmt.setBoolean(3, permiso.isValor());
+                        insertStmt.setTimestamp(4, Timestamp.valueOf(permiso.getFechaAsignacion()));
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -35,7 +47,7 @@ public class UsuarioPermisoRepository {
         List<UsuarioPermiso> permisos = new ArrayList<>();
         String sql = "SELECT * FROM usuario_permisos WHERE usuario_id = ? ORDER BY fecha_asignacion DESC";
         try (Connection conn = databaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, usuarioId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

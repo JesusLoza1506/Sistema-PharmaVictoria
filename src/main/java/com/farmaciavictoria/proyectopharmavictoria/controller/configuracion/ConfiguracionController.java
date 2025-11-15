@@ -31,6 +31,12 @@ public class ConfiguracionController {
                     getClass().getResource("/fxml/configuracion/VencimientoAlertaCard.fxml"));
             AnchorPane cardVencimiento = loaderVencimiento.load();
             cardsPane.getChildren().add(cardVencimiento);
+
+            // Nuevo card: Permisos de Vendedor
+            FXMLLoader loaderPermisos = new FXMLLoader(
+                    getClass().getResource("/fxml/configuracion/PermisosVendedorCard.fxml"));
+            AnchorPane cardPermisos = loaderPermisos.load();
+            cardsPane.getChildren().add(cardPermisos);
         } catch (Exception e) {
             e.printStackTrace();
             mostrarError("Error", "No se pudo cargar los cards de configuración: " + e.getMessage());

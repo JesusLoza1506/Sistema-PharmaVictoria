@@ -42,7 +42,7 @@
                             </graphic>
                             <text>Nuevo Proveedor</text>
                         </Button>
-                        <Button fx:id="btnExportarProveedores" mnemonicParsing="false" onAction="#onExportarProveedores" styleClass="productos-header-btn-green">
+                        <Button fx:id="btnExportar" mnemonicParsing="false" onAction="#onExportarProveedores" styleClass="productos-header-btn-green">
                             <graphic>
                                 <ImageView fitHeight="22" fitWidth="22" preserveRatio="true">
                                     <image>

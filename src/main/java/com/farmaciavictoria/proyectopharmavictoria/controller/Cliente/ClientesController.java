@@ -27,6 +27,8 @@ public class ClientesController implements Initializable {
     private javafx.scene.chart.NumberAxis barChartClientesYAxis;
     @FXML
     private javafx.scene.chart.PieChart pieChartRangoEdad;
+    @FXML
+    private Label lblDistribucionEdad;
 
     private void cargarTopClientesConMasCompras() {
         // Obtener todos los clientes reales (sin genéricos)
@@ -248,8 +250,57 @@ public class ClientesController implements Initializable {
         cargarTopClientesConMasCompras();
     }
 
+    // Permisos granulares del vendedor para Clientes
+    private boolean permisoNuevoCliente = false;
+    private boolean permisoExportarCliente = false;
+    private boolean permisoEditarCliente = false;
+    private boolean permisoEliminarCliente = false;
+    private boolean permisoDashboardTop = false;
+    private boolean permisoGraficaEdad = false;
+
+    private void cargarPermisosVendedor() {
+        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                .getInstance()
+                .getAuthenticationService().getUsuarioActual();
+        if (usuario != null
+                && usuario.getRol() == com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario.Rol.VENDEDOR) {
+            com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService usuarioService = com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService
+                    .getInstance();
+            permisoNuevoCliente = usuarioService.tienePermiso(usuario.getId(), "clientes", "nuevo");
+            permisoExportarCliente = usuarioService.tienePermiso(usuario.getId(), "clientes", "exportar");
+            permisoEditarCliente = usuarioService.tienePermiso(usuario.getId(), "clientes", "editar");
+            permisoEliminarCliente = usuarioService.tienePermiso(usuario.getId(), "clientes", "eliminar");
+            permisoDashboardTop = usuarioService.tienePermiso(usuario.getId(), "clientes", "dashboard_top");
+            permisoGraficaEdad = usuarioService.tienePermiso(usuario.getId(), "clientes", "grafica_edad");
+        } else {
+            // Si es admin, todos los permisos
+            permisoNuevoCliente = true;
+            permisoExportarCliente = true;
+            permisoEditarCliente = true;
+            permisoEliminarCliente = true;
+            permisoDashboardTop = true;
+            permisoGraficaEdad = true;
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        cargarPermisosVendedor();
+        // Refuerzo: ocultar botón Exportar si no tiene permiso
+        javafx.application.Platform.runLater(() -> {
+            if (tablaClientes != null && tablaClientes.getScene() != null) {
+                javafx.scene.control.Button btnExportarClientes = (javafx.scene.control.Button) tablaClientes.getScene()
+                        .lookup("#btnExportarClientes");
+                if (btnExportarClientes != null) {
+                    btnExportarClientes.setVisible(permisoExportarCliente);
+                    btnExportarClientes.setManaged(permisoExportarCliente);
+                    if (!permisoExportarCliente) {
+                        btnExportarClientes.setDisable(true);
+                    }
+                }
+            }
+        });
+        // ...existing code...
         colTipoCliente.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String tipo, boolean empty) {
@@ -300,9 +351,28 @@ public class ClientesController implements Initializable {
                 javafx.scene.control.Button btnNuevoCliente = (javafx.scene.control.Button) tablaClientes.getScene()
                         .lookup("#btnNuevoCliente");
                 if (btnNuevoCliente != null) {
-                    btnNuevoCliente.setVisible(esAdmin);
-                    btnNuevoCliente.setManaged(esAdmin);
+                    btnNuevoCliente.setVisible(permisoNuevoCliente);
+                    btnNuevoCliente.setManaged(permisoNuevoCliente);
                 }
+                javafx.scene.control.Button btnExportarClientes = (javafx.scene.control.Button) tablaClientes.getScene()
+                        .lookup("#btnExportarClientes");
+                if (btnExportarClientes != null) {
+                    btnExportarClientes.setVisible(permisoExportarCliente);
+                    btnExportarClientes.setManaged(permisoExportarCliente);
+                }
+            }
+            // Ocultar dashboards según permisos
+            if (barChartTopClientes != null) {
+                barChartTopClientes.setVisible(permisoDashboardTop);
+                barChartTopClientes.setManaged(permisoDashboardTop);
+            }
+            if (pieChartRangoEdad != null) {
+                pieChartRangoEdad.setVisible(permisoGraficaEdad);
+                pieChartRangoEdad.setManaged(permisoGraficaEdad);
+            }
+            if (lblDistribucionEdad != null) {
+                lblDistribucionEdad.setVisible(permisoGraficaEdad);
+                lblDistribucionEdad.setManaged(permisoGraficaEdad);
             }
         });
         if (lblTotalClientes != null && clienteService != null) {
@@ -412,7 +482,6 @@ public class ClientesController implements Initializable {
                     private final javafx.scene.control.Button btnEditar = new javafx.scene.control.Button();
                     private final javafx.scene.control.Button btnVer = new javafx.scene.control.Button();
                     private final javafx.scene.control.Button btnEliminar = new javafx.scene.control.Button();
-                    // Cambiar el orden: Editar - Ver - Eliminar
                     private final javafx.scene.layout.HBox box = new javafx.scene.layout.HBox(5, btnEditar, btnVer,
                             btnEliminar);
                     {
@@ -459,19 +528,18 @@ public class ClientesController implements Initializable {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            // Control de visibilidad por rol
                             com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
                                     .getInstance()
                                     .getAuthenticationService().getUsuarioActual();
                             boolean esAdmin = usuario != null && usuario.isAdmin();
-                            btnEditar.setVisible(esAdmin);
-                            btnEditar.setManaged(esAdmin);
-                            btnEliminar.setVisible(esAdmin);
-                            btnEliminar.setManaged(esAdmin);
-                            btnVer.setVisible(true);
+                            btnEditar.setVisible(permisoEditarCliente);
+                            btnEditar.setManaged(permisoEditarCliente);
+                            btnEliminar.setVisible(permisoEliminarCliente);
+                            btnEliminar.setManaged(permisoEliminarCliente);
+                            btnVer.setVisible(true); // Siempre visible
                             btnVer.setManaged(true);
                             setGraphic(box);
-                            btnEliminar.setDisable(false); // Habilita siempre al refrescar
+                            btnEliminar.setDisable(false);
                         }
                     }
                 });

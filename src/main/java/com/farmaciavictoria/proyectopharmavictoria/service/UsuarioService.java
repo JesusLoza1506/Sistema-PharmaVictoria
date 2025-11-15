@@ -23,6 +23,26 @@ import java.util.Optional;
  */
 public class UsuarioService {
     /**
+     * Verifica si el usuario tiene el permiso granular especificado para el módulo
+     * dado
+     */
+    public boolean tienePermiso(Long usuarioId, String modulo, String accion) {
+        // Ejemplo: permiso = "proveedores.nuevo", "proveedores.exportar", etc.
+        String clavePermiso = modulo + "." + accion;
+        List<UsuarioPermiso> permisos = obtenerPermisos(usuarioId);
+        for (UsuarioPermiso permiso : permisos) {
+            if (permiso.getPermiso().equalsIgnoreCase(clavePermiso)) {
+                return permiso.isValor();
+            }
+        }
+        return false;
+    }
+
+    public UsuarioPermisoRepository getPermisoRepository() {
+        return permisoRepository;
+    }
+
+    /**
      * Restablece la contraseña usando el token de recuperación.
      */
     public boolean restablecerPasswordConToken(String token, String nuevaPassword) {

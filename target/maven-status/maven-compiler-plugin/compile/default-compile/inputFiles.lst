@@ -68,6 +68,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Cliente\ExportarClientesController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\Usuario\RecuperarContraseñaController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\ClienteHistorialCambioService.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\configuracion\PermisosVendedorCardController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\reportes\view\ReporteVentasPorProductoCardController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\reportes\export\ExportadorPDFReporte.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\PharmavictoriaApplication.java
@@ -114,6 +115,7 @@ C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectoph
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\reportes\export\ReporteTipo.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\ResetPasswordController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\EmailService.java
+C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\controller\configuracion\PermisosVendedorGestionController.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\model\Usuario\UsuarioAlerta.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\repository\Usuario\UsuarioAlertaRepository.java
 C:\Projects\proyectopharmavictoria\src\main\java\com\farmaciavictoria\proyectopharmavictoria\service\NotificationService.java

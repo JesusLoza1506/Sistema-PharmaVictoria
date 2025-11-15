@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.PermisosVendedorGestionController" spacing="24" alignment="TOP_CENTER" prefWidth="600" prefHeight="400" style="-fx-background-color: #f5f5f5;">
+    <children>
+        <Label text="Gestión de Permisos de Vendedor" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1976D2;" />
+        <TitledPane text="Inventario" expanded="false">
+            <content>
+                <VBox spacing="8" alignment="TOP_LEFT">
+                    <CheckBox fx:id="chkVerInventario" text="Ver productos en inventario" disable="true" selected="true" />
+                    <CheckBox fx:id="chkAgregarProducto" text="Agregar productos" />
+                    <CheckBox fx:id="chkEditarProducto" text="Editar productos" />
+                    <CheckBox fx:id="chkEliminarProducto" text="Eliminar productos" />
+                    <CheckBox fx:id="chkActivarInactivarProducto" text="Activar/Inactivar productos" />
+                    <CheckBox fx:id="chkEdicionMasiva" text="Edición masiva de productos" />
+                    <CheckBox fx:id="chkExportarInventario" text="Exportar inventario" />
+                </VBox>
+            </content>
+        </TitledPane>
+        <TitledPane text="Clientes" expanded="false">
+            <content>
+                <VBox spacing="8" alignment="TOP_LEFT">
+                    <CheckBox fx:id="chkVerCliente" text="Ver cliente" disable="true" selected="true" />
+                    <CheckBox fx:id="chkNuevoCliente" text="Nuevo cliente" />
+                    <CheckBox fx:id="chkExportarCliente" text="Exportar cliente" />
+                    <CheckBox fx:id="chkEditarCliente" text="Editar cliente" />
+                    <CheckBox fx:id="chkEliminarCliente" text="Eliminar cliente" />
+                    <CheckBox fx:id="chkDashboardTopClientes" text="Dashboard visual: Top 3 clientes con más compras" />
+                    <CheckBox fx:id="chkGraficaEdad" text="Dashboard visual: Distribución por edad" />
+                </VBox>
+            </content>
+        </TitledPane>
+        <TitledPane text="Proveedores" expanded="false">
+            <content>
+                <VBox spacing="8" alignment="TOP_LEFT">
+                    <CheckBox fx:id="chkVerProveedor" text="Ver proveedores" disable="true" selected="true" />
+                    <CheckBox fx:id="chkNuevoProveedor" text="Nuevo proveedor" />
+                    <CheckBox fx:id="chkExportarProveedor" text="Exportar proveedores" />
+                    <CheckBox fx:id="chkContactarProveedor" text="Contactar proveedores" />
+                    <CheckBox fx:id="chkEditarProveedor" text="Editar proveedores" />
+                    <CheckBox fx:id="chkEliminarProveedor" text="Eliminar proveedores" />
+                    <CheckBox fx:id="chkActivarInactivarProveedor" text="Activar/Inactivar proveedores" />
+                    <CheckBox fx:id="chkDashboardTopProveedores" text="Dashboard visual: Top proveedores con más productos" />
+                    <CheckBox fx:id="chkDashboardDistribucionEstado" text="Dashboard visual: Distribución por estado" />
+                </VBox>
+            </content>
+        </TitledPane>
+    </children>
+</VBox>

@@ -79,7 +79,17 @@ public class ConfiguracionNotificacionesController {
             config.setUseSSL(chkSSL.isSelected());
             config.setUseTLS(chkTLS.isSelected());
             EmailConfigService.guardarConfig(config);
-            lblEstado.setText("Configuración guardada correctamente.");
+            // Actualizar el observador de correo para que use el nuevo destinatario sin
+            // reiniciar la app
+            com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager eventManager = com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager
+                    .getInstance();
+            eventManager.unsubscribe("StockVencimientoEmailObserver");
+            com.farmaciavictoria.proyectopharmavictoria.service.EmailService emailService = new com.farmaciavictoria.proyectopharmavictoria.service.EmailService(
+                    config.getSmtpUser(), config.getSmtpPassword());
+            com.farmaciavictoria.proyectopharmavictoria.util.StockVencimientoEmailObserver nuevoObserver = new com.farmaciavictoria.proyectopharmavictoria.util.StockVencimientoEmailObserver(
+                    emailService, config.getDestinatario());
+            eventManager.subscribe(nuevoObserver);
+            lblEstado.setText("Configuración guardada correctamente y destinatario actualizado.");
         } catch (Exception e) {
             lblEstado.setText("Error al guardar: " + e.getMessage());
         }

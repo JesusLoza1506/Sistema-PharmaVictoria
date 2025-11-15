@@ -45,6 +45,15 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ProductosController implements Initializable, SystemEventObserver {
+    // Botones granulares para permisos
+    @FXML
+    private Button btnAgregarProducto;
+    @FXML
+    private Button btnEditarProducto;
+    @FXML
+    private Button btnEliminarProducto;
+    @FXML
+    private Button btnActivarInactivarProducto;
     @FXML
     private Button btnExportar;
 
@@ -140,6 +149,12 @@ public class ProductosController implements Initializable, SystemEventObserver {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+                .getInstance()
+                .getAuthenticationService().getUsuarioActual();
+        // Ocultar/mostrar botones principales según permisos granulares del vendedor
+        boolean esAdmin = usuario != null && usuario.isAdmin();
+        boolean esVendedor = usuario != null && usuario.isVendedor();
         if (btnExportar != null) {
             btnExportar.setOnAction(e -> mostrarModalExportar());
         }
@@ -151,30 +166,168 @@ public class ProductosController implements Initializable, SystemEventObserver {
         setupActionColumn();
         setupEventHandlers();
 
+        // Ocultar/mostrar botones principales según permisos granulares del vendedor
+        // Variables ya declaradas previamente en el método, no repetir
+
+        if (esAdmin) {
+            if (btnNuevoProducto != null) {
+                btnNuevoProducto.setVisible(true);
+                btnNuevoProducto.setManaged(true);
+            }
+            if (btnEdicionMasiva != null) {
+                btnEdicionMasiva.setVisible(true);
+                btnEdicionMasiva.setManaged(true);
+            }
+            if (btnExportar != null) {
+                btnExportar.setVisible(true);
+                btnExportar.setManaged(true);
+            }
+        } else if (esVendedor) {
+            com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService usuarioService = com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService
+                    .getInstance();
+            java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario> vendedores = usuarioService
+                    .obtenerUsuarios().stream()
+                    .filter(u -> u
+                            .getRol() == com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario.Rol.VENDEDOR)
+                    .collect(java.util.stream.Collectors.toList());
+            final java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioPermiso> permisos;
+            if (!vendedores.isEmpty()) {
+                permisos = usuarioService.obtenerPermisos(vendedores.get(0).getId());
+            } else {
+                permisos = java.util.Collections.emptyList();
+            }
+            java.util.function.Function<String, Boolean> tienePermiso = clave -> permisos.stream()
+                    .anyMatch(p -> clave.equals(p.getPermiso()) && p.isValor());
+
+            if (btnNuevoProducto != null) {
+                boolean visible = tienePermiso.apply("inventario.agregar");
+                btnNuevoProducto.setVisible(visible);
+                btnNuevoProducto.setManaged(visible);
+            }
+            if (btnEdicionMasiva != null) {
+                boolean visible = tienePermiso.apply("inventario.edicion_masiva");
+                btnEdicionMasiva.setVisible(visible);
+                btnEdicionMasiva.setManaged(visible);
+            }
+            if (btnExportar != null) {
+                boolean visible = tienePermiso.apply("inventario.exportar");
+                btnExportar.setVisible(visible);
+                btnExportar.setManaged(visible);
+            }
+        } else {
+            if (btnNuevoProducto != null) {
+                btnNuevoProducto.setVisible(false);
+                btnNuevoProducto.setManaged(false);
+            }
+            if (btnEdicionMasiva != null) {
+                btnEdicionMasiva.setVisible(false);
+                btnEdicionMasiva.setManaged(false);
+            }
+            if (btnExportar != null) {
+                btnExportar.setVisible(false);
+                btnExportar.setManaged(false);
+            }
+        }
+
         // Suscribirse al Observer para recibir eventos del sistema
         eventManager.subscribe(this);
 
         mostrarNotificacionesInventario();
 
-        // Ocultar botones principales según el rol
-        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                .getInstance()
-                .getAuthenticationService().getUsuarioActual();
-        boolean esAdmin = usuario != null && usuario.isAdmin();
-        boolean esVendedor = usuario != null && usuario.isVendedor();
-        if (btnNuevoProducto != null) {
-            btnNuevoProducto.setVisible(esAdmin);
-            btnNuevoProducto.setManaged(esAdmin);
-        }
-        if (btnEdicionMasiva != null) {
-            btnEdicionMasiva.setVisible(esAdmin);
-            btnEdicionMasiva.setManaged(esAdmin);
-        }
-        // Exportar: visible para ambos, pero puedes condicionar aquí si lo deseas
-        // Estadística: valor inventario solo para admin
-        if (lblValorInventario != null) {
-            lblValorInventario.setVisible(esAdmin);
-            lblValorInventario.setManaged(esAdmin);
+        // Ya declaradas al inicio del método, no repetir
+
+        if (esAdmin) {
+            if (btnNuevoProducto != null) {
+                btnNuevoProducto.setVisible(true);
+                btnNuevoProducto.setManaged(true);
+            }
+            if (btnEdicionMasiva != null) {
+                btnEdicionMasiva.setVisible(true);
+                btnEdicionMasiva.setManaged(true);
+            }
+            if (lblValorInventario != null) {
+                lblValorInventario.setVisible(true);
+                lblValorInventario.setManaged(true);
+            }
+            if (btnAgregarProducto != null) {
+                btnAgregarProducto.setVisible(true);
+                btnAgregarProducto.setManaged(true);
+            }
+            if (btnEditarProducto != null) {
+                btnEditarProducto.setVisible(true);
+                btnEditarProducto.setManaged(true);
+            }
+            if (btnEliminarProducto != null) {
+                btnEliminarProducto.setVisible(true);
+                btnEliminarProducto.setManaged(true);
+            }
+            if (btnActivarInactivarProducto != null) {
+                btnActivarInactivarProducto.setVisible(true);
+                btnActivarInactivarProducto.setManaged(true);
+            }
+            if (btnExportar != null) {
+                btnExportar.setVisible(true);
+                btnExportar.setManaged(true);
+            }
+        } else if (esVendedor) {
+            // Obtener permisos granulares del primer vendedor (global)
+            com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService usuarioService = com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService
+                    .getInstance();
+            java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario> vendedores = usuarioService
+                    .obtenerUsuarios()
+                    .stream()
+                    .filter(u -> u
+                            .getRol() == com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario.Rol.VENDEDOR)
+                    .collect(java.util.stream.Collectors.toList());
+            final java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioPermiso> permisos;
+            if (!vendedores.isEmpty()) {
+                permisos = usuarioService.obtenerPermisos(vendedores.get(0).getId());
+            } else {
+                permisos = java.util.Collections.emptyList();
+            }
+            java.util.function.Function<String, Boolean> tienePermiso = clave -> permisos.stream()
+                    .anyMatch(p -> clave.equals(p.getPermiso()) && p.isValor());
+
+            if (btnNuevoProducto != null) {
+                boolean visible = tienePermiso.apply("inventario.agregar");
+                btnNuevoProducto.setVisible(visible);
+                btnNuevoProducto.setManaged(visible);
+            }
+            if (btnEdicionMasiva != null) {
+                boolean visible = tienePermiso.apply("inventario.edicion_masiva");
+                btnEdicionMasiva.setVisible(visible);
+                btnEdicionMasiva.setManaged(visible);
+            }
+            if (btnAgregarProducto != null) {
+                boolean visible = tienePermiso.apply("inventario.agregar");
+                btnAgregarProducto.setVisible(visible);
+                btnAgregarProducto.setManaged(visible);
+            }
+            if (btnEditarProducto != null) {
+                boolean visible = tienePermiso.apply("inventario.editar");
+                btnEditarProducto.setVisible(visible);
+                btnEditarProducto.setManaged(visible);
+            }
+            if (btnEliminarProducto != null) {
+                boolean visible = tienePermiso.apply("inventario.eliminar");
+                btnEliminarProducto.setVisible(visible);
+                btnEliminarProducto.setManaged(visible);
+            }
+            if (btnActivarInactivarProducto != null) {
+                boolean visible = tienePermiso.apply("inventario.activar_inactivar");
+                btnActivarInactivarProducto.setVisible(visible);
+                btnActivarInactivarProducto.setManaged(visible);
+            }
+            if (btnExportar != null) {
+                boolean visible = tienePermiso.apply("inventario.exportar");
+                btnExportar.setVisible(visible);
+                btnExportar.setManaged(visible);
+            }
+            // Estadística: valor inventario solo para admin
+            if (lblValorInventario != null) {
+                lblValorInventario.setVisible(false);
+                lblValorInventario.setManaged(false);
+            }
         }
     }
 
@@ -547,14 +700,51 @@ public class ProductosController implements Initializable, SystemEventObserver {
                                     .getAuthenticationService().getUsuarioActual();
                             boolean esAdmin = usuario != null && usuario.isAdmin();
                             // Acciones por producto según rol
-                            btnEditar.setVisible(esAdmin);
-                            btnEditar.setManaged(esAdmin);
-                            btnToggleEstado.setVisible(esAdmin);
-                            btnToggleEstado.setManaged(esAdmin);
-                            btnEliminar.setVisible(esAdmin);
-                            btnEliminar.setManaged(esAdmin);
-                            btnVer.setVisible(true);
-                            btnVer.setManaged(true);
+                            if (esAdmin) {
+                                btnEditar.setVisible(true);
+                                btnEditar.setManaged(true);
+                                btnToggleEstado.setVisible(true);
+                                btnToggleEstado.setManaged(true);
+                                btnEliminar.setVisible(true);
+                                btnEliminar.setManaged(true);
+                                btnVer.setVisible(true);
+                                btnVer.setManaged(true);
+                            } else if (usuario != null && usuario.isVendedor()) {
+                                // Obtener permisos granulares del primer vendedor (global)
+                                com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService usuarioService = com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService
+                                        .getInstance();
+                                java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario> vendedores = usuarioService
+                                        .obtenerUsuarios().stream()
+                                        .filter(u -> u
+                                                .getRol() == com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario.Rol.VENDEDOR)
+                                        .collect(java.util.stream.Collectors.toList());
+                                final java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioPermiso> permisos;
+                                if (!vendedores.isEmpty()) {
+                                    permisos = usuarioService.obtenerPermisos(vendedores.get(0).getId());
+                                } else {
+                                    permisos = java.util.Collections.emptyList();
+                                }
+                                java.util.function.Function<String, Boolean> tienePermiso = clave -> permisos.stream()
+                                        .anyMatch(p -> clave.equals(p.getPermiso()) && p.isValor());
+
+                                btnEditar.setVisible(tienePermiso.apply("inventario.editar"));
+                                btnEditar.setManaged(tienePermiso.apply("inventario.editar"));
+                                btnToggleEstado.setVisible(tienePermiso.apply("inventario.activar_inactivar"));
+                                btnToggleEstado.setManaged(tienePermiso.apply("inventario.activar_inactivar"));
+                                btnEliminar.setVisible(tienePermiso.apply("inventario.eliminar"));
+                                btnEliminar.setManaged(tienePermiso.apply("inventario.eliminar"));
+                                btnVer.setVisible(true); // Ver detalles siempre visible
+                                btnVer.setManaged(true);
+                            } else {
+                                btnEditar.setVisible(false);
+                                btnEditar.setManaged(false);
+                                btnToggleEstado.setVisible(false);
+                                btnToggleEstado.setManaged(false);
+                                btnEliminar.setVisible(false);
+                                btnEliminar.setManaged(false);
+                                btnVer.setVisible(true);
+                                btnVer.setManaged(true);
+                            }
                             if (producto.getActivo()) {
                                 btnToggleEstado.setText("⏸");
                                 btnToggleEstado.setTooltip(new Tooltip("Inactivar producto"));

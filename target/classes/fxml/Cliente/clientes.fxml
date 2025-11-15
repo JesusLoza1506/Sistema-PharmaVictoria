@@ -133,7 +133,7 @@
                   </BarChart>
                </VBox>
                <VBox spacing="18.0" alignment="CENTER" prefWidth="400.0">
-                  <Label text="Distribución por rango de edad" styleClass="dashboard-title" />
+                  <Label fx:id="lblDistribucionEdad" text="Distribución por rango de edad" styleClass="dashboard-title" />
                   <PieChart fx:id="pieChartRangoEdad" title="" prefWidth="350.0" prefHeight="270.0" style="-fx-background-color: #fff; -fx-border-color: #e0e0e0; -fx-border-width: 1px;" />
                </VBox>
             </children>
