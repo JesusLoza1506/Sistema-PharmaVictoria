@@ -38,14 +38,8 @@ public class ClienteService {
         if (cliente.getPuntosUsados() == null) {
             cliente.setPuntosUsados(0);
         }
-        // El campo frecuente ahora es booleano, inicializar si es null
-        // (Si el modelo lo permite, pero normalmente isFrecuente() es primitivo)
         if (cliente.getCreatedAt() == null) {
             cliente.setCreatedAt(LocalDateTime.now());
-        }
-        // Marcar como frecuente si tiene más de 500 puntos
-        if (cliente.getPuntosDisponibles() != null && cliente.getPuntosDisponibles() >= 500) {
-            cliente.setEsFrecuente(true);
         }
     }
 
@@ -260,14 +254,8 @@ public class ClienteService {
      * Filtrar clientes por estado frecuente
      */
     public List<Cliente> buscarFrecuentes() {
-        try {
-            return obtenerTodos(0, 1000).stream()
-                    .filter(Cliente::isFrecuente)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            logger.error("Error al buscar clientes frecuentes: {}", e.getMessage(), e);
-            return List.of();
-        }
+        // Eliminado: lógica de clientes frecuentes
+        return List.of();
     }
 
     /**
@@ -371,11 +359,6 @@ public class ClienteService {
                             new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
                                     cliente.getId(), "puntos_usados", safeToString(clienteAnterior.getPuntosUsados()),
                                     safeToString(cliente.getPuntosUsados()), usuario, ahora));
-                if (!safeEquals(clienteAnterior.isFrecuente(), cliente.isFrecuente()))
-                    historialService.registrarCambio(
-                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
-                                    cliente.getId(), "frecuente", safeToString(clienteAnterior.isFrecuente()),
-                                    safeToString(cliente.isFrecuente()), usuario, ahora));
                 if (!safeEquals(clienteAnterior.getCreatedAt(), cliente.getCreatedAt()))
                     historialService.registrarCambio(
                             new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
@@ -572,14 +555,8 @@ public class ClienteService {
      * ✅ SERVICE LAYER: Obtener clientes frecuentes
      */
     public List<Cliente> obtenerClientesFrecuentes() {
-        try {
-            return obtenerTodos().stream()
-                    .filter(Cliente::isFrecuente)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            logger.error("Error al obtener clientes frecuentes: {}", e.getMessage(), e);
-            return List.of();
-        }
+        // Eliminado: lógica de clientes frecuentes
+        return List.of();
     }
 
     /**
@@ -590,9 +567,7 @@ public class ClienteService {
             List<Cliente> todos = obtenerTodos();
 
             int totalActivos = todos.size();
-            int frecuentes = (int) todos.stream()
-                    .filter(Cliente::isFrecuente)
-                    .count();
+            int frecuentes = 0; // Eliminado: lógica de clientes frecuentes
             int nuevosDelMes = 0; // Por implementar con fecha_registro
             double promedioPuntos = todos.stream()
                     .mapToInt(c -> c.getPuntosDisponibles() != null ? c.getPuntosDisponibles() : 0)

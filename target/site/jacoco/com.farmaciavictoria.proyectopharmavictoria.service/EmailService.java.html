@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.service</a> &gt; <span class="el_source">EmailService.java</span></div><h1>EmailService.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.service;
+
+import java.util.Properties;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.activation.DataHandler;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.MessagingException;
+
+public class EmailService {
+    // Enviar correo a proveedor con diseño formal
+    public void sendProveedorEmail(String to, String subject, String text, java.io.File adjunto)
+            throws MessagingException {
+<span class="nc" id="L14">        Session session = Session.getInstance(props, new Authenticator() {</span>
+            protected PasswordAuthentication getPasswordAuthentication() {
+<span class="nc" id="L16">                return new PasswordAuthentication(username, password);</span>
+            }
+        });
+<span class="nc" id="L19">        Message message = new MimeMessage(session);</span>
+<span class="nc" id="L20">        message.setFrom(new InternetAddress(username));</span>
+<span class="nc" id="L21">        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));</span>
+<span class="nc" id="L22">        message.setSubject(subject);</span>
+<span class="nc" id="L23">        String htmlBody = generarHtmlCorreoProveedor(subject, text);</span>
+<span class="nc bnc" id="L24" title="All 2 branches missed.">        if (adjunto != null) {</span>
+<span class="nc" id="L25">            MimeBodyPart textoPart = new MimeBodyPart();</span>
+<span class="nc" id="L26">            textoPart.setContent(htmlBody, &quot;text/html; charset=utf-8&quot;);</span>
+<span class="nc" id="L27">            MimeBodyPart adjuntoPart = new MimeBodyPart();</span>
+<span class="nc" id="L28">            adjuntoPart.setDataHandler(new DataHandler(new FileDataSource(adjunto)));</span>
+<span class="nc" id="L29">            adjuntoPart.setFileName(adjunto.getName());</span>
+<span class="nc" id="L30">            Multipart multipart = new MimeMultipart();</span>
+<span class="nc" id="L31">            multipart.addBodyPart(textoPart);</span>
+<span class="nc" id="L32">            multipart.addBodyPart(adjuntoPart);</span>
+<span class="nc" id="L33">            message.setContent(multipart);</span>
+<span class="nc" id="L34">        } else {</span>
+<span class="nc" id="L35">            message.setContent(htmlBody, &quot;text/html; charset=utf-8&quot;);</span>
+        }
+<span class="nc" id="L37">        Transport.send(message);</span>
+<span class="nc" id="L38">    }</span>
+
+    private final String username;
+    private final String password;
+    private final Properties props;
+
+<span class="nc" id="L44">    public EmailService(String username, String password) {</span>
+<span class="nc" id="L45">        this.username = username;</span>
+<span class="nc" id="L46">        this.password = password;</span>
+<span class="nc" id="L47">        props = new Properties();</span>
+<span class="nc" id="L48">        props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L49">        props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L50">        props.put(&quot;mail.smtp.host&quot;, &quot;smtp.gmail.com&quot;);</span>
+<span class="nc" id="L51">        props.put(&quot;mail.smtp.port&quot;, &quot;587&quot;);</span>
+<span class="nc" id="L52">    }</span>
+
+    public void sendEmail(String to, String subject, String text) throws MessagingException {
+<span class="nc" id="L55">        sendEmail(to, subject, text, null);</span>
+<span class="nc" id="L56">    }</span>
+
+    public void sendEmail(String to, String subject, String text, java.io.File adjunto) throws MessagingException {
+<span class="nc" id="L59">        Session session = Session.getInstance(props, new Authenticator() {</span>
+            protected PasswordAuthentication getPasswordAuthentication() {
+<span class="nc" id="L61">                return new PasswordAuthentication(username, password);</span>
+            }
+        });
+<span class="nc" id="L64">        Message message = new MimeMessage(session);</span>
+<span class="nc" id="L65">        message.setFrom(new InternetAddress(username));</span>
+<span class="nc" id="L66">        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));</span>
+<span class="nc" id="L67">        message.setSubject(subject);</span>
+
+        // Si el asunto contiene palabras clave de proveedores, usar diseño formal
+        String htmlBody;
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (esCorreoProveedor(subject)) {</span>
+<span class="nc" id="L72">            htmlBody = generarHtmlCorreoProveedor(subject, text);</span>
+        } else {
+<span class="nc" id="L74">            htmlBody = generarHtmlCorreo(subject, text);</span>
+        }
+
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (adjunto != null) {</span>
+<span class="nc" id="L78">            MimeBodyPart textoPart = new MimeBodyPart();</span>
+<span class="nc" id="L79">            textoPart.setContent(htmlBody, &quot;text/html; charset=utf-8&quot;);</span>
+<span class="nc" id="L80">            MimeBodyPart adjuntoPart = new MimeBodyPart();</span>
+<span class="nc" id="L81">            adjuntoPart.setDataHandler(new DataHandler(new FileDataSource(adjunto)));</span>
+<span class="nc" id="L82">            adjuntoPart.setFileName(adjunto.getName());</span>
+<span class="nc" id="L83">            Multipart multipart = new MimeMultipart();</span>
+<span class="nc" id="L84">            multipart.addBodyPart(textoPart);</span>
+<span class="nc" id="L85">            multipart.addBodyPart(adjuntoPart);</span>
+<span class="nc" id="L86">            message.setContent(multipart);</span>
+<span class="nc" id="L87">        } else {</span>
+<span class="nc" id="L88">            message.setContent(htmlBody, &quot;text/html; charset=utf-8&quot;);</span>
+        }
+<span class="nc" id="L90">        Transport.send(message);</span>
+<span class="nc" id="L91">    }</span>
+
+    // Detecta si el correo es para proveedores según el asunto
+    private boolean esCorreoProveedor(String subject) {
+<span class="nc" id="L95">        String s = subject.toLowerCase();</span>
+<span class="nc bnc" id="L96" title="All 8 branches missed.">        return s.contains(&quot;cotización&quot;) || s.contains(&quot;proveedor&quot;) || s.contains(&quot;solicitud&quot;) || s.contains(&quot;contacto&quot;)</span>
+<span class="nc bnc" id="L97" title="All 4 branches missed.">                || s.contains(&quot;oferta&quot;) || s.contains(&quot;pedido&quot;);</span>
+    }
+
+    // Diseño elegante y formal para correos a proveedores
+    private String generarHtmlCorreoProveedor(String asunto, String mensaje) {
+<span class="nc" id="L102">        return &quot;&lt;div style='font-family:Segoe UI,Arial,sans-serif;background:#fff;padding:32px;border-radius:10px;border:1px solid #e0e0e0;max-width:600px;margin:auto;'&gt;&quot;</span>
+                + &quot;&lt;h2 style='color:#2e7d32;margin-bottom:16px;'&gt;&quot; + asunto + &quot;&lt;/h2&gt;&quot;
+                + &quot;&lt;div style='font-size:16px;color:#222;margin-bottom:24px;'&gt;&quot;
+                + &quot;&lt;p&gt;Estimado proveedor,&lt;/p&gt;&quot;
+                + &quot;&lt;p&gt;&quot; + mensaje + &quot;&lt;/p&gt;&quot;
+                + &quot;&lt;/div&gt;&quot;
+                + &quot;&lt;div style='font-size:15px;color:#555;margin-bottom:24px;'&gt;&quot;
+                + &quot;Agradecemos su atención y quedamos atentos a su respuesta.&lt;br&gt;&lt;br&gt;Atentamente,&lt;br&gt;&lt;b&gt;Equipo PharmaVictoria&lt;/b&gt;&quot;
+                + &quot;&lt;/div&gt;&quot;
+                + &quot;&lt;hr style='border:none;border-top:1px solid #e0e0e0;margin:24px 0;'&gt;&quot;
+                + &quot;&lt;div style='font-size:12px;color:#aaa;'&gt;Este mensaje fue enviado desde el sistema de gestión &lt;b&gt;PharmaVictoria&lt;/b&gt;.&lt;/div&gt;&quot;
+                + &quot;&lt;/div&gt;&quot;;
+    }
+
+    /**
+     * Genera el cuerpo HTML con mejor diseño para el correo de alerta.
+     */
+    private String generarHtmlCorreo(String subject, String mensaje) {
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        String color = subject.contains(&quot;Stock Bajo&quot;) ? &quot;#ff9800&quot; : &quot;#e53935&quot;;</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        String icono = subject.contains(&quot;Stock Bajo&quot;) ? &quot;&amp;#9888;&quot; : &quot;&amp;#128308;&quot;;</span>
+<span class="nc" id="L122">        return &quot;&lt;div style='font-family:Arial,sans-serif;background:#f9f9f9;padding:24px;border-radius:12px;border:1px solid #eee;max-width:480px;margin:auto;'&gt;&quot;</span>
+                + &quot;&lt;h2 style='color:&quot; + color + &quot;;margin-bottom:8px;'&gt;&quot; + icono + &quot; &quot; + subject + &quot;&lt;/h2&gt;&quot;
+                + &quot;&lt;div style='font-size:16px;color:#333;margin-bottom:16px;'&gt;&quot; + mensaje + &quot;&lt;/div&gt;&quot;
+                + &quot;&lt;hr style='border:none;border-top:1px solid #eee;margin:16px 0;'&gt;&quot;
+                + &quot;&lt;div style='font-size:13px;color:#888;'&gt;&quot;
+                + &quot;Este correo fue generado automáticamente por el sistema &lt;b&gt;PharmaVictoria&lt;/b&gt;.&quot;
+                + &quot;&lt;/div&gt;&quot;
+                + &quot;&lt;/div&gt;&quot;;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

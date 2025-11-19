@@ -1,4 +1,3 @@
-// Controlador para la vista de configuración
 package com.farmaciavictoria.proyectopharmavictoria.controller.configuracion;
 
 import javafx.fxml.FXML;
@@ -23,18 +22,18 @@ public class ConfiguracionController {
     private void cargarCardsConfiguracion() {
         try {
             FXMLLoader loaderCorreo = new FXMLLoader(
-                    getClass().getResource("/fxml/configuracion/NotificacionesCorreoCard.fxml"));
+                    getClass().getResource("/fxml/Configuracion/NotificacionesCorreoCard.fxml"));
             AnchorPane cardCorreo = loaderCorreo.load();
             cardsPane.getChildren().add(cardCorreo);
 
             FXMLLoader loaderVencimiento = new FXMLLoader(
-                    getClass().getResource("/fxml/configuracion/VencimientoAlertaCard.fxml"));
+                    getClass().getResource("/fxml/Configuracion/VencimientoAlertaCard.fxml"));
             AnchorPane cardVencimiento = loaderVencimiento.load();
             cardsPane.getChildren().add(cardVencimiento);
 
             // Nuevo card: Permisos de Vendedor
             FXMLLoader loaderPermisos = new FXMLLoader(
-                    getClass().getResource("/fxml/configuracion/PermisosVendedorCard.fxml"));
+                    getClass().getResource("/fxml/Configuracion/PermisosVendedorCard.fxml"));
             AnchorPane cardPermisos = loaderPermisos.load();
             cardsPane.getChildren().add(cardPermisos);
         } catch (Exception e) {

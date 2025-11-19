@@ -1,11 +1,5 @@
 package com.farmaciavictoria.proyectopharmavictoria.controller.Usuario;
 
-import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.UsuarioFilterStrategy;
-import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorNombre;
-import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorApellido;
-import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorDni;
-import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorRol;
-import com.farmaciavictoria.proyectopharmavictoria.strategy.Usuario.FiltroPorEstado;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
 import com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService;
 import javafx.collections.FXCollections;
@@ -31,12 +25,6 @@ public class UsuariosController {
     private Label lblTitulo;
     @FXML
     private Label lblTotalUsuarios;
-    @FXML
-    private TextField txtBuscar;
-    @FXML
-    private ComboBox<String> cmbRol;
-    @FXML
-    private ComboBox<String> cmbEstado;
     @FXML
     private Button btnNuevoUsuario;
     @FXML
@@ -64,14 +52,14 @@ public class UsuariosController {
     private final UsuarioService usuarioService = UsuarioService.getInstance();
     private Usuario usuarioAutenticado;
     private ObservableList<Usuario> usuariosList = FXCollections.observableArrayList();
-    private javafx.collections.transformation.FilteredList<Usuario> usuariosFiltrados;
+    // Eliminada lógica de paginación
     // Variables de paginación eliminadas
 
     @FXML
     public void initialize() {
         configurarTabla();
         cargarUsuarios();
-        configurarFiltros();
+        // Filtros eliminados
         // Paginación eliminada
         // Dashboard eliminado: no se actualizan estadísticas ni gráficas
         btnNuevoUsuario.setOnAction(e -> onNuevoUsuario());
@@ -230,13 +218,6 @@ public class UsuariosController {
         });
     }
 
-    private void cargarSucursales() {
-        // ...existing code...
-
-        // Reutilizar exactamente la implementación de acciones del Inventario
-        // ...existing code...
-    }
-
     // Métodos de acción para los botones
     private void verDetallesUsuario(Usuario usuario) {
         if (usuario != null) {
@@ -267,13 +248,13 @@ public class UsuariosController {
                 VBox form = loader.load();
                 UsuarioFormController formController = loader.getController();
                 formController.cargarUsuario(usuario); // Método para cargar datos en el formulario
+                formController.setModoEdicion(true); // Activar modo edición visual
                 Stage stage = new Stage();
                 stage.setTitle("Editar Usuario");
                 Scene scene = new Scene(form);
                 stage.setScene(scene);
                 stage.initOwner(btnNuevoUsuario.getScene().getWindow());
                 stage.setResizable(true);
-                formController.btnCancelar.setOnAction(e -> stage.close());
                 formController.btnGuardar.setOnAction(e -> {
                     // Guardar valores originales para auditoría ANTES de modificar el usuario
                     String oldUsername = usuario.getUsername() != null ? usuario.getUsername() : "";
@@ -440,55 +421,7 @@ public class UsuariosController {
     private void cargarUsuarios() {
         List<Usuario> usuarios = usuarioService.obtenerUsuarios();
         usuariosList.setAll(usuarios);
-        usuariosFiltrados = new javafx.collections.transformation.FilteredList<>(usuariosList, u -> true);
-        // Paginación eliminada
         lblTotalUsuarios.setText("Total: " + usuarios.size() + " usuarios");
-    }
-
-    private void configurarFiltros() {
-        cmbRol.setItems(FXCollections.observableArrayList("ADMIN", "VENDEDOR"));
-        cmbEstado.setItems(FXCollections.observableArrayList("Activo", "Inactivo"));
-        txtBuscar.textProperty().addListener((obs, oldVal, newVal) -> filtrarUsuarios());
-        cmbRol.valueProperty().addListener((obs, oldVal, newVal) -> filtrarUsuarios());
-        cmbEstado.valueProperty().addListener((obs, oldVal, newVal) -> filtrarUsuarios());
-    }
-
-    private void filtrarUsuarios() {
-        String busqueda = txtBuscar.getText().trim().toLowerCase();
-        String rol = cmbRol.getValue();
-        String estado = cmbEstado.getValue();
-        usuariosFiltrados.setPredicate(u -> {
-            boolean coincideBusqueda = busqueda.isEmpty()
-                    || u.getUsername().toLowerCase().contains(busqueda)
-                    || (u.getNombres() != null && u.getNombres().toLowerCase().contains(busqueda))
-                    || (u.getApellidos() != null && u.getApellidos().toLowerCase().contains(busqueda))
-                    || (u.getDni() != null && u.getDni().toLowerCase().contains(busqueda))
-                    || (u.getTelefono() != null && u.getTelefono().toLowerCase().contains(busqueda));
-            boolean coincideRol = rol == null || rol.isBlank()
-                    || (u.getRol() != null && u.getRol().name().equalsIgnoreCase(rol));
-            boolean coincideEstado = estado == null || estado.isBlank() || (estado.equals("Activo") && u.isActivo())
-                    || (estado.equals("Inactivo") && !u.isActivo());
-            return coincideBusqueda && coincideRol && coincideEstado;
-        });
-        // Paginación eliminada
-        lblTotalUsuarios.setText("Total: " + usuariosFiltrados.size() + " usuarios");
-    }
-
-    // Configuración de paginación profesional
-    private void configurarPaginacion() {
-        // Método de paginación eliminado
-    }
-
-    private void actualizarPaginacion() {
-        // Método de paginación eliminado
-    }
-
-    private void onPaginaAnterior() {
-        // Método de paginación eliminado
-    }
-
-    private void onPaginaSiguiente() {
-        // Método de paginación eliminado
     }
 
     @FXML
@@ -504,7 +437,6 @@ public class UsuariosController {
             stage.setScene(scene);
             stage.initOwner(btnNuevoUsuario.getScene().getWindow());
             stage.setResizable(true);
-            formController.btnCancelar.setOnAction(e -> stage.close());
             formController.btnGuardar.setOnAction(e -> {
                 formController.guardarUsuario();
                 if (formController.isRegistrado()) {

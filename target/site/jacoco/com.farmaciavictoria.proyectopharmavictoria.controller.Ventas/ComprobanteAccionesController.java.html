@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ComprobanteAccionesController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Ventas</a> &gt; <span class="el_source">ComprobanteAccionesController.java</span></div><h1>ComprobanteAccionesController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Ventas;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import java.awt.Desktop;
+import java.net.URI;
+
+<span class="nc" id="L10">public class ComprobanteAccionesController {</span>
+    @FXML
+    private Label lblMensaje;
+    @FXML
+    private Button btnAbrirPDF;
+    @FXML
+    private Button btnEnviarWhatsApp;
+    @FXML
+    private Button btnEnviarGmail;
+    @FXML
+    private Button btnImprimir;
+
+    private String pdfUrl;
+    private String clienteNombre;
+    private String clienteEmail;
+    private String clienteTelefono;
+    private Stage stage;
+
+    public void setDatos(String pdfUrl, String clienteNombre, String clienteEmail, String clienteTelefono) {
+<span class="nc" id="L29">        this.pdfUrl = pdfUrl;</span>
+<span class="nc" id="L30">        this.clienteNombre = clienteNombre;</span>
+<span class="nc" id="L31">        this.clienteEmail = clienteEmail;</span>
+<span class="nc" id="L32">        this.clienteTelefono = clienteTelefono;</span>
+        // Mostrar mensaje según disponibilidad del PDF
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (lblMensaje != null) {</span>
+<span class="nc bnc" id="L35" title="All 4 branches missed.">            if (pdfUrl != null &amp;&amp; !pdfUrl.isEmpty()) {</span>
+<span class="nc" id="L36">                lblMensaje.setText(&quot;¡Comprobante electrónico generado exitosamente!&quot;);</span>
+            } else {
+<span class="nc" id="L38">                lblMensaje.setText(&quot;No se recibió el enlace PDF.&quot;);</span>
+            }
+        }
+<span class="nc" id="L41">    }</span>
+
+    public void setStage(Stage stage) {
+<span class="nc" id="L44">        this.stage = stage;</span>
+<span class="nc" id="L45">    }</span>
+
+    @FXML
+    private void initialize() {
+<span class="nc" id="L49">        btnAbrirPDF.setOnAction(e -&gt; abrirPDF());</span>
+<span class="nc" id="L50">        btnEnviarWhatsApp.setOnAction(e -&gt; enviarWhatsApp());</span>
+<span class="nc" id="L51">        btnEnviarGmail.setOnAction(e -&gt; enviarGmail());</span>
+<span class="nc" id="L52">        btnImprimir.setOnAction(e -&gt; imprimirPDF());</span>
+<span class="nc" id="L53">    }</span>
+
+    private void abrirPDF() {
+<span class="nc" id="L56">        System.out.println(&quot;[DEBUG] abrirPDF - pdfUrl: &quot; + pdfUrl);</span>
+<span class="nc bnc" id="L57" title="All 4 branches missed.">        if (pdfUrl != null &amp;&amp; !pdfUrl.isEmpty()) {</span>
+            try {
+<span class="nc" id="L59">                Desktop.getDesktop().browse(new URI(pdfUrl));</span>
+<span class="nc" id="L60">                System.out.println(&quot;[DEBUG] PDF abierto correctamente: &quot; + pdfUrl);</span>
+<span class="nc" id="L61">            } catch (Exception ex) {</span>
+<span class="nc" id="L62">                System.err.println(&quot;[ERROR] No se pudo abrir el PDF: &quot; + ex.getMessage());</span>
+<span class="nc" id="L63">                lblMensaje.setText(&quot;No se pudo abrir el PDF: &quot; + ex.getMessage());</span>
+<span class="nc" id="L64">            }</span>
+        } else {
+<span class="nc" id="L66">            System.err.println(&quot;[ERROR] No se recibió el enlace PDF.&quot;);</span>
+<span class="nc" id="L67">            lblMensaje.setText(&quot;No se recibió el enlace PDF.&quot;);</span>
+        }
+<span class="nc" id="L69">    }</span>
+
+    private void imprimirPDF() {
+<span class="nc" id="L72">        System.out.println(&quot;[DEBUG] imprimirPDF - pdfUrl: &quot; + pdfUrl);</span>
+<span class="nc bnc" id="L73" title="All 4 branches missed.">        if (pdfUrl != null &amp;&amp; !pdfUrl.isEmpty()) {</span>
+<span class="nc" id="L74">            java.io.File tempFile = null;</span>
+            try {
+                // Descargar el PDF a un archivo temporal
+<span class="nc" id="L77">                java.net.URL url = new java.net.URL(pdfUrl);</span>
+<span class="nc" id="L78">                tempFile = java.io.File.createTempFile(&quot;comprobante&quot;, &quot;.pdf&quot;);</span>
+<span class="nc" id="L79">                try (java.io.InputStream in = url.openStream();</span>
+<span class="nc" id="L80">                        java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {</span>
+<span class="nc" id="L81">                    byte[] buffer = new byte[4096];</span>
+                    int bytesRead;
+<span class="nc bnc" id="L83" title="All 2 branches missed.">                    while ((bytesRead = in.read(buffer)) != -1) {</span>
+<span class="nc" id="L84">                        out.write(buffer, 0, bytesRead);</span>
+                    }
+                }
+                // Imprimir usando PDFBox
+<span class="nc" id="L88">                org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(tempFile);</span>
+<span class="nc" id="L89">                org.apache.pdfbox.printing.PDFPageable pageable = new org.apache.pdfbox.printing.PDFPageable(document);</span>
+<span class="nc" id="L90">                javax.print.PrintService service = javax.print.PrintServiceLookup.lookupDefaultPrintService();</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">                if (service == null) {</span>
+<span class="nc" id="L92">                    lblMensaje.setText(&quot;No se encontró impresora predeterminada.&quot;);</span>
+<span class="nc" id="L93">                    document.close();</span>
+<span class="nc" id="L94">                    return;</span>
+                }
+<span class="nc" id="L96">                java.awt.print.PrinterJob job = java.awt.print.PrinterJob.getPrinterJob();</span>
+<span class="nc" id="L97">                job.setPageable(pageable);</span>
+<span class="nc" id="L98">                job.setPrintService(service);</span>
+<span class="nc" id="L99">                job.print();</span>
+<span class="nc" id="L100">                document.close();</span>
+<span class="nc" id="L101">                lblMensaje.setText(&quot;Comprobante enviado a la impresora correctamente.&quot;);</span>
+<span class="nc" id="L102">            } catch (Exception ex) {</span>
+<span class="nc" id="L103">                System.err.println(&quot;[ERROR] No se pudo imprimir el PDF: &quot; + ex.getMessage());</span>
+<span class="nc" id="L104">                lblMensaje.setText(&quot;No se pudo imprimir el PDF: &quot; + ex.getMessage());</span>
+            } finally {
+<span class="nc bnc" id="L106" title="All 4 branches missed.">                if (tempFile != null &amp;&amp; tempFile.exists()) {</span>
+<span class="nc" id="L107">                    tempFile.delete();</span>
+                }
+            }
+<span class="nc" id="L110">        } else {</span>
+<span class="nc" id="L111">            System.err.println(&quot;[ERROR] No se recibió el enlace PDF.&quot;);</span>
+<span class="nc" id="L112">            lblMensaje.setText(&quot;No se recibió el enlace PDF.&quot;);</span>
+        }
+<span class="nc" id="L114">    }</span>
+
+    private void enviarWhatsApp() {
+<span class="nc" id="L117">        System.out.println(&quot;[DEBUG] enviarWhatsApp - pdfUrl: &quot; + pdfUrl + &quot;, telefono: &quot; + clienteTelefono);</span>
+<span class="nc bnc" id="L118" title="All 4 branches missed.">        if (pdfUrl != null &amp;&amp; !pdfUrl.isEmpty()) {</span>
+<span class="nc" id="L119">            String mensaje = &quot;Hola, aquí está tu comprobante electrónico: &quot; + pdfUrl;</span>
+<span class="nc bnc" id="L120" title="All 4 branches missed.">            String telefonoFormateado = (clienteTelefono != null &amp;&amp; !clienteTelefono.trim().isEmpty())</span>
+<span class="nc" id="L121">                    ? clienteTelefono.replaceAll(&quot;[^0-9]&quot;, &quot;&quot;)</span>
+<span class="nc" id="L122">                    : &quot;&quot;;</span>
+            String url;
+<span class="nc bnc" id="L124" title="All 2 branches missed.">            if (!telefonoFormateado.isEmpty()) {</span>
+<span class="nc" id="L125">                url = &quot;https://wa.me/&quot; + telefonoFormateado + &quot;?text=&quot;</span>
+<span class="nc" id="L126">                        + java.net.URLEncoder.encode(mensaje, java.nio.charset.StandardCharsets.UTF_8);</span>
+            } else {
+<span class="nc" id="L128">                url = &quot;https://wa.me/?text=&quot;</span>
+<span class="nc" id="L129">                        + java.net.URLEncoder.encode(mensaje, java.nio.charset.StandardCharsets.UTF_8);</span>
+            }
+            try {
+<span class="nc" id="L132">                Desktop.getDesktop().browse(new URI(url));</span>
+<span class="nc" id="L133">                System.out.println(&quot;[DEBUG] WhatsApp abierto correctamente: &quot; + url);</span>
+<span class="nc" id="L134">            } catch (Exception ex) {</span>
+<span class="nc" id="L135">                System.err.println(&quot;[ERROR] No se pudo abrir WhatsApp: &quot; + ex.getMessage());</span>
+<span class="nc" id="L136">                lblMensaje.setText(&quot;No se pudo abrir WhatsApp: &quot; + ex.getMessage());</span>
+<span class="nc" id="L137">            }</span>
+<span class="nc" id="L138">        } else {</span>
+<span class="nc" id="L139">            System.err.println(&quot;[ERROR] No se recibió el enlace PDF.&quot;);</span>
+<span class="nc" id="L140">            lblMensaje.setText(&quot;No se recibió el enlace PDF.&quot;);</span>
+        }
+<span class="nc" id="L142">    }</span>
+
+    private void enviarGmail() {
+<span class="nc" id="L145">        System.out.println(&quot;[DEBUG] enviarGmail - pdfUrl: &quot; + pdfUrl + &quot;, clienteEmail: &quot; + clienteEmail);</span>
+<span class="nc bnc" id="L146" title="All 8 branches missed.">        if (pdfUrl != null &amp;&amp; !pdfUrl.isEmpty() &amp;&amp; clienteEmail != null &amp;&amp; !clienteEmail.isEmpty()) {</span>
+<span class="nc" id="L147">            String asunto = &quot;Comprobante electrónico&quot;;</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">            String cuerpo = &quot;Hola &quot; + (clienteNombre != null ? clienteNombre : &quot;&quot;)</span>
+                    + &quot;,\nAdjunto el comprobante electrónico en PDF.&quot;;
+<span class="nc" id="L150">            java.io.File tempFile = null;</span>
+            try {
+                // Descargar PDF a archivo temporal
+<span class="nc" id="L153">                java.net.URL url = new java.net.URL(pdfUrl);</span>
+<span class="nc" id="L154">                tempFile = java.io.File.createTempFile(&quot;comprobante&quot;, &quot;.pdf&quot;);</span>
+<span class="nc" id="L155">                try (java.io.InputStream in = url.openStream();</span>
+<span class="nc" id="L156">                        java.io.FileOutputStream out = new java.io.FileOutputStream(tempFile)) {</span>
+<span class="nc" id="L157">                    byte[] buffer = new byte[4096];</span>
+                    int bytesRead;
+<span class="nc bnc" id="L159" title="All 2 branches missed.">                    while ((bytesRead = in.read(buffer)) != -1) {</span>
+<span class="nc" id="L160">                        out.write(buffer, 0, bytesRead);</span>
+                    }
+                }
+                // Configuración SMTP (demo Gmail)
+<span class="nc" id="L164">                String remitente = &quot;lozayataco@gmail.com&quot;; // Cambia por tu correo</span>
+<span class="nc" id="L165">                String password = &quot;bahx gnoo ejji jgeh&quot;; // Usa contraseña de aplicación Gmail</span>
+<span class="nc" id="L166">                String host = &quot;smtp.gmail.com&quot;;</span>
+<span class="nc" id="L167">                int port = 587;</span>
+<span class="nc" id="L168">                java.util.Properties props = new java.util.Properties();</span>
+<span class="nc" id="L169">                props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L170">                props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L171">                props.put(&quot;mail.smtp.host&quot;, host);</span>
+<span class="nc" id="L172">                props.put(&quot;mail.smtp.port&quot;, String.valueOf(port));</span>
+<span class="nc" id="L173">                jakarta.mail.Session session = jakarta.mail.Session.getInstance(props,</span>
+<span class="nc" id="L174">                        new jakarta.mail.Authenticator() {</span>
+                            protected jakarta.mail.PasswordAuthentication getPasswordAuthentication() {
+<span class="nc" id="L176">                                return new jakarta.mail.PasswordAuthentication(remitente, password);</span>
+                            }
+                        });
+<span class="nc" id="L179">                jakarta.mail.Message message = new jakarta.mail.internet.MimeMessage(session);</span>
+<span class="nc" id="L180">                message.setFrom(new jakarta.mail.internet.InternetAddress(remitente));</span>
+<span class="nc" id="L181">                message.setRecipients(jakarta.mail.Message.RecipientType.TO,</span>
+<span class="nc" id="L182">                        jakarta.mail.internet.InternetAddress.parse(clienteEmail));</span>
+<span class="nc" id="L183">                message.setSubject(asunto);</span>
+                // Crear parte de texto y adjunto
+<span class="nc" id="L185">                jakarta.mail.Multipart multipart = new jakarta.mail.internet.MimeMultipart();</span>
+<span class="nc" id="L186">                jakarta.mail.BodyPart texto = new jakarta.mail.internet.MimeBodyPart();</span>
+<span class="nc" id="L187">                texto.setText(cuerpo);</span>
+<span class="nc" id="L188">                multipart.addBodyPart(texto);</span>
+<span class="nc" id="L189">                jakarta.mail.internet.MimeBodyPart adjunto = new jakarta.mail.internet.MimeBodyPart();</span>
+<span class="nc" id="L190">                adjunto.attachFile(tempFile);</span>
+<span class="nc" id="L191">                adjunto.setFileName(&quot;Comprobante.pdf&quot;);</span>
+<span class="nc" id="L192">                multipart.addBodyPart(adjunto);</span>
+<span class="nc" id="L193">                message.setContent(multipart);</span>
+                // Enviar correo
+<span class="nc" id="L195">                jakarta.mail.Transport.send(message);</span>
+<span class="nc" id="L196">                lblMensaje.setText(&quot;Correo enviado correctamente a &quot; + clienteEmail);</span>
+<span class="nc" id="L197">                System.out.println(&quot;[DEBUG] Correo enviado correctamente&quot;);</span>
+<span class="nc" id="L198">            } catch (Exception ex) {</span>
+<span class="nc" id="L199">                System.err.println(&quot;[ERROR] No se pudo enviar el correo: &quot; + ex.getMessage());</span>
+<span class="nc" id="L200">                lblMensaje.setText(&quot;No se pudo enviar el correo: &quot; + ex.getMessage());</span>
+            } finally {
+<span class="nc bnc" id="L202" title="All 4 branches missed.">                if (tempFile != null &amp;&amp; tempFile.exists()) {</span>
+<span class="nc" id="L203">                    tempFile.delete();</span>
+                }
+            }
+<span class="nc" id="L206">        } else {</span>
+<span class="nc" id="L207">            System.err.println(&quot;[ERROR] No se recibió el enlace PDF o email del cliente.&quot;);</span>
+<span class="nc" id="L208">            lblMensaje.setText(&quot;No se recibió el enlace PDF o email del cliente.&quot;);</span>
+        }
+<span class="nc" id="L210">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

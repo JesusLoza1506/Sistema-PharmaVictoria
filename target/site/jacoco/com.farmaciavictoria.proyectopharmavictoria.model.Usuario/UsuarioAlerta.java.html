@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioAlerta.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.model.Usuario</a> &gt; <span class="el_source">UsuarioAlerta.java</span></div><h1>UsuarioAlerta.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.model.Usuario;
+
+import java.time.LocalDateTime;
+
+public class UsuarioAlerta {
+    private Long id;
+    private Long usuarioId;
+    private String tipoAlerta;
+    private String mensaje;
+    private LocalDateTime fecha;
+    private boolean leida;
+
+<span class="nc" id="L13">    public UsuarioAlerta() {</span>
+<span class="nc" id="L14">    }</span>
+
+    // Getters y setters
+    public Long getId() {
+<span class="nc" id="L18">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L22">        this.id = id;</span>
+<span class="nc" id="L23">    }</span>
+
+    public Long getUsuarioId() {
+<span class="nc" id="L26">        return usuarioId;</span>
+    }
+
+    public void setUsuarioId(Long usuarioId) {
+<span class="nc" id="L30">        this.usuarioId = usuarioId;</span>
+<span class="nc" id="L31">    }</span>
+
+    public String getTipoAlerta() {
+<span class="nc" id="L34">        return tipoAlerta;</span>
+    }
+
+    public void setTipoAlerta(String tipoAlerta) {
+<span class="nc" id="L38">        this.tipoAlerta = tipoAlerta;</span>
+<span class="nc" id="L39">    }</span>
+
+    public String getMensaje() {
+<span class="nc" id="L42">        return mensaje;</span>
+    }
+
+    public void setMensaje(String mensaje) {
+<span class="nc" id="L46">        this.mensaje = mensaje;</span>
+<span class="nc" id="L47">    }</span>
+
+    public LocalDateTime getFecha() {
+<span class="nc" id="L50">        return fecha;</span>
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+<span class="nc" id="L54">        this.fecha = fecha;</span>
+<span class="nc" id="L55">    }</span>
+
+    public boolean isLeida() {
+<span class="nc" id="L58">        return leida;</span>
+    }
+
+    public void setLeida(boolean leida) {
+<span class="nc" id="L62">        this.leida = leida;</span>
+<span class="nc" id="L63">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -12,10 +12,7 @@ import javafx.stage.FileChooser;
 import java.util.List;
 
 public class ExportarUsuariosPreviewController {
-    @FXML
-    private ComboBox<String> cmbEstado;
-    @FXML
-    private TextField txtBuscar;
+    // Eliminados controles de filtro
     @FXML
     private TableView<Usuario> tablePreview;
     @FXML
@@ -44,16 +41,10 @@ public class ExportarUsuariosPreviewController {
 
     public void initialize() {
         usuarioService = UsuarioService.getInstance();
-        cargarFiltros();
         setupTableColumns();
         setupActions();
         tablePreview.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        aplicarFiltros();
-    }
-
-    private void cargarFiltros() {
-        cmbEstado.getItems().addAll("Todos", "Activo", "Inactivo");
-        cmbEstado.getSelectionModel().select(0);
+        cargarUsuarios();
     }
 
     private void setupTableColumns() {
@@ -76,28 +67,12 @@ public class ExportarUsuariosPreviewController {
     private void setupActions() {
         btnExportarExcel.setOnAction(e -> exportar("excel"));
         btnExportarPDF.setOnAction(e -> exportar("pdf"));
-        cmbEstado.setOnAction(e -> aplicarFiltros());
-        txtBuscar.setOnKeyReleased(e -> aplicarFiltros());
     }
 
-    private void aplicarFiltros() {
-        String estado = cmbEstado.getValue();
-        String texto = txtBuscar.getText().trim().toLowerCase();
+    // Eliminar método de filtros, solo mostrar todos los usuarios
+    private void cargarUsuarios() {
         List<Usuario> usuarios = usuarioService.obtenerTodos();
-        usuariosFiltrados.setAll(usuarios.stream()
-                .filter(u -> {
-                    if (estado == null || estado.equals("Todos"))
-                        return true;
-                    if (estado.equals("Activo"))
-                        return u.isActivo();
-                    if (estado.equals("Inactivo"))
-                        return !u.isActivo();
-                    return true;
-                })
-                .filter(u -> texto.isEmpty() || u.getNombres().toLowerCase().contains(texto)
-                        || u.getApellidos().toLowerCase().contains(texto) || u.getDni().toLowerCase().contains(texto)
-                        || u.getUsername().toLowerCase().contains(texto))
-                .toList());
+        usuariosFiltrados.setAll(usuarios);
         tablePreview.setItems(usuariosFiltrados);
     }
 

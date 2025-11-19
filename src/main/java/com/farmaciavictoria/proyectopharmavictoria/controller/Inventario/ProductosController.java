@@ -68,11 +68,9 @@ public class ProductosController implements Initializable, SystemEventObserver {
 
     private int paginaActual = 1;
     private int totalPaginas = 1;
-    private int tamanoPagina = 10;
+    private int tamanoPagina = -1; // -1 = Todos por defecto
 
     private static final Logger logger = LoggerFactory.getLogger(ProductosController.class);
-
-    // Tabla y columnas
     @FXML
     private TableView<Producto> tableProductos;
     @FXML
@@ -89,8 +87,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
     private TableColumn<Producto, Boolean> colEstado;
     @FXML
     private TableColumn<Producto, Void> colAcciones;
-
-    // Controles de filtros
     @FXML
     private TextField txtBuscar;
     @FXML
@@ -103,12 +99,8 @@ public class ProductosController implements Initializable, SystemEventObserver {
     private CheckBox chkMostrarInactivos;
     @FXML
     private ComboBox<String> cmbBusquedaStrategy;
-
-    // Botones principales
     @FXML
     private Button btnNuevoProducto;
-
-    // Labels de estadísticas
     @FXML
     private Label lblTotalProductos;
     @FXML
@@ -130,9 +122,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
     private final DecimalFormat formatoMoneda = new DecimalFormat("S/ #,##0.00");
     private final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /**
-     * ✅ DEPENDENCY INJECTION: Constructor con inyección de dependencias
-     */
     public ProductosController() {
         try {
             ServiceContainer container = ServiceContainer.getInstance();
@@ -233,8 +222,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
         eventManager.subscribe(this);
 
         mostrarNotificacionesInventario();
-
-        // Ya declaradas al inicio del método, no repetir
 
         if (esAdmin) {
             if (btnNuevoProducto != null) {
@@ -356,9 +343,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
         }
     }
 
-    /**
-     * ✅ OBSERVER PATTERN: Implementar observer para eventos del sistema
-     */
     @Override
     public void onEvent(SystemEvent event) {
         Platform.runLater(() -> {
@@ -390,9 +374,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
         return "ProductosController-" + this.hashCode();
     }
 
-    /**
-     * ✅ SERVICE LAYER: Configuración de componentes usando service layer
-     */
     private void initializeComponents() {
         productos = FXCollections.observableArrayList();
         productosFiltrados = new FilteredList<>(productos, p -> true);
@@ -401,14 +382,59 @@ public class ProductosController implements Initializable, SystemEventObserver {
         // Inicializar opciones de paginación
         if (cmbTamanoPagina != null) {
             cmbTamanoPagina.getItems().clear();
-            cmbTamanoPagina.getItems().addAll(5, 10, 20, 50);
-            cmbTamanoPagina.setValue(10);
+            cmbTamanoPagina.getItems().addAll(-1, 5, 10, 20, 50); // -1 = Todos
+            cmbTamanoPagina.setValue(-1);
+            cmbTamanoPagina.setConverter(new javafx.util.StringConverter<Integer>() {
+                @Override
+                public String toString(Integer value) {
+                    if (value == null || value == -1)
+                        return "Todos";
+                    return value.toString();
+                }
+
+                @Override
+                public Integer fromString(String string) {
+                    if ("Todos".equals(string))
+                        return -1;
+                    try {
+                        return Integer.parseInt(string);
+                    } catch (Exception e) {
+                        return -1;
+                    }
+                }
+            });
+            cmbTamanoPagina.setCellFactory(listView -> new javafx.scene.control.ListCell<Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item == -1 ? "Todos" : item.toString());
+                    }
+                }
+            });
+            cmbTamanoPagina.setButtonCell(new javafx.scene.control.ListCell<Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item == -1 ? "Todos" : item.toString());
+                    }
+                }
+            });
             cmbTamanoPagina.valueProperty().addListener((obs, oldVal, newVal) -> {
                 tamanoPagina = newVal;
                 paginaActual = 1;
                 actualizarPaginacion();
                 actualizarEstadisticas();
             });
+            // Mostrar todos por defecto al iniciar
+            paginaActual = 1;
+            actualizarPaginacion();
+            actualizarEstadisticas();
         }
 
         // Inicializar opciones de estrategia de búsqueda
@@ -765,9 +791,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         });
     }
 
-    /**
-     * Mostrar historial de movimientos de inventario para un producto
-     */
+    // Mostrar historial de movimientos de inventario para un producto
     private void mostrarHistorialInventario(Producto producto) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Inventario/historial-inventario.fxml"));
@@ -801,9 +825,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         }
     }
 
-    /**
-     * ✅ SERVICE LAYER: Cargar datos usando service layer
-     */
+    // Cargar datos usando service layer
     private void loadData() {
         Task<List<Producto>> task = new Task<List<Producto>>() {
             @Override
@@ -838,7 +860,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
         String estadoSeleccionado = cmbEstado.getValue();
         boolean mostrarInactivos = chkMostrarInactivos != null && chkMostrarInactivos.isSelected();
 
-        // Estrategia de búsqueda
         String estrategia = (cmbBusquedaStrategy != null && cmbBusquedaStrategy.getValue() != null)
                 ? cmbBusquedaStrategy.getValue()
                 : "Nombre";
@@ -906,31 +927,45 @@ public class ProductosController implements Initializable, SystemEventObserver {
     }
 
     private void actualizarPaginacion() {
-        int total = productosFiltrados.size();
-        totalPaginas = (int) Math.ceil((double) total / tamanoPagina);
-        if (totalPaginas == 0)
-            totalPaginas = 1;
-        if (paginaActual > totalPaginas)
-            paginaActual = totalPaginas;
-        int desde = (paginaActual - 1) * tamanoPagina;
-        int hasta = Math.min(desde + tamanoPagina, total);
+        // Filtrar productos válidos si aplica (aquí solo se usa productosFiltrados)
+        java.util.List<Producto> productosValidos = productosFiltrados;
+        int total = productosValidos.size();
         ObservableList<Producto> pagina = FXCollections.observableArrayList();
-        for (int i = desde; i < hasta; i++) {
-            pagina.add(productosFiltrados.get(i));
+        if (tamanoPagina == -1) {
+            pagina.addAll(productosValidos);
+            tableProductos.setItems(pagina);
+            if (lblPaginaActual != null) {
+                lblPaginaActual.setText("Mostrando todos");
+            }
+            if (btnPaginaAnterior != null)
+                btnPaginaAnterior.setDisable(true);
+            if (btnPaginaSiguiente != null)
+                btnPaginaSiguiente.setDisable(true);
+        } else {
+            totalPaginas = (int) Math.ceil((double) total / tamanoPagina);
+            if (totalPaginas < 1)
+                totalPaginas = 1;
+            if (paginaActual < 1)
+                paginaActual = 1;
+            if (paginaActual > totalPaginas)
+                paginaActual = totalPaginas;
+            int desde = (paginaActual - 1) * tamanoPagina;
+            int hasta = Math.min(desde + tamanoPagina, total);
+            for (int i = desde; i < hasta; i++) {
+                pagina.add(productosValidos.get(i));
+            }
+            tableProductos.setItems(pagina);
+            if (lblPaginaActual != null) {
+                lblPaginaActual.setText("Página " + paginaActual + " de " + totalPaginas);
+            }
+            if (btnPaginaAnterior != null)
+                btnPaginaAnterior.setDisable(paginaActual <= 1);
+            if (btnPaginaSiguiente != null)
+                btnPaginaSiguiente.setDisable(paginaActual >= totalPaginas);
         }
-        tableProductos.setItems(pagina);
         // Mostrar el total de productos filtrados (no solo la página)
         if (lblTotalProductos != null) {
-            lblTotalProductos.setText("Total: " + productosFiltrados.size() + " productos");
-        }
-        if (lblPaginaActual != null) {
-            lblPaginaActual.setText("Página " + paginaActual + " de " + totalPaginas);
-        }
-        if (btnPaginaAnterior != null) {
-            btnPaginaAnterior.setDisable(paginaActual == 1);
-        }
-        if (btnPaginaSiguiente != null) {
-            btnPaginaSiguiente.setDisable(paginaActual == totalPaginas);
+            lblTotalProductos.setText("Total: " + productosValidos.size() + " productos");
         }
     }
 
@@ -994,23 +1029,15 @@ public class ProductosController implements Initializable, SystemEventObserver {
         notificationService.mostrarInfo("¡Inventario actualizado correctamente!");
     }
 
-    /**
-     * Verifica si el panel de historial de inventario está visible
-     */
+    // Verifica si el panel de historial de inventario está visible
     private boolean isHistorialInventarioVisible() {
         // Implementa la lógica según tu UI, por defecto retorna true si existe el panel
         // Si tienes un TabPane, verifica si el tab está seleccionado
         return true;
     }
 
-    /**
-     * Refresca el historial de inventario
-     */
+    // Refresca el historial de inventario
     private void refrescarHistorialInventario() {
-        // Si tienes un controlador de historial, llama su método de recarga
-        // Ejemplo:
-        // historialInventarioController.refrescar();
-        // Si no existe, deja este método vacío
     }
 
     @FXML
@@ -1113,7 +1140,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
                     + (productoActualizado != null ? productoActualizado.getNombre() : producto.getNombre()));
             Scene scene = new Scene(root);
 
-            // Cargar CSS
             try {
                 String css = getClass().getResource("/css/Inventario/producto-detalles.css").toExternalForm();
                 scene.getStylesheets().add(css);
@@ -1137,9 +1163,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         }
     }
 
-    /**
-     * ✅ SERVICE LAYER: Ajustar stock usando service layer
-     */
+    // Ajustar stock usando service layer
     private void ajustarStock(Producto producto) {
         TextInputDialog dialog = new TextInputDialog(String.valueOf(producto.getStockActual()));
         dialog.setTitle("Ajustar Stock");
@@ -1154,10 +1178,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
                 if (producto.getId() != null && stockAnterior != nuevoStock) {
                     producto.setStockActual(nuevoStock);
                     productoService.actualizar(producto);
-                    // Registrar movimiento en historial solo si hay cambio real
-                    // Auditoría de inventario ahora solo se registra en producto_historial_cambio
-                    // Si se requiere, aquí se puede llamar a
-                    // ProductoHistorialCambioRepository.registrarCambio
                     notificationService.mostrarExito("Stock actualizado correctamente");
                 } else {
                     notificationService.mostrarError("No se realizó ningún cambio de stock.");
@@ -1171,9 +1191,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
         });
     }
 
-    /**
-     * ✅ SERVICE LAYER: Cambiar ubicación usando service layer
-     */
     private void cambiarUbicacion(Producto producto) {
         TextInputDialog dialog = new TextInputDialog(producto.getUbicacion());
         dialog.setTitle("Cambiar Ubicación");
@@ -1194,9 +1211,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         });
     }
 
-    /**
-     * ✅ SERVICE LAYER: Desactivar producto usando service layer
-     */
+    // Desactivar producto
     private void abrirFormularioProducto(Producto producto) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Inventario/producto-form.fxml"));
@@ -1210,7 +1225,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
                 controller.setProducto(producto);
             }
 
-            // Callback optimizado: solo actualiza si hay cambios reales
             controller.setOnProductoGuardado(prodGuardado -> {
                 if (producto != null && productos.contains(producto)) {
                     // Copia profunda del producto previo para comparación
@@ -1249,9 +1263,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
                                     .registrarCambio(previo.getId(), "stock_actual", previo.getStockActual().toString(),
                                             prodGuardado.getStockActual().toString(), usuario);
                         }
-                        // Puedes agregar más campos relevantes aquí
-                        // Actualizar el producto previo en la lista para evitar duplicados en futuras
-                        // ediciones
                         for (int i = 0; i < productos.size(); i++) {
                             if (productos.get(i).getId().equals(prodGuardado.getId())) {
                                 productos.set(i, prodGuardado);
@@ -1260,7 +1271,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
                         }
                     }
                 }
-                // Fin del método
                 boolean encontrado = false;
                 for (int i = 0; i < productos.size(); i++) {
                     if (productos.get(i).getId().equals(prodGuardado.getId())) {
@@ -1294,9 +1304,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         }
     }
 
-    /**
-     * Cambia el estado (activo/inactivo) de un producto
-     */
+    // Cambia el estado (activo/inactivo) de un producto
     public void toggleEstadoProducto(Producto producto) {
         if (producto != null && producto.getId() != null) {
             try {
@@ -1313,9 +1321,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         }
     }
 
-    /**
-     * Elimina definitivamente un producto
-     */
+    // Elimina definitivamente un producto
     public void eliminarProductoDefinitivo(Producto producto) {
         if (producto != null && producto.getId() != null) {
             // Primera advertencia
@@ -1379,10 +1385,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         }
     }
 
-    /**
-     * ✅ NOTIFICACIONES OPTIMIZADAS: Solo mostrar notificaciones al entrar al
-     * inventario
-     */
+    // Solo mostrar notificaciones al entrar al inventario
     private void mostrarNotificacionesInventario() {
         try {
             notificationService.mostrarNotificacionesInventario();
@@ -1392,9 +1395,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
         }
     }
 
-    /**
-     * Método FXML para abrir la edición masiva (llamado desde productos.fxml)
-     */
+    // Método FXML para abrir la edición masiva (llamado desde productos.fxml)
     @FXML
     public void onEdicionMasiva(javafx.event.ActionEvent event) {
         mostrarModalEdicionMasiva();
@@ -1411,7 +1412,6 @@ public class ProductosController implements Initializable, SystemEventObserver {
             controller.setNotificationService(notificationService);
             controller.setProveedorService(com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
                     .getInstance().getProveedorService());
-            // Asegurar que la vista de selección esté visible al abrir
             controller.mostrarVistaSeleccion();
             Stage stage = new Stage();
             stage.setTitle("Edición Masiva de Productos");

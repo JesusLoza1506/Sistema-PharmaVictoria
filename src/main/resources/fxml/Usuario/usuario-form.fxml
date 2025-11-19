@@ -10,7 +10,7 @@
         <!-- ===== HEADER ===== -->
         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="form-header">
             <children>
-                <Label styleClass="form-title" text="➕ NUEVO USUARIO" />
+                <Label fx:id="lblTitulo" styleClass="form-title" text="➕ NUEVO USUARIO" />
             </children>
         </HBox>
         <!-- ===== FORMULARIO ===== -->
@@ -107,7 +107,6 @@
             <children>
                 <Button fx:id="btnGuardar" mnemonicParsing="false" styleClass="btn-primary" text="💾 Registrar Usuario" onAction="#guardarUsuario" />
                 <Button fx:id="btnLimpiar" mnemonicParsing="false" styleClass="btn-secondary" text="🔄 Limpiar Campos" onAction="#limpiarCampos" />
-                <Button fx:id="btnCancelar" mnemonicParsing="false" styleClass="btn-danger" text="❌ Cancelar" onAction="#cancelar" />
             </children>
             <padding>
                 <Insets bottom="15" left="15" right="15" top="15" />

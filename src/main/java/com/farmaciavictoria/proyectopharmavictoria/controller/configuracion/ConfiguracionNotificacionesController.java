@@ -1,4 +1,3 @@
-// Controlador para la configuración de notificaciones por correo
 package com.farmaciavictoria.proyectopharmavictoria.controller.configuracion;
 
 import javafx.fxml.FXML;

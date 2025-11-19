@@ -12,7 +12,6 @@ import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager;
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -32,7 +31,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -46,11 +44,6 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * ✅ ENTERPRISE CONTROLLER - Dashboard refactorizado
- * Aplica Service Layer Pattern, Dependency Injection y Observer Pattern
- * Panel principal con actualizaciones en tiempo real
- */
 public class DashboardVendedorController implements Initializable, SystemEventObserver {
 
     private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
@@ -82,15 +75,12 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
     private ProveedorService proveedorService = ServiceContainer.getInstance().getProveedorService();
     private Usuario usuarioLogueado;
 
-    /**
-     * Manejador de evento para el botón de reporte de ventas en el dashboard.
-     */
+    // Manejador de evento para el botón de reporte de ventas en el dashboard.
     public void reporteVentas(javafx.event.ActionEvent event) {
         mostrarError("En desarrollo", "Funcionalidad de reporte de ventas en desarrollo.");
     }
 
     // Event handlers para navegación
-
     @FXML
     private void navegarADashboard() {
         try {
@@ -98,7 +88,6 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard-vendedor.fxml"));
             Parent root = loader.load();
             DashboardVendedorController controller = loader.getController();
-            // Refrescar usuario logueado desde AuthenticationService
             com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
                     .getUsuarioActual();
             controller.setUsuario(usuarioActual);
@@ -177,10 +166,6 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         }
     }
 
-    /**
-     * ✅ CORRECCIÓN: Método unificado para la carga de datos.
-     * Es llamado por initialize (una vez) y por refrescarDatos().
-     */
     private void configurarValoresIniciales() {
         try {
             // Configurar fecha/hora
@@ -225,17 +210,10 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         }
     }
 
-    /**
-     * ✅ MÉTODO PRINCIPAL DE REFRESCO DE DATOS
-     */
     public void refrescarDatos() {
         // Asegurarse de que la actualización se haga en el hilo de la UI
         Platform.runLater(this::configurarValoresIniciales);
     }
-
-    // Archivo: DashboardController.java
-
-    // Archivo: DashboardController.java
 
     private void cargarDatosProductos() {
         try {
@@ -304,10 +282,6 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         }
     }
 
-    // En DashboardController.java
-
-    // Métodos de carga de widgets eliminados del FXML ya no son necesarios
-
     // Implementación de métodos requeridos por las interfaces
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -326,9 +300,6 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
     public void onEvent(SystemEvent event) {
         logger.info("Evento recibido: " + event.toString());
 
-        // Refrescar el dashboard ante eventos relevantes
-        // ✅ CORRECCIÓN 1: Usar event.getTipo() en lugar de event.getType()
-        // ✅ CORRECCIÓN 2: Usar SystemEvent.EventType en lugar de SystemEvent.Type
         if ((event.getTipo() == SystemEvent.EventType.VENTA_REGISTRADA) ||
                 (event.getTipo() == SystemEvent.EventType.PRODUCTO_ACTUALIZADO) ||
                 (event.getTipo() == SystemEvent.EventType.CLIENTE_ACTUALIZADO)) {
@@ -340,8 +311,6 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
     public String getObserverId() {
         return "DashboardController";
     }
-
-    // ✅ MÉTODOS DE NAVEGACIÓN (Se eliminaron onProductos/onProveedores duplicados)
 
     @FXML
     private void showClientes() {
@@ -594,11 +563,7 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         mostrarError("En desarrollo", "La funcionalidad de agregar producto rápido aún no está disponible.");
     }
 
-    // ✅ MÉTODOS AUXILIARES PARA OBTENER DATOS REALES DE LA BASE DE DATOS
-
-    /**
-     * Obtener monto total de ventas de hoy desde la BD
-     */
+    // Obtener monto total de ventas de hoy desde la BD
     private double obtenerMontoMisVentasHoyDesdeBD() {
         if (usuarioLogueado == null)
             return 0.0;
@@ -618,10 +583,8 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         return 0.0;
     }
 
-    /**
-     * Obtener número real de transacciones de hoy desde la BD (número de boletas
-     * únicas)
-     */
+    // Obtener número real de transacciones de hoy desde la BD (número de boletas
+    // únicas)
     private int obtenerMisVentasHoyDesdeBD() {
         if (usuarioLogueado == null)
             return 0;
@@ -641,9 +604,7 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         return 0;
     }
 
-    /**
-     * Obtener número real de clientes desde la BD
-     */
+    // Obtener número real de clientes desde la BD
     private int obtenerClientesDesdeBD() {
         String sql = "SELECT COUNT(*) as total FROM clientes WHERE dni <> '00000000' AND UPPER(nombres) <> 'GENÉRICO'";
 
@@ -661,9 +622,7 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         return 0;
     }
 
-    /**
-     * Obtener número real de clientes nuevos del mes desde la BD
-     */
+    // Obtener número real de clientes nuevos del mes desde la BD
     private int obtenerClientesNuevosDesdeBD() {
         String sql = """
                 SELECT COUNT(*) as total
@@ -688,9 +647,7 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         return 0;
     }
 
-    /**
-     * Establecer el usuario logueado y actualizar la interfaz
-     */
+    // Establecer el usuario logueado y actualizar la interfaz
     public void setUsuario(Usuario usuario) {
         this.usuarioLogueado = usuario;
 
@@ -713,9 +670,6 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         });
     }
 
-    /**
-     * UI: Mostrar mensaje de error
-     */
     private void mostrarError(String titulo, String mensaje) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -726,22 +680,15 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         });
     }
 
-    // NOTA: El método obtenerTransaccionesHoyDesdeBD() ha sido declarado redundante
-    // ya que obtenerVentasHoyDesdeBD() ahora cuenta transacciones únicas (boletas).
     private int obtenerTransaccionesHoyDesdeBD() {
         return obtenerMisVentasHoyDesdeBD();
     }
 
-    // NOTA: El método obtenerStockBajoNombres() es redundante con
-    // cargarProductosStockBajo()
-    // y se eliminó su uso.
     private List<String> obtenerStockBajoNombres() {
         return productoService.obtenerProductosStockBajo().stream().map(Producto::getNombre).toList();
     }
 
-    /**
-     * Clase modelo para las ventas recientes en el TableView
-     */
+    // Clase modelo para las ventas recientes en el TableView
     public static class VentaReciente {
         private final String fechaHora;
         private final String cliente;
@@ -772,9 +719,7 @@ public class DashboardVendedorController implements Initializable, SystemEventOb
         }
     }
 
-    /**
-     * Clase modelo para los productos con stock bajo en el TableView
-     */
+    // Clase modelo para los productos con stock bajo en el TableView
     public static class ProductoStockBajo {
         private final String producto;
         private final String stockActual;

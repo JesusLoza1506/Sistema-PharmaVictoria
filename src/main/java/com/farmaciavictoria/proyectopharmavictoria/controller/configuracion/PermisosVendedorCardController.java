@@ -20,13 +20,16 @@ public class PermisosVendedorCardController {
     private void abrirGestionPermisos(MouseEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/configuracion/PermisosVendedorGestion.fxml"));
+                    getClass().getResource("/fxml/Configuracion/PermisosVendedorGestion.fxml"));
             Parent formRoot = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Gestión de Permisos de Vendedor");
             stage.setScene(new Scene(formRoot));
             stage.setMinWidth(650);
             stage.setMinHeight(450);
+            // Obtener el controlador y pasar el Stage
+            PermisosVendedorGestionController controller = loader.getController();
+            controller.setStage(stage);
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();

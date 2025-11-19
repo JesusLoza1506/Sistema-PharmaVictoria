@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConfiguracionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.configuracion</a> &gt; <span class="el_source">ConfiguracionController.java</span></div><h1>ConfiguracionController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.configuracion;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.StackPane;
+
+<span class="nc" id="L10">public class ConfiguracionController {</span>
+    // Panel que contiene las tarjetas de configuración
+    @FXML
+    private FlowPane cardsPane;
+
+    // Inicializa el controlador y carga las tarjetas de configuración
+    @FXML
+    public void initialize() {
+<span class="nc" id="L18">        cargarCardsConfiguracion();</span>
+<span class="nc" id="L19">    }</span>
+
+    // Carga las tarjetas de configuración en el panel
+    private void cargarCardsConfiguracion() {
+        try {
+<span class="nc" id="L24">            FXMLLoader loaderCorreo = new FXMLLoader(</span>
+<span class="nc" id="L25">                    getClass().getResource(&quot;/fxml/Configuracion/NotificacionesCorreoCard.fxml&quot;));</span>
+<span class="nc" id="L26">            AnchorPane cardCorreo = loaderCorreo.load();</span>
+<span class="nc" id="L27">            cardsPane.getChildren().add(cardCorreo);</span>
+
+<span class="nc" id="L29">            FXMLLoader loaderVencimiento = new FXMLLoader(</span>
+<span class="nc" id="L30">                    getClass().getResource(&quot;/fxml/Configuracion/VencimientoAlertaCard.fxml&quot;));</span>
+<span class="nc" id="L31">            AnchorPane cardVencimiento = loaderVencimiento.load();</span>
+<span class="nc" id="L32">            cardsPane.getChildren().add(cardVencimiento);</span>
+
+            // Nuevo card: Permisos de Vendedor
+<span class="nc" id="L35">            FXMLLoader loaderPermisos = new FXMLLoader(</span>
+<span class="nc" id="L36">                    getClass().getResource(&quot;/fxml/Configuracion/PermisosVendedorCard.fxml&quot;));</span>
+<span class="nc" id="L37">            AnchorPane cardPermisos = loaderPermisos.load();</span>
+<span class="nc" id="L38">            cardsPane.getChildren().add(cardPermisos);</span>
+<span class="nc" id="L39">        } catch (Exception e) {</span>
+<span class="nc" id="L40">            e.printStackTrace();</span>
+<span class="nc" id="L41">            mostrarError(&quot;Error&quot;, &quot;No se pudo cargar los cards de configuración: &quot; + e.getMessage());</span>
+<span class="nc" id="L42">        }</span>
+<span class="nc" id="L43">    }</span>
+
+    // Muestra un mensaje de error en la interfaz
+    private void mostrarError(String titulo, String mensaje) {
+<span class="nc" id="L47">        javafx.application.Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L48">            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(</span>
+                    javafx.scene.control.Alert.AlertType.ERROR);
+<span class="nc" id="L50">            alert.setTitle(titulo);</span>
+<span class="nc" id="L51">            alert.setHeaderText(null);</span>
+<span class="nc" id="L52">            alert.setContentText(mensaje);</span>
+<span class="nc" id="L53">            alert.showAndWait();</span>
+<span class="nc" id="L54">        });</span>
+<span class="nc" id="L55">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

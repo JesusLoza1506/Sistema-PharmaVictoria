@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioHistorialCambioRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.repository.Usuario</a> &gt; <span class="el_source">UsuarioHistorialCambioRepository.java</span></div><h1>UsuarioHistorialCambioRepository.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.repository.Usuario;
+
+import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class UsuarioHistorialCambioRepository {
+    private final DatabaseConfig databaseConfig;
+<span class="fc" id="L13">    private static final Logger logger = LoggerFactory.getLogger(UsuarioHistorialCambioRepository.class);</span>
+
+<span class="fc" id="L15">    public UsuarioHistorialCambioRepository() {</span>
+<span class="fc" id="L16">        this.databaseConfig = DatabaseConfig.getInstance();</span>
+<span class="fc" id="L17">    }</span>
+
+    public void save(UsuarioHistorialCambio cambio) {
+<span class="nc" id="L20">        String sql = &quot;INSERT INTO usuario_historial_cambio (usuario_id, campo_modificado, valor_anterior, valor_nuevo, modificado_por, fecha) VALUES (?, ?, ?, ?, ?, ?)&quot;;</span>
+<span class="nc" id="L21">        try (Connection conn = databaseConfig.getConnection();</span>
+<span class="nc" id="L22">                PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+<span class="nc" id="L23">            stmt.setInt(1, cambio.getUsuario_id());</span>
+<span class="nc" id="L24">            stmt.setString(2, cambio.getCampo_modificado());</span>
+<span class="nc" id="L25">            stmt.setString(3, cambio.getValor_anterior());</span>
+<span class="nc" id="L26">            stmt.setString(4, cambio.getValor_nuevo());</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">            if (cambio.getModificado_por() != null) {</span>
+<span class="nc" id="L28">                stmt.setInt(5, cambio.getModificado_por());</span>
+            } else {
+<span class="nc" id="L30">                stmt.setNull(5, java.sql.Types.INTEGER);</span>
+            }
+<span class="nc bnc" id="L32" title="All 2 branches missed.">            stmt.setTimestamp(6, cambio.getFecha() != null ? Timestamp.valueOf(cambio.getFecha())</span>
+<span class="nc" id="L33">                    : new Timestamp(System.currentTimeMillis()));</span>
+<span class="nc" id="L34">            stmt.executeUpdate();</span>
+<span class="nc" id="L35">            logger.debug(&quot;Historial de cambio guardado para usuario_id={}&quot;, cambio.getUsuario_id());</span>
+<span class="nc" id="L36">        } catch (SQLException e) {</span>
+<span class="nc" id="L37">            logger.error(&quot;Error al guardar historial de cambio para usuario_id={}: {}&quot;, cambio.getUsuario_id(),</span>
+<span class="nc" id="L38">                    e.getMessage(), e);</span>
+<span class="nc" id="L39">            throw new RuntimeException(&quot;Error al guardar historial de cambio&quot;, e);</span>
+<span class="nc" id="L40">        }</span>
+<span class="nc" id="L41">    }</span>
+
+    public List&lt;UsuarioHistorialCambio&gt; findByUsuarioId(int usuarioId) {
+<span class="nc" id="L44">        List&lt;UsuarioHistorialCambio&gt; cambios = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L45">        String sql = &quot;SELECT * FROM usuario_historial_cambio WHERE usuario_id = ? ORDER BY fecha DESC&quot;;</span>
+<span class="nc" id="L46">        try (Connection conn = databaseConfig.getConnection();</span>
+<span class="nc" id="L47">                PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+<span class="nc" id="L48">            stmt.setInt(1, usuarioId);</span>
+<span class="nc" id="L49">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc" id="L51">                    UsuarioHistorialCambio cambio = new UsuarioHistorialCambio();</span>
+<span class="nc" id="L52">                    cambio.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="nc" id="L53">                    cambio.setUsuario_id(rs.getInt(&quot;usuario_id&quot;));</span>
+<span class="nc" id="L54">                    cambio.setCampo_modificado(rs.getString(&quot;campo_modificado&quot;));</span>
+<span class="nc" id="L55">                    cambio.setValor_anterior(rs.getString(&quot;valor_anterior&quot;));</span>
+<span class="nc" id="L56">                    cambio.setValor_nuevo(rs.getString(&quot;valor_nuevo&quot;));</span>
+<span class="nc" id="L57">                    int modPor = rs.getInt(&quot;modificado_por&quot;);</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">                    cambio.setModificado_por(rs.wasNull() ? null : modPor);</span>
+<span class="nc" id="L59">                    Timestamp ts = rs.getTimestamp(&quot;fecha&quot;);</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">                    cambio.setFecha(ts != null ? ts.toLocalDateTime() : null);</span>
+<span class="nc" id="L61">                    cambios.add(cambio);</span>
+<span class="nc" id="L62">                }</span>
+<span class="nc" id="L63">                logger.debug(&quot;{} cambios recuperados para usuario_id={}&quot;, cambios.size(), usuarioId);</span>
+            }
+<span class="nc" id="L65">        } catch (SQLException e) {</span>
+<span class="nc" id="L66">            logger.error(&quot;Error al leer historial de cambios para usuario_id={}: {}&quot;, usuarioId, e.getMessage(), e);</span>
+<span class="nc" id="L67">            throw new RuntimeException(&quot;Error al leer historial de cambios&quot;, e);</span>
+<span class="nc" id="L68">        }</span>
+<span class="nc" id="L69">        return cambios;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

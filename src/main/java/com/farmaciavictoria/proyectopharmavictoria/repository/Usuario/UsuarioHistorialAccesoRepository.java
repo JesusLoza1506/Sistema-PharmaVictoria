@@ -9,9 +9,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Repository para historial de accesos de usuario
- */
 public class UsuarioHistorialAccesoRepository {
     private final DatabaseConfig databaseConfig;
     private static final Logger logger = LoggerFactory.getLogger(UsuarioHistorialAccesoRepository.class);
@@ -23,7 +20,7 @@ public class UsuarioHistorialAccesoRepository {
     public void save(UsuarioHistorialAcceso acceso) {
         String sql = "INSERT INTO usuario_historial_acceso (usuario_id, fecha_acceso, ip_address, user_agent, exito, motivo_fallo) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, acceso.getUsuarioId());
             stmt.setTimestamp(2, Timestamp.valueOf(acceso.getFechaAcceso()));
             stmt.setString(3, acceso.getIpAddress());
@@ -33,7 +30,8 @@ public class UsuarioHistorialAccesoRepository {
             stmt.executeUpdate();
             logger.debug("Historial de acceso guardado para usuarioId={}", acceso.getUsuarioId());
         } catch (SQLException e) {
-            logger.error("Error al guardar historial de acceso para usuarioId={}: {}", acceso.getUsuarioId(), e.getMessage(), e);
+            logger.error("Error al guardar historial de acceso para usuarioId={}: {}", acceso.getUsuarioId(),
+                    e.getMessage(), e);
             throw new RuntimeException("Error al guardar historial de acceso", e);
         }
     }
@@ -42,7 +40,7 @@ public class UsuarioHistorialAccesoRepository {
         List<UsuarioHistorialAcceso> accesos = new ArrayList<>();
         String sql = "SELECT * FROM usuario_historial_acceso WHERE usuario_id = ? ORDER BY fecha_acceso DESC";
         try (Connection conn = databaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setLong(1, usuarioId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {

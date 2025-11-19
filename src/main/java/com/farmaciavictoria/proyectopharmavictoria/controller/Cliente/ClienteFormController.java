@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
 
 public class ClienteFormController {
-    // Callback para notificar edición instantánea (ahora acepta el cliente editado)
+    @FXML
+    private Label lblTitulo;
+    @FXML
+    private Button btnGuardar;
     private java.util.function.Consumer<Cliente> onClienteEditado;
 
     public void setOnClienteEditado(java.util.function.Consumer<Cliente> callback) {
@@ -56,6 +59,8 @@ public class ClienteFormController {
         this.cliente = cliente;
         if (cliente != null) {
             editMode = true;
+            if (lblTitulo != null)
+                lblTitulo.setText("EDITAR CLIENTE");
             comboTipoCliente.setValue(cliente.getTipoCliente());
             txtNombres.setText(cliente.getNombres());
             txtApellidos.setText(cliente.getApellidos());
@@ -65,13 +70,19 @@ public class ClienteFormController {
             if (cliente.getFechaNacimiento() != null) {
                 dpFechaNacimiento.setValue(cliente.getFechaNacimiento());
             }
-            chkActivo.setSelected(Boolean.TRUE.equals(cliente.isFrecuente()));
             if ("Empresa".equals(cliente.getTipoCliente())) {
                 txtRuc.setText(cliente.getDocumento());
                 txtRazonSocial.setText(cliente.getRazonSocial());
             } else {
                 txtDni.setText(cliente.getDocumento());
             }
+            if (btnGuardar != null)
+                btnGuardar.setText("Actualizar Cliente");
+        } else {
+            if (lblTitulo != null)
+                lblTitulo.setText("NUEVO CLIENTE");
+            if (btnGuardar != null)
+                btnGuardar.setText("Guardar Cliente");
         }
         actualizarVisibilidadCampos();
     }
@@ -80,6 +91,10 @@ public class ClienteFormController {
     public void initialize() {
         comboTipoCliente.getItems().addAll("Natural", "Empresa");
         comboTipoCliente.setValue("Natural");
+        if (lblTitulo != null)
+            lblTitulo.setText("NUEVO CLIENTE");
+        if (btnGuardar != null)
+            btnGuardar.setText("Guardar Cliente");
         // Mostrar/ocultar campos según el tipo seleccionado
         comboTipoCliente.valueProperty().addListener((obs, oldVal, newVal) -> {
             if ("Empresa".equalsIgnoreCase(newVal)) {
@@ -216,11 +231,10 @@ public class ClienteFormController {
         try {
             Cliente clienteGuardado = getClienteFromForm();
             logger.info(
-                    "[GUARDAR] Intentando guardar cliente: tipo={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, es_frecuente={}",
+                    "[GUARDAR] Intentando guardar cliente: tipo={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}",
                     clienteGuardado.getTipoCliente(), clienteGuardado.getDocumento(), clienteGuardado.getRazonSocial(),
                     clienteGuardado.getNombres(), clienteGuardado.getApellidos(), clienteGuardado.getTelefono(),
-                    clienteGuardado.getEmail(), clienteGuardado.getDireccion(), clienteGuardado.getFechaNacimiento(),
-                    clienteGuardado.isFrecuente());
+                    clienteGuardado.getEmail(), clienteGuardado.getDireccion(), clienteGuardado.getFechaNacimiento());
             if (!chkActivo.isSelected()) {
                 mostrarAlertaClienteInactivo();
             }
@@ -348,12 +362,11 @@ public class ClienteFormController {
         if (dpFechaNacimiento.getValue() != null) {
             cliente.setFechaNacimiento(dpFechaNacimiento.getValue());
         }
-        cliente.setEsFrecuente(chkActivo.isSelected());
         logger.info(
-                "[FORM] Datos del cliente a guardar: tipo_cliente={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, es_frecuente={}",
+                "[FORM] Datos del cliente a guardar: tipo_cliente={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}",
                 cliente.getTipoCliente(), cliente.getDocumento(), cliente.getRazonSocial(), cliente.getNombres(),
                 cliente.getApellidos(), cliente.getTelefono(), cliente.getEmail(), cliente.getDireccion(),
-                cliente.getFechaNacimiento(), cliente.isFrecuente());
+                cliente.getFechaNacimiento());
         return cliente;
     }
 

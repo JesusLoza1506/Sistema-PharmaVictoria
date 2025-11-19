@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuariosController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Usuario</a> &gt; <span class="el_source">UsuariosController.java</span></div><h1>UsuariosController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Usuario;
+
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
+import com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import java.util.List;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+
+/**
+ * Controlador principal para la gestión de usuarios
+ */
+<span class="nc" id="L23">public class UsuariosController {</span>
+    @FXML
+    private Label lblTitulo;
+    @FXML
+    private Label lblTotalUsuarios;
+    @FXML
+    private Button btnNuevoUsuario;
+    @FXML
+    private Button btnExportar;
+    @FXML
+    private Button btnAjustesVista;
+    @FXML
+    private TableView&lt;Usuario&gt; tablaUsuarios;
+    // Columna ID eliminada del FXML
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colUsername;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colNombres;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colApellidos;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colDni;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colTelefono;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colEstado;
+    @FXML
+    private TableColumn&lt;Usuario, Void&gt; colAcciones;
+    // Columna Último Acceso eliminada del FXML
+<span class="nc" id="L52">    private final UsuarioService usuarioService = UsuarioService.getInstance();</span>
+    private Usuario usuarioAutenticado;
+<span class="nc" id="L54">    private ObservableList&lt;Usuario&gt; usuariosList = FXCollections.observableArrayList();</span>
+    // Eliminada lógica de paginación
+    // Variables de paginación eliminadas
+
+    @FXML
+    public void initialize() {
+<span class="nc" id="L60">        configurarTabla();</span>
+<span class="nc" id="L61">        cargarUsuarios();</span>
+        // Filtros eliminados
+        // Paginación eliminada
+        // Dashboard eliminado: no se actualizan estadísticas ni gráficas
+<span class="nc" id="L65">        btnNuevoUsuario.setOnAction(e -&gt; onNuevoUsuario());</span>
+        // La acción de btnExportar se define en el FXML con onAction=&quot;#onExportar&quot;
+<span class="nc" id="L67">    }</span>
+
+    // Método vinculado al botón Exportar en el FXML
+    public void onExportar(javafx.event.ActionEvent event) {
+<span class="nc" id="L71">        exportarUsuariosExcel(); // Ahora abre la ventana de vista previa de exportación</span>
+<span class="nc" id="L72">    }</span>
+
+    // Método para recibir el usuario autenticado desde el DashboardController
+    public void setUsuarioAutenticado(Usuario usuario) {
+<span class="nc" id="L76">        this.usuarioAutenticado = usuario;</span>
+<span class="nc" id="L77">    }</span>
+
+    private void exportarUsuariosExcel() {
+        try {
+<span class="nc" id="L81">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Usuario/exportar-usuarios-preview.fxml&quot;));</span>
+<span class="nc" id="L82">            VBox vistaPrevia = loader.load();</span>
+<span class="nc" id="L83">            com.farmaciavictoria.proyectopharmavictoria.controller.Usuario.ExportarUsuariosPreviewController controller = loader</span>
+<span class="nc" id="L84">                    .getController();</span>
+<span class="nc" id="L85">            Stage stage = new Stage();</span>
+<span class="nc" id="L86">            stage.setTitle(&quot;Exportar Usuarios - Vista Previa&quot;);</span>
+<span class="nc" id="L87">            Scene scene = new Scene(vistaPrevia);</span>
+<span class="nc" id="L88">            stage.setScene(scene);</span>
+            // ...existing code...
+<span class="nc" id="L90">            stage.setResizable(true);</span>
+<span class="nc" id="L91">            stage.showAndWait();</span>
+<span class="nc" id="L92">        } catch (Exception ex) {</span>
+<span class="nc" id="L93">            ex.printStackTrace();</span>
+<span class="nc" id="L94">            Alert alert = new Alert(Alert.AlertType.ERROR,</span>
+                    &quot;No se pudo abrir la vista previa de exportación de usuarios.&quot;);
+<span class="nc" id="L96">            alert.showAndWait();</span>
+<span class="nc" id="L97">        }</span>
+<span class="nc" id="L98">    }</span>
+
+    private void exportarUsuariosPDF() {
+<span class="nc" id="L101">        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();</span>
+<span class="nc" id="L102">        fileChooser.setInitialFileName(&quot;usuarios.pdf&quot;);</span>
+<span class="nc" id="L103">        fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter(&quot;Archivo PDF&quot;, &quot;*.pdf&quot;));</span>
+<span class="nc" id="L104">        fileChooser.setTitle(&quot;Exportar listado de usuarios&quot;);</span>
+<span class="nc" id="L105">        javafx.stage.Stage stage = (javafx.stage.Stage) btnExportar.getScene().getWindow();</span>
+<span class="nc" id="L106">        java.io.File file = fileChooser.showSaveDialog(stage);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (file != null) {</span>
+            try {
+<span class="nc" id="L109">                com.farmaciavictoria.proyectopharmavictoria.util.ExportFacade.exportarUsuariosPDF(usuariosList,</span>
+<span class="nc" id="L110">                        file.getAbsolutePath().replace(&quot;.pdf&quot;, &quot;&quot;));</span>
+<span class="nc" id="L111">                mostrarMensajeExportacion(&quot;Archivo exportado correctamente en:\n&quot; + file.getAbsolutePath());</span>
+<span class="nc" id="L112">            } catch (Exception ex) {</span>
+<span class="nc" id="L113">                mostrarMensajeExportacion(&quot;Error al exportar el archivo. Intente nuevamente.&quot;);</span>
+<span class="nc" id="L114">            }</span>
+        }
+<span class="nc" id="L116">    }</span>
+
+    private void mostrarMensajeExportacion(String mensaje) {
+<span class="nc" id="L119">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L120">        alert.setTitle(&quot;Exportación de Usuarios&quot;);</span>
+<span class="nc" id="L121">        alert.setHeaderText(null);</span>
+<span class="nc" id="L122">        alert.setContentText(mensaje);</span>
+<span class="nc" id="L123">        alert.showAndWait();</span>
+<span class="nc" id="L124">    }</span>
+
+    private void configurarTabla() {
+<span class="nc" id="L127">        colUsername.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;username&quot;));</span>
+<span class="nc" id="L128">        colNombres.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;nombres&quot;));</span>
+<span class="nc" id="L129">        colApellidos.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;apellidos&quot;));</span>
+<span class="nc" id="L130">        colDni.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;dni&quot;));</span>
+<span class="nc" id="L131">        colTelefono.setCellValueFactory(new PropertyValueFactory&lt;&gt;(&quot;telefono&quot;));</span>
+        // ...existing code...
+<span class="nc" id="L133">        colEstado.setCellValueFactory(cellData -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">                cellData.getValue().isActivo() ? &quot;Activo&quot; : &quot;Inactivo&quot;));</span>
+<span class="nc" id="L135">        tablaUsuarios.setItems(usuariosList);</span>
+
+        // CellFactory para acciones (editar, ver, activar/desactivar, eliminar)
+<span class="nc" id="L138">        colAcciones.setCellFactory(param -&gt; new TableCell&lt;&gt;() {</span>
+<span class="nc" id="L139">            private final Button btnEditar = new Button();</span>
+<span class="nc" id="L140">            private final Button btnVer = new Button();</span>
+<span class="nc" id="L141">            private final Button btnToggleEstado = new Button();</span>
+<span class="nc" id="L142">            private final Button btnEliminar = new Button();</span>
+
+            {
+<span class="nc" id="L145">                javafx.scene.image.ImageView iconEditar = new javafx.scene.image.ImageView(</span>
+<span class="nc" id="L146">                        getClass().getResource(&quot;/icons/editar.png&quot;).toExternalForm());</span>
+<span class="nc" id="L147">                javafx.scene.image.ImageView iconVer = new javafx.scene.image.ImageView(</span>
+<span class="nc" id="L148">                        getClass().getResource(&quot;/icons/ver.png&quot;).toExternalForm());</span>
+<span class="nc" id="L149">                javafx.scene.image.ImageView iconEliminar = new javafx.scene.image.ImageView(</span>
+<span class="nc" id="L150">                        getClass().getResource(&quot;/icons/eliminar.png&quot;).toExternalForm());</span>
+
+<span class="nc" id="L152">                iconEditar.setFitWidth(24);</span>
+<span class="nc" id="L153">                iconEditar.setFitHeight(24);</span>
+<span class="nc" id="L154">                iconVer.setFitWidth(24);</span>
+<span class="nc" id="L155">                iconVer.setFitHeight(24);</span>
+<span class="nc" id="L156">                iconEliminar.setFitWidth(24);</span>
+<span class="nc" id="L157">                iconEliminar.setFitHeight(24);</span>
+
+<span class="nc" id="L159">                btnEditar.setGraphic(iconEditar);</span>
+<span class="nc" id="L160">                btnVer.setGraphic(iconVer);</span>
+<span class="nc" id="L161">                btnEliminar.setGraphic(iconEliminar);</span>
+
+<span class="nc" id="L163">                btnEditar.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-add&quot;);</span>
+<span class="nc" id="L164">                btnVer.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-eye&quot;);</span>
+<span class="nc" id="L165">                btnToggleEstado.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-toggle&quot;);</span>
+<span class="nc" id="L166">                btnEliminar.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-trash&quot;);</span>
+
+<span class="nc" id="L168">                btnEditar.setPrefSize(35, 35);</span>
+<span class="nc" id="L169">                btnVer.setPrefSize(35, 35);</span>
+<span class="nc" id="L170">                btnToggleEstado.setPrefSize(35, 35);</span>
+<span class="nc" id="L171">                btnEliminar.setPrefSize(35, 35);</span>
+
+<span class="nc" id="L173">                btnEditar.setTooltip(new Tooltip(&quot;Editar usuario&quot;));</span>
+<span class="nc" id="L174">                btnVer.setTooltip(new Tooltip(&quot;Ver detalles&quot;));</span>
+<span class="nc" id="L175">                btnEliminar.setTooltip(new Tooltip(&quot;Eliminar usuario&quot;));</span>
+
+                // Acciones
+<span class="nc" id="L178">                btnEditar.setOnAction(e -&gt; {</span>
+<span class="nc" id="L179">                    Usuario usuario = getTableView().getItems().get(getIndex());</span>
+<span class="nc" id="L180">                    editarUsuario(usuario);</span>
+<span class="nc" id="L181">                });</span>
+<span class="nc" id="L182">                btnVer.setOnAction(e -&gt; {</span>
+<span class="nc" id="L183">                    Usuario usuario = getTableView().getItems().get(getIndex());</span>
+<span class="nc" id="L184">                    verDetallesUsuario(usuario);</span>
+<span class="nc" id="L185">                });</span>
+<span class="nc" id="L186">                btnToggleEstado.setOnAction(e -&gt; {</span>
+<span class="nc" id="L187">                    Usuario usuario = getTableView().getItems().get(getIndex());</span>
+<span class="nc" id="L188">                    toggleEstadoUsuario(usuario);</span>
+<span class="nc" id="L189">                });</span>
+<span class="nc" id="L190">                btnEliminar.setOnAction(e -&gt; {</span>
+<span class="nc" id="L191">                    Usuario usuario = getTableView().getItems().get(getIndex());</span>
+<span class="nc" id="L192">                    eliminarUsuario(usuario);</span>
+<span class="nc" id="L193">                });</span>
+<span class="nc" id="L194">            }</span>
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+<span class="nc" id="L198">                super.updateItem(item, empty);</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">                if (empty) {</span>
+<span class="nc" id="L200">                    setGraphic(null);</span>
+                } else {
+<span class="nc" id="L202">                    Usuario usuario = getTableView().getItems().get(getIndex());</span>
+<span class="nc" id="L203">                    HBox box = new HBox(6, btnEditar, btnVer, btnToggleEstado, btnEliminar);</span>
+<span class="nc" id="L204">                    box.setAlignment(javafx.geometry.Pos.CENTER);</span>
+                    // Toggle estado visual
+<span class="nc bnc" id="L206" title="All 4 branches missed.">                    if (usuario != null &amp;&amp; usuario.isActivo()) {</span>
+<span class="nc" id="L207">                        btnToggleEstado.setText(&quot;⏸&quot;);</span>
+<span class="nc" id="L208">                        btnToggleEstado.setTooltip(new Tooltip(&quot;Inactivar usuario&quot;));</span>
+<span class="nc" id="L209">                        btnToggleEstado.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-toggle&quot;, &quot;btn-toggle-active&quot;);</span>
+                    } else {
+<span class="nc" id="L211">                        btnToggleEstado.setText(&quot;▶&quot;);</span>
+<span class="nc" id="L212">                        btnToggleEstado.setTooltip(new Tooltip(&quot;Activar usuario&quot;));</span>
+<span class="nc" id="L213">                        btnToggleEstado.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-toggle&quot;, &quot;btn-toggle-inactive&quot;);</span>
+                    }
+<span class="nc" id="L215">                    setGraphic(box);</span>
+                }
+<span class="nc" id="L217">            }</span>
+        });
+<span class="nc" id="L219">    }</span>
+
+    // Métodos de acción para los botones
+    private void verDetallesUsuario(Usuario usuario) {
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        if (usuario != null) {</span>
+            try {
+<span class="nc" id="L225">                FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Usuario/usuario-detalles.fxml&quot;));</span>
+<span class="nc" id="L226">                BorderPane detalles = loader.load();</span>
+<span class="nc" id="L227">                UsuarioDetallesController detallesController = loader.getController();</span>
+<span class="nc" id="L228">                detallesController.cargarUsuario(usuario);</span>
+<span class="nc" id="L229">                Stage stage = new Stage();</span>
+<span class="nc" id="L230">                stage.setTitle(&quot;Detalles del Usuario&quot;);</span>
+<span class="nc" id="L231">                Scene scene = new Scene(detalles);</span>
+<span class="nc" id="L232">                stage.setScene(scene);</span>
+<span class="nc" id="L233">                stage.initOwner(btnNuevoUsuario.getScene().getWindow());</span>
+<span class="nc" id="L234">                stage.setResizable(false);</span>
+<span class="nc" id="L235">                stage.showAndWait();</span>
+<span class="nc" id="L236">            } catch (Exception ex) {</span>
+<span class="nc" id="L237">                ex.printStackTrace();</span>
+<span class="nc" id="L238">                Alert alert = new Alert(Alert.AlertType.ERROR, &quot;No se pudo abrir la ventana de detalles de usuario.&quot;);</span>
+<span class="nc" id="L239">                alert.showAndWait();</span>
+<span class="nc" id="L240">            }</span>
+        }
+<span class="nc" id="L242">    }</span>
+
+    private void editarUsuario(Usuario usuario) {
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        if (usuario != null) {</span>
+            try {
+<span class="nc" id="L247">                FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Usuario/usuario-form.fxml&quot;));</span>
+<span class="nc" id="L248">                VBox form = loader.load();</span>
+<span class="nc" id="L249">                UsuarioFormController formController = loader.getController();</span>
+<span class="nc" id="L250">                formController.cargarUsuario(usuario); // Método para cargar datos en el formulario</span>
+<span class="nc" id="L251">                formController.setModoEdicion(true); // Activar modo edición visual</span>
+<span class="nc" id="L252">                Stage stage = new Stage();</span>
+<span class="nc" id="L253">                stage.setTitle(&quot;Editar Usuario&quot;);</span>
+<span class="nc" id="L254">                Scene scene = new Scene(form);</span>
+<span class="nc" id="L255">                stage.setScene(scene);</span>
+<span class="nc" id="L256">                stage.initOwner(btnNuevoUsuario.getScene().getWindow());</span>
+<span class="nc" id="L257">                stage.setResizable(true);</span>
+<span class="nc" id="L258">                formController.btnGuardar.setOnAction(e -&gt; {</span>
+                    // Guardar valores originales para auditoría ANTES de modificar el usuario
+<span class="nc bnc" id="L260" title="All 2 branches missed.">                    String oldUsername = usuario.getUsername() != null ? usuario.getUsername() : &quot;&quot;;</span>
+<span class="nc" id="L261">                    Usuario.Rol oldRol = usuario.getRol();</span>
+                    // Eliminado campo sucursalId
+<span class="nc bnc" id="L263" title="All 2 branches missed.">                    String oldNombres = usuario.getNombres() != null ? usuario.getNombres() : &quot;&quot;;</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">                    String oldApellidos = usuario.getApellidos() != null ? usuario.getApellidos() : &quot;&quot;;</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">                    String oldDni = usuario.getDni() != null ? usuario.getDni() : &quot;&quot;;</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">                    String oldTelefono = usuario.getTelefono() != null ? usuario.getTelefono() : &quot;&quot;;</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">                    String oldEmail = usuario.getEmail() != null ? usuario.getEmail() : &quot;&quot;;</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">                    String oldPasswordHash = usuario.getPasswordHash() != null ? usuario.getPasswordHash() : &quot;&quot;;</span>
+
+                    // Nuevos valores del formulario
+<span class="nc" id="L271">                    String newUsername = formController.getUsername();</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">                    Usuario.Rol newRol = &quot;ADMIN&quot;.equals(formController.getRol()) ? Usuario.Rol.ADMIN</span>
+<span class="nc" id="L273">                            : Usuario.Rol.VENDEDOR;</span>
+                    // Eliminado campo sucursal
+<span class="nc" id="L275">                    String newNombres = formController.getNombres();</span>
+<span class="nc" id="L276">                    String newApellidos = formController.getApellidos();</span>
+<span class="nc" id="L277">                    String newDni = formController.getDni();</span>
+<span class="nc" id="L278">                    String newTelefono = formController.getTelefono();</span>
+<span class="nc" id="L279">                    String newEmail = formController.getEmail();</span>
+<span class="nc" id="L280">                    String rawPassword = formController.getPassword();</span>
+<span class="nc" id="L281">                    String newPasswordHash = oldPasswordHash;</span>
+<span class="nc bnc" id="L282" title="All 4 branches missed.">                    if (rawPassword != null &amp;&amp; !rawPassword.isBlank()) {</span>
+<span class="nc" id="L283">                        newPasswordHash = com.farmaciavictoria.proyectopharmavictoria.util.PasswordUtil</span>
+<span class="nc" id="L284">                                .hashPassword(rawPassword);</span>
+                    }
+
+                    // Actualiza el usuario con los datos del formulario
+<span class="nc" id="L288">                    usuario.setUsername(newUsername);</span>
+<span class="nc" id="L289">                    usuario.setRol(newRol);</span>
+                    // ...existing code...
+<span class="nc" id="L291">                    usuario.setNombres(newNombres);</span>
+<span class="nc" id="L292">                    usuario.setApellidos(newApellidos);</span>
+<span class="nc" id="L293">                    usuario.setDni(newDni);</span>
+<span class="nc" id="L294">                    usuario.setTelefono(newTelefono);</span>
+<span class="nc" id="L295">                    usuario.setEmail(newEmail);</span>
+<span class="nc bnc" id="L296" title="All 4 branches missed.">                    if (rawPassword != null &amp;&amp; !rawPassword.isBlank()) {</span>
+<span class="nc" id="L297">                        usuario.setPasswordHash(newPasswordHash);</span>
+                    }
+
+<span class="nc" id="L300">                    formController.guardarUsuario();</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">                    if (formController.isRegistrado()) {</span>
+<span class="nc bnc" id="L302" title="All 4 branches missed.">                        Long adminId = (usuarioAutenticado != null &amp;&amp; usuarioAutenticado.getId() != null)</span>
+<span class="nc" id="L303">                                ? usuarioAutenticado.getId()</span>
+<span class="nc" id="L304">                                : null;</span>
+                        // Auditoría campo a campo
+<span class="nc bnc" id="L306" title="All 2 branches missed.">                        if (!oldUsername.equals(newUsername)) {</span>
+<span class="nc" id="L307">                            usuarioService.editarUsuario(usuario, &quot;username&quot;, oldUsername, newUsername, adminId);</span>
+                        }
+<span class="nc bnc" id="L309" title="All 2 branches missed.">                        if (oldRol != newRol) {</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">                            usuarioService.editarUsuario(usuario, &quot;rol&quot;, oldRol != null ? oldRol.name() : &quot;&quot;,</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">                                    newRol != null ? newRol.name() : &quot;&quot;, adminId);</span>
+                        }
+                        // Eliminado control de auditoría para sucursalId
+<span class="nc bnc" id="L314" title="All 2 branches missed.">                        if (!oldNombres.equals(newNombres)) {</span>
+<span class="nc" id="L315">                            usuarioService.editarUsuario(usuario, &quot;nombres&quot;, oldNombres, newNombres, adminId);</span>
+                        }
+<span class="nc bnc" id="L317" title="All 2 branches missed.">                        if (!oldApellidos.equals(newApellidos)) {</span>
+<span class="nc" id="L318">                            usuarioService.editarUsuario(usuario, &quot;apellidos&quot;, oldApellidos, newApellidos, adminId);</span>
+                        }
+<span class="nc bnc" id="L320" title="All 2 branches missed.">                        if (!oldDni.equals(newDni)) {</span>
+<span class="nc" id="L321">                            usuarioService.editarUsuario(usuario, &quot;dni&quot;, oldDni, newDni, adminId);</span>
+                        }
+<span class="nc bnc" id="L323" title="All 2 branches missed.">                        if (!oldTelefono.equals(newTelefono)) {</span>
+<span class="nc" id="L324">                            usuarioService.editarUsuario(usuario, &quot;telefono&quot;, oldTelefono, newTelefono, adminId);</span>
+                        }
+<span class="nc bnc" id="L326" title="All 2 branches missed.">                        if (!oldEmail.equals(newEmail)) {</span>
+<span class="nc" id="L327">                            usuarioService.editarUsuario(usuario, &quot;email&quot;, oldEmail, newEmail, adminId);</span>
+                        }
+<span class="nc bnc" id="L329" title="All 6 branches missed.">                        if (rawPassword != null &amp;&amp; !rawPassword.isBlank() &amp;&amp; !oldPasswordHash.equals(newPasswordHash)) {</span>
+<span class="nc" id="L330">                            usuarioService.editarUsuario(usuario, &quot;passwordHash&quot;, &quot;(hash anterior)&quot;, &quot;(hash nuevo)&quot;,</span>
+                                    adminId);
+                        }
+<span class="nc" id="L333">                        cargarUsuarios();</span>
+<span class="nc" id="L334">                        mostrarConfirmacionEdicion();</span>
+<span class="nc" id="L335">                        stage.close();</span>
+                    }
+<span class="nc" id="L337">                });</span>
+<span class="nc" id="L338">                stage.showAndWait();</span>
+<span class="nc" id="L339">            } catch (Exception ex) {</span>
+<span class="nc" id="L340">                ex.printStackTrace();</span>
+<span class="nc" id="L341">                Alert alert = new Alert(Alert.AlertType.ERROR, &quot;No se pudo abrir el formulario de edición de usuario.&quot;);</span>
+<span class="nc" id="L342">                alert.showAndWait();</span>
+<span class="nc" id="L343">            }</span>
+        }
+<span class="nc" id="L345">    }</span>
+
+    private void eliminarUsuario(Usuario usuario) {
+<span class="nc" id="L348">        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L349">        confirmacion.setTitle(&quot;Confirmar Eliminación&quot;);</span>
+<span class="nc" id="L350">        confirmacion.setHeaderText(&quot;¿Eliminar usuario?&quot;);</span>
+<span class="nc" id="L351">        confirmacion.setContentText(&quot;¿Está seguro de que desea eliminar el usuario '&quot; + usuario.getUsername()</span>
+                + &quot;'? Esta acción no se puede deshacer.&quot;);
+<span class="nc" id="L353">        confirmacion.showAndWait().ifPresent(response -&gt; {</span>
+<span class="nc bnc" id="L354" title="All 2 branches missed.">            if (response == ButtonType.OK) {</span>
+                try {
+<span class="nc bnc" id="L356" title="All 4 branches missed.">                    Long adminId = (usuarioAutenticado != null &amp;&amp; usuarioAutenticado.getId() != null)</span>
+<span class="nc" id="L357">                            ? usuarioAutenticado.getId()</span>
+<span class="nc" id="L358">                            : null;</span>
+<span class="nc" id="L359">                    usuarioService.eliminarUsuario(usuario.getId(), adminId);</span>
+<span class="nc" id="L360">                    cargarUsuarios();</span>
+<span class="nc" id="L361">                    Alert info = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L362">                    info.setTitle(&quot;Usuario eliminado&quot;);</span>
+<span class="nc" id="L363">                    info.setHeaderText(null);</span>
+<span class="nc" id="L364">                    info.setContentText(&quot;¡El usuario ha sido eliminado exitosamente!&quot;);</span>
+<span class="nc" id="L365">                    info.showAndWait();</span>
+<span class="nc" id="L366">                } catch (Exception e) {</span>
+<span class="nc" id="L367">                    Alert error = new Alert(Alert.AlertType.ERROR, &quot;No se pudo eliminar el usuario: &quot; + e.getMessage());</span>
+<span class="nc" id="L368">                    error.showAndWait();</span>
+<span class="nc" id="L369">                }</span>
+            }
+<span class="nc" id="L371">        });</span>
+<span class="nc" id="L372">    }</span>
+
+    private void mostrarConfirmacionEliminacion() {
+<span class="nc" id="L375">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L376">        alert.setTitle(&quot;Usuario eliminado&quot;);</span>
+<span class="nc" id="L377">        alert.setHeaderText(null);</span>
+<span class="nc" id="L378">        alert.setContentText(&quot;¡El usuario ha sido eliminado exitosamente!&quot;);</span>
+<span class="nc" id="L379">        alert.showAndWait();</span>
+<span class="nc" id="L380">    }</span>
+
+    private void toggleEstadoUsuario(Usuario usuario) {
+        try {
+            // Cambiar estado
+<span class="nc bnc" id="L385" title="All 2 branches missed.">            boolean nuevoEstado = !usuario.isActivo();</span>
+<span class="nc" id="L386">            usuario.setActivo(nuevoEstado);</span>
+
+            // Actualizar en BD usando service layer
+<span class="nc" id="L389">            String usuarioActual = System.getProperty(&quot;user.name&quot;, &quot;sistema&quot;);</span>
+            // Usar el método correcto para actualizar el usuario
+<span class="nc" id="L391">            usuarioService.actualizarEstado(usuario.getId(), nuevoEstado, usuarioActual);</span>
+
+            // Actualizar solo la fila modificada en la tabla (sin recargar toda la lista)
+<span class="nc" id="L394">            tablaUsuarios.refresh();</span>
+
+            // Notificación discreta
+<span class="nc bnc" id="L397" title="All 2 branches missed.">            String mensaje = nuevoEstado ? String.format(&quot;Usuario '%s' ACTIVADO correctamente&quot;, usuario.getUsername())</span>
+<span class="nc" id="L398">                    : String.format(&quot;Usuario '%s' INACTIVADO correctamente&quot;, usuario.getUsername());</span>
+
+            // Si tienes notificationService, úsalo. Si no, muestra Alert.
+            try {
+                com.farmaciavictoria.proyectopharmavictoria.service.NotificationService notificationService = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
+<span class="nc" id="L403">                        .getInstance().getNotificationService();</span>
+<span class="nc" id="L404">                notificationService.mostrarExito(mensaje);</span>
+<span class="nc" id="L405">            } catch (Exception ex) {</span>
+<span class="nc" id="L406">                Alert alert = new Alert(Alert.AlertType.INFORMATION, mensaje);</span>
+<span class="nc" id="L407">                alert.showAndWait();</span>
+<span class="nc" id="L408">            }</span>
+<span class="nc" id="L409">            System.out.println(&quot;Estado del usuario &quot; + usuario.getUsername() + &quot; cambiado a: &quot;</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">                    + (nuevoEstado ? &quot;ACTIVO&quot; : &quot;INACTIVO&quot;));</span>
+<span class="nc" id="L411">        } catch (Exception e) {</span>
+<span class="nc" id="L412">            Alert alert = new Alert(Alert.AlertType.ERROR,</span>
+<span class="nc" id="L413">                    &quot;No se pudo cambiar el estado del usuario: &quot; + e.getMessage());</span>
+<span class="nc" id="L414">            alert.showAndWait();</span>
+<span class="nc" id="L415">        }</span>
+<span class="nc" id="L416">    }</span>
+
+    private void cambiarPasswordUsuario(Usuario usuario) {
+<span class="nc" id="L419">    }</span>
+
+    private void cargarUsuarios() {
+<span class="nc" id="L422">        List&lt;Usuario&gt; usuarios = usuarioService.obtenerUsuarios();</span>
+<span class="nc" id="L423">        usuariosList.setAll(usuarios);</span>
+<span class="nc" id="L424">        lblTotalUsuarios.setText(&quot;Total: &quot; + usuarios.size() + &quot; usuarios&quot;);</span>
+<span class="nc" id="L425">    }</span>
+
+    @FXML
+    private void onNuevoUsuario() {
+        try {
+<span class="nc" id="L430">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Usuario/usuario-form.fxml&quot;));</span>
+<span class="nc" id="L431">            VBox form = loader.load();</span>
+<span class="nc" id="L432">            UsuarioFormController formController = loader.getController();</span>
+            // Mostrar el formulario en un Stage modal personalizado, sin botones de Dialog
+<span class="nc" id="L434">            Stage stage = new Stage();</span>
+<span class="nc" id="L435">            stage.setTitle(&quot;Registrar Usuario&quot;);</span>
+<span class="nc" id="L436">            Scene scene = new Scene(form);</span>
+<span class="nc" id="L437">            stage.setScene(scene);</span>
+<span class="nc" id="L438">            stage.initOwner(btnNuevoUsuario.getScene().getWindow());</span>
+<span class="nc" id="L439">            stage.setResizable(true);</span>
+<span class="nc" id="L440">            formController.btnGuardar.setOnAction(e -&gt; {</span>
+<span class="nc" id="L441">                formController.guardarUsuario();</span>
+<span class="nc bnc" id="L442" title="All 2 branches missed.">                if (formController.isRegistrado()) {</span>
+<span class="nc" id="L443">                    Usuario nuevo = new Usuario();</span>
+<span class="nc" id="L444">                    nuevo.setUsername(formController.getUsername());</span>
+                    // Hashear la contraseña con BCrypt
+<span class="nc" id="L446">                    String rawPassword = formController.getPassword();</span>
+<span class="nc" id="L447">                    String hashedPassword = com.farmaciavictoria.proyectopharmavictoria.util.PasswordUtil</span>
+<span class="nc" id="L448">                            .hashPassword(rawPassword);</span>
+<span class="nc" id="L449">                    nuevo.setPasswordHash(hashedPassword);</span>
+<span class="nc bnc" id="L450" title="All 2 branches missed.">                    nuevo.setRol(&quot;ADMIN&quot;.equals(formController.getRol()) ? Usuario.Rol.ADMIN : Usuario.Rol.VENDEDOR);</span>
+                    // ...existing code...
+<span class="nc" id="L452">                    nuevo.setNombres(formController.getNombres());</span>
+<span class="nc" id="L453">                    nuevo.setApellidos(formController.getApellidos());</span>
+<span class="nc" id="L454">                    nuevo.setDni(formController.getDni());</span>
+<span class="nc" id="L455">                    nuevo.setTelefono(formController.getTelefono());</span>
+<span class="nc" id="L456">                    nuevo.setEmail(formController.getEmail());</span>
+<span class="nc" id="L457">                    nuevo.setActivo(true);</span>
+<span class="nc bnc" id="L458" title="All 4 branches missed.">                    Long adminId = (usuarioAutenticado != null &amp;&amp; usuarioAutenticado.getId() != null)</span>
+<span class="nc" id="L459">                            ? usuarioAutenticado.getId()</span>
+<span class="nc" id="L460">                            : null;</span>
+<span class="nc" id="L461">                    String error = usuarioService.registrarUsuario(nuevo, adminId);</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">                    if (error != null) {</span>
+<span class="nc" id="L463">                        mostrarErrorRegistro(error);</span>
+                    } else {
+<span class="nc" id="L465">                        cargarUsuarios();</span>
+<span class="nc" id="L466">                        mostrarConfirmacionRegistro();</span>
+<span class="nc" id="L467">                        stage.close();</span>
+                    }
+                }
+<span class="nc" id="L470">            });</span>
+<span class="nc" id="L471">            stage.showAndWait();</span>
+<span class="nc" id="L472">        } catch (Exception ex) {</span>
+<span class="nc" id="L473">            ex.printStackTrace();</span>
+<span class="nc" id="L474">            Alert alert = new Alert(Alert.AlertType.ERROR, &quot;No se pudo abrir el formulario de usuario.&quot;);</span>
+<span class="nc" id="L475">            alert.showAndWait();</span>
+<span class="nc" id="L476">        }</span>
+<span class="nc" id="L477">    }</span>
+
+    private void mostrarConfirmacionRegistro() {
+<span class="nc" id="L480">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L481">        alert.setTitle(&quot;Usuario registrado&quot;);</span>
+<span class="nc" id="L482">        alert.setHeaderText(null);</span>
+<span class="nc" id="L483">        alert.setContentText(&quot;¡El usuario ha sido registrado exitosamente!&quot;);</span>
+<span class="nc" id="L484">        alert.showAndWait();</span>
+<span class="nc" id="L485">    }</span>
+
+    private void mostrarConfirmacionEdicion() {
+<span class="nc" id="L488">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L489">        alert.setTitle(&quot;Usuario editado&quot;);</span>
+<span class="nc" id="L490">        alert.setHeaderText(null);</span>
+<span class="nc" id="L491">        alert.setContentText(&quot;¡El usuario ha sido editado exitosamente!&quot;);</span>
+<span class="nc" id="L492">        alert.showAndWait();</span>
+<span class="nc" id="L493">    }</span>
+
+    private void mostrarErrorRegistro(String mensaje) {
+<span class="nc" id="L496">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L497">        alert.setTitle(&quot;Error de registro&quot;);</span>
+<span class="nc" id="L498">        alert.setHeaderText(&quot;No se pudo registrar el usuario&quot;);</span>
+<span class="nc" id="L499">        alert.setContentText(mensaje);</span>
+<span class="nc" id="L500">        alert.showAndWait();</span>
+<span class="nc" id="L501">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

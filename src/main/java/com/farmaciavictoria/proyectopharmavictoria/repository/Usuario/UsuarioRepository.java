@@ -1,26 +1,17 @@
-// ...existing code...
 package com.farmaciavictoria.proyectopharmavictoria.repository.Usuario;
 
 import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository para Usuario
- * Maneja todas las operaciones de base de datos relacionadas con usuarios
- */
 public class UsuarioRepository {
-    /**
-     * Busca usuario por token de recuperación
-     */
+
     public Usuario buscarPorTokenRecuperacion(String token) {
         String sql = "SELECT * FROM usuarios WHERE recovery_token = ?";
         try (Connection conn = databaseConfig.getConnection();
@@ -37,9 +28,6 @@ public class UsuarioRepository {
         return null;
     }
 
-    /**
-     * Actualiza la contraseña y limpia el token de recuperación
-     */
     public boolean actualizarPasswordYLimpiarToken(Long id, String passwordHash) {
         String sql = "UPDATE usuarios SET password_hash = ?, recovery_token = NULL, recovery_token_expiry = NULL WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
@@ -54,9 +42,6 @@ public class UsuarioRepository {
         }
     }
 
-    /**
-     * Guarda el token de recuperación y su expiración para el usuario
-     */
     public boolean setRecoveryToken(Long id, String token, LocalDateTime expiry) {
         String sql = "UPDATE usuarios SET recovery_token = ?, recovery_token_expiry = ? WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();

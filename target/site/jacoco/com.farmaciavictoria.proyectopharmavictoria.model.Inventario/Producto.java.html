@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Producto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.model.Inventario</a> &gt; <span class="el_source">Producto.java</span></div><h1>Producto.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.model.Inventario;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+/**
+ * Entidad Producto que corresponde al esquema de base de datos actual
+ */
+public class Producto {
+    private Integer id;
+    private String codigo;
+    private String nombre;
+    private String descripcion;
+    private String principioActivo;
+    private String concentracion;
+    private FormaFarmaceutica formaFarmaceutica;
+    private BigDecimal precioCompra;
+    private BigDecimal precioVenta;
+    private BigDecimal margenGanancia; // Columna calculada
+    private Integer stockActual;
+    private Integer stockMinimo;
+    private Integer stockMaximo;
+    private Integer proveedorId;
+    private String proveedorNombre; // Nombre del proveedor (solo lectura)
+    private CategoriaProducto categoria;
+    private String ubicacion;
+    private String lote;
+    private LocalDate fechaVencimiento;
+    private String laboratorio; // Campo solo para interfaz
+    private LocalDate fechaFabricacion; // Campo solo para interfaz
+<span class="fc" id="L32">    private javafx.beans.property.BooleanProperty requiereReceta = new javafx.beans.property.SimpleBooleanProperty(</span>
+            false);
+<span class="fc" id="L34">    private javafx.beans.property.BooleanProperty esControlado = new javafx.beans.property.SimpleBooleanProperty(false);</span>
+    private Boolean activo;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    // Constructor vacío
+<span class="fc" id="L40">    public Producto() {</span>
+<span class="fc" id="L41">        this.activo = true;</span>
+<span class="fc" id="L42">        this.requiereReceta.set(false);</span>
+<span class="fc" id="L43">        this.esControlado.set(false);</span>
+<span class="fc" id="L44">        this.stockActual = 0;</span>
+<span class="fc" id="L45">        this.stockMinimo = 5;</span>
+<span class="fc" id="L46">        this.stockMaximo = 100;</span>
+<span class="fc" id="L47">        this.formaFarmaceutica = FormaFarmaceutica.TABLETA;</span>
+<span class="fc" id="L48">        this.categoria = CategoriaProducto.OTROS;</span>
+<span class="fc" id="L49">    }</span>
+
+    // Constructor completo
+    public Producto(String codigo, String nombre, String descripcion, String principioActivo,
+            String concentracion, FormaFarmaceutica formaFarmaceutica, BigDecimal precioCompra,
+            BigDecimal precioVenta, Integer stockActual, Integer stockMinimo, Integer stockMaximo,
+            Integer proveedorId, CategoriaProducto categoria, String ubicacion, String lote,
+            LocalDate fechaVencimiento, Boolean requiereReceta, Boolean esControlado) {
+<span class="nc" id="L57">        this();</span>
+<span class="nc" id="L58">        this.codigo = codigo;</span>
+<span class="nc" id="L59">        this.nombre = nombre;</span>
+<span class="nc" id="L60">        this.descripcion = descripcion;</span>
+<span class="nc" id="L61">        this.principioActivo = principioActivo;</span>
+<span class="nc" id="L62">        this.concentracion = concentracion;</span>
+<span class="nc" id="L63">        this.formaFarmaceutica = formaFarmaceutica;</span>
+<span class="nc" id="L64">        this.precioCompra = precioCompra;</span>
+<span class="nc" id="L65">        this.precioVenta = precioVenta;</span>
+<span class="nc" id="L66">        this.stockActual = stockActual;</span>
+<span class="nc" id="L67">        this.stockMinimo = stockMinimo;</span>
+<span class="nc" id="L68">        this.stockMaximo = stockMaximo;</span>
+<span class="nc" id="L69">        this.proveedorId = proveedorId;</span>
+<span class="nc" id="L70">        this.categoria = categoria;</span>
+<span class="nc" id="L71">        this.ubicacion = ubicacion;</span>
+<span class="nc" id="L72">        this.lote = lote;</span>
+<span class="nc" id="L73">        this.fechaVencimiento = fechaVencimiento;</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        this.requiereReceta.set(requiereReceta != null ? requiereReceta : false);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        this.esControlado.set(esControlado != null ? esControlado : false);</span>
+<span class="nc" id="L76">    }</span>
+
+    // Getters y Setters
+    public Integer getId() {
+<span class="nc" id="L80">        return id;</span>
+    }
+
+    public void setId(Integer id) {
+<span class="nc" id="L84">        this.id = id;</span>
+<span class="nc" id="L85">    }</span>
+
+    public String getCodigo() {
+<span class="nc" id="L88">        return codigo;</span>
+    }
+
+    public void setCodigo(String codigo) {
+<span class="nc" id="L92">        this.codigo = codigo;</span>
+<span class="nc" id="L93">    }</span>
+
+    public String getNombre() {
+<span class="fc" id="L96">        return nombre;</span>
+    }
+
+    public void setNombre(String nombre) {
+<span class="fc" id="L100">        this.nombre = nombre;</span>
+<span class="fc" id="L101">    }</span>
+
+    public String getDescripcion() {
+<span class="nc" id="L104">        return descripcion;</span>
+    }
+
+    public void setDescripcion(String descripcion) {
+<span class="nc" id="L108">        this.descripcion = descripcion;</span>
+<span class="nc" id="L109">    }</span>
+
+    public String getPrincipioActivo() {
+<span class="nc" id="L112">        return principioActivo;</span>
+    }
+
+    public void setPrincipioActivo(String principioActivo) {
+<span class="nc" id="L116">        this.principioActivo = principioActivo;</span>
+<span class="nc" id="L117">    }</span>
+
+    public String getConcentracion() {
+<span class="nc" id="L120">        return concentracion;</span>
+    }
+
+    public void setConcentracion(String concentracion) {
+<span class="nc" id="L124">        this.concentracion = concentracion;</span>
+<span class="nc" id="L125">    }</span>
+
+    public FormaFarmaceutica getFormaFarmaceutica() {
+<span class="nc" id="L128">        return formaFarmaceutica;</span>
+    }
+
+    public void setFormaFarmaceutica(FormaFarmaceutica formaFarmaceutica) {
+<span class="nc" id="L132">        this.formaFarmaceutica = formaFarmaceutica;</span>
+<span class="nc" id="L133">    }</span>
+
+    public BigDecimal getPrecioCompra() {
+<span class="nc" id="L136">        return precioCompra;</span>
+    }
+
+    public void setPrecioCompra(BigDecimal precioCompra) {
+<span class="nc" id="L140">        this.precioCompra = precioCompra;</span>
+<span class="nc" id="L141">    }</span>
+
+    public BigDecimal getPrecioVenta() {
+<span class="nc" id="L144">        return precioVenta;</span>
+    }
+
+    public void setPrecioVenta(BigDecimal precioVenta) {
+<span class="nc" id="L148">        this.precioVenta = precioVenta;</span>
+<span class="nc" id="L149">    }</span>
+
+    public BigDecimal getMargenGanancia() {
+<span class="nc" id="L152">        return margenGanancia;</span>
+    }
+
+    public void setMargenGanancia(BigDecimal margenGanancia) {
+<span class="nc" id="L156">        this.margenGanancia = margenGanancia;</span>
+<span class="nc" id="L157">    }</span>
+
+    public Integer getStockActual() {
+<span class="nc" id="L160">        return stockActual;</span>
+    }
+
+    public void setStockActual(Integer stockActual) {
+<span class="nc" id="L164">        this.stockActual = stockActual;</span>
+<span class="nc" id="L165">    }</span>
+
+    public Integer getStockMinimo() {
+<span class="nc" id="L168">        return stockMinimo;</span>
+    }
+
+    public void setStockMinimo(Integer stockMinimo) {
+<span class="nc" id="L172">        this.stockMinimo = stockMinimo;</span>
+<span class="nc" id="L173">    }</span>
+
+    public Integer getStockMaximo() {
+<span class="nc" id="L176">        return stockMaximo;</span>
+    }
+
+    public void setStockMaximo(Integer stockMaximo) {
+<span class="nc" id="L180">        this.stockMaximo = stockMaximo;</span>
+<span class="nc" id="L181">    }</span>
+
+    public Integer getProveedorId() {
+<span class="nc" id="L184">        return proveedorId;</span>
+    }
+
+    public void setProveedorId(Integer proveedorId) {
+<span class="nc" id="L188">        this.proveedorId = proveedorId;</span>
+<span class="nc" id="L189">    }</span>
+
+    public String getProveedorNombre() {
+<span class="fc" id="L192">        return proveedorNombre;</span>
+    }
+
+    public void setProveedorNombre(String proveedorNombre) {
+<span class="fc" id="L196">        this.proveedorNombre = proveedorNombre;</span>
+<span class="fc" id="L197">    }</span>
+
+    public CategoriaProducto getCategoria() {
+<span class="nc" id="L200">        return categoria;</span>
+    }
+
+    public void setCategoria(CategoriaProducto categoria) {
+<span class="nc" id="L204">        this.categoria = categoria;</span>
+<span class="nc" id="L205">    }</span>
+
+    public String getUbicacion() {
+<span class="nc" id="L208">        return ubicacion;</span>
+    }
+
+    public void setUbicacion(String ubicacion) {
+<span class="nc" id="L212">        this.ubicacion = ubicacion;</span>
+<span class="nc" id="L213">    }</span>
+
+    public String getLote() {
+<span class="fc" id="L216">        return lote;</span>
+    }
+
+    public void setLote(String lote) {
+<span class="fc" id="L220">        this.lote = lote;</span>
+<span class="fc" id="L221">    }</span>
+
+    public LocalDate getFechaVencimiento() {
+<span class="fc" id="L224">        return fechaVencimiento;</span>
+    }
+
+    public void setFechaVencimiento(LocalDate fechaVencimiento) {
+<span class="fc" id="L228">        this.fechaVencimiento = fechaVencimiento;</span>
+<span class="fc" id="L229">    }</span>
+
+    public String getLaboratorio() {
+<span class="fc" id="L232">        return laboratorio;</span>
+    }
+
+    public void setLaboratorio(String laboratorio) {
+<span class="fc" id="L236">        this.laboratorio = laboratorio;</span>
+<span class="fc" id="L237">    }</span>
+
+    public LocalDate getFechaFabricacion() {
+<span class="nc" id="L240">        return fechaFabricacion;</span>
+    }
+
+    public void setFechaFabricacion(LocalDate fechaFabricacion) {
+<span class="nc" id="L244">        this.fechaFabricacion = fechaFabricacion;</span>
+<span class="nc" id="L245">    }</span>
+
+    public Boolean getRequiereReceta() {
+<span class="nc" id="L248">        return requiereReceta.get();</span>
+    }
+
+    public void setRequiereReceta(Boolean requiereReceta) {
+<span class="nc bnc" id="L252" title="All 2 branches missed.">        this.requiereReceta.set(requiereReceta != null ? requiereReceta : false);</span>
+<span class="nc" id="L253">    }</span>
+
+    public javafx.beans.property.BooleanProperty requiereRecetaProperty() {
+<span class="nc" id="L256">        return requiereReceta;</span>
+    }
+
+    // Eliminar método duplicado y corregir asignación
+
+    public Boolean getEsControlado() {
+<span class="nc" id="L262">        return esControlado.get();</span>
+    }
+
+    public void setEsControlado(Boolean esControlado) {
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        this.esControlado.set(esControlado != null ? esControlado : false);</span>
+<span class="nc" id="L267">    }</span>
+
+    public javafx.beans.property.BooleanProperty esControladoProperty() {
+<span class="nc" id="L270">        return esControlado;</span>
+    }
+
+    // Eliminar método duplicado y corregir asignación
+
+    public Boolean getActivo() {
+<span class="nc" id="L276">        return activo;</span>
+    }
+
+    public void setActivo(Boolean activo) {
+<span class="nc" id="L280">        this.activo = activo;</span>
+<span class="nc" id="L281">    }</span>
+
+    public LocalDateTime getCreatedAt() {
+<span class="nc" id="L284">        return createdAt;</span>
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+<span class="nc" id="L288">        this.createdAt = createdAt;</span>
+<span class="nc" id="L289">    }</span>
+
+    public LocalDateTime getUpdatedAt() {
+<span class="nc" id="L292">        return updatedAt;</span>
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+<span class="nc" id="L296">        this.updatedAt = updatedAt;</span>
+<span class="nc" id="L297">    }</span>
+
+    // Métodos de utilidad
+    public boolean isStockBajo() {
+<span class="nc bnc" id="L301" title="All 6 branches missed.">        return stockActual != null &amp;&amp; stockMinimo != null &amp;&amp; stockActual &lt;= stockMinimo;</span>
+    }
+
+    public boolean isProximoVencer() {
+<span class="nc bnc" id="L305" title="All 2 branches missed.">        if (fechaVencimiento == null)</span>
+<span class="nc" id="L306">            return false;</span>
+<span class="nc" id="L307">        int dias = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService.getDiasVencimientoAlerta();</span>
+<span class="nc" id="L308">        java.time.LocalDate hoy = java.time.LocalDate.now();</span>
+<span class="nc" id="L309">        java.time.LocalDate limite = hoy.plusDays(dias);</span>
+<span class="nc bnc" id="L310" title="All 4 branches missed.">        return (fechaVencimiento.isAfter(hoy.minusDays(1)) &amp;&amp; fechaVencimiento.isBefore(limite.plusDays(1)));</span>
+    }
+
+    public boolean isVencido() {
+<span class="nc bnc" id="L314" title="All 2 branches missed.">        if (fechaVencimiento == null)</span>
+<span class="nc" id="L315">            return false;</span>
+<span class="nc" id="L316">        return fechaVencimiento.isBefore(LocalDate.now());</span>
+    }
+
+    public String getCodigoNombre() {
+<span class="nc" id="L320">        return codigo + &quot; - &quot; + nombre;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L325">        return getCodigoNombre();</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L330" title="All 2 branches missed.">        if (this == obj)</span>
+<span class="nc" id="L331">            return true;</span>
+<span class="nc bnc" id="L332" title="All 4 branches missed.">        if (obj == null || getClass() != obj.getClass())</span>
+<span class="nc" id="L333">            return false;</span>
+<span class="nc" id="L334">        Producto producto = (Producto) obj;</span>
+        // Compara código, nombre y stock para detectar cambios relevantes en la tabla
+<span class="nc bnc" id="L336" title="All 6 branches missed.">        if (codigo != null ? !codigo.equals(producto.codigo) : producto.codigo != null)</span>
+<span class="nc" id="L337">            return false;</span>
+<span class="nc bnc" id="L338" title="All 6 branches missed.">        if (nombre != null ? !nombre.equals(producto.nombre) : producto.nombre != null)</span>
+<span class="nc" id="L339">            return false;</span>
+<span class="nc bnc" id="L340" title="All 6 branches missed.">        if (stockActual != null ? !stockActual.equals(producto.stockActual) : producto.stockActual != null)</span>
+<span class="nc" id="L341">            return false;</span>
+<span class="nc bnc" id="L342" title="All 6 branches missed.">        if (stockMaximo != null ? !stockMaximo.equals(producto.stockMaximo) : producto.stockMaximo != null)</span>
+<span class="nc" id="L343">            return false;</span>
+<span class="nc" id="L344">        return true;</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc bnc" id="L349" title="All 2 branches missed.">        return codigo != null ? codigo.hashCode() : 0;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

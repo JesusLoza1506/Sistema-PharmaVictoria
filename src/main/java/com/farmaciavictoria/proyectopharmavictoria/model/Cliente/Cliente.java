@@ -49,11 +49,6 @@ public class Cliente {
         }
     }
 
-    // Devuelve true si es frecuente
-    public boolean isFrecuente() {
-        return Boolean.TRUE.equals(esFrecuente);
-    }
-
     // Devuelve true si el cliente fue creado este mes
     public boolean esNuevoEsteMes() {
         if (createdAt == null)
@@ -62,7 +57,6 @@ public class Cliente {
         return createdAt.getYear() == ahora.getYear() && createdAt.getMonth() == ahora.getMonth();
     }
 
-    // ✅ Campos de la tabla actual
     private Integer id;
     private String apellidos;
     private String telefono;
@@ -77,16 +71,13 @@ public class Cliente {
     // Sistema de puntos
     private Integer puntosTotales;
     private Integer puntosUsados;
-    private Boolean esFrecuente;
     // Timestamps
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // ✅ CONSTRUCTORES
     public Cliente() {
         this.puntosTotales = 0;
         this.puntosUsados = 0;
-        this.esFrecuente = false;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -97,11 +88,7 @@ public class Cliente {
         this.apellidos = apellidos;
     }
 
-    // ✅ MÉTODOS DE NEGOCIO
-
-    /**
-     * Obtiene el nombre completo o razón social del cliente
-     */
+    // Obtiene el nombre completo o razón social del cliente
     public String getNombreCompleto() {
         if (tipoCliente != null && tipoCliente.equalsIgnoreCase("Empresa")) {
             if (razonSocial != null && !razonSocial.trim().isEmpty()) {
@@ -122,16 +109,12 @@ public class Cliente {
         }
     }
 
-    /**
-     * Devuelve el documento principal según tipo de cliente
-     */
+    // Devuelve el documento principal según tipo de cliente
     public String getDocumento() {
         return documento;
     }
 
-    /**
-     * Calcula los puntos disponibles
-     */
+    // Calcula los puntos disponibles
     public Integer getPuntosDisponibles() {
         if (puntosTotales == null)
             puntosTotales = 0;
@@ -140,25 +123,16 @@ public class Cliente {
         return puntosTotales - puntosUsados;
     }
 
-    /**
-     * Agrega puntos al cliente
-     */
+    // Agrega puntos al cliente
     public void agregarPuntos(Integer puntos) {
         if (puntos != null && puntos > 0) {
             if (puntosTotales == null)
                 puntosTotales = 0;
             puntosTotales += puntos;
 
-            // Marcar como frecuente si tiene más de 500 puntos
-            if (getPuntosDisponibles() >= 500) {
-                esFrecuente = true;
-            }
         }
     }
 
-    /**
-     * Redime puntos del cliente
-     */
     public boolean redimirPuntos(Integer puntos) {
         if (puntos == null || puntos <= 0) {
             return false;
@@ -174,9 +148,6 @@ public class Cliente {
         return false;
     }
 
-    /**
-     * Calcula la edad del cliente
-     */
     public Integer getEdad() {
         if (fechaNacimiento == null) {
             return null;
@@ -184,32 +155,20 @@ public class Cliente {
         return Period.between(fechaNacimiento, LocalDate.now()).getYears();
     }
 
-    /**
-     * Verifica si es un cliente VIP
-     */
     public boolean esClienteVip() {
         return getPuntosDisponibles() >= 1000;
     }
 
-    /**
-     * Valida si el DNI tiene formato correcto
-     */
     public boolean tieneDniValido() {
         return documento != null && documento.matches("^\\d{8}$");
     }
 
-    /**
-     * Valida si el email tiene formato correcto
-     */
     public boolean tieneEmailValido() {
         if (email == null || email.trim().isEmpty()) {
             return true; // Email opcional
         }
         return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
-
-    // ✅ GETTERS Y SETTERS
-    // ...existing code...
 
     public void setNombres(String nombres) {
         this.nombres = nombres;
@@ -247,8 +206,6 @@ public class Cliente {
         this.direccion = direccion;
     }
 
-    // ...existing code...
-
     public void setDocumento(String documento) {
         this.documento = documento;
     }
@@ -281,11 +238,6 @@ public class Cliente {
         return nombres;
     }
 
-    // ...existing code...
-
-    // Removed duplicate getters and setters for nombres, apellidos, telefono, and
-    // documento
-
     public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
@@ -310,10 +262,6 @@ public class Cliente {
         this.puntosUsados = puntosUsados;
     }
 
-    public void setEsFrecuente(Boolean esFrecuente) {
-        this.esFrecuente = esFrecuente;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -330,12 +278,10 @@ public class Cliente {
         this.updatedAt = updatedAt;
     }
 
-    // ✅ MÉTODOS AUXILIARES
     @Override
     public String toString() {
         return "Cliente{" +
                 "id=" + id +
-                ", esFrecuente=" + esFrecuente +
                 '}';
     }
 

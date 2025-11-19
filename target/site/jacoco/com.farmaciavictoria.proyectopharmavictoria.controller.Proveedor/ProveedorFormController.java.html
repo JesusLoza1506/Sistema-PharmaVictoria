@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProveedorFormController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor</a> &gt; <span class="el_source">ProveedorFormController.java</span></div><h1>ProveedorFormController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor;
+
+import com.farmaciavictoria.proyectopharmavictoria.service.ProveedorService;
+import com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer;
+import javafx.collections.FXCollections;
+import com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.function.Consumer;
+import java.util.regex.Pattern;
+
+public class ProveedorFormController implements Initializable {
+
+<span class="nc" id="L21">    private static final Logger logger = LoggerFactory.getLogger(ProveedorFormController.class);</span>
+
+    // FXML Components - Información Básica
+    @FXML
+    private Label lblTitulo;
+    @FXML
+    private TextField txtRazonSocial;
+    @FXML
+    private TextField txtRuc;
+    @FXML
+    private TextField txtContacto;
+
+    // FXML Components - Información de Contacto
+    @FXML
+    private TextField txtTelefono;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    private TextArea txtDireccion;
+
+    // FXML Components - Información Comercial
+    @FXML
+    private ComboBox&lt;String&gt; cmbCondicionesPago;
+    @FXML
+    private TextArea txtObservaciones;
+    @FXML
+    private ComboBox&lt;String&gt; cmbTipoProducto;
+    @FXML
+    private CheckBox chkActivo;
+
+    // FXML Components - Botones
+    @FXML
+    private Button btnGuardar;
+    @FXML
+    private Button btnLimpiar;
+    // Botón Cancelar eliminado
+
+    private final ProveedorService proveedorService;
+
+    private Proveedor proveedorActual;
+<span class="nc" id="L61">    private boolean modoEdicion = false;</span>
+    private Consumer&lt;Proveedor&gt; onProveedorGuardado;
+
+    // Patrones de validación flexibles
+<span class="nc" id="L65">    private static final Pattern PATTERN_EMAIL = Pattern.compile(</span>
+            &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$&quot;);
+<span class="nc" id="L67">    private static final Pattern PATTERN_RUC = Pattern.compile(&quot;^\\d{8,11}$&quot;);</span>
+<span class="nc" id="L68">    private static final Pattern PATTERN_TELEFONO = Pattern.compile(&quot;^[0-9+\\-\\s\\(\\)]{7,20}$&quot;);</span>
+
+<span class="nc" id="L70">    public ProveedorFormController() {</span>
+        try {
+<span class="nc" id="L72">            ServiceContainer container = ServiceContainer.getInstance();</span>
+<span class="nc" id="L73">            this.proveedorService = container.getProveedorService();</span>
+
+<span class="nc" id="L75">            logger.info(&quot;ProveedorFormController inicializado con enterprise patterns&quot;);</span>
+<span class="nc" id="L76">        } catch (Exception e) {</span>
+<span class="nc" id="L77">            logger.error(&quot;Error al inicializar ProveedorFormController: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L78">            throw new RuntimeException(&quot;Fallo crítico en inicialización del formulario&quot;, e);</span>
+<span class="nc" id="L79">        }</span>
+<span class="nc" id="L80">    }</span>
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+<span class="nc" id="L84">        initializeComponents();</span>
+<span class="nc" id="L85">        setupEventHandlers();</span>
+<span class="nc" id="L86">        logger.debug(&quot;ProveedorFormController inicializado correctamente&quot;);</span>
+<span class="nc" id="L87">    }</span>
+
+    private void initializeComponents() {
+        // Configurar ComboBox de condiciones de pago
+<span class="nc" id="L91">        cmbCondicionesPago.setItems(FXCollections.observableArrayList(</span>
+                &quot;Contado&quot;,
+                &quot;15 días&quot;,
+                &quot;30 días&quot;,
+                &quot;45 días&quot;,
+                &quot;60 días&quot;,
+                &quot;90 días&quot;,
+                &quot;Contra entrega&quot;));
+<span class="nc" id="L99">        cmbCondicionesPago.setValue(&quot;30 días&quot;);</span>
+
+        // ComboBox Tipo de Producto
+<span class="nc" id="L102">        cmbTipoProducto.setItems(FXCollections.observableArrayList(</span>
+                &quot;Medicamentos&quot;,
+                &quot;Insumos&quot;,
+                &quot;Material Médico&quot;,
+                &quot;Otros&quot;));
+<span class="nc" id="L107">        cmbTipoProducto.setPromptText(&quot;Seleccionar tipo&quot;);</span>
+
+<span class="nc" id="L109">    }</span>
+
+    private void setupEventHandlers() {
+        // Validación flexible de RUC (solo números, no longitud fija)
+<span class="nc" id="L113">        txtRuc.textProperty().addListener((observable, oldValue, newValue) -&gt; {</span>
+<span class="nc bnc" id="L114" title="All 4 branches missed.">            if (newValue != null &amp;&amp; !newValue.matches(&quot;\\d*&quot;)) {</span>
+<span class="nc" id="L115">                txtRuc.setText(oldValue);</span>
+            }
+<span class="nc" id="L117">        });</span>
+
+        // Validación flexible de teléfono
+<span class="nc" id="L120">        txtTelefono.textProperty().addListener((observable, oldValue, newValue) -&gt; {</span>
+<span class="nc bnc" id="L121" title="All 4 branches missed.">            if (newValue != null &amp;&amp; newValue.length() &gt; 20) {</span>
+<span class="nc" id="L122">                txtTelefono.setText(newValue.substring(0, 20));</span>
+            }
+<span class="nc" id="L124">        });</span>
+<span class="nc" id="L125">    }</span>
+
+    // Configurar proveedor para edición
+    public void setProveedor(Proveedor proveedor) {
+<span class="nc" id="L129">        this.proveedorActual = proveedor;</span>
+<span class="nc" id="L130">        this.modoEdicion = true;</span>
+<span class="nc" id="L131">        cargarDatos();</span>
+<span class="nc" id="L132">        lblTitulo.setText(&quot;EDITAR PROVEEDOR&quot;);</span>
+<span class="nc" id="L133">        btnGuardar.setText(&quot;💾 Actualizar Proveedor&quot;);</span>
+<span class="nc" id="L134">    }</span>
+
+    // Callback para notificar cuando se guarda
+    public void setOnProveedorGuardado(Consumer&lt;Proveedor&gt; callback) {
+<span class="nc" id="L138">        this.onProveedorGuardado = callback;</span>
+<span class="nc" id="L139">    }</span>
+
+    private void cargarDatos() {
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        if (proveedorActual == null)</span>
+<span class="nc" id="L143">            return;</span>
+
+<span class="nc" id="L145">        txtRazonSocial.setText(proveedorActual.getRazonSocial());</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">        txtRuc.setText(proveedorActual.getRuc() != null ? proveedorActual.getRuc() : &quot;&quot;);</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        txtContacto.setText(proveedorActual.getContacto() != null ? proveedorActual.getContacto() : &quot;&quot;);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        txtTelefono.setText(proveedorActual.getTelefono() != null ? proveedorActual.getTelefono() : &quot;&quot;);</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        txtEmail.setText(proveedorActual.getEmail() != null ? proveedorActual.getEmail() : &quot;&quot;);</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        txtDireccion.setText(proveedorActual.getDireccion() != null ? proveedorActual.getDireccion() : &quot;&quot;);</span>
+<span class="nc" id="L151">        cmbCondicionesPago.setValue(</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">                proveedorActual.getCondicionesPago() != null ? proveedorActual.getCondicionesPago() : &quot;30 días&quot;);</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">        txtObservaciones.setText(proveedorActual.getObservaciones() != null ? proveedorActual.getObservaciones() : &quot;&quot;);</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if (proveedorActual.getTipoProducto() != null) {</span>
+<span class="nc" id="L155">            cmbTipoProducto.setValue(proveedorActual.getTipoProducto());</span>
+        }
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        chkActivo.setSelected(proveedorActual.getActivo() != null ? proveedorActual.getActivo() : true);</span>
+
+<span class="nc" id="L159">    }</span>
+
+    @FXML
+    private void guardar(ActionEvent event) {
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        if (validarCampos()) {</span>
+            try {
+<span class="nc bnc" id="L165" title="All 2 branches missed.">                Proveedor proveedor = modoEdicion ? proveedorActual : new Proveedor();</span>
+
+                // Establecer datos básicos
+<span class="nc" id="L168">                proveedor.setRazonSocial(txtRazonSocial.getText().trim());</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                proveedor.setRuc(txtRuc.getText().trim().isEmpty() ? null : txtRuc.getText().trim());</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                proveedor.setContacto(txtContacto.getText().trim().isEmpty() ? null : txtContacto.getText().trim());</span>
+
+                // Datos de contacto
+<span class="nc bnc" id="L173" title="All 2 branches missed.">                proveedor.setTelefono(txtTelefono.getText().trim().isEmpty() ? null : txtTelefono.getText().trim());</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                proveedor.setEmail(txtEmail.getText().trim().isEmpty() ? null : txtEmail.getText().trim());</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">                proveedor.setDireccion(txtDireccion.getText().trim().isEmpty() ? null : txtDireccion.getText().trim());</span>
+
+                // Datos comerciales
+<span class="nc" id="L178">                proveedor.setCondicionesPago(cmbCondicionesPago.getValue());</span>
+<span class="nc" id="L179">                proveedor.setObservaciones(</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">                        txtObservaciones.getText().trim().isEmpty() ? null : txtObservaciones.getText().trim());</span>
+<span class="nc" id="L181">                proveedor.setTipoProducto(cmbTipoProducto.getValue());</span>
+<span class="nc" id="L182">                proveedor.setActivo(chkActivo.isSelected());</span>
+
+                // Validar unicidad de razón social (nombre)
+<span class="nc" id="L185">                boolean existeNombre = proveedorService.existePorRazonSocial(proveedor.getRazonSocial(),</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                        modoEdicion ? proveedor.getId() : null);</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                if (existeNombre) {</span>
+<span class="nc" id="L188">                    showWarning(&quot;Validación&quot;,</span>
+                            &quot;Ya existe un proveedor con el mismo nombre. No se puede registrar ni actualizar.&quot;);
+<span class="nc" id="L190">                    return;</span>
+                }
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                Proveedor proveedorGuardado = modoEdicion</span>
+<span class="nc" id="L194">                        ? proveedorService.actualizar(proveedor, System.getProperty(&quot;user.name&quot;, &quot;sistema&quot;))</span>
+<span class="nc" id="L195">                        : proveedorService.guardar(proveedor);</span>
+
+<span class="nc" id="L197">                showInfo(&quot;Éxito&quot;,</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">                        modoEdicion ? &quot;Proveedor actualizado exitosamente&quot; : &quot;Proveedor registrado exitosamente&quot;);</span>
+
+<span class="nc bnc" id="L200" title="All 2 branches missed.">                if (onProveedorGuardado != null) {</span>
+<span class="nc" id="L201">                    onProveedorGuardado.accept(proveedorGuardado);</span>
+                }
+
+                // Cerrar el formulario automáticamente
+<span class="nc" id="L205">                Stage stage = (Stage) btnGuardar.getScene().getWindow();</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">                if (stage != null) {</span>
+<span class="nc" id="L207">                    stage.close();</span>
+                }
+
+<span class="nc" id="L210">            } catch (Exception e) {</span>
+<span class="nc" id="L211">                logger.error(&quot;Error al guardar proveedor: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L212">                showError(&quot;Error al guardar&quot;, e.getMessage());</span>
+<span class="nc" id="L213">            }</span>
+        }
+<span class="nc" id="L215">    }</span>
+
+    @FXML
+    private void limpiar(ActionEvent event) {
+<span class="nc" id="L219">        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L220">        alert.setTitle(&quot;Limpiar Campos&quot;);</span>
+<span class="nc" id="L221">        alert.setHeaderText(&quot;¿Limpiar todos los campos?&quot;);</span>
+<span class="nc" id="L222">        alert.setContentText(&quot;Esta acción borrará toda la información ingresada.&quot;);</span>
+
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        if (alert.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {</span>
+<span class="nc" id="L225">            limpiarCampos();</span>
+        }
+<span class="nc" id="L227">    }</span>
+
+    // Método cancelar y lógica eliminados
+
+    private boolean validarCampos() {
+<span class="nc" id="L232">        StringBuilder errores = new StringBuilder();</span>
+
+        // Validar razón social (OBLIGATORIO)
+<span class="nc" id="L235">        String razonSocial = txtRazonSocial.getText().trim();</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        if (razonSocial.isEmpty()) {</span>
+<span class="nc" id="L237">            errores.append(&quot;• La razón social es obligatoria\n&quot;);</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        } else if (razonSocial.length() &lt; 3) {</span>
+<span class="nc" id="L239">            errores.append(&quot;• La razón social debe tener al menos 3 caracteres\n&quot;);</span>
+        }
+
+        // Validar RUC (OPCIONAL pero si se ingresa debe ser válido)
+<span class="nc" id="L243">        String ruc = txtRuc.getText().trim();</span>
+<span class="nc bnc" id="L244" title="All 4 branches missed.">        if (!ruc.isEmpty() &amp;&amp; !PATTERN_RUC.matcher(ruc).matches()) {</span>
+<span class="nc" id="L245">            errores.append(&quot;• El RUC debe tener entre 8 y 11 dígitos\n&quot;);</span>
+        }
+
+        // Validar email (OPCIONAL pero si se ingresa debe ser válido)
+<span class="nc" id="L249">        String email = txtEmail.getText().trim();</span>
+<span class="nc bnc" id="L250" title="All 4 branches missed.">        if (!email.isEmpty() &amp;&amp; !PATTERN_EMAIL.matcher(email).matches()) {</span>
+<span class="nc" id="L251">            errores.append(&quot;• El formato del email no es válido\n&quot;);</span>
+        }
+
+        // Validar teléfono (OPCIONAL pero si se ingresa debe ser válido)
+<span class="nc" id="L255">        String telefono = txtTelefono.getText().trim();</span>
+<span class="nc bnc" id="L256" title="All 4 branches missed.">        if (!telefono.isEmpty() &amp;&amp; !PATTERN_TELEFONO.matcher(telefono).matches()) {</span>
+<span class="nc" id="L257">            errores.append(&quot;• El formato del teléfono no es válido\n&quot;);</span>
+        }
+
+        // Validar tipo de producto (opcional)
+        // Validar sucursalId (opcional pero si se ingresa debe ser número)
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (errores.length() &gt; 0) {</span>
+<span class="nc" id="L263">            showWarning(&quot;Errores de validación&quot;, errores.toString());</span>
+<span class="nc" id="L264">            return false;</span>
+        }
+<span class="nc" id="L266">        return true;</span>
+    }
+
+    private void limpiarCampos() {
+        // Información básica
+<span class="nc" id="L271">        txtRazonSocial.clear();</span>
+<span class="nc" id="L272">        txtRuc.clear();</span>
+<span class="nc" id="L273">        txtContacto.clear();</span>
+
+        // Información de contacto
+<span class="nc" id="L276">        txtTelefono.clear();</span>
+<span class="nc" id="L277">        txtEmail.clear();</span>
+<span class="nc" id="L278">        txtDireccion.clear();</span>
+
+        // Información comercial
+<span class="nc" id="L281">        cmbCondicionesPago.setValue(&quot;30 días&quot;);</span>
+<span class="nc" id="L282">        txtObservaciones.clear();</span>
+<span class="nc" id="L283">        cmbTipoProducto.setValue(null);</span>
+<span class="nc" id="L284">        chkActivo.setSelected(true);</span>
+
+<span class="nc" id="L286">    }</span>
+
+    // Método cerrarVentana eliminado completamente
+
+    // Métodos de utilidad para mostrar alertas
+    private void showInfo(String title, String message) {
+<span class="nc" id="L292">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L293">        alert.setTitle(title);</span>
+<span class="nc" id="L294">        alert.setHeaderText(null);</span>
+<span class="nc" id="L295">        alert.setContentText(message);</span>
+<span class="nc" id="L296">        alert.showAndWait();</span>
+<span class="nc" id="L297">    }</span>
+
+    private void showWarning(String title, String message) {
+<span class="nc" id="L300">        Alert alert = new Alert(Alert.AlertType.WARNING);</span>
+<span class="nc" id="L301">        alert.setTitle(title);</span>
+<span class="nc" id="L302">        alert.setHeaderText(null);</span>
+<span class="nc" id="L303">        alert.setContentText(message);</span>
+<span class="nc" id="L304">        alert.showAndWait();</span>
+<span class="nc" id="L305">    }</span>
+
+    private void showError(String title, String message) {
+<span class="nc" id="L308">        Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L309">        alert.setTitle(title);</span>
+<span class="nc" id="L310">        alert.setHeaderText(null);</span>
+<span class="nc" id="L311">        alert.setContentText(message);</span>
+<span class="nc" id="L312">        alert.showAndWait();</span>
+<span class="nc" id="L313">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

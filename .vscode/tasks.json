@@ -122,6 +122,26 @@
 				"$maven"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Generar reporte JaCoCo",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"test"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Test ProductoFormControllerTest.java",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"-Dtest=com.farmaciavictoria.proyectopharmavictoria.controller.Inventario.ProductoFormControllerTest",
+				"test"
+			],
+			"group": "test"
 		}
 	]
 }

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClienteExportAuditRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.repository.Cliente</a> &gt; <span class="el_source">ClienteExportAuditRepository.java</span></div><h1>ClienteExportAuditRepository.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.repository.Cliente;
+
+import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteExportAudit;
+
+import java.sql.*;
+
+<span class="nc" id="L8">public class ClienteExportAuditRepository {</span>
+<span class="nc" id="L9">    private final DatabaseConfig databaseConfig = DatabaseConfig.getInstance();</span>
+
+    public void save(ClienteExportAudit audit) {
+<span class="nc" id="L12">        String sql = &quot;INSERT INTO cliente_export_audit (usuario, fecha, tipo_archivo, ruta_archivo, cantidad_clientes) VALUES (?, ?, ?, ?, ?)&quot;;</span>
+<span class="nc" id="L13">        try (Connection conn = databaseConfig.getConnection();</span>
+<span class="nc" id="L14">             PreparedStatement stmt = conn.prepareStatement(sql)) {</span>
+<span class="nc" id="L15">            stmt.setString(1, audit.getUsuario());</span>
+<span class="nc" id="L16">            stmt.setTimestamp(2, Timestamp.valueOf(audit.getFecha()));</span>
+<span class="nc" id="L17">            stmt.setString(3, audit.getTipoArchivo());</span>
+<span class="nc" id="L18">            stmt.setString(4, audit.getRutaArchivo());</span>
+<span class="nc" id="L19">            stmt.setInt(5, audit.getCantidadClientes());</span>
+<span class="nc" id="L20">            stmt.executeUpdate();</span>
+<span class="nc" id="L21">        } catch (Exception e) {</span>
+<span class="nc" id="L22">            e.printStackTrace();</span>
+<span class="nc" id="L23">        }</span>
+<span class="nc" id="L24">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExportadorPDFReporte.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export</a> &gt; <span class="el_source">ExportadorPDFReporte.java</span></div><h1>ExportadorPDFReporte.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export;
+
+import java.util.List;
+
+import com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO;
+
+import java.io.File;
+
+<span class="fc" id="L9">public class ExportadorPDFReporte implements ExportadorReporte {</span>
+    @Override
+    public void exportar(List&lt;VentaReporteDTO&gt; datos, File destino) {
+        try {
+<span class="fc" id="L13">            com.itextpdf.text.Document document = new com.itextpdf.text.Document();</span>
+<span class="fc" id="L14">            com.itextpdf.text.pdf.PdfWriter.getInstance(document, new java.io.FileOutputStream(destino));</span>
+<span class="fc" id="L15">            document.open();</span>
+
+            // Logo centrado
+<span class="fc" id="L18">            String logoPath = &quot;src/main/resources/icons/logofarmacia.png&quot;;</span>
+            try {
+<span class="fc" id="L20">                com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(logoPath);</span>
+<span class="fc" id="L21">                logo.scaleToFit(100, 100);</span>
+<span class="fc" id="L22">                logo.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);</span>
+<span class="fc" id="L23">                document.add(logo);</span>
+<span class="nc" id="L24">            } catch (Exception ex) {</span>
+                // Si falla el logo, continuar sin él
+<span class="fc" id="L26">            }</span>
+
+            // Título profesional
+<span class="fc" id="L29">            com.itextpdf.text.Paragraph titulo = new com.itextpdf.text.Paragraph(&quot;Reporte de Ventas por Período&quot;,</span>
+<span class="fc" id="L30">                    com.itextpdf.text.FontFactory.getFont(com.itextpdf.text.FontFactory.HELVETICA_BOLD, 20));</span>
+<span class="fc" id="L31">            titulo.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);</span>
+<span class="fc" id="L32">            document.add(titulo);</span>
+<span class="fc" id="L33">            document.add(new com.itextpdf.text.Paragraph(&quot; &quot;));</span>
+
+<span class="fc bfc" id="L35" title="All 2 branches covered.">            for (VentaReporteDTO venta : datos) {</span>
+<span class="fc" id="L36">                com.itextpdf.text.Paragraph sub = new com.itextpdf.text.Paragraph(</span>
+<span class="fc" id="L37">                        &quot;Venta N°: &quot; + venta.getNumeroBoleta() + &quot; | Serie: &quot; + venta.getSerie(),</span>
+<span class="fc" id="L38">                        com.itextpdf.text.FontFactory.getFont(com.itextpdf.text.FontFactory.HELVETICA_BOLD, 14));</span>
+<span class="fc" id="L39">                document.add(sub);</span>
+<span class="fc" id="L40">                document.add(new com.itextpdf.text.Paragraph(&quot;Fecha: &quot; + venta.getFechaVenta() + &quot; | Cliente: &quot;</span>
+<span class="fc" id="L41">                        + venta.getCliente() + &quot; | Vendedor: &quot; + venta.getVendedor()));</span>
+<span class="fc" id="L42">                document.add(new com.itextpdf.text.Paragraph(</span>
+<span class="fc" id="L43">                        &quot;Total: S/. &quot; + venta.getTotal() + &quot; | Estado: &quot; + venta.getEstado()));</span>
+<span class="fc" id="L44">                document.add(new com.itextpdf.text.Paragraph(&quot;Productos:&quot;));</span>
+
+<span class="fc" id="L46">                com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(5);</span>
+                // Cabecera con fondo y fuente blanca
+<span class="fc" id="L48">                com.itextpdf.text.BaseColor headerColor = new com.itextpdf.text.BaseColor(33, 150, 243);</span>
+<span class="fc" id="L49">                com.itextpdf.text.Font headerFont = com.itextpdf.text.FontFactory</span>
+<span class="fc" id="L50">                        .getFont(com.itextpdf.text.FontFactory.HELVETICA_BOLD, 12, com.itextpdf.text.BaseColor.WHITE);</span>
+<span class="fc" id="L51">                String[] headers = { &quot;Producto&quot;, &quot;Cantidad&quot;, &quot;Precio Unitario&quot;, &quot;Descuento&quot;, &quot;Subtotal&quot; };</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">                for (String h : headers) {</span>
+<span class="fc" id="L53">                    com.itextpdf.text.pdf.PdfPCell cell = new com.itextpdf.text.pdf.PdfPCell(</span>
+                            new com.itextpdf.text.Phrase(h, headerFont));
+<span class="fc" id="L55">                    cell.setBackgroundColor(headerColor);</span>
+<span class="fc" id="L56">                    cell.setHorizontalAlignment(com.itextpdf.text.Element.ALIGN_CENTER);</span>
+<span class="fc" id="L57">                    cell.setPadding(6);</span>
+<span class="fc" id="L58">                    table.addCell(cell);</span>
+                }
+                // Datos
+<span class="fc bfc" id="L61" title="All 2 branches covered.">                for (com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.ProductoDetalleDTO prod : venta</span>
+<span class="fc" id="L62">                        .getProductos()) {</span>
+<span class="fc" id="L63">                    table.addCell(prod.getNombre());</span>
+<span class="fc" id="L64">                    table.addCell(String.valueOf(prod.getCantidad()));</span>
+<span class="fc" id="L65">                    table.addCell(prod.getPrecioUnitario().toPlainString());</span>
+<span class="fc" id="L66">                    table.addCell(prod.getDescuento().toPlainString());</span>
+<span class="fc" id="L67">                    table.addCell(prod.getSubtotal().toPlainString());</span>
+<span class="fc" id="L68">                }</span>
+<span class="fc" id="L69">                document.add(table);</span>
+<span class="fc" id="L70">                document.add(new com.itextpdf.text.Paragraph(&quot; &quot;));</span>
+<span class="fc" id="L71">            }</span>
+<span class="fc" id="L72">            document.close();</span>
+<span class="fc" id="L73">        } catch (Exception e) {</span>
+<span class="fc" id="L74">            e.printStackTrace();</span>
+<span class="fc" id="L75">        }</span>
+<span class="fc" id="L76">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

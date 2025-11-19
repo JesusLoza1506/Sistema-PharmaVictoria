@@ -53,10 +53,8 @@ public class ProveedorFormController implements Initializable {
     private Button btnGuardar;
     @FXML
     private Button btnLimpiar;
-    @FXML
-    private Button btnCancelar;
+    // Botón Cancelar eliminado
 
-    // ✅ SERVICE LAYER PATTERN + DEPENDENCY INJECTION
     private final ProveedorService proveedorService;
 
     private Proveedor proveedorActual;
@@ -66,13 +64,9 @@ public class ProveedorFormController implements Initializable {
     // Patrones de validación flexibles
     private static final Pattern PATTERN_EMAIL = Pattern.compile(
             "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    private static final Pattern PATTERN_RUC = Pattern.compile("^\\d{8,11}$"); // ✅ FLEXIBLE: 8-11 dígitos
-    private static final Pattern PATTERN_TELEFONO = Pattern.compile("^[0-9+\\-\\s\\(\\)]{7,20}$"); // ✅ FLEXIBLE:
-                                                                                                   // formato libre
+    private static final Pattern PATTERN_RUC = Pattern.compile("^\\d{8,11}$");
+    private static final Pattern PATTERN_TELEFONO = Pattern.compile("^[0-9+\\-\\s\\(\\)]{7,20}$");
 
-    /**
-     * ✅ DEPENDENCY INJECTION: Constructor con inyección de dependencias
-     */
     public ProveedorFormController() {
         try {
             ServiceContainer container = ServiceContainer.getInstance();
@@ -130,20 +124,16 @@ public class ProveedorFormController implements Initializable {
         });
     }
 
-    /**
-     * ✅ ENTERPRISE PATTERN: Configurar proveedor para edición
-     */
+    // Configurar proveedor para edición
     public void setProveedor(Proveedor proveedor) {
         this.proveedorActual = proveedor;
         this.modoEdicion = true;
         cargarDatos();
-        lblTitulo.setText("✏️ EDITAR PROVEEDOR");
+        lblTitulo.setText("EDITAR PROVEEDOR");
         btnGuardar.setText("💾 Actualizar Proveedor");
     }
 
-    /**
-     * ✅ ENTERPRISE PATTERN: Callback para notificar cuando se guarda
-     */
+    // Callback para notificar cuando se guarda
     public void setOnProveedorGuardado(Consumer<Proveedor> callback) {
         this.onProveedorGuardado = callback;
     }
@@ -200,7 +190,6 @@ public class ProveedorFormController implements Initializable {
                     return;
                 }
 
-                // ✅ SERVICE LAYER: Guardar usando service layer
                 Proveedor proveedorGuardado = modoEdicion
                         ? proveedorService.actualizar(proveedor, System.getProperty("user.name", "sistema"))
                         : proveedorService.guardar(proveedor);
@@ -208,12 +197,15 @@ public class ProveedorFormController implements Initializable {
                 showInfo("Éxito",
                         modoEdicion ? "Proveedor actualizado exitosamente" : "Proveedor registrado exitosamente");
 
-                // Notificar al componente padre
                 if (onProveedorGuardado != null) {
                     onProveedorGuardado.accept(proveedorGuardado);
                 }
 
-                cerrarVentana();
+                // Cerrar el formulario automáticamente
+                Stage stage = (Stage) btnGuardar.getScene().getWindow();
+                if (stage != null) {
+                    stage.close();
+                }
 
             } catch (Exception e) {
                 logger.error("Error al guardar proveedor: {}", e.getMessage(), e);
@@ -234,14 +226,8 @@ public class ProveedorFormController implements Initializable {
         }
     }
 
-    @FXML
-    private void cancelar(ActionEvent event) {
-        cerrarVentana();
-    }
+    // Método cancelar y lógica eliminados
 
-    /**
-     * ✅ ENTERPRISE PATTERN: Validaciones centralizadas
-     */
     private boolean validarCampos() {
         StringBuilder errores = new StringBuilder();
 
@@ -299,10 +285,7 @@ public class ProveedorFormController implements Initializable {
 
     }
 
-    private void cerrarVentana() {
-        Stage stage = (Stage) btnCancelar.getScene().getWindow();
-        stage.close();
-    }
+    // Método cerrarVentana eliminado completamente
 
     // Métodos de utilidad para mostrar alertas
     private void showInfo(String title, String message) {

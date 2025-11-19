@@ -55,13 +55,6 @@
                     </HBox>
                     <HBox alignment="CENTER" spacing="24.0" styleClass="filter-bar">
                         <children>
-                            <Label styleClass="filter-label" text="Buscar:" />
-                            <TextField fx:id="txtBuscar" promptText="Buscar por nombre, apellido, DNI..." styleClass="search-field" />
-                            <Label styleClass="filter-label" text="Rol:" />
-                            <ComboBox fx:id="cmbRol" promptText="Rol" styleClass="filter-combo" />
-                            <!-- Eliminado filtro de sucursal -->
-                            <Label styleClass="filter-label" text="Estado:" />
-                            <ComboBox fx:id="cmbEstado" promptText="Estado" styleClass="filter-combo" />
                             <Region HBox.hgrow="ALWAYS" />
                             <Label fx:id="lblTotalUsuarios" styleClass="total-count" text="Total: 0 usuarios" />
                         </children>
@@ -90,22 +83,7 @@
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                         </columnResizePolicy>
                     </TableView>
-                    <Region minHeight="24.0" maxHeight="32.0" VBox.vgrow="NEVER" />
-                    <HBox alignment="CENTER" spacing="10.0" styleClass="pagination-bar" VBox.vgrow="NEVER">
-                        <children>
-                            <Region HBox.hgrow="ALWAYS" />
-                            <Button fx:id="btnPaginaAnterior" text="⟨ Anterior" />
-                            <Label fx:id="lblPaginaActual" text="Página 1 de 1" />
-                            <Button fx:id="btnPaginaSiguiente" text="Siguiente ⟩" />
-                            <Label text="Mostrar:" styleClass="pagination-label" />
-                            <ComboBox fx:id="cmbTamanoPagina" prefWidth="80.0" styleClass="pagination-combo" />
-                            <Label text="por página" styleClass="pagination-label" />
-                            <Region HBox.hgrow="ALWAYS" />
-                        </children>
-                        <padding>
-                            <Insets bottom="10.0" top="10.0" left="24.0" right="24.0" />
-                        </padding>
-                    </HBox>
+                    <!-- Eliminada barra de paginación -->
                 </children>
             </VBox>
         </children>

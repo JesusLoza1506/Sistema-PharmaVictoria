@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioFormController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Usuario</a> &gt; <span class="el_source">UsuarioFormController.java</span></div><h1>UsuarioFormController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Usuario;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+
+<span class="nc" id="L7">public class UsuarioFormController {</span>
+    public void cargarUsuario(com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario) {
+<span class="nc bnc" id="L9" title="All 2 branches missed.">        if (usuario == null)</span>
+<span class="nc" id="L10">            return;</span>
+<span class="nc" id="L11">        txtUsername.setText(usuario.getUsername());</span>
+<span class="nc" id="L12">        txtPassword.setText(&quot;&quot;); // Por seguridad, no mostrar hash</span>
+<span class="nc bnc" id="L13" title="All 2 branches missed.">        cmbRol.setValue(usuario.getRol() != null ? usuario.getRol().name() : null);</span>
+        // ...existing code...
+<span class="nc" id="L15">        txtNombres.setText(usuario.getNombres());</span>
+<span class="nc" id="L16">        txtApellidos.setText(usuario.getApellidos());</span>
+<span class="nc" id="L17">        txtDni.setText(usuario.getDni());</span>
+<span class="nc" id="L18">        txtTelefono.setText(usuario.getTelefono());</span>
+<span class="nc" id="L19">        txtEmail.setText(usuario.getEmail());</span>
+<span class="nc" id="L20">    }</span>
+
+    @FXML
+    public void guardarUsuario() {
+        // Aquí puedes agregar la lógica de validación y registro
+<span class="nc" id="L25">        registrado = true;</span>
+<span class="nc" id="L26">        cerrar();</span>
+<span class="nc" id="L27">    }</span>
+
+    @FXML
+    private void limpiarCampos() {
+<span class="nc" id="L31">        cmbRol.getSelectionModel().clearSelection();</span>
+        // ...existing code...
+<span class="nc" id="L33">        txtNombres.clear();</span>
+<span class="nc" id="L34">        txtApellidos.clear();</span>
+<span class="nc" id="L35">        txtDni.clear();</span>
+<span class="nc" id="L36">        txtTelefono.clear();</span>
+<span class="nc" id="L37">        txtEmail.clear();</span>
+<span class="nc" id="L38">    }</span>
+
+    // Eliminada lógica de cancelar
+
+    public String getUsername() {
+<span class="nc" id="L43">        return txtUsername.getText();</span>
+    }
+
+    public String getPassword() {
+<span class="nc" id="L47">        return txtPassword.getText();</span>
+    }
+
+    public String getRol() {
+<span class="nc" id="L51">        return cmbRol.getValue();</span>
+    }
+
+    // ...existing code...
+
+    public String getNombres() {
+<span class="nc" id="L57">        return txtNombres.getText();</span>
+    }
+
+    public String getApellidos() {
+<span class="nc" id="L61">        return txtApellidos.getText();</span>
+    }
+
+    public String getDni() {
+<span class="nc" id="L65">        return txtDni.getText();</span>
+    }
+
+    public String getTelefono() {
+<span class="nc" id="L69">        return txtTelefono.getText();</span>
+    }
+
+    public String getEmail() {
+<span class="nc" id="L73">        return txtEmail.getText();</span>
+    }
+
+    @FXML
+    private TextField txtUsername;
+    @FXML
+    private PasswordField txtPassword;
+    @FXML
+    private ComboBox&lt;String&gt; cmbRol;
+    // ...existing code...
+    @FXML
+    private TextField txtNombres;
+    @FXML
+    private TextField txtApellidos;
+    @FXML
+    private TextField txtDni;
+    @FXML
+    private TextField txtTelefono;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    public Button btnGuardar;
+    @FXML
+    private Label lblTitulo;
+
+<span class="nc" id="L98">    private boolean registrado = false;</span>
+
+    @FXML
+    public void initialize() {
+<span class="nc" id="L102">        cmbRol.getItems().addAll(&quot;ADMIN&quot;, &quot;VENDEDOR&quot;);</span>
+        // ...existing code...
+<span class="nc" id="L104">    }</span>
+
+    @FXML
+    private void cerrar() {
+<span class="nc" id="L108">        Stage stage = (Stage) btnGuardar.getScene().getWindow();</span>
+<span class="nc" id="L109">        stage.close();</span>
+<span class="nc" id="L110">    }</span>
+
+    public void setModoEdicion(boolean edicion) {
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (lblTitulo != null) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            lblTitulo.setText(edicion ? &quot;EDITAR USUARIO&quot; : &quot;➕ NUEVO USUARIO&quot;);</span>
+        }
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        if (btnGuardar != null) {</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">            btnGuardar.setText(edicion ? &quot;Actualizar Usuario&quot; : &quot;Registrar Usuario&quot;);</span>
+        }
+<span class="nc" id="L119">    }</span>
+
+    public boolean isRegistrado() {
+<span class="nc" id="L122">        return registrado;</span>
+    }
+
+    // Puedes agregar aquí la lógica para validar y obtener los datos del usuario
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

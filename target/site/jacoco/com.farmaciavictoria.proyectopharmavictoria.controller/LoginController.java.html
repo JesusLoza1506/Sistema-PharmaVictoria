@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller</a> &gt; <span class="el_source">LoginController.java</span></div><h1>LoginController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller;
+
+import javafx.scene.image.ImageView;
+import com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService;
+import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+<span class="nc" id="L26">public class LoginController implements Initializable {</span>
+
+<span class="nc" id="L28">    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);</span>
+
+    @FXML
+    private Hyperlink forgotPasswordLink;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private TextField passwordVisibleField;
+    @FXML
+    private Button togglePasswordButton;
+    @FXML
+    private Button loginButton;
+    @FXML
+    private ProgressIndicator loginProgress;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private Label versionLabel;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Label connectionStatus;
+
+    private AuthenticationService authService;
+    private UsuarioRepository usuarioRepository;
+
+<span class="nc" id="L56">    private boolean isDatabaseConnected = false;</span>
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+<span class="nc" id="L60">        togglePasswordButton.setOnAction(e -&gt; togglePasswordVisibility());</span>
+<span class="nc" id="L61">        forgotPasswordLink.setOnAction(e -&gt; handleForgotPassword());</span>
+<span class="nc" id="L62">        Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L63">            ImageView icon = new ImageView(</span>
+<span class="nc" id="L64">                    new javafx.scene.image.Image(getClass().getResourceAsStream(&quot;/icons/eyelogin.png&quot;)));</span>
+<span class="nc" id="L65">            icon.setFitWidth(18);</span>
+<span class="nc" id="L66">            icon.setFitHeight(18);</span>
+<span class="nc" id="L67">            icon.setPreserveRatio(true);</span>
+<span class="nc" id="L68">            togglePasswordButton.setGraphic(icon);</span>
+<span class="nc" id="L69">        });</span>
+<span class="nc" id="L70">        logger.info(&quot;Inicializando controlador de Login&quot;);</span>
+
+        // Inicializar servicios
+<span class="nc" id="L73">        initializeServices();</span>
+
+        // Configurar interfaz
+<span class="nc" id="L76">        setupUI();</span>
+
+        // Verificar conexión a base de datos
+<span class="nc" id="L79">        checkDatabaseConnection();</span>
+
+        // Configurar eventos
+<span class="nc" id="L82">        setupEventHandlers();</span>
+
+        // Sincronizar campos de contraseña
+<span class="nc" id="L85">        passwordVisibleField.setVisible(false);</span>
+        // Bind bidireccional es crucial para mantener ambos campos sincronizados
+<span class="nc" id="L87">        passwordVisibleField.textProperty().bindBidirectional(passwordField.textProperty());</span>
+
+<span class="nc" id="L89">        logger.info(&quot;Controlador de Login inicializado correctamente&quot;);</span>
+<span class="nc" id="L90">    }</span>
+
+    // Muestra un diálogo para recuperación de contraseña
+    private void handleForgotPassword() {
+        try {
+<span class="nc" id="L95">            FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource(&quot;/fxml/forgot_password_dialog.fxml&quot;));</span>
+<span class="nc" id="L96">            javafx.scene.layout.StackPane root = dialogLoader.load();</span>
+            // Se asume la existencia de ForgotPasswordDialogController para fines de
+            // compilación
+            // ForgotPasswordDialogController dialogController =
+            // dialogLoader.getController();
+            // dialogController.setUsuarioRepository(usuarioRepository);
+
+<span class="nc" id="L103">            Stage dialogStage = new Stage();</span>
+<span class="nc" id="L104">            dialogStage.setTitle(&quot;Recuperar acceso&quot;);</span>
+<span class="nc" id="L105">            dialogStage.initOwner(loginButton.getScene().getWindow());</span>
+<span class="nc" id="L106">            dialogStage.initModality(javafx.stage.Modality.WINDOW_MODAL);</span>
+<span class="nc" id="L107">            Scene scene = new Scene(root);</span>
+<span class="nc" id="L108">            scene.getStylesheets().add(getClass().getResource(&quot;/css/forgot_password_dialog.css&quot;).toExternalForm());</span>
+<span class="nc" id="L109">            dialogStage.setScene(scene);</span>
+<span class="nc" id="L110">            dialogStage.setResizable(false);</span>
+<span class="nc" id="L111">            dialogStage.showAndWait();</span>
+<span class="nc" id="L112">        } catch (Exception e) {</span>
+<span class="nc" id="L113">            logger.error(&quot;Error al mostrar diálogo de recuperación: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L114">            Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L115">            alert.setTitle(&quot;Recuperación de acceso&quot;);</span>
+<span class="nc" id="L116">            alert.setHeaderText(null);</span>
+<span class="nc" id="L117">            alert.setContentText(&quot;No se pudo mostrar el diálogo de recuperación.&quot;);</span>
+<span class="nc" id="L118">            alert.showAndWait();</span>
+<span class="nc" id="L119">        }</span>
+<span class="nc" id="L120">    }</span>
+
+    // Inicializa los servicios desde ServiceContainer
+    private void initializeServices() {
+        try {
+<span class="nc" id="L125">            ServiceContainer container = ServiceContainer.getInstance();</span>
+<span class="nc" id="L126">            this.authService = container.getAuthenticationService();</span>
+<span class="nc" id="L127">            this.usuarioRepository = container.getUsuarioRepository();</span>
+<span class="nc" id="L128">            logger.info(&quot;Servicios inicializados correctamente via Dependency Injection&quot;);</span>
+<span class="nc" id="L129">        } catch (Exception e) {</span>
+<span class="nc" id="L130">            logger.error(&quot;Error al inicializar servicios: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L131">            showLoginError(&quot;Error al inicializar servicios del sistema&quot;);</span>
+<span class="nc" id="L132">        }</span>
+<span class="nc" id="L133">    }</span>
+
+    // Configura la interfaz de usuario
+    private void setupUI() {
+<span class="nc" id="L137">        versionLabel.setText(&quot;PharmaVictoria v1.0 - 2025&quot;);</span>
+<span class="nc" id="L138">        statusLabel.setText(&quot;Sistema Operativo&quot;);</span>
+<span class="nc" id="L139">        Platform.runLater(() -&gt; usernameField.requestFocus());</span>
+<span class="nc" id="L140">        loginButton.setDefaultButton(true);</span>
+<span class="nc" id="L141">        logger.debug(&quot;Interfaz configurada correctamente&quot;);</span>
+<span class="nc" id="L142">    }</span>
+
+    // Verifica la conexión a la base de datos
+    private void checkDatabaseConnection() {
+<span class="nc" id="L146">        Task&lt;Boolean&gt; connectionTask = new Task&lt;&gt;() {</span>
+            @Override
+            protected Boolean call() {
+                try {
+<span class="nc" id="L150">                    return DatabaseConfig.getInstance().testConnection();</span>
+<span class="nc" id="L151">                } catch (Exception e) {</span>
+<span class="nc" id="L152">                    logger.error(&quot;Error de conexión a BD: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L153">                    return false;</span>
+                }
+            }
+        };
+
+<span class="nc" id="L158">        connectionTask.setOnSucceeded(e -&gt; {</span>
+<span class="nc" id="L159">            isDatabaseConnected = connectionTask.getValue();</span>
+<span class="nc" id="L160">            updateConnectionStatus();</span>
+<span class="nc" id="L161">        });</span>
+
+<span class="nc" id="L163">        connectionTask.setOnFailed(e -&gt; {</span>
+<span class="nc" id="L164">            isDatabaseConnected = false;</span>
+<span class="nc" id="L165">            updateConnectionStatus();</span>
+<span class="nc" id="L166">            logger.error(&quot;Fallo en verificación de conexión: {}&quot;, connectionTask.getException().getMessage());</span>
+<span class="nc" id="L167">        });</span>
+
+<span class="nc" id="L169">        new Thread(connectionTask).start();</span>
+<span class="nc" id="L170">    }</span>
+
+    private void updateConnectionStatus() {
+<span class="nc" id="L173">        Platform.runLater(() -&gt; {</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (isDatabaseConnected) {</span>
+<span class="nc" id="L175">                connectionStatus.setText(&quot;🟢 Base de Datos Conectada&quot;);</span>
+<span class="nc" id="L176">                connectionStatus.setStyle(&quot;-fx-text-fill: white;&quot;);</span>
+                // Habilitar el botón solo si la conexión es exitosa y no hay un proceso en
+                // curso
+<span class="nc" id="L179">                loginButton.setDisable(false);</span>
+            } else {
+<span class="nc" id="L181">                connectionStatus.setText(&quot;🔴 Sin Conexión a BD&quot;);</span>
+<span class="nc" id="L182">                connectionStatus.setStyle(&quot;-fx-text-fill: #ffcccb;&quot;);</span>
+<span class="nc" id="L183">                loginButton.setDisable(true);</span>
+<span class="nc" id="L184">                showLoginError(&quot;No se puede conectar a la base de datos&quot;);</span>
+            }
+<span class="nc" id="L186">        });</span>
+<span class="nc" id="L187">    }</span>
+
+    // Configura los manejadores de eventos
+    private void setupEventHandlers() {
+<span class="nc" id="L191">        passwordField.setOnAction(e -&gt; handleLogin());</span>
+<span class="nc" id="L192">        usernameField.setOnAction(e -&gt; passwordField.requestFocus());</span>
+<span class="nc" id="L193">        usernameField.textProperty().addListener((obs, oldVal, newVal) -&gt; clearError());</span>
+<span class="nc" id="L194">        passwordField.textProperty().addListener((obs, oldVal, newVal) -&gt; clearError());</span>
+<span class="nc" id="L195">        passwordVisibleField.setOnAction(e -&gt; handleLogin());</span>
+<span class="nc" id="L196">    }</span>
+
+    // Alterna la visibilidad de la contraseña
+    private void togglePasswordVisibility() {
+<span class="nc" id="L200">        boolean isVisible = passwordVisibleField.isVisible();</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        if (isVisible) {</span>
+            // Ocultar campo visible, mostrar campo de contraseña
+<span class="nc" id="L203">            passwordVisibleField.setVisible(false);</span>
+<span class="nc" id="L204">            passwordVisibleField.setManaged(false);</span>
+<span class="nc" id="L205">            passwordField.setVisible(true);</span>
+<span class="nc" id="L206">            passwordField.setManaged(true);</span>
+<span class="nc" id="L207">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L208">                togglePasswordButton.setGraphic(null);</span>
+<span class="nc" id="L209">                ImageView icon = new ImageView(</span>
+<span class="nc" id="L210">                        new javafx.scene.image.Image(getClass().getResourceAsStream(&quot;/icons/eyelogin.png&quot;)));</span>
+<span class="nc" id="L211">                icon.setFitWidth(18);</span>
+<span class="nc" id="L212">                icon.setFitHeight(18);</span>
+<span class="nc" id="L213">                icon.setPreserveRatio(true);</span>
+<span class="nc" id="L214">                togglePasswordButton.setGraphic(icon);</span>
+<span class="nc" id="L215">            });</span>
+<span class="nc" id="L216">            passwordField.requestFocus(); // Asegurar el foco correcto</span>
+        } else {
+            // Mostrar campo visible, ocultar campo de contraseña
+<span class="nc" id="L219">            passwordVisibleField.setVisible(true);</span>
+<span class="nc" id="L220">            passwordVisibleField.setManaged(true);</span>
+<span class="nc" id="L221">            passwordField.setVisible(false);</span>
+<span class="nc" id="L222">            passwordField.setManaged(false);</span>
+<span class="nc" id="L223">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L224">                togglePasswordButton.setGraphic(null);</span>
+<span class="nc" id="L225">                ImageView icon = new ImageView(</span>
+<span class="nc" id="L226">                        new javafx.scene.image.Image(getClass().getResourceAsStream(&quot;/icons/noteyelogin.png&quot;)));</span>
+<span class="nc" id="L227">                icon.setFitWidth(18);</span>
+<span class="nc" id="L228">                icon.setFitHeight(18);</span>
+<span class="nc" id="L229">                icon.setPreserveRatio(true);</span>
+<span class="nc" id="L230">                togglePasswordButton.setGraphic(icon);</span>
+<span class="nc" id="L231">            });</span>
+<span class="nc" id="L232">            passwordVisibleField.requestFocus(); // Asegurar el foco correcto</span>
+        }
+<span class="nc" id="L234">    }</span>
+
+    // Maneja el evento de inicio de sesión
+    @FXML
+    private void handleLogin() {
+<span class="nc" id="L239">        logger.info(&quot;Iniciando proceso de autenticación&quot;);</span>
+
+        // Validar campos localmente
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (!validateFields()) {</span>
+<span class="nc" id="L243">            return;</span>
+        }
+
+        // Mostrar spinner y deshabilitar interfaz
+<span class="nc" id="L247">        loginProgress.setVisible(true);</span>
+<span class="nc" id="L248">        setUIEnabled(false);</span>
+
+        // Crear tarea de autenticación
+<span class="nc" id="L251">        Task&lt;Usuario&gt; loginTask = new Task&lt;&gt;() {</span>
+            @Override
+            protected Usuario call() throws Exception {
+<span class="nc" id="L254">                String username = usernameField.getText().trim();</span>
+<span class="nc" id="L255">                String password = passwordField.getText();</span>
+
+<span class="nc" id="L257">                logger.debug(&quot;Intentando autenticar usuario: {}&quot;, username);</span>
+<span class="nc" id="L258">                return authService.authenticate(username, password);</span>
+            }
+        };
+
+        // Configurar callbacks
+<span class="nc" id="L263">        loginTask.setOnSucceeded(e -&gt; {</span>
+<span class="nc" id="L264">            loginProgress.setVisible(false);</span>
+<span class="nc" id="L265">            Usuario usuario = loginTask.getValue();</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">            if (usuario != null) {</span>
+                // Éxito: Usar el nuevo método unificado
+<span class="nc" id="L268">                showLoginResult(usuario, &quot;¡Bienvenido &quot; + usuario.getNombreCompleto() + &quot;!&quot;, true);</span>
+            } else {
+                // Fallo: Usar el nuevo método unificado
+<span class="nc" id="L271">                showLoginResult(null, &quot;Credenciales incorrectas&quot;, false);</span>
+            }
+<span class="nc" id="L273">        });</span>
+
+<span class="nc" id="L275">        loginTask.setOnFailed(e -&gt; {</span>
+<span class="nc" id="L276">            loginProgress.setVisible(false);</span>
+<span class="nc" id="L277">            Throwable exception = loginTask.getException();</span>
+<span class="nc" id="L278">            logger.error(&quot;Error durante autenticación: {}&quot;, exception.getMessage(), exception);</span>
+            // Error Interno: Usar el nuevo método unificado
+<span class="nc" id="L280">            showLoginResult(null, &quot;Error interno del sistema&quot;, false);</span>
+<span class="nc" id="L281">        });</span>
+
+<span class="nc" id="L283">        new Thread(loginTask).start();</span>
+<span class="nc" id="L284">    }</span>
+
+    // ************************************************
+    // NUEVO MÉTODO UNIFICADO PARA MANEJAR EL RESULTADO
+    // ************************************************
+    private void showLoginResult(Usuario usuario, String message, boolean success) {
+<span class="nc" id="L290">        Platform.runLater(() -&gt; {</span>
+<span class="nc bnc" id="L291" title="All 2 branches missed.">            if (success) {</span>
+<span class="nc" id="L292">                logger.info(&quot;Login exitoso para usuario: {} ({})&quot;, usuario.getUsername(), usuario.getRol());</span>
+<span class="nc" id="L293">                showSuccess(message);</span>
+
+                // Asignar usuario globalmente y actualizar último login
+<span class="nc" id="L296">                com.farmaciavictoria.proyectopharmavictoria.SessionManager.setUsuarioActual(usuario);</span>
+<span class="nc" id="L297">                updateLastLogin(usuario);</span>
+
+                // Navegar al dashboard después del delay
+<span class="nc" id="L300">                PauseTransition delay = new PauseTransition(Duration.seconds(1.5));</span>
+<span class="nc" id="L301">                delay.setOnFinished(e -&gt; navigateToDashboard(usuario));</span>
+<span class="nc" id="L302">                delay.play();</span>
+<span class="nc" id="L303">            } else {</span>
+<span class="nc" id="L304">                logger.warn(&quot;Login fallido: {}&quot;, message);</span>
+                // Mostrar error con estilo de éxito temporal para el efecto
+<span class="nc" id="L306">                showLoginError(message, usernameField, passwordField);</span>
+
+                // Restablecer interfaz después del delay (1.5 segundos)
+<span class="nc" id="L309">                PauseTransition delay = new PauseTransition(Duration.seconds(1.5));</span>
+<span class="nc" id="L310">                delay.setOnFinished(e -&gt; {</span>
+<span class="nc" id="L311">                    clearError();</span>
+<span class="nc" id="L312">                    setUIEnabled(true);</span>
+<span class="nc" id="L313">                    passwordField.clear();</span>
+<span class="nc" id="L314">                    passwordVisibleField.clear(); // Limpiar el campo visible también</span>
+<span class="nc" id="L315">                    passwordField.requestFocus();</span>
+<span class="nc" id="L316">                });</span>
+<span class="nc" id="L317">                delay.play();</span>
+            }
+<span class="nc" id="L319">        });</span>
+<span class="nc" id="L320">    }</span>
+    // ************************************************
+
+    // Valida los campos de entrada
+    private boolean validateFields() {
+<span class="nc" id="L325">        String username = usernameField.getText().trim();</span>
+<span class="nc" id="L326">        String password = passwordField.getText();</span>
+
+<span class="nc bnc" id="L328" title="All 2 branches missed.">        if (username.isEmpty()) {</span>
+<span class="nc" id="L329">            showLoginError(&quot;Por favor ingrese su usuario&quot;, usernameField);</span>
+<span class="nc" id="L330">            usernameField.requestFocus();</span>
+<span class="nc" id="L331">            return false;</span>
+        }
+
+<span class="nc bnc" id="L334" title="All 2 branches missed.">        if (password.isEmpty()) {</span>
+<span class="nc" id="L335">            showLoginError(&quot;Por favor ingrese su contraseña&quot;, passwordField);</span>
+<span class="nc" id="L336">            passwordField.requestFocus();</span>
+<span class="nc" id="L337">            return false;</span>
+        }
+
+<span class="nc bnc" id="L340" title="All 2 branches missed.">        if (username.length() &lt; 3) {</span>
+<span class="nc" id="L341">            showLoginError(&quot;El usuario debe tener al menos 3 caracteres&quot;, usernameField);</span>
+<span class="nc" id="L342">            usernameField.requestFocus();</span>
+<span class="nc" id="L343">            return false;</span>
+        }
+
+<span class="nc" id="L346">        return true;</span>
+    }
+
+    // Actualiza el último login del usuario
+    private void updateLastLogin(Usuario usuario) {
+<span class="nc" id="L351">        Task&lt;Void&gt; updateTask = new Task&lt;&gt;() {</span>
+            @Override
+            protected Void call() throws Exception {
+                // Se asume que este método existe en UsuarioRepository
+<span class="nc" id="L355">                usuarioRepository.updateLastLogin(usuario.getUsername());</span>
+<span class="nc" id="L356">                return null;</span>
+            }
+        };
+
+<span class="nc" id="L360">        updateTask.setOnFailed(</span>
+<span class="nc" id="L361">                e -&gt; logger.warn(&quot;No se pudo actualizar último login: {}&quot;, updateTask.getException().getMessage()));</span>
+
+<span class="nc" id="L363">        new Thread(updateTask).start();</span>
+<span class="nc" id="L364">    }</span>
+
+    // Navega al dashboard principal
+    private void navigateToDashboard(Usuario usuario) {
+        try {
+<span class="nc" id="L369">            logger.info(&quot;[NAV] Navegando al dashboard principal&quot;);</span>
+            String fxmlPath;
+<span class="nc" id="L371">            boolean esVendedor = false;</span>
+            // Se asume que Usuario tiene un método getRol() que devuelve un Enum o similar
+<span class="nc bnc" id="L373" title="All 2 branches missed.">            if (usuario.getRol() != null) {</span>
+<span class="nc" id="L374">                String rol = usuario.getRol().toString().toLowerCase(); // Usar toString() si es un Enum</span>
+<span class="nc" id="L375">                esVendedor = rol.contains(&quot;vendedor&quot;);</span>
+            }
+<span class="nc bnc" id="L377" title="All 2 branches missed.">            if (esVendedor) {</span>
+<span class="nc" id="L378">                fxmlPath = &quot;/fxml/dashboard-vendedor.fxml&quot;;</span>
+            } else {
+<span class="nc" id="L380">                fxmlPath = &quot;/fxml/dashboard.fxml&quot;;</span>
+            }
+
+<span class="nc" id="L383">            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));</span>
+<span class="nc" id="L384">            Parent root = loader.load();</span>
+
+            // Lógica de seteo de usuario en el controlador del dashboard (se asume
+            // existencia)
+<span class="nc bnc" id="L388" title="All 2 branches missed.">            if (esVendedor) {</span>
+<span class="nc" id="L389">                DashboardVendedorController dashboardVendedorController = loader.getController();</span>
+<span class="nc bnc" id="L390" title="All 2 branches missed.">                if (dashboardVendedorController != null) {</span>
+<span class="nc" id="L391">                    dashboardVendedorController.setUsuario(usuario);</span>
+<span class="nc" id="L392">                    logger.debug(&quot;[NAV] Usuario establecido en dashboard vendedor: {}&quot;, usuario.getNombreCompleto());</span>
+                }
+<span class="nc" id="L394">            } else {</span>
+<span class="nc" id="L395">                DashboardController dashboardController = loader.getController();</span>
+<span class="nc bnc" id="L396" title="All 2 branches missed.">                if (dashboardController != null) {</span>
+<span class="nc" id="L397">                    dashboardController.setUsuario(usuario);</span>
+<span class="nc" id="L398">                    logger.debug(&quot;[NAV] Usuario establecido en dashboard: {}&quot;, usuario.getNombreCompleto());</span>
+                }
+            }
+
+<span class="nc" id="L402">            Scene scene = new Scene(root);</span>
+<span class="nc" id="L403">            scene.getStylesheets().add(getClass().getResource(&quot;/css/styles.css&quot;).toExternalForm());</span>
+
+<span class="nc" id="L405">            Stage stage = (Stage) loginButton.getScene().getWindow();</span>
+<span class="nc" id="L406">            logger.info(&quot;[NAV] Antes de cambiar escena: maximized={} width={} height={}&quot;, stage.isMaximized(),</span>
+<span class="nc" id="L407">                    stage.getWidth(), stage.getHeight());</span>
+<span class="nc" id="L408">            double screenWidth = javafx.stage.Screen.getPrimary().getVisualBounds().getWidth();</span>
+<span class="nc" id="L409">            double screenHeight = javafx.stage.Screen.getPrimary().getVisualBounds().getHeight();</span>
+<span class="nc" id="L410">            stage.setScene(scene);</span>
+<span class="nc" id="L411">            stage.setTitle(&quot;PharmaVictoria - Menú Principal&quot;);</span>
+<span class="nc" id="L412">            stage.setResizable(true);</span>
+<span class="nc" id="L413">            stage.centerOnScreen();</span>
+<span class="nc" id="L414">            Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L415">                stage.setMaximized(true);</span>
+<span class="nc bnc" id="L416" title="All 4 branches missed.">                if (stage.isMaximized() &amp;&amp; (Math.abs(stage.getWidth() - screenWidth) &gt; 10</span>
+<span class="nc bnc" id="L417" title="All 2 branches missed.">                        || Math.abs(stage.getHeight() - screenHeight) &gt; 10)) {</span>
+<span class="nc" id="L418">                    logger.warn(&quot;[NAV] Maximizado pero tamaño incorrecto, forzando tamaño: {}x{}&quot;, screenWidth,</span>
+<span class="nc" id="L419">                            screenHeight);</span>
+<span class="nc" id="L420">                    stage.setMaximized(false);</span>
+<span class="nc" id="L421">                    stage.setWidth(screenWidth);</span>
+<span class="nc" id="L422">                    stage.setHeight(screenHeight);</span>
+<span class="nc" id="L423">                    stage.setMaximized(true);</span>
+                }
+<span class="nc" id="L425">                logger.info(&quot;[NAV] Después de workaround: maximized={} width={} height={}&quot;, stage.isMaximized(),</span>
+<span class="nc" id="L426">                        stage.getWidth(), stage.getHeight());</span>
+<span class="nc" id="L427">            });</span>
+<span class="nc" id="L428">            logger.info(&quot;[NAV] Navegación al dashboard completada&quot;);</span>
+<span class="nc" id="L429">        } catch (IOException e) {</span>
+<span class="nc" id="L430">            logger.error(&quot;Error al cargar dashboard: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L431">            showLoginError(&quot;Error al cargar la pantalla principal&quot;);</span>
+<span class="nc" id="L432">            setUIEnabled(true);</span>
+<span class="nc" id="L433">        }</span>
+<span class="nc" id="L434">    }</span>
+
+    // Maneja el evento de cancelar
+    @FXML
+    private void handleCancel() {
+<span class="nc" id="L439">        logger.info(&quot;Cancelando aplicación&quot;);</span>
+<span class="nc" id="L440">        Platform.exit();</span>
+<span class="nc" id="L441">    }</span>
+
+    // Muestra un mensaje de error de login o validación
+    private void showLoginError(String message, Control... fields) {
+<span class="nc" id="L445">        logger.error(&quot;[LOGIN] showLoginError: {}&quot;, message);</span>
+<span class="nc" id="L446">        errorLabel.setText(message);</span>
+<span class="nc" id="L447">        errorLabel.setVisible(true);</span>
+<span class="nc" id="L448">        errorLabel.getStyleClass().removeAll(&quot;success-label&quot;);</span>
+<span class="nc" id="L449">        errorLabel.getStyleClass().add(&quot;error-label&quot;);</span>
+<span class="nc bnc" id="L450" title="All 2 branches missed.">        if (fields != null) {</span>
+<span class="nc bnc" id="L451" title="All 2 branches missed.">            for (Control field : fields) {</span>
+<span class="nc" id="L452">                addErrorStyle(field);</span>
+            }
+        }
+<span class="nc" id="L455">    }</span>
+
+    // Muestra un mensaje de éxito
+    private void showSuccess(String message) {
+<span class="nc" id="L459">        errorLabel.setText(message);</span>
+<span class="nc" id="L460">        errorLabel.setVisible(true);</span>
+<span class="nc" id="L461">        errorLabel.getStyleClass().removeAll(&quot;error-label&quot;);</span>
+<span class="nc" id="L462">        errorLabel.getStyleClass().add(&quot;success-label&quot;);</span>
+<span class="nc" id="L463">    }</span>
+
+    // Limpia el mensaje de error
+    private void clearError() {
+<span class="nc" id="L467">        Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L468">            errorLabel.setVisible(false);</span>
+<span class="nc" id="L469">            errorLabel.setText(&quot;&quot;);</span>
+<span class="nc" id="L470">            removeErrorStyles();</span>
+<span class="nc" id="L471">        });</span>
+<span class="nc" id="L472">    }</span>
+
+    // Añade estilo de error a un campo
+    private void addErrorStyle(Control control) {
+<span class="nc" id="L476">        control.getStyleClass().add(&quot;error&quot;);</span>
+<span class="nc" id="L477">    }</span>
+
+    // Remueve estilos de error de todos los campos
+    private void removeErrorStyles() {
+<span class="nc" id="L481">        usernameField.getStyleClass().removeAll(&quot;error&quot;, &quot;success&quot;);</span>
+<span class="nc" id="L482">        passwordField.getStyleClass().removeAll(&quot;error&quot;, &quot;success&quot;);</span>
+<span class="nc" id="L483">    }</span>
+
+    // Habilita o deshabilita la interfaz
+    private void setUIEnabled(boolean enabled) {
+<span class="nc bnc" id="L487" title="All 2 branches missed.">        usernameField.setDisable(!enabled);</span>
+<span class="nc bnc" id="L488" title="All 2 branches missed.">        passwordField.setDisable(!enabled);</span>
+<span class="nc bnc" id="L489" title="All 2 branches missed.">        passwordVisibleField.setDisable(!enabled); // Aseguramos que este también se deshabilite</span>
+<span class="nc bnc" id="L490" title="All 2 branches missed.">        togglePasswordButton.setDisable(!enabled); // Deshabilita el botón de ojo</span>
+<span class="nc bnc" id="L491" title="All 4 branches missed.">        loginButton.setDisable(!enabled || !isDatabaseConnected);</span>
+
+<span class="nc bnc" id="L493" title="All 2 branches missed.">        if (enabled) {</span>
+<span class="nc" id="L494">            loginButton.setText(&quot;INICIAR SESIÓN&quot;);</span>
+<span class="nc" id="L495">            loginProgress.setVisible(false);</span>
+        } else {
+<span class="nc" id="L497">            loginButton.setText(&quot;VERIFICANDO...&quot;);</span>
+        }
+<span class="nc" id="L499">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

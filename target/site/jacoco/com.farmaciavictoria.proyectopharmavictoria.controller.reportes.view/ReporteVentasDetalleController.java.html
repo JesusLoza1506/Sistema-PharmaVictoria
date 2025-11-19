@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReporteVentasDetalleController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view</a> &gt; <span class="el_source">ReporteVentasDetalleController.java</span></div><h1>ReporteVentasDetalleController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import java.time.LocalDate;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+<span class="nc" id="L10">public class ReporteVentasDetalleController {</span>
+<span class="nc" id="L11">    private static final Logger logger = LoggerFactory.getLogger(ReporteVentasDetalleController.class);</span>
+    @FXML
+    private DatePicker dateInicio;
+    @FXML
+    private DatePicker dateFin;
+    @FXML
+    private Button btnFiltrar;
+    @FXML
+    private Button btnExportarPDF;
+    @FXML
+    private Button btnExportarExcel;
+    @FXML
+    private TableView&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO&gt; tableVentas;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colNumero;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colSerie;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colFecha;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colCliente;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colVendedor;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colTotal;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colTipoPago;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colEstado;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String&gt; colProductos;
+
+<span class="nc" id="L43">    private com.farmaciavictoria.proyectopharmavictoria.controller.reportes.strategy.ReporteVentasStrategy estrategia = new com.farmaciavictoria.proyectopharmavictoria.controller.reportes.strategy.ReporteVentasDetalleStrategy();</span>
+<span class="nc" id="L44">    private java.util.List&lt;com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO&gt; ventasFiltradas = new java.util.ArrayList&lt;&gt;();</span>
+
+    @FXML
+    private void initialize() {
+        // Configurar columnas para mostrar los datos del DTO
+<span class="nc" id="L49">        colNumero.setCellValueFactory(</span>
+<span class="nc" id="L50">                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getNumeroBoleta()));</span>
+<span class="nc" id="L51">        colSerie.setCellValueFactory(</span>
+<span class="nc" id="L52">                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getSerie()));</span>
+<span class="nc" id="L53">        colFecha.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                data.getValue().getFechaVenta() != null ? data.getValue().getFechaVenta().toString() : &quot;&quot;));</span>
+<span class="nc" id="L55">        colCliente.setCellValueFactory(</span>
+<span class="nc" id="L56">                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getCliente()));</span>
+<span class="nc" id="L57">        colVendedor.setCellValueFactory(</span>
+<span class="nc" id="L58">                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getVendedor()));</span>
+<span class="nc" id="L59">        colTotal.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">                data.getValue().getTotal() != null ? data.getValue().getTotal().toPlainString() : &quot;&quot;));</span>
+<span class="nc" id="L61">        colTipoPago.setCellValueFactory(</span>
+<span class="nc" id="L62">                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getTipoPago()));</span>
+<span class="nc" id="L63">        colEstado.setCellValueFactory(</span>
+<span class="nc" id="L64">                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getEstado()));</span>
+<span class="nc" id="L65">        colProductos.setCellValueFactory(</span>
+<span class="nc" id="L66">                data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L67" title="All 4 branches missed.">                        data.getValue().getProductos() != null &amp;&amp; !data.getValue().getProductos().isEmpty()</span>
+<span class="nc" id="L68">                                ? data.getValue().getProductos().stream()</span>
+<span class="nc" id="L69">                                        .map(p -&gt; p.getNombre() + &quot; x&quot; + p.getCantidad())</span>
+<span class="nc" id="L70">                                        .reduce((a, b) -&gt; a + &quot;, &quot; + b).orElse(&quot;&quot;)</span>
+<span class="nc" id="L71">                                : &quot;Sin productos&quot;));</span>
+<span class="nc" id="L72">    }</span>
+
+    @FXML
+    private void onFiltrar() {
+<span class="nc" id="L76">        LocalDate inicio = dateInicio.getValue();</span>
+<span class="nc" id="L77">        LocalDate fin = dateFin.getValue();</span>
+<span class="nc" id="L78">        logger.info(&quot;[REPORTE] Filtrando ventas desde {} hasta {}&quot;, inicio, fin);</span>
+<span class="nc bnc" id="L79" title="All 4 branches missed.">        if (inicio == null || fin == null) {</span>
+<span class="nc" id="L80">            mostrarAlerta(&quot;Debes seleccionar ambas fechas para filtrar.&quot;);</span>
+<span class="nc" id="L81">            logger.warn(&quot;[REPORTE] Fechas no seleccionadas&quot;);</span>
+<span class="nc" id="L82">            return;</span>
+        }
+<span class="nc" id="L84">        java.time.LocalDateTime inicioDT = inicio.atStartOfDay();</span>
+<span class="nc" id="L85">        java.time.LocalDateTime finDT = fin.atTime(23, 59, 59);</span>
+        try {
+<span class="nc" id="L87">            ventasFiltradas = estrategia.obtenerReporte(inicioDT.toLocalDate(), finDT.toLocalDate());</span>
+<span class="nc" id="L88">            logger.info(&quot;[REPORTE] Ventas encontradas: {}&quot;, ventasFiltradas.size());</span>
+<span class="nc" id="L89">            tableVentas.getItems().setAll(ventasFiltradas);</span>
+<span class="nc" id="L90">            mostrarAlerta(&quot;Filtro aplicado: &quot; + inicioDT + &quot; a &quot; + finDT + &quot;\nResultados: &quot; + ventasFiltradas.size());</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (ventasFiltradas.isEmpty()) {</span>
+<span class="nc" id="L92">                mostrarAlerta(&quot;No se encontraron ventas en el período seleccionado.&quot;);</span>
+<span class="nc" id="L93">                logger.warn(&quot;[REPORTE] No se encontraron ventas en el período seleccionado&quot;);</span>
+            }
+<span class="nc" id="L95">        } catch (Exception ex) {</span>
+<span class="nc" id="L96">            mostrarAlerta(&quot;Error al obtener ventas: &quot; + ex.getMessage());</span>
+<span class="nc" id="L97">            logger.error(&quot;[REPORTE] Error al obtener ventas&quot;, ex);</span>
+<span class="nc" id="L98">        }</span>
+<span class="nc" id="L99">    }</span>
+
+    @FXML
+    private void onExportarPDF() {
+        try {
+<span class="nc bnc" id="L104" title="All 4 branches missed.">            if (ventasFiltradas == null || ventasFiltradas.isEmpty()) {</span>
+<span class="nc" id="L105">                System.out.println(&quot;[LOG] No hay datos para exportar PDF&quot;);</span>
+<span class="nc" id="L106">                mostrarAlerta(&quot;No hay datos para exportar.&quot;);</span>
+<span class="nc" id="L107">                return;</span>
+            }
+<span class="nc" id="L109">            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();</span>
+<span class="nc" id="L110">            fileChooser.setTitle(&quot;Guardar reporte PDF&quot;);</span>
+<span class="nc" id="L111">            fileChooser.getExtensionFilters().add(new javafx.stage.FileChooser.ExtensionFilter(&quot;PDF Files&quot;, &quot;*.pdf&quot;));</span>
+<span class="nc" id="L112">            fileChooser.setInitialFileName(&quot;reporte_ventas.pdf&quot;);</span>
+<span class="nc" id="L113">            java.io.File destino = fileChooser.showSaveDialog(btnExportarPDF.getScene().getWindow());</span>
+<span class="nc" id="L114">            System.out.println(&quot;[LOG] FileChooser PDF destino: &quot; + destino);</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            if (destino != null) {</span>
+<span class="nc" id="L116">                String ruta = destino.getAbsolutePath();</span>
+                // Forzar extensión .pdf
+<span class="nc bnc" id="L118" title="All 2 branches missed.">                if (!ruta.toLowerCase().endsWith(&quot;.pdf&quot;)) {</span>
+<span class="nc" id="L119">                    ruta += &quot;.pdf&quot;;</span>
+                }
+<span class="nc" id="L121">                System.out.println(&quot;[LOG] Exportando PDF a: &quot; + ruta);</span>
+<span class="nc" id="L122">                com.farmaciavictoria.proyectopharmavictoria.util.ExportFacade.exportarReporteVentasAvanzado(</span>
+                        &quot;PDF&quot;, ventasFiltradas, ruta);
+<span class="nc" id="L124">                mostrarAlerta(&quot;Reporte PDF exportado correctamente en: &quot; + ruta);</span>
+<span class="nc" id="L125">            } else {</span>
+<span class="nc" id="L126">                System.out.println(&quot;[LOG] FileChooser PDF cancelado por el usuario&quot;);</span>
+            }
+<span class="nc" id="L128">        } catch (Exception e) {</span>
+<span class="nc" id="L129">            System.err.println(&quot;[ERROR] Error al exportar PDF: &quot; + e.getMessage());</span>
+<span class="nc" id="L130">            e.printStackTrace();</span>
+<span class="nc" id="L131">            mostrarAlerta(&quot;Error al exportar PDF: &quot; + e.getMessage());</span>
+<span class="nc" id="L132">        }</span>
+<span class="nc" id="L133">    }</span>
+
+    @FXML
+    private void onExportarExcel() {
+        try {
+<span class="nc bnc" id="L138" title="All 4 branches missed.">            if (ventasFiltradas == null || ventasFiltradas.isEmpty()) {</span>
+<span class="nc" id="L139">                System.out.println(&quot;[LOG] No hay datos para exportar Excel&quot;);</span>
+<span class="nc" id="L140">                mostrarAlerta(&quot;No hay datos para exportar.&quot;);</span>
+<span class="nc" id="L141">                return;</span>
+            }
+<span class="nc" id="L143">            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();</span>
+<span class="nc" id="L144">            fileChooser.setTitle(&quot;Guardar reporte Excel&quot;);</span>
+<span class="nc" id="L145">            fileChooser.getExtensionFilters()</span>
+<span class="nc" id="L146">                    .add(new javafx.stage.FileChooser.ExtensionFilter(&quot;Excel Files&quot;, &quot;*.xlsx&quot;));</span>
+<span class="nc" id="L147">            fileChooser.setInitialFileName(&quot;reporte_ventas.xlsx&quot;);</span>
+<span class="nc" id="L148">            java.io.File destino = fileChooser.showSaveDialog(btnExportarExcel.getScene().getWindow());</span>
+<span class="nc" id="L149">            System.out.println(&quot;[LOG] FileChooser Excel destino: &quot; + destino);</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">            if (destino != null) {</span>
+<span class="nc" id="L151">                String ruta = destino.getAbsolutePath();</span>
+                // Forzar extensión .xlsx
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                if (!ruta.toLowerCase().endsWith(&quot;.xlsx&quot;)) {</span>
+<span class="nc" id="L154">                    ruta += &quot;.xlsx&quot;;</span>
+                }
+<span class="nc" id="L156">                System.out.println(&quot;[LOG] Exportando Excel a: &quot; + ruta);</span>
+<span class="nc" id="L157">                com.farmaciavictoria.proyectopharmavictoria.util.ExportFacade.exportarReporteVentasAvanzado(</span>
+                        &quot;Excel&quot;, ventasFiltradas, ruta);
+<span class="nc" id="L159">                mostrarAlerta(&quot;Reporte Excel exportado correctamente en: &quot; + ruta);</span>
+<span class="nc" id="L160">            } else {</span>
+<span class="nc" id="L161">                System.out.println(&quot;[LOG] FileChooser Excel cancelado por el usuario&quot;);</span>
+            }
+<span class="nc" id="L163">        } catch (Exception e) {</span>
+<span class="nc" id="L164">            System.err.println(&quot;[ERROR] Error al exportar Excel: &quot; + e.getMessage());</span>
+<span class="nc" id="L165">            e.printStackTrace();</span>
+<span class="nc" id="L166">            mostrarAlerta(&quot;Error al exportar Excel: &quot; + e.getMessage());</span>
+<span class="nc" id="L167">        }</span>
+<span class="nc" id="L168">    }</span>
+
+    private void mostrarAlerta(String mensaje) {
+<span class="nc" id="L171">        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(</span>
+                javafx.scene.control.Alert.AlertType.INFORMATION);
+<span class="nc" id="L173">        alert.setTitle(&quot;Reporte de Ventas&quot;);</span>
+<span class="nc" id="L174">        alert.setHeaderText(null);</span>
+<span class="nc" id="L175">        alert.setContentText(mensaje);</span>
+<span class="nc" id="L176">        alert.showAndWait();</span>
+<span class="nc" id="L177">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -101,8 +101,7 @@
                      </columnConstraints>
                      <Label styleClass="field-label" text="Puntos Totales:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                      <Label fx:id="puntosEmpresaLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                     <Label styleClass="field-label" text="Frecuente:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                     <Label fx:id="frecuenteEmpresaLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                     <!-- Eliminado campo 'Frecuente' empresa -->
                      <Label styleClass="field-label" text="Fecha de Registro:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                      <Label fx:id="fechaRegistroEmpresaLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   </GridPane>
@@ -116,8 +115,7 @@
                      <Label fx:id="fechaNacimientoLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                      <Label styleClass="field-label" text="Puntos Totales:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                      <Label fx:id="puntosTotalesLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                     <Label styleClass="field-label" text="Frecuente:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                     <Label fx:id="frecuenteLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                     <!-- Eliminado campo 'Frecuente' natural -->
                      <Label styleClass="field-label" text="Fecha de Registro:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                      <Label fx:id="fechaRegistroLabel" styleClass="field-value" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   </GridPane>

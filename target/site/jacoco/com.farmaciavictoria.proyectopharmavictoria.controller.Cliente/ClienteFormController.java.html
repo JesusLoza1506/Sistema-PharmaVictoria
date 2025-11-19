@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClienteFormController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Cliente</a> &gt; <span class="el_source">ClienteFormController.java</span></div><h1>ClienteFormController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Cliente;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
+
+<span class="nc" id="L12">public class ClienteFormController {</span>
+    @FXML
+    private Label lblTitulo;
+    @FXML
+    private Button btnGuardar;
+    private java.util.function.Consumer&lt;Cliente&gt; onClienteEditado;
+
+    public void setOnClienteEditado(java.util.function.Consumer&lt;Cliente&gt; callback) {
+<span class="nc" id="L20">        this.onClienteEditado = callback;</span>
+<span class="nc" id="L21">    }</span>
+
+    @FXML
+    public void onCancelar() {
+        // Cierra la ventana del formulario
+<span class="nc" id="L26">        Stage stage = (Stage) txtDni.getScene().getWindow();</span>
+<span class="nc" id="L27">        stage.close();</span>
+<span class="nc" id="L28">    }</span>
+
+    @FXML
+    private ComboBox&lt;String&gt; comboTipoCliente;
+    @FXML
+    private TextField txtDni;
+    @FXML
+    private TextField txtRuc;
+    @FXML
+    private TextField txtRazonSocial;
+    @FXML
+    private TextField txtNombres;
+    @FXML
+    private TextField txtApellidos;
+    @FXML
+    private TextField txtTelefono;
+    @FXML
+    private TextField txtEmail;
+    @FXML
+    private TextArea txtDireccion;
+    @FXML
+    private DatePicker dpFechaNacimiento;
+    @FXML
+    private CheckBox chkActivo;
+    @FXML
+    private Label lblError;
+
+    private Cliente cliente;
+<span class="nc" id="L56">    private boolean editMode = false;</span>
+
+    public void setCliente(Cliente cliente) {
+<span class="nc" id="L59">        this.cliente = cliente;</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (cliente != null) {</span>
+<span class="nc" id="L61">            editMode = true;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">            if (lblTitulo != null)</span>
+<span class="nc" id="L63">                lblTitulo.setText(&quot;EDITAR CLIENTE&quot;);</span>
+<span class="nc" id="L64">            comboTipoCliente.setValue(cliente.getTipoCliente());</span>
+<span class="nc" id="L65">            txtNombres.setText(cliente.getNombres());</span>
+<span class="nc" id="L66">            txtApellidos.setText(cliente.getApellidos());</span>
+<span class="nc" id="L67">            txtTelefono.setText(cliente.getTelefono());</span>
+<span class="nc" id="L68">            txtEmail.setText(cliente.getEmail());</span>
+<span class="nc" id="L69">            txtDireccion.setText(cliente.getDireccion());</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (cliente.getFechaNacimiento() != null) {</span>
+<span class="nc" id="L71">                dpFechaNacimiento.setValue(cliente.getFechaNacimiento());</span>
+            }
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            if (&quot;Empresa&quot;.equals(cliente.getTipoCliente())) {</span>
+<span class="nc" id="L74">                txtRuc.setText(cliente.getDocumento());</span>
+<span class="nc" id="L75">                txtRazonSocial.setText(cliente.getRazonSocial());</span>
+            } else {
+<span class="nc" id="L77">                txtDni.setText(cliente.getDocumento());</span>
+            }
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            if (btnGuardar != null)</span>
+<span class="nc" id="L80">                btnGuardar.setText(&quot;Actualizar Cliente&quot;);</span>
+        } else {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (lblTitulo != null)</span>
+<span class="nc" id="L83">                lblTitulo.setText(&quot;NUEVO CLIENTE&quot;);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (btnGuardar != null)</span>
+<span class="nc" id="L85">                btnGuardar.setText(&quot;Guardar Cliente&quot;);</span>
+        }
+<span class="nc" id="L87">        actualizarVisibilidadCampos();</span>
+<span class="nc" id="L88">    }</span>
+
+    @FXML
+    public void initialize() {
+<span class="nc" id="L92">        comboTipoCliente.getItems().addAll(&quot;Natural&quot;, &quot;Empresa&quot;);</span>
+<span class="nc" id="L93">        comboTipoCliente.setValue(&quot;Natural&quot;);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (lblTitulo != null)</span>
+<span class="nc" id="L95">            lblTitulo.setText(&quot;NUEVO CLIENTE&quot;);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (btnGuardar != null)</span>
+<span class="nc" id="L97">            btnGuardar.setText(&quot;Guardar Cliente&quot;);</span>
+        // Mostrar/ocultar campos según el tipo seleccionado
+<span class="nc" id="L99">        comboTipoCliente.valueProperty().addListener((obs, oldVal, newVal) -&gt; {</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            if (&quot;Empresa&quot;.equalsIgnoreCase(newVal)) {</span>
+<span class="nc" id="L101">                txtRuc.setDisable(false);</span>
+<span class="nc" id="L102">                txtRuc.setVisible(true);</span>
+<span class="nc" id="L103">                txtRazonSocial.setDisable(false);</span>
+<span class="nc" id="L104">                txtRazonSocial.setVisible(true);</span>
+<span class="nc" id="L105">                txtDni.setDisable(true);</span>
+<span class="nc" id="L106">                txtDni.setVisible(false);</span>
+            } else {
+<span class="nc" id="L108">                txtDni.setDisable(false);</span>
+<span class="nc" id="L109">                txtDni.setVisible(true);</span>
+<span class="nc" id="L110">                txtRuc.setDisable(true);</span>
+<span class="nc" id="L111">                txtRuc.setVisible(false);</span>
+<span class="nc" id="L112">                txtRazonSocial.setDisable(true);</span>
+<span class="nc" id="L113">                txtRazonSocial.setVisible(false);</span>
+            }
+<span class="nc" id="L115">        });</span>
+        // Inicializar visibilidad al abrir el formulario
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (&quot;Empresa&quot;.equalsIgnoreCase(comboTipoCliente.getValue())) {</span>
+<span class="nc" id="L118">            txtRuc.setDisable(false);</span>
+<span class="nc" id="L119">            txtRuc.setVisible(true);</span>
+<span class="nc" id="L120">            txtRazonSocial.setDisable(false);</span>
+<span class="nc" id="L121">            txtRazonSocial.setVisible(true);</span>
+<span class="nc" id="L122">            txtDni.setDisable(true);</span>
+<span class="nc" id="L123">            txtDni.setVisible(false);</span>
+        } else {
+<span class="nc" id="L125">            txtDni.setDisable(false);</span>
+<span class="nc" id="L126">            txtDni.setVisible(true);</span>
+<span class="nc" id="L127">            txtRuc.setDisable(true);</span>
+<span class="nc" id="L128">            txtRuc.setVisible(false);</span>
+<span class="nc" id="L129">            txtRazonSocial.setDisable(true);</span>
+<span class="nc" id="L130">            txtRazonSocial.setVisible(false);</span>
+        }
+<span class="nc" id="L132">        actualizarVisibilidadCampos();</span>
+<span class="nc" id="L133">        comboTipoCliente.valueProperty().addListener((obs, oldVal, newVal) -&gt; actualizarVisibilidadCampos());</span>
+<span class="nc" id="L134">    }</span>
+
+    private void actualizarVisibilidadCampos() {
+<span class="nc" id="L137">        String tipo = comboTipoCliente.getValue();</span>
+<span class="nc" id="L138">        boolean esEmpresa = &quot;Empresa&quot;.equals(tipo);</span>
+<span class="nc" id="L139">        boolean esNatural = &quot;Natural&quot;.equals(tipo);</span>
+
+        // Campos para cliente natural
+<span class="nc" id="L142">        txtDni.setVisible(esNatural);</span>
+<span class="nc" id="L143">        txtNombres.setVisible(esNatural);</span>
+<span class="nc" id="L144">        txtNombres.setDisable(esEmpresa);</span>
+<span class="nc" id="L145">        txtApellidos.setVisible(esNatural);</span>
+<span class="nc" id="L146">        txtApellidos.setDisable(esEmpresa);</span>
+<span class="nc" id="L147">        dpFechaNacimiento.setVisible(esNatural);</span>
+<span class="nc" id="L148">        dpFechaNacimiento.setDisable(esEmpresa);</span>
+
+        // Campos para empresa
+<span class="nc" id="L151">        txtRuc.setVisible(esEmpresa);</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        txtRuc.setDisable(!esEmpresa);</span>
+<span class="nc" id="L153">        txtRazonSocial.setVisible(esEmpresa);</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        txtRazonSocial.setDisable(!esEmpresa);</span>
+
+        // Campos comunes (siempre visibles)
+<span class="nc" id="L157">        txtTelefono.setVisible(true);</span>
+<span class="nc" id="L158">        txtEmail.setVisible(true);</span>
+<span class="nc" id="L159">        txtDireccion.setVisible(true);</span>
+<span class="nc" id="L160">    }</span>
+
+    @FXML
+    public void onGuardarCliente() {
+<span class="nc" id="L164">        String tipo = comboTipoCliente.getValue();</span>
+<span class="nc" id="L165">        String nombres = txtNombres.getText().trim();</span>
+<span class="nc" id="L166">        String apellidos = txtApellidos.getText().trim();</span>
+<span class="nc" id="L167">        String telefono = txtTelefono.getText().trim();</span>
+<span class="nc" id="L168">        String email = txtEmail.getText().trim();</span>
+<span class="nc" id="L169">        clearError();</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        if (&quot;Natural&quot;.equals(tipo)) {</span>
+<span class="nc" id="L171">            String dni = txtDni.getText().trim();</span>
+<span class="nc bnc" id="L172" title="All 4 branches missed.">            if (dni.isEmpty() || nombres.isEmpty()) {</span>
+<span class="nc" id="L173">                showError(&quot;DNI y Nombres son obligatorios.&quot;);</span>
+<span class="nc" id="L174">                mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L175">                return;</span>
+            }
+<span class="nc bnc" id="L177" title="All 2 branches missed.">            if (!dni.matches(&quot;\\d{8}&quot;)) {</span>
+<span class="nc" id="L178">                showError(&quot;El DNI debe tener 8 dígitos.&quot;);</span>
+<span class="nc" id="L179">                mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L180">                return;</span>
+            }
+<span class="nc bnc" id="L182" title="All 2 branches missed.">            if (existeClienteConDni(dni)) {</span>
+<span class="nc" id="L183">                showError(&quot;El DNI ya está registrado. Ingrese uno diferente.&quot;);</span>
+<span class="nc" id="L184">                mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L185">                return;</span>
+            }
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        } else if (&quot;Empresa&quot;.equals(tipo)) {</span>
+<span class="nc" id="L188">            String ruc = txtRuc.getText().trim();</span>
+<span class="nc" id="L189">            String razonSocial = txtRazonSocial.getText().trim();</span>
+<span class="nc bnc" id="L190" title="All 4 branches missed.">            if (ruc.isEmpty() || razonSocial.isEmpty()) {</span>
+<span class="nc" id="L191">                showError(&quot;RUC y Razón Social son obligatorios.&quot;);</span>
+<span class="nc" id="L192">                mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L193">                return;</span>
+            }
+<span class="nc bnc" id="L195" title="All 2 branches missed.">            if (!ruc.matches(&quot;\\d{11}&quot;)) {</span>
+<span class="nc" id="L196">                showError(&quot;El RUC debe tener 11 dígitos.&quot;);</span>
+<span class="nc" id="L197">                mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L198">                return;</span>
+            }
+<span class="nc bnc" id="L200" title="All 2 branches missed.">            if (existeClienteConRuc(ruc)) {</span>
+<span class="nc" id="L201">                showError(&quot;El RUC ya está registrado. Ingrese uno diferente.&quot;);</span>
+<span class="nc" id="L202">                mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L203">                return;</span>
+            }
+        }
+<span class="nc bnc" id="L206" title="All 4 branches missed.">        if (!email.isEmpty() &amp;&amp; !email.matches(&quot;^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$&quot;)) {</span>
+<span class="nc" id="L207">            showError(&quot;El email no tiene un formato válido.&quot;);</span>
+<span class="nc" id="L208">            mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L209">            return;</span>
+        }
+<span class="nc bnc" id="L211" title="All 4 branches missed.">        if (!telefono.isEmpty() &amp;&amp; !telefono.matches(&quot;^\\d{6,15}$&quot;)) {</span>
+<span class="nc" id="L212">            showError(&quot;El teléfono debe tener entre 6 y 15 dígitos.&quot;);</span>
+<span class="nc" id="L213">            mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L214">            return;</span>
+        }
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (existeClienteConNombre(nombres)) {</span>
+<span class="nc" id="L217">            showError(&quot;El nombre ya está registrado. Ingrese uno diferente.&quot;);</span>
+<span class="nc" id="L218">            mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L219">            return;</span>
+        }
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (existeClienteConEmail(email)) {</span>
+<span class="nc" id="L222">            showError(&quot;El email ya está registrado. Ingrese uno diferente.&quot;);</span>
+<span class="nc" id="L223">            mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L224">            return;</span>
+        }
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (existeClienteConTelefono(telefono)) {</span>
+<span class="nc" id="L227">            showError(&quot;El teléfono ya está registrado. Ingrese uno diferente.&quot;);</span>
+<span class="nc" id="L228">            mostrarAlertaDatosIncompletos();</span>
+<span class="nc" id="L229">            return;</span>
+        }
+        try {
+<span class="nc" id="L232">            Cliente clienteGuardado = getClienteFromForm();</span>
+<span class="nc" id="L233">            logger.info(</span>
+                    &quot;[GUARDAR] Intentando guardar cliente: tipo={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}&quot;,
+<span class="nc" id="L235">                    clienteGuardado.getTipoCliente(), clienteGuardado.getDocumento(), clienteGuardado.getRazonSocial(),</span>
+<span class="nc" id="L236">                    clienteGuardado.getNombres(), clienteGuardado.getApellidos(), clienteGuardado.getTelefono(),</span>
+<span class="nc" id="L237">                    clienteGuardado.getEmail(), clienteGuardado.getDireccion(), clienteGuardado.getFechaNacimiento());</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">            if (!chkActivo.isSelected()) {</span>
+<span class="nc" id="L239">                mostrarAlertaClienteInactivo();</span>
+            }
+<span class="nc" id="L241">            mostrarNotificacionGuardado();</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">            if (onClienteEditado != null) {</span>
+<span class="nc" id="L243">                onClienteEditado.accept(clienteGuardado);</span>
+            }
+<span class="nc" id="L245">            ((Stage) comboTipoCliente.getScene().getWindow()).close();</span>
+<span class="nc" id="L246">        } catch (Exception e) {</span>
+<span class="nc" id="L247">            logger.error(&quot;[ERROR GUARDAR CLIENTE] {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L248">            showError(&quot;Error al guardar el cliente: &quot; + e.getMessage());</span>
+<span class="nc" id="L249">        }</span>
+<span class="nc" id="L250">    }</span>
+
+    // ALERTAS Y NOTIFICACIONES
+    private void mostrarAlertaDatosIncompletos() {
+<span class="nc" id="L254">        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);</span>
+<span class="nc" id="L255">        alert.setTitle(&quot;Datos incompletos&quot;);</span>
+<span class="nc" id="L256">        alert.setHeaderText(&quot;El cliente tiene datos incompletos o inválidos.&quot;);</span>
+<span class="nc" id="L257">        alert.setContentText(&quot;Por favor, revise los campos obligatorios y el formato de los datos.&quot;);</span>
+<span class="nc" id="L258">        alert.showAndWait();</span>
+<span class="nc" id="L259">    }</span>
+
+    private void mostrarAlertaClienteInactivo() {
+<span class="nc" id="L262">        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(</span>
+                javafx.scene.control.Alert.AlertType.INFORMATION);
+<span class="nc" id="L264">        alert.setTitle(&quot;Cliente inactivo&quot;);</span>
+<span class="nc" id="L265">        alert.setHeaderText(&quot;El cliente ha sido registrado como inactivo.&quot;);</span>
+<span class="nc" id="L266">        alert.setContentText(&quot;Recuerde que los clientes inactivos no podrán realizar compras ni acumular puntos.&quot;);</span>
+<span class="nc" id="L267">        alert.showAndWait();</span>
+<span class="nc" id="L268">    }</span>
+
+    private void mostrarNotificacionGuardado() {
+<span class="nc" id="L271">        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(</span>
+                javafx.scene.control.Alert.AlertType.INFORMATION);
+<span class="nc" id="L273">        alert.setTitle(&quot;Cliente guardado&quot;);</span>
+<span class="nc" id="L274">        alert.setHeaderText(null);</span>
+<span class="nc" id="L275">        alert.setContentText(&quot;El cliente se ha guardado correctamente.&quot;);</span>
+<span class="nc" id="L276">        alert.showAndWait();</span>
+<span class="nc" id="L277">    }</span>
+
+    // Validación de repetidos usando el servicio (debe inyectarse la lista de
+    // clientes)
+<span class="nc" id="L281">    private java.util.List&lt;Cliente&gt; clientesExistentes = new java.util.ArrayList&lt;&gt;();</span>
+
+    public void setClientesExistentes(java.util.List&lt;Cliente&gt; lista) {
+<span class="nc bnc" id="L284" title="All 2 branches missed.">        this.clientesExistentes = lista != null ? lista : new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc" id="L285">    }</span>
+
+    private boolean existeClienteConDni(String dni) {
+<span class="nc bnc" id="L288" title="All 6 branches missed.">        if (editMode &amp;&amp; cliente != null &amp;&amp; dni.equals(cliente.getDocumento())</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">                &amp;&amp; &quot;Natural&quot;.equals(cliente.getTipoCliente()))</span>
+<span class="nc" id="L290">            return false;</span>
+<span class="nc bnc" id="L291" title="All 2 branches missed.">        return clientesExistentes.stream().anyMatch(c -&gt; &quot;Natural&quot;.equals(c.getTipoCliente())</span>
+<span class="nc bnc" id="L292" title="All 4 branches missed.">                &amp;&amp; c.getDocumento() != null &amp;&amp; c.getDocumento().equalsIgnoreCase(dni));</span>
+    }
+
+    private boolean existeClienteConNombre(String nombre) {
+<span class="nc bnc" id="L296" title="All 4 branches missed.">        if (editMode &amp;&amp; cliente != null) {</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">            if (&quot;Empresa&quot;.equals(cliente.getTipoCliente())) {</span>
+<span class="nc" id="L298">                String razonSocial = txtRazonSocial.getText().trim();</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">                if (razonSocial.equalsIgnoreCase(cliente.getRazonSocial()))</span>
+<span class="nc" id="L300">                    return false;</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">                return clientesExistentes.stream().anyMatch(c -&gt; &quot;Empresa&quot;.equals(c.getTipoCliente())</span>
+<span class="nc bnc" id="L302" title="All 4 branches missed.">                        &amp;&amp; c.getRazonSocial() != null &amp;&amp; c.getRazonSocial().equalsIgnoreCase(razonSocial));</span>
+            } else {
+<span class="nc bnc" id="L304" title="All 2 branches missed.">                if (nombre.equalsIgnoreCase(cliente.getNombres()))</span>
+<span class="nc" id="L305">                    return false;</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">                return clientesExistentes.stream().anyMatch(c -&gt; &quot;Natural&quot;.equals(c.getTipoCliente())</span>
+<span class="nc bnc" id="L307" title="All 4 branches missed.">                        &amp;&amp; c.getNombres() != null &amp;&amp; c.getNombres().equalsIgnoreCase(nombre));</span>
+            }
+        }
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        if (&quot;Empresa&quot;.equals(comboTipoCliente.getValue())) {</span>
+<span class="nc" id="L311">            String razonSocial = txtRazonSocial.getText().trim();</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">            return clientesExistentes.stream().anyMatch(c -&gt; &quot;Empresa&quot;.equals(c.getTipoCliente())</span>
+<span class="nc bnc" id="L313" title="All 4 branches missed.">                    &amp;&amp; c.getRazonSocial() != null &amp;&amp; c.getRazonSocial().equalsIgnoreCase(razonSocial));</span>
+        } else {
+<span class="nc bnc" id="L315" title="All 2 branches missed.">            return clientesExistentes.stream().anyMatch(c -&gt; &quot;Natural&quot;.equals(c.getTipoCliente())</span>
+<span class="nc bnc" id="L316" title="All 4 branches missed.">                    &amp;&amp; c.getNombres() != null &amp;&amp; c.getNombres().equalsIgnoreCase(nombre));</span>
+        }
+    }
+
+    private boolean existeClienteConEmail(String email) {
+<span class="nc bnc" id="L321" title="All 2 branches missed.">        if (email.isEmpty())</span>
+<span class="nc" id="L322">            return false;</span>
+<span class="nc bnc" id="L323" title="All 6 branches missed.">        if (editMode &amp;&amp; cliente != null &amp;&amp; email.equals(cliente.getEmail()))</span>
+<span class="nc" id="L324">            return false;</span>
+<span class="nc bnc" id="L325" title="All 4 branches missed.">        return clientesExistentes.stream().anyMatch(c -&gt; c.getEmail() != null &amp;&amp; c.getEmail().equalsIgnoreCase(email));</span>
+    }
+
+    private boolean existeClienteConTelefono(String telefono) {
+<span class="nc bnc" id="L329" title="All 2 branches missed.">        if (telefono.isEmpty())</span>
+<span class="nc" id="L330">            return false;</span>
+<span class="nc bnc" id="L331" title="All 6 branches missed.">        if (editMode &amp;&amp; cliente != null &amp;&amp; telefono.equals(cliente.getTelefono()))</span>
+<span class="nc" id="L332">            return false;</span>
+<span class="nc" id="L333">        return clientesExistentes.stream()</span>
+<span class="nc bnc" id="L334" title="All 4 branches missed.">                .anyMatch(c -&gt; c.getTelefono() != null &amp;&amp; c.getTelefono().equalsIgnoreCase(telefono));</span>
+    }
+
+    private boolean existeClienteConRuc(String ruc) {
+<span class="nc bnc" id="L338" title="All 6 branches missed.">        if (editMode &amp;&amp; cliente != null &amp;&amp; ruc.equals(cliente.getDocumento())</span>
+<span class="nc bnc" id="L339" title="All 2 branches missed.">                &amp;&amp; &quot;Empresa&quot;.equals(cliente.getTipoCliente()))</span>
+<span class="nc" id="L340">            return false;</span>
+<span class="nc bnc" id="L341" title="All 2 branches missed.">        return clientesExistentes.stream().anyMatch(c -&gt; &quot;Empresa&quot;.equals(c.getTipoCliente())</span>
+<span class="nc bnc" id="L342" title="All 4 branches missed.">                &amp;&amp; c.getDocumento() != null &amp;&amp; c.getDocumento().equalsIgnoreCase(ruc));</span>
+    }
+
+    public Cliente getClienteFromForm() {
+<span class="nc bnc" id="L346" title="All 2 branches missed.">        if (cliente == null)</span>
+<span class="nc" id="L347">            cliente = new Cliente();</span>
+<span class="nc" id="L348">        String tipo = comboTipoCliente.getValue();</span>
+<span class="nc" id="L349">        cliente.setTipoCliente(tipo);</span>
+<span class="nc bnc" id="L350" title="All 2 branches missed.">        if (&quot;Empresa&quot;.equals(tipo)) {</span>
+<span class="nc" id="L351">            cliente.setDocumento(txtRuc.getText());</span>
+<span class="nc" id="L352">            cliente.setRazonSocial(txtRazonSocial.getText());</span>
+        } else {
+<span class="nc" id="L354">            cliente.setDocumento(txtDni.getText());</span>
+<span class="nc" id="L355">            cliente.setRazonSocial(&quot;&quot;);</span>
+        }
+<span class="nc" id="L357">        cliente.setNombres(txtNombres.getText());</span>
+<span class="nc" id="L358">        cliente.setApellidos(txtApellidos.getText());</span>
+<span class="nc" id="L359">        cliente.setTelefono(txtTelefono.getText());</span>
+<span class="nc" id="L360">        cliente.setEmail(txtEmail.getText());</span>
+<span class="nc" id="L361">        cliente.setDireccion(txtDireccion.getText());</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">        if (dpFechaNacimiento.getValue() != null) {</span>
+<span class="nc" id="L363">            cliente.setFechaNacimiento(dpFechaNacimiento.getValue());</span>
+        }
+<span class="nc" id="L365">        logger.info(</span>
+                &quot;[FORM] Datos del cliente a guardar: tipo_cliente={}, documento={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}&quot;,
+<span class="nc" id="L367">                cliente.getTipoCliente(), cliente.getDocumento(), cliente.getRazonSocial(), cliente.getNombres(),</span>
+<span class="nc" id="L368">                cliente.getApellidos(), cliente.getTelefono(), cliente.getEmail(), cliente.getDireccion(),</span>
+<span class="nc" id="L369">                cliente.getFechaNacimiento());</span>
+<span class="nc" id="L370">        return cliente;</span>
+    }
+
+    @FXML
+    public void onLimpiarCampos() {
+<span class="nc" id="L375">        txtDni.clear();</span>
+<span class="nc" id="L376">        txtRuc.clear();</span>
+<span class="nc" id="L377">        txtRazonSocial.clear();</span>
+<span class="nc" id="L378">        txtNombres.clear();</span>
+<span class="nc" id="L379">        txtApellidos.clear();</span>
+<span class="nc" id="L380">        txtTelefono.clear();</span>
+<span class="nc" id="L381">        txtEmail.clear();</span>
+<span class="nc" id="L382">        txtDireccion.clear();</span>
+<span class="nc" id="L383">        dpFechaNacimiento.setValue(null);</span>
+<span class="nc" id="L384">        clearError();</span>
+<span class="nc" id="L385">        comboTipoCliente.setValue(&quot;NATURAL&quot;);</span>
+<span class="nc" id="L386">        actualizarVisibilidadCampos();</span>
+<span class="nc" id="L387">    }</span>
+
+    public void showError(String msg) {
+<span class="nc" id="L390">        lblError.setText(msg);</span>
+<span class="nc" id="L391">        lblError.setVisible(true);</span>
+<span class="nc" id="L392">    }</span>
+
+    public void clearError() {
+<span class="nc" id="L395">        lblError.setText(&quot;&quot;);</span>
+<span class="nc" id="L396">        lblError.setVisible(false);</span>
+<span class="nc" id="L397">    }</span>
+
+<span class="nc" id="L399">    private static final Logger logger = LoggerFactory.getLogger(ClienteFormController.class);</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

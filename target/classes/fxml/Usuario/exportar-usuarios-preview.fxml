@@ -11,14 +11,7 @@
         <Separator />
         <VBox spacing="18.0" styleClass="modal-content-box">
             <children>
-                <HBox spacing="24.0" alignment="CENTER_LEFT" styleClass="modal-filter-bar">
-                    <children>
-                        <Label styleClass="filter-label" text="Estado:" />
-                        <ComboBox fx:id="cmbEstado" prefWidth="120.0" promptText="Todos" styleClass="filter-combo" />
-                        <Label styleClass="filter-label" text="Buscar:" />
-                        <TextField fx:id="txtBuscar" prefWidth="220.0" promptText="Nombre, DNI, Usuario..." styleClass="search-field" />
-                    </children>
-                </HBox>
+                <!-- Eliminada barra de filtros -->
                 <Label styleClass="preview-label" text="Vista previa de exportación:" />
                 <TableView fx:id="tablePreview" styleClass="productos-table" VBox.vgrow="ALWAYS">
                     <columns>

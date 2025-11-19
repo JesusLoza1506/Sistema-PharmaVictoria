@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VentaReporteDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto</a> &gt; <span class="el_source">VentaReporteDTO.java</span></div><h1>VentaReporteDTO.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.math.BigDecimal;
+
+<span class="fc" id="L7">public class VentaReporteDTO {</span>
+    private int idVenta;
+    private String numeroBoleta;
+    private String serie;
+    private LocalDateTime fechaVenta;
+    private String cliente;
+    private String vendedor;
+    private BigDecimal subtotal;
+    private BigDecimal descuento;
+    private BigDecimal total;
+    private String tipoPago;
+    private String estado;
+    private List&lt;ProductoDetalleDTO&gt; productos;
+
+    public int getIdVenta() {
+<span class="fc" id="L22">        return idVenta;</span>
+    }
+
+    public void setIdVenta(int idVenta) {
+<span class="fc" id="L26">        this.idVenta = idVenta;</span>
+<span class="fc" id="L27">    }</span>
+
+    public String getNumeroBoleta() {
+<span class="fc" id="L30">        return numeroBoleta;</span>
+    }
+
+    public void setNumeroBoleta(String numeroBoleta) {
+<span class="fc" id="L34">        this.numeroBoleta = numeroBoleta;</span>
+<span class="fc" id="L35">    }</span>
+
+    public String getSerie() {
+<span class="fc" id="L38">        return serie;</span>
+    }
+
+    public void setSerie(String serie) {
+<span class="fc" id="L42">        this.serie = serie;</span>
+<span class="fc" id="L43">    }</span>
+
+    public LocalDateTime getFechaVenta() {
+<span class="fc" id="L46">        return fechaVenta;</span>
+    }
+
+    public void setFechaVenta(LocalDateTime fechaVenta) {
+<span class="fc" id="L50">        this.fechaVenta = fechaVenta;</span>
+<span class="fc" id="L51">    }</span>
+
+    public String getCliente() {
+<span class="fc" id="L54">        return cliente;</span>
+    }
+
+    public void setCliente(String cliente) {
+<span class="fc" id="L58">        this.cliente = cliente;</span>
+<span class="fc" id="L59">    }</span>
+
+    public String getVendedor() {
+<span class="fc" id="L62">        return vendedor;</span>
+    }
+
+    public void setVendedor(String vendedor) {
+<span class="fc" id="L66">        this.vendedor = vendedor;</span>
+<span class="fc" id="L67">    }</span>
+
+    public BigDecimal getSubtotal() {
+<span class="fc" id="L70">        return subtotal;</span>
+    }
+
+    public void setSubtotal(BigDecimal subtotal) {
+<span class="fc" id="L74">        this.subtotal = subtotal;</span>
+<span class="fc" id="L75">    }</span>
+
+    public BigDecimal getDescuento() {
+<span class="fc" id="L78">        return descuento;</span>
+    }
+
+    public void setDescuento(BigDecimal descuento) {
+<span class="fc" id="L82">        this.descuento = descuento;</span>
+<span class="fc" id="L83">    }</span>
+
+    public BigDecimal getTotal() {
+<span class="fc" id="L86">        return total;</span>
+    }
+
+    public void setTotal(BigDecimal total) {
+<span class="fc" id="L90">        this.total = total;</span>
+<span class="fc" id="L91">    }</span>
+
+    public String getTipoPago() {
+<span class="fc" id="L94">        return tipoPago;</span>
+    }
+
+    public void setTipoPago(String tipoPago) {
+<span class="fc" id="L98">        this.tipoPago = tipoPago;</span>
+<span class="fc" id="L99">    }</span>
+
+    public String getEstado() {
+<span class="fc" id="L102">        return estado;</span>
+    }
+
+    public void setEstado(String estado) {
+<span class="fc" id="L106">        this.estado = estado;</span>
+<span class="fc" id="L107">    }</span>
+
+    public List&lt;ProductoDetalleDTO&gt; getProductos() {
+<span class="fc" id="L110">        return productos;</span>
+    }
+
+    public void setProductos(List&lt;ProductoDetalleDTO&gt; productos) {
+<span class="fc" id="L114">        this.productos = productos;</span>
+<span class="fc" id="L115">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

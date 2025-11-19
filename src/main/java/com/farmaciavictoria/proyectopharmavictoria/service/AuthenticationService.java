@@ -9,10 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 
-/**
- * Servicio de autenticación para PHARMAVICTORIA
- * Maneja la validación de credenciales y sesiones de usuario
- */
 public class AuthenticationService {
     // Usuario autenticado actual
     private static Usuario usuarioActual;

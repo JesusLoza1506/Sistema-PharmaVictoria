@@ -40,7 +40,7 @@ public class VencimientoAlertaCardController {
     // Actualiza el texto del detalle con los días configurados
     private void actualizarDetalle() {
         int dias = leerDiasAlerta();
-        lblDetalle.setText("Configurar días previos para alerta (actual: " + dias + ")");
+        lblDetalle.setText("Días para alerta: " + dias);
     }
 
     // Lee el valor actual de días de alerta desde el servicio
@@ -61,10 +61,8 @@ public class VencimientoAlertaCardController {
         }
     }
 
-    /**
-     * Notifica a los controladores principales para refrescar la lógica de
-     * productos próximos a vencer
-     */
+    // Notifica a los controladores principales para refrescar la lógica de
+    // productos próximos a vencer
     private void notificarActualizacionAlertas() {
         logger.info("[VencimientoAlertaCard] Notificando actualización de alertas de vencimiento");
         javafx.application.Platform.runLater(() -> {
@@ -103,16 +101,24 @@ public class VencimientoAlertaCardController {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Editar días de alerta de vencimiento");
 
-        Label lbl = new Label("Cantidad de días previos para alerta:");
+        Label lbl = new Label("Días para alerta:");
         TextField txtDias = new TextField(String.valueOf(leerDiasAlerta()));
-        txtDias.setMaxWidth(80);
+        txtDias.setPromptText("Ej: 10");
+        txtDias.setMaxWidth(100);
+        txtDias.setStyle(
+                "-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 8 12; -fx-font-size: 15px; -fx-border-color: #bdbdbd;");
+
         Button btnGuardar = new Button("Guardar");
         btnGuardar.setDefaultButton(true);
+        btnGuardar.setStyle(
+                "-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-size: 15px; -fx-effect: dropshadow(gaussian, #1976d2, 8, 0.3, 0, 2);");
+
         btnGuardar.setOnAction(e -> {
             try {
                 int nuevoDias = Integer.parseInt(txtDias.getText());
                 if (nuevoDias < 1 || nuevoDias > 365) {
                     mostrarError("El valor debe estar entre 1 y 365 días.");
+                    txtDias.setStyle(txtDias.getStyle() + "-fx-border-color: #e53935;");
                     return;
                 }
                 guardarDiasAlerta(nuevoDias);
@@ -121,12 +127,16 @@ public class VencimientoAlertaCardController {
                 mostrarInfo("Valor actualizado correctamente.");
             } catch (NumberFormatException ex) {
                 mostrarError("Ingrese un número válido.");
+                txtDias.setStyle(txtDias.getStyle() + "-fx-border-color: #e53935;");
             }
         });
 
-        VBox vbox = new VBox(12, lbl, txtDias, btnGuardar);
+        VBox vbox = new VBox(16, lbl, txtDias, btnGuardar);
         vbox.setAlignment(Pos.CENTER);
-        vbox.setMinWidth(320);
+        vbox.setMinWidth(340);
+        vbox.setStyle(
+                "-fx-background-color: #fff; -fx-background-radius: 16; -fx-padding: 32 32 24 32; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);");
+
         Scene scene = new Scene(vbox);
         dialog.setScene(scene);
         dialog.showAndWait();

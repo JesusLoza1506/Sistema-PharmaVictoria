@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VistaPreviaComprobanteController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Ventas</a> &gt; <span class="el_source">VistaPreviaComprobanteController.java</span></div><h1>VistaPreviaComprobanteController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Ventas;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.collections.ObservableList;
+import javafx.collections.FXCollections;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils.Cliente;
+import com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils.DetalleVenta;
+
+<span class="nc" id="L13">public class VistaPreviaComprobanteController {</span>
+    @FXML
+    private Label lblCliente;
+    @FXML
+    private Label lblDocumento;
+    @FXML
+    private Label lblDireccion;
+    @FXML
+    private Label lblTipoComprobante;
+    @FXML
+    private Label lblSerie;
+    @FXML
+    private Label lblNumero;
+    @FXML
+    private Label lblTotal;
+    @FXML
+    private TableView&lt;DetalleVenta&gt; tableDetalles;
+    @FXML
+    private TableColumn&lt;DetalleVenta, Number&gt; colCantidad;
+    @FXML
+    private TableColumn&lt;DetalleVenta, String&gt; colDescripcion;
+    @FXML
+    private TableColumn&lt;DetalleVenta, Number&gt; colPrecioUnitario;
+    @FXML
+    private TableColumn&lt;DetalleVenta, Number&gt; colIGV;
+    @FXML
+    private TableColumn&lt;DetalleVenta, Number&gt; colTotal;
+    @FXML
+    private Button btnEmitir;
+    @FXML
+    private Button btnCancelar;
+    @FXML
+    private Label lblAdvertencia;
+
+    @FXML
+    private ImageView logoSunat;
+
+    private Runnable onConfirmar;
+    private Stage stage;
+
+    public void setDatos(Cliente cliente, String tipoComprobante, String serie, String numero, String total,
+            ObservableList&lt;DetalleVenta&gt; detalles) {
+<span class="nc" id="L55">        lblCliente.setText(cliente.razon_social);</span>
+<span class="nc" id="L56">        lblDocumento.setText(cliente.numero_documento);</span>
+<span class="nc" id="L57">        lblDireccion.setText(cliente.direccion);</span>
+<span class="nc" id="L58">        lblTipoComprobante.setText(tipoComprobante);</span>
+<span class="nc" id="L59">        lblSerie.setText(serie);</span>
+<span class="nc" id="L60">        lblNumero.setText(numero);</span>
+<span class="nc" id="L61">        lblTotal.setText(total);</span>
+<span class="nc" id="L62">        tableDetalles.setItems(detalles);</span>
+<span class="nc" id="L63">    }</span>
+
+    public void setOnConfirmar(Runnable r) {
+<span class="nc" id="L66">        this.onConfirmar = r;</span>
+<span class="nc" id="L67">    }</span>
+
+    public void setStage(Stage s) {
+<span class="nc" id="L70">        this.stage = s;</span>
+<span class="nc" id="L71">    }</span>
+
+    @FXML
+    private void initialize() {
+<span class="nc" id="L75">        colCantidad</span>
+<span class="nc" id="L76">                .setCellValueFactory(data -&gt; new javafx.beans.property.SimpleDoubleProperty(data.getValue().cantidad));</span>
+<span class="nc" id="L77">        colDescripcion.setCellValueFactory(</span>
+<span class="nc" id="L78">                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().descripcion));</span>
+<span class="nc" id="L79">        colPrecioUnitario.setCellValueFactory(</span>
+<span class="nc" id="L80">                data -&gt; new javafx.beans.property.SimpleDoubleProperty(data.getValue().precio_unitario));</span>
+<span class="nc" id="L81">        colIGV.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleDoubleProperty(data.getValue().igv));</span>
+<span class="nc" id="L82">        colTotal.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleDoubleProperty(data.getValue().total));</span>
+<span class="nc" id="L83">        btnEmitir.setOnAction(e -&gt; {</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (onConfirmar != null)</span>
+<span class="nc" id="L85">                onConfirmar.run();</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (stage != null)</span>
+<span class="nc" id="L87">                stage.close();</span>
+<span class="nc" id="L88">        });</span>
+<span class="nc" id="L89">        btnCancelar.setOnAction(e -&gt; {</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (stage != null)</span>
+<span class="nc" id="L91">                stage.close();</span>
+<span class="nc" id="L92">        });</span>
+
+        // Cargar el logo de SUNAT
+        try {
+<span class="nc" id="L96">            Image sunatImg = new Image(getClass().getResource(&quot;/icons/sunat.png&quot;).toExternalForm());</span>
+<span class="nc" id="L97">            logoSunat.setImage(sunatImg);</span>
+<span class="nc" id="L98">        } catch (Exception ex) {</span>
+            // Si no se encuentra la imagen, no hacer nada
+<span class="nc" id="L100">        }</span>
+<span class="nc" id="L101">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

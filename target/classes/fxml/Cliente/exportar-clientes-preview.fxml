@@ -11,21 +11,7 @@
         <Separator />
         <VBox spacing="18.0" styleClass="modal-content-box">
             <children>
-                <HBox alignment="CENTER" spacing="24.0" styleClass="filter-bar">
-                    <children>
-                        <Label styleClass="filter-label" text="Buscar:" />
-                        <TextField fx:id="txtBuscar" prefWidth="250.0" promptText="DNI, nombre, apellidos, teléfono, email..." styleClass="search-field" />
-                        <Label styleClass="filter-label" text="Buscar por:" />
-                        <ComboBox fx:id="cmbTipoFiltro" prefWidth="130.0" promptText="Tipo" styleClass="filter-combo" />
-                        <Label styleClass="filter-label" text="Estado:" />
-                        <ComboBox fx:id="cmbEstadoFiltro" prefWidth="120.0" promptText="Todos" styleClass="filter-combo" />
-                        <CheckBox fx:id="chkSoloFrecuentes" styleClass="filter-checkbox" text="Solo frecuentes" />
-                        <Region HBox.hgrow="ALWAYS" />
-                    </children>
-                    <padding>
-                        <Insets bottom="10.0" left="24.0" right="24.0" top="10.0" />
-                    </padding>
-                </HBox>
+                <!-- Barra de filtros eliminada para exportación -->
                 <Label styleClass="preview-label" text="Vista previa de exportación:" />
                 <TableView fx:id="tablePreview" styleClass="clientes-table" VBox.vgrow="ALWAYS">
                     <columns>
@@ -38,7 +24,7 @@
                         <TableColumn fx:id="colPuntosTotales" prefWidth="100.0" text="Puntos Totales" />
                         <TableColumn fx:id="colPuntosUsados" prefWidth="100.0" text="Puntos Usados" />
                         <TableColumn fx:id="colPuntosDisponibles" prefWidth="120.0" text="Puntos Disponibles" />
-                        <TableColumn fx:id="colFrecuente" prefWidth="90.0" text="Frecuente" />
+                        <!-- Columna 'Frecuente' eliminada -->
                     </columns>
                 </TableView>
             </children>

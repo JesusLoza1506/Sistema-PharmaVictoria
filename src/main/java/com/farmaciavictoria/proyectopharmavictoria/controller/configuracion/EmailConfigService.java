@@ -42,9 +42,9 @@ public class EmailConfigService {
                 config = (EmailConfig) ois.readObject();
             }
         }
-        // Carga usuario y contraseña SMTP desde application.properties si existen
-        String smtpUser = getProperty("mail.smtp.user");
-        String smtpPassword = getProperty("mail.smtp.password");
+        // Carga usuario y contraseña SMTP desde config.properties si existen
+        String smtpUser = getProperty("smtp.user");
+        String smtpPassword = getProperty("smtp.password");
         if (smtpUser != null && !smtpUser.isEmpty())
             config.setSmtpUser(smtpUser);
         if (smtpPassword != null && !smtpPassword.isEmpty())

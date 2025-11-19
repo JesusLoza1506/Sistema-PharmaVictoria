@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SystemEventManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.events</a> &gt; <span class="el_source">SystemEventManager.java</span></div><h1>SystemEventManager.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.events;
+
+import javafx.application.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class SystemEventManager {
+
+<span class="fc" id="L14">    private static final Logger logger = LoggerFactory.getLogger(SystemEventManager.class);</span>
+
+    private static SystemEventManager instance;
+<span class="fc" id="L17">    private final List&lt;SystemEventObserver&gt; observers = new CopyOnWriteArrayList&lt;&gt;();</span>
+<span class="fc" id="L18">    private final ExecutorService eventExecutor = Executors.newFixedThreadPool(3);</span>
+
+<span class="fc" id="L20">    private SystemEventManager() {</span>
+<span class="fc" id="L21">        logger.info(&quot;SystemEventManager inicializado&quot;);</span>
+<span class="fc" id="L22">    }</span>
+
+    public static SystemEventManager getInstance() {
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        if (instance == null) {</span>
+<span class="fc" id="L26">            synchronized (SystemEventManager.class) {</span>
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">                if (instance == null) {</span>
+<span class="fc" id="L28">                    instance = new SystemEventManager();</span>
+                }
+<span class="fc" id="L30">            }</span>
+        }
+<span class="fc" id="L32">        return instance;</span>
+    }
+
+    public void subscribe(SystemEventObserver observer) {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (observer == null) {</span>
+<span class="nc" id="L37">            logger.warn(&quot;Intento de suscribir observador nulo&quot;);</span>
+<span class="nc" id="L38">            return;</span>
+        }
+
+        // Evitar duplicados
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (observers.stream().anyMatch(o -&gt; o.getObserverId().equals(observer.getObserverId()))) {</span>
+<span class="nc" id="L43">            logger.debug(&quot;Observador ya existe: {}&quot;, observer.getObserverId());</span>
+<span class="nc" id="L44">            return;</span>
+        }
+
+<span class="nc" id="L47">        observers.add(observer);</span>
+<span class="nc" id="L48">        logger.info(&quot;Observador suscrito: {} (Total: {})&quot;,</span>
+<span class="nc" id="L49">                observer.getObserverId(), observers.size());</span>
+<span class="nc" id="L50">    }</span>
+
+    public void unsubscribe(SystemEventObserver observer) {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        if (observer == null)</span>
+<span class="nc" id="L54">            return;</span>
+
+<span class="nc" id="L56">        boolean removed = observers.removeIf(o -&gt; o.getObserverId().equals(observer.getObserverId()));</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (removed) {</span>
+<span class="nc" id="L58">            logger.info(&quot;Observador desuscrito: {} (Total: {})&quot;,</span>
+<span class="nc" id="L59">                    observer.getObserverId(), observers.size());</span>
+        }
+<span class="nc" id="L61">    }</span>
+
+    public void unsubscribe(String observerId) {
+<span class="nc" id="L64">        boolean removed = observers.removeIf(o -&gt; o.getObserverId().equals(observerId));</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (removed) {</span>
+<span class="nc" id="L66">            logger.info(&quot;Observador desuscrito por ID: {} (Total: {})&quot;,</span>
+<span class="nc" id="L67">                    observerId, observers.size());</span>
+        }
+<span class="nc" id="L69">    }</span>
+
+    public void publishEvent(SystemEvent event) {
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (event == null) {</span>
+<span class="nc" id="L73">            logger.warn(&quot;Intento de publicar evento nulo&quot;);</span>
+<span class="nc" id="L74">            return;</span>
+        }
+
+<span class="nc" id="L77">        logger.debug(&quot;Publicando evento: {} a {} observadores&quot;,</span>
+<span class="nc" id="L78">                event.getTipo(), observers.size());</span>
+
+        // Notificar observadores de forma asíncrona
+<span class="nc" id="L81">        eventExecutor.submit(() -&gt; notifyObservers(event));</span>
+<span class="nc" id="L82">    }</span>
+
+    public void publishEvent(SystemEvent.EventType tipo, String mensaje, Object source) {
+<span class="nc" id="L85">        publishEvent(new SystemEvent(tipo, mensaje, source));</span>
+<span class="nc" id="L86">    }</span>
+
+    private void notifyObservers(SystemEvent event) {
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        for (SystemEventObserver observer : observers) {</span>
+            try {
+                // Ejecutar en hilo UI de JavaFX para actualizaciones de interfaz
+<span class="nc" id="L92">                Platform.runLater(() -&gt; {</span>
+                    try {
+<span class="nc" id="L94">                        observer.onEvent(event);</span>
+<span class="nc" id="L95">                    } catch (Exception e) {</span>
+<span class="nc" id="L96">                        logger.error(&quot;Error en observador {}: {}&quot;,</span>
+<span class="nc" id="L97">                                observer.getObserverId(), e.getMessage(), e);</span>
+<span class="nc" id="L98">                    }</span>
+<span class="nc" id="L99">                });</span>
+<span class="nc" id="L100">            } catch (Exception e) {</span>
+<span class="nc" id="L101">                logger.error(&quot;Error al notificar observador {}: {}&quot;,</span>
+<span class="nc" id="L102">                        observer.getObserverId(), e.getMessage(), e);</span>
+<span class="nc" id="L103">            }</span>
+<span class="nc" id="L104">        }</span>
+<span class="nc" id="L105">    }</span>
+
+    public int getObserverCount() {
+<span class="nc" id="L108">        return observers.size();</span>
+    }
+
+    public void clearAllObservers() {
+<span class="nc" id="L112">        int count = observers.size();</span>
+<span class="nc" id="L113">        observers.clear();</span>
+<span class="nc" id="L114">        logger.info(&quot;Todos los observadores eliminados: {}&quot;, count);</span>
+<span class="nc" id="L115">    }</span>
+
+    public void shutdown() {
+<span class="nc" id="L118">        logger.info(&quot;Cerrando SystemEventManager...&quot;);</span>
+
+<span class="nc" id="L120">        clearAllObservers();</span>
+<span class="nc" id="L121">        eventExecutor.shutdown();</span>
+
+<span class="nc" id="L123">        logger.info(&quot;SystemEventManager cerrado&quot;);</span>
+<span class="nc" id="L124">    }</span>
+
+    public String getManagerInfo() {
+<span class="nc" id="L127">        return String.format(&quot;SystemEventManager - Observadores: %d, Executor activo: %s&quot;,</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">                observers.size(), !eventExecutor.isShutdown());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

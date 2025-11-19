@@ -19,7 +19,7 @@ public class ReporteVentasDetalleStrategy implements ReporteVentasStrategy {
                 "FROM ventas v " +
                 "LEFT JOIN clientes c ON v.cliente_id = c.id " +
                 "JOIN usuarios u ON v.usuario_id = u.id " +
-                "WHERE v.fecha_venta BETWEEN ? AND ? ";
+                "WHERE v.fecha_venta BETWEEN ? AND ? AND v.estado = 'REALIZADA' ";
 
         try (java.sql.Connection conn = obtenerConexion();
                 java.sql.PreparedStatement ps = conn.prepareStatement(sqlVentas)) {

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DetalleVenta.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.model.Ventas</a> &gt; <span class="el_source">DetalleVenta.java</span></div><h1>DetalleVenta.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.model.Ventas;
+
+import java.math.BigDecimal;
+import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
+
+<span class="nc" id="L6">public class DetalleVenta {</span>
+    private int id;
+    private Venta venta;
+    private Producto producto;
+    private int cantidad;
+    private BigDecimal precioUnitario;
+    private BigDecimal descuento;
+    private BigDecimal subtotal;
+    private String lote;
+    private java.time.LocalDate fechaVencimiento;
+
+    // Getters y setters
+<span class="nc" id="L18">    public int getId() { return id; }</span>
+<span class="nc" id="L19">    public void setId(int id) { this.id = id; }</span>
+
+<span class="nc" id="L21">    public Venta getVenta() { return venta; }</span>
+<span class="nc" id="L22">    public void setVenta(Venta venta) { this.venta = venta; }</span>
+
+<span class="nc" id="L24">    public Producto getProducto() { return producto; }</span>
+<span class="nc" id="L25">    public void setProducto(Producto producto) { this.producto = producto; }</span>
+
+<span class="nc" id="L27">    public int getCantidad() { return cantidad; }</span>
+<span class="nc" id="L28">    public void setCantidad(int cantidad) { this.cantidad = cantidad; }</span>
+
+<span class="nc" id="L30">    public BigDecimal getPrecioUnitario() { return precioUnitario; }</span>
+<span class="nc" id="L31">    public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }</span>
+
+<span class="nc" id="L33">    public BigDecimal getDescuento() { return descuento; }</span>
+<span class="nc" id="L34">    public void setDescuento(BigDecimal descuento) { this.descuento = descuento; }</span>
+
+<span class="nc" id="L36">    public BigDecimal getSubtotal() { return subtotal; }</span>
+<span class="nc" id="L37">    public void setSubtotal(BigDecimal subtotal) { this.subtotal = subtotal; }</span>
+
+<span class="nc" id="L39">    public String getLote() { return lote; }</span>
+<span class="nc" id="L40">    public void setLote(String lote) { this.lote = lote; }</span>
+
+<span class="nc" id="L42">    public java.time.LocalDate getFechaVencimiento() { return fechaVencimiento; }</span>
+<span class="nc" id="L43">    public void setFechaVencimiento(java.time.LocalDate fechaVencimiento) { this.fechaVencimiento = fechaVencimiento; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

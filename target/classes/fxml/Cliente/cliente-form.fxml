@@ -135,7 +135,7 @@
             <children>
                 <Button fx:id="btnGuardar" mnemonicParsing="false" onAction="#onGuardarCliente" styleClass="btn-primary" text=" Guardar Cliente" />
                 <Button fx:id="btnLimpiar" mnemonicParsing="false" onAction="#onLimpiarCampos" styleClass="btn-secondary" text=" Limpiar Campos" />
-                <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#onCancelar" styleClass="btn-danger" text=" Cancelar" />
+                    <!-- Botón Cancelar eliminado -->
             </children>
             <padding>
                 <Insets bottom="15" left="15" right="15" top="15" />

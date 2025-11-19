@@ -28,8 +28,6 @@ public class UsuarioFormController {
 
     @FXML
     private void limpiarCampos() {
-        txtUsername.clear();
-        txtPassword.clear();
         cmbRol.getSelectionModel().clearSelection();
         // ...existing code...
         txtNombres.clear();
@@ -39,11 +37,7 @@ public class UsuarioFormController {
         txtEmail.clear();
     }
 
-    @FXML
-    private void cancelar() {
-        registrado = false;
-        cerrar();
-    }
+    // Eliminada lógica de cancelar
 
     public String getUsername() {
         return txtUsername.getText();
@@ -99,7 +93,7 @@ public class UsuarioFormController {
     @FXML
     public Button btnGuardar;
     @FXML
-    public Button btnCancelar;
+    private Label lblTitulo;
 
     private boolean registrado = false;
 
@@ -107,13 +101,21 @@ public class UsuarioFormController {
     public void initialize() {
         cmbRol.getItems().addAll("ADMIN", "VENDEDOR");
         // ...existing code...
-        btnCancelar.setOnAction(e -> cerrar());
     }
 
     @FXML
     private void cerrar() {
-        Stage stage = (Stage) btnCancelar.getScene().getWindow();
+        Stage stage = (Stage) btnGuardar.getScene().getWindow();
         stage.close();
+    }
+
+    public void setModoEdicion(boolean edicion) {
+        if (lblTitulo != null) {
+            lblTitulo.setText(edicion ? "EDITAR USUARIO" : "➕ NUEVO USUARIO");
+        }
+        if (btnGuardar != null) {
+            btnGuardar.setText(edicion ? "Actualizar Usuario" : "Registrar Usuario");
+        }
     }
 
     public boolean isRegistrado() {

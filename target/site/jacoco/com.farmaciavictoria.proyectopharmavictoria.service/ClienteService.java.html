@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClienteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.service</a> &gt; <span class="el_source">ClienteService.java</span></div><h1>ClienteService.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.service;
+
+import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager;
+import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository;
+import com.farmaciavictoria.proyectopharmavictoria.events.SystemEvent;
+import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+public class ClienteService {
+    /**
+     * Normaliza y prepara los datos del cliente antes de guardar
+     */
+    private void prepararClienteParaGuardar(Cliente cliente) {
+<span class="nc bnc" id="L23" title="All 2 branches missed.">        if (cliente.getNombres() != null) {</span>
+<span class="nc" id="L24">            cliente.setNombres(cliente.getNombres().trim().toUpperCase());</span>
+        }
+<span class="nc bnc" id="L26" title="All 2 branches missed.">        if (cliente.getApellidos() != null) {</span>
+<span class="nc" id="L27">            cliente.setApellidos(cliente.getApellidos().trim().toUpperCase());</span>
+        }
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if (cliente.getEmail() != null) {</span>
+<span class="nc" id="L30">            cliente.setEmail(cliente.getEmail().trim().toLowerCase());</span>
+        }
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        if (cliente.getDocumento() != null) {</span>
+<span class="nc" id="L33">            cliente.setDocumento(cliente.getDocumento().trim());</span>
+        }
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (cliente.getPuntosTotales() == null) {</span>
+<span class="nc" id="L36">            cliente.setPuntosTotales(0);</span>
+        }
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (cliente.getPuntosUsados() == null) {</span>
+<span class="nc" id="L39">            cliente.setPuntosUsados(0);</span>
+        }
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (cliente.getCreatedAt() == null) {</span>
+<span class="nc" id="L42">            cliente.setCreatedAt(LocalDateTime.now());</span>
+        }
+<span class="nc" id="L44">    }</span>
+
+    /**
+     * Devuelve todos los clientes sin paginación
+     */
+    public List&lt;Cliente&gt; obtenerTodos() {
+        try {
+            // Si existe findAll() sin parámetros, úsalo. Si no, usa paginación amplia.
+            // return clienteRepository.findAll();
+<span class="nc" id="L53">            return clienteRepository.findAll(0, 10000); // Ajusta el límite según el tamaño esperado</span>
+<span class="nc" id="L54">        } catch (Exception e) {</span>
+<span class="nc" id="L55">            logger.error(&quot;Error al obtener todos los clientes: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L56">            return List.of();</span>
+        }
+    }
+
+    /**
+     * Obtiene el historial de cambios para un cliente específico
+     */
+    public List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio&gt; obtenerHistorialDeCambios(
+            Integer clienteId) {
+<span class="nc bnc" id="L65" title="All 4 branches missed.">        if (clienteId == null || clienteId &lt;= 0)</span>
+<span class="nc" id="L66">            return List.of();</span>
+<span class="nc" id="L67">        return historialService.obtenerHistorialPorCliente(clienteId);</span>
+    }
+
+    // Servicio de historial de cambios
+<span class="fc" id="L71">    private final com.farmaciavictoria.proyectopharmavictoria.service.ClienteHistorialCambioService historialService = new com.farmaciavictoria.proyectopharmavictoria.service.ClienteHistorialCambioService();</span>
+
+    // Métodos adaptados para compatibilidad con el controlador
+    public List&lt;Cliente&gt; obtenerTodosLosClientes() {
+<span class="nc" id="L75">        return obtenerTodos();</span>
+    }
+
+    public Cliente guardarCliente(Cliente cliente) {
+<span class="nc" id="L79">        return guardar(cliente);</span>
+    }
+
+    public Cliente actualizarCliente(Cliente cliente) {
+<span class="nc" id="L83">        return guardar(cliente);</span>
+    }
+
+    public boolean eliminarCliente(Integer id) {
+<span class="nc bnc" id="L87" title="All 4 branches missed.">        if (id == null || id &lt;= 0) {</span>
+<span class="nc" id="L88">            logger.error(&quot;ID de cliente inválido: {}&quot;, id);</span>
+<span class="nc" id="L89">            throw new IllegalArgumentException(&quot;ID de cliente inválido&quot;);</span>
+        }
+<span class="nc" id="L91">        Cliente clienteAnterior = obtenerPorId(id);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        if (clienteAnterior == null) {</span>
+<span class="nc" id="L93">            logger.warn(&quot;No existe cliente con ID: {}&quot;, id);</span>
+<span class="nc" id="L94">            return false;</span>
+        }
+<span class="nc" id="L96">        try (java.sql.Connection conn = DatabaseConfig.getInstance().getConnection()) {</span>
+            // Eliminar historial de cambios
+<span class="nc" id="L98">            try (java.sql.PreparedStatement stmt = conn</span>
+<span class="nc" id="L99">                    .prepareStatement(&quot;DELETE FROM cliente_historial_cambio WHERE cliente_id = ?&quot;)) {</span>
+<span class="nc" id="L100">                stmt.setInt(1, id);</span>
+<span class="nc" id="L101">                int rows = stmt.executeUpdate();</span>
+<span class="nc" id="L102">                logger.info(&quot;Historial eliminado para cliente {}: {} registros&quot;, id, rows);</span>
+            }
+<span class="nc" id="L104">        } catch (java.sql.SQLException sqlEx) {</span>
+<span class="nc" id="L105">            logger.error(&quot;SQLException al eliminar historial de cliente {}: {}&quot;, id, sqlEx.getMessage(), sqlEx);</span>
+<span class="nc" id="L106">            return false;</span>
+<span class="nc" id="L107">        } catch (Exception e) {</span>
+<span class="nc" id="L108">            logger.error(&quot;Error inesperado al eliminar historial de cliente {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L109">            return false;</span>
+<span class="nc" id="L110">        }</span>
+<span class="nc" id="L111">        boolean eliminado = false;</span>
+        try {
+<span class="nc" id="L113">            eliminado = clienteRepository.delete(id);</span>
+<span class="nc" id="L114">        } catch (Exception e) {</span>
+<span class="nc" id="L115">            logger.error(&quot;Error al eliminar cliente en repositorio ID {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L116">            return false;</span>
+<span class="nc" id="L117">        }</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (eliminado) {</span>
+<span class="nc" id="L119">            logger.info(&quot;Cliente eliminado ID: {}&quot;, id);</span>
+            // Auditoría: registrar historial de eliminación
+<span class="nc" id="L121">            String usuario = System.getProperty(&quot;user.name&quot;, &quot;sistema&quot;);</span>
+<span class="nc" id="L122">            java.time.LocalDateTime ahora = java.time.LocalDateTime.now();</span>
+<span class="nc" id="L123">            historialService.registrarCambio(</span>
+                    new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L125">                            id, &quot;ELIMINACION&quot;, clienteAnterior.getNombreCompleto(), null, usuario, ahora));</span>
+            // Publicar evento solo si fue eliminado
+<span class="nc" id="L127">            eventManager.publishEvent(SystemEvent.EventType.CLIENTE_ELIMINADO,</span>
+                    &quot;Cliente eliminado ID: &quot; + id,
+                    this);
+<span class="nc" id="L130">        } else {</span>
+<span class="nc" id="L131">            logger.warn(&quot;No se pudo eliminar el cliente ID: {}&quot;, id);</span>
+        }
+<span class="nc" id="L133">        return eliminado;</span>
+    }
+
+<span class="fc" id="L136">    private static final Logger logger = LoggerFactory.getLogger(ClienteService.class);</span>
+
+    // ✅ DEPENDENCY INJECTION
+    private final ClienteRepository clienteRepository;
+    private final SystemEventManager eventManager;
+
+    // ✅ PATRONES DE VALIDACIÓN
+<span class="fc" id="L143">    private static final Pattern PATTERN_DNI = Pattern.compile(&quot;^\\d{8}$&quot;);</span>
+<span class="fc" id="L144">    private static final Pattern PATTERN_EMAIL = Pattern.compile(</span>
+            &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$&quot;);
+<span class="fc" id="L146">    private static final Pattern PATTERN_TELEFONO = Pattern.compile(&quot;^\\d{7,15}$&quot;);</span>
+
+    /**
+     * ✅ DEPENDENCY INJECTION: Constructor
+     */
+<span class="fc" id="L151">    public ClienteService(ClienteRepository clienteRepository) {</span>
+<span class="fc" id="L152">        this.clienteRepository = clienteRepository;</span>
+<span class="fc" id="L153">        this.eventManager = SystemEventManager.getInstance();</span>
+<span class="fc" id="L154">        logger.info(&quot;ClienteService inicializado&quot;);</span>
+<span class="fc" id="L155">    }</span>
+
+    // ✅ OPERACIONES PRINCIPALES
+
+    /**
+     * ✅ SERVICE LAYER: Obtener todos los clientes activos
+     */
+    /**
+     * Obtener todos los clientes con paginación
+     */
+    public List&lt;Cliente&gt; obtenerTodos(int offset, int limit) {
+        try {
+<span class="nc" id="L167">            logger.debug(&quot;Obteniendo todos los clientes paginados&quot;);</span>
+<span class="nc" id="L168">            return clienteRepository.findAll(offset, limit);</span>
+<span class="nc" id="L169">        } catch (Exception e) {</span>
+<span class="nc" id="L170">            logger.error(&quot;Error al obtener clientes: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L171">            throw new RuntimeException(&quot;Error al obtener la lista de clientes&quot;, e);</span>
+        }
+    }
+
+    /**
+     * ✅ SERVICE LAYER: Obtener cliente por ID
+     */
+    public Cliente obtenerPorId(Integer id) {
+        try {
+<span class="nc bnc" id="L180" title="All 4 branches missed.">            if (id == null || id &lt;= 0) {</span>
+<span class="nc" id="L181">                throw new IllegalArgumentException(&quot;ID de cliente inválido&quot;);</span>
+            }
+<span class="nc" id="L183">            Optional&lt;Cliente&gt; clienteOpt = clienteRepository.findById(id);</span>
+<span class="nc" id="L184">            return clienteOpt.orElse(null);</span>
+<span class="nc" id="L185">        } catch (Exception e) {</span>
+<span class="nc" id="L186">            logger.error(&quot;Error al obtener cliente por ID {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L187">            throw e;</span>
+        }
+    }
+
+    /**
+     * ✅ SERVICE LAYER: Buscar cliente por DNI
+     */
+    public Optional&lt;Cliente&gt; buscarPorDni(String dni) {
+        // Eliminado: buscarPorDni ya no es válido, usar buscarPorDocumento si se
+        // requiere
+<span class="nc" id="L197">        throw new UnsupportedOperationException(&quot;La búsqueda por DNI ha sido eliminada. Use buscarPorDocumento.&quot;);</span>
+    }
+
+    /**
+     * ✅ SERVICE LAYER: Buscar clientes por nombre
+     */
+    /**
+     * Buscar clientes por nombre o apellido
+     */
+    public List&lt;Cliente&gt; buscarPorNombreOApellido(String texto) {
+        try {
+<span class="nc bnc" id="L208" title="All 4 branches missed.">            if (texto == null || texto.trim().isEmpty()) {</span>
+<span class="nc" id="L209">                return List.of();</span>
+            }
+<span class="nc" id="L211">            logger.debug(&quot;Buscando clientes por nombre/apellido: {}&quot;, texto);</span>
+<span class="nc" id="L212">            return clienteRepository.findByNombreOApellido(texto.trim());</span>
+<span class="nc" id="L213">        } catch (Exception e) {</span>
+<span class="nc" id="L214">            logger.error(&quot;Error al buscar clientes por nombre/apellido '{}': {}&quot;, texto, e.getMessage(), e);</span>
+<span class="nc" id="L215">            return List.of();</span>
+        }
+    }
+
+    /**
+     * Filtrar clientes por teléfono
+     */
+    public List&lt;Cliente&gt; buscarPorTelefono(String telefono) {
+        try {
+<span class="nc bnc" id="L224" title="All 4 branches missed.">            if (telefono == null || telefono.trim().isEmpty()) {</span>
+<span class="nc" id="L225">                return List.of();</span>
+            }
+<span class="nc" id="L227">            return obtenerTodos(0, 1000).stream()</span>
+<span class="nc" id="L228">                    .filter(c -&gt; telefono.equals(c.getTelefono()))</span>
+<span class="nc" id="L229">                    .collect(Collectors.toList());</span>
+<span class="nc" id="L230">        } catch (Exception e) {</span>
+<span class="nc" id="L231">            logger.error(&quot;Error al buscar clientes por teléfono '{}': {}&quot;, telefono, e.getMessage(), e);</span>
+<span class="nc" id="L232">            return List.of();</span>
+        }
+    }
+
+    /**
+     * Filtrar clientes por email
+     */
+    public List&lt;Cliente&gt; buscarPorEmail(String email) {
+        try {
+<span class="nc bnc" id="L241" title="All 4 branches missed.">            if (email == null || email.trim().isEmpty()) {</span>
+<span class="nc" id="L242">                return List.of();</span>
+            }
+<span class="nc" id="L244">            return obtenerTodos(0, 1000).stream()</span>
+<span class="nc" id="L245">                    .filter(c -&gt; email.equalsIgnoreCase(c.getEmail()))</span>
+<span class="nc" id="L246">                    .collect(Collectors.toList());</span>
+<span class="nc" id="L247">        } catch (Exception e) {</span>
+<span class="nc" id="L248">            logger.error(&quot;Error al buscar clientes por email '{}': {}&quot;, email, e.getMessage(), e);</span>
+<span class="nc" id="L249">            return List.of();</span>
+        }
+    }
+
+    /**
+     * Filtrar clientes por estado frecuente
+     */
+    public List&lt;Cliente&gt; buscarFrecuentes() {
+        // Eliminado: lógica de clientes frecuentes
+<span class="nc" id="L258">        return List.of();</span>
+    }
+
+    /**
+     * Filtrar clientes por estado inactivo (si existiera campo)
+     */
+    public List&lt;Cliente&gt; buscarInactivos() {
+        // Si se agrega campo activo/inactivo, aquí se implementa
+<span class="nc" id="L266">        return List.of();</span>
+    }
+
+    /**
+     * ✅ SERVICE LAYER: Guardar cliente (crear o actualizar)
+     */
+    public Cliente guardar(Cliente cliente) {
+        try {
+<span class="nc" id="L274">            logger.debug(&quot;Iniciando proceso de guardado de cliente&quot;);</span>
+            // Aplicar validaciones de negocio
+<span class="nc" id="L276">            validarCliente(cliente);</span>
+            // Preparar datos para persistencia
+<span class="nc" id="L278">            prepararClienteParaGuardar(cliente);</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">            boolean esNuevo = cliente.getId() == null;</span>
+<span class="nc" id="L280">            Cliente clienteAnterior = null;</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">            if (!esNuevo) {</span>
+<span class="nc" id="L282">                clienteAnterior = obtenerPorId(cliente.getId());</span>
+            }
+<span class="nc" id="L284">            boolean guardado = clienteRepository.save(cliente);</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">            if (!guardado) {</span>
+<span class="nc" id="L286">                throw new RuntimeException(&quot;No se pudo guardar el cliente en la base de datos&quot;);</span>
+            }
+<span class="nc bnc" id="L288" title="All 2 branches missed.">            String accion = esNuevo ? &quot;creado&quot; : &quot;actualizado&quot;;</span>
+<span class="nc" id="L289">            logger.info(&quot;Cliente {} exitosamente: {}&quot;, accion, cliente.getNombreCompleto());</span>
+            // Auditoría: registrar historial de cambios siguiendo el patrón de proveedores
+            String usuario = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
+<span class="nc bnc" id="L292" title="All 2 branches missed.">                    .getUsuarioActual() != null</span>
+                            ? com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
+<span class="nc" id="L294">                                    .getUsuarioActual().getUsername()</span>
+<span class="nc" id="L295">                            : System.getProperty(&quot;user.name&quot;, &quot;sistema&quot;);</span>
+<span class="nc" id="L296">            java.time.LocalDateTime ahora = java.time.LocalDateTime.now();</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">            if (esNuevo) {</span>
+<span class="nc" id="L298">                historialService.registrarCambio(</span>
+                        new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L300">                                cliente.getId(), &quot;CREACION&quot;, null, cliente.getNombreCompleto(), usuario, ahora));</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">            } else if (clienteAnterior != null) {</span>
+                // Comparar campos relevantes y registrar cada cambio individualmente
+<span class="nc bnc" id="L303" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getDocumento(), cliente.getDocumento()))</span>
+<span class="nc" id="L304">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L306">                                    cliente.getId(), &quot;documento&quot;, clienteAnterior.getDocumento(),</span>
+<span class="nc" id="L307">                                    cliente.getDocumento(), usuario,</span>
+                                    ahora));
+<span class="nc bnc" id="L309" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getTipoCliente(), cliente.getTipoCliente()))</span>
+<span class="nc" id="L310">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L312">                                    cliente.getId(), &quot;tipo_cliente&quot;, clienteAnterior.getTipoCliente(),</span>
+<span class="nc" id="L313">                                    cliente.getTipoCliente(), usuario,</span>
+                                    ahora));
+<span class="nc bnc" id="L315" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getRazonSocial(), cliente.getRazonSocial()))</span>
+<span class="nc" id="L316">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L318">                                    cliente.getId(), &quot;razon_social&quot;, clienteAnterior.getRazonSocial(),</span>
+<span class="nc" id="L319">                                    cliente.getRazonSocial(), usuario,</span>
+                                    ahora));
+<span class="nc bnc" id="L321" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getNombres(), cliente.getNombres()))</span>
+<span class="nc" id="L322">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L324">                                    cliente.getId(), &quot;nombres&quot;, clienteAnterior.getNombres(), cliente.getNombres(),</span>
+                                    usuario, ahora));
+<span class="nc bnc" id="L326" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getApellidos(), cliente.getApellidos()))</span>
+<span class="nc" id="L327">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L329">                                    cliente.getId(), &quot;apellidos&quot;, clienteAnterior.getApellidos(),</span>
+<span class="nc" id="L330">                                    cliente.getApellidos(), usuario, ahora));</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getTelefono(), cliente.getTelefono()))</span>
+<span class="nc" id="L332">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L334">                                    cliente.getId(), &quot;telefono&quot;, clienteAnterior.getTelefono(), cliente.getTelefono(),</span>
+                                    usuario, ahora));
+<span class="nc bnc" id="L336" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getEmail(), cliente.getEmail()))</span>
+<span class="nc" id="L337">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L339">                                    cliente.getId(), &quot;email&quot;, clienteAnterior.getEmail(), cliente.getEmail(), usuario,</span>
+                                    ahora));
+<span class="nc bnc" id="L341" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getDireccion(), cliente.getDireccion()))</span>
+<span class="nc" id="L342">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L344">                                    cliente.getId(), &quot;direccion&quot;, clienteAnterior.getDireccion(),</span>
+<span class="nc" id="L345">                                    cliente.getDireccion(), usuario, ahora));</span>
+<span class="nc bnc" id="L346" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getFechaNacimiento(), cliente.getFechaNacimiento()))</span>
+<span class="nc" id="L347">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L349">                                    cliente.getId(), &quot;fecha_nacimiento&quot;,</span>
+<span class="nc" id="L350">                                    safeToString(clienteAnterior.getFechaNacimiento()),</span>
+<span class="nc" id="L351">                                    safeToString(cliente.getFechaNacimiento()), usuario, ahora));</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getPuntosTotales(), cliente.getPuntosTotales()))</span>
+<span class="nc" id="L353">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L355">                                    cliente.getId(), &quot;puntos_totales&quot;, safeToString(clienteAnterior.getPuntosTotales()),</span>
+<span class="nc" id="L356">                                    safeToString(cliente.getPuntosTotales()), usuario, ahora));</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getPuntosUsados(), cliente.getPuntosUsados()))</span>
+<span class="nc" id="L358">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L360">                                    cliente.getId(), &quot;puntos_usados&quot;, safeToString(clienteAnterior.getPuntosUsados()),</span>
+<span class="nc" id="L361">                                    safeToString(cliente.getPuntosUsados()), usuario, ahora));</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getCreatedAt(), cliente.getCreatedAt()))</span>
+<span class="nc" id="L363">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L365">                                    cliente.getId(), &quot;created_at&quot;, safeToString(clienteAnterior.getCreatedAt()),</span>
+<span class="nc" id="L366">                                    safeToString(cliente.getCreatedAt()), usuario, ahora));</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getUpdatedAt(), cliente.getUpdatedAt()))</span>
+<span class="nc" id="L368">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L370">                                    cliente.getId(), &quot;updated_at&quot;, safeToString(clienteAnterior.getUpdatedAt()),</span>
+<span class="nc" id="L371">                                    safeToString(cliente.getUpdatedAt()), usuario, ahora));</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">                if (!safeEquals(clienteAnterior.getPuntosDisponibles(), cliente.getPuntosDisponibles()))</span>
+<span class="nc" id="L373">                    historialService.registrarCambio(</span>
+                            new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio(
+<span class="nc" id="L375">                                    cliente.getId(), &quot;puntos_disponibles&quot;,</span>
+<span class="nc" id="L376">                                    safeToString(clienteAnterior.getPuntosDisponibles()),</span>
+<span class="nc" id="L377">                                    safeToString(cliente.getPuntosDisponibles()), usuario, ahora));</span>
+            }
+            // ✅ OBSERVER PATTERN: Publicar evento
+<span class="nc bnc" id="L380" title="All 2 branches missed.">            SystemEvent.EventType tipoEvento = esNuevo ? SystemEvent.EventType.CLIENTE_CREADO</span>
+<span class="nc" id="L381">                    : SystemEvent.EventType.CLIENTE_ACTUALIZADO;</span>
+<span class="nc" id="L382">            eventManager.publishEvent(tipoEvento,</span>
+<span class="nc" id="L383">                    &quot;Cliente &quot; + accion + &quot;: &quot; + cliente.getNombreCompleto(),</span>
+                    this);
+<span class="nc" id="L385">            return cliente;</span>
+<span class="nc" id="L386">        } catch (Exception e) {</span>
+<span class="nc" id="L387">            logger.error(&quot;Error al guardar cliente: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L388">            throw e;</span>
+        }
+    }
+
+    // Métodos auxiliares para comparación segura
+    private boolean safeEquals(Object a, Object b) {
+<span class="nc bnc" id="L394" title="All 4 branches missed.">        if (a == null &amp;&amp; b == null)</span>
+<span class="nc" id="L395">            return true;</span>
+<span class="nc bnc" id="L396" title="All 4 branches missed.">        if (a == null || b == null)</span>
+<span class="nc" id="L397">            return false;</span>
+<span class="nc" id="L398">        return a.equals(b);</span>
+    }
+
+    private String safeToString(Object o) {
+<span class="nc bnc" id="L402" title="All 2 branches missed.">        return o == null ? &quot;&quot; : o.toString();</span>
+    }
+
+    // Método desactivar eliminado: ahora eliminarCliente hace el borrado real
+
+    // ✅ SISTEMA DE PUNTOS
+
+    /**
+     * ✅ SERVICE LAYER: Agregar puntos por compra
+     */
+    public void agregarPuntosPorCompra(Integer clienteId, Double montoCompra) {
+        try {
+<span class="nc bnc" id="L414" title="All 6 branches missed.">            if (clienteId == null || montoCompra == null || montoCompra &lt;= 0) {</span>
+<span class="nc" id="L415">                return;</span>
+            }
+            // Calcular puntos (1 punto por cada S/ 10)
+<span class="nc" id="L418">            int puntosAGanar = (int) (montoCompra / 10);</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">            if (puntosAGanar &gt; 0) {</span>
+<span class="nc" id="L420">                logger.info(&quot;Puntos agregados a cliente ID {}: {} puntos por compra de S/ {}&quot;,</span>
+<span class="nc" id="L421">                        clienteId, puntosAGanar, montoCompra);</span>
+                // ✅ OBSERVER PATTERN: Publicar evento de puntos
+<span class="nc" id="L423">                eventManager.publishEvent(SystemEvent.EventType.CLIENTE_PUNTOS_AGREGADOS,</span>
+<span class="nc" id="L424">                        String.format(&quot;Cliente ID %d ganó %d puntos&quot;, clienteId, puntosAGanar),</span>
+                        this);
+            }
+<span class="nc" id="L427">        } catch (Exception e) {</span>
+<span class="nc" id="L428">            logger.error(&quot;Error al agregar puntos por compra: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L429">        }</span>
+<span class="nc" id="L430">    }</span>
+
+    /**
+     * ✅ SERVICE LAYER: Redimir puntos del cliente
+     */
+    public boolean redimirPuntos(Integer clienteId, Integer puntos) {
+        try {
+<span class="nc bnc" id="L437" title="All 6 branches missed.">            if (clienteId == null || puntos == null || puntos &lt;= 0) {</span>
+<span class="nc" id="L438">                return false;</span>
+            }
+
+<span class="nc" id="L441">            logger.info(&quot;Puntos redimidos de cliente ID {}: {} puntos&quot;, clienteId, puntos);</span>
+
+            // ✅ OBSERVER PATTERN: Publicar evento de redención
+<span class="nc" id="L444">            eventManager.publishEvent(SystemEvent.EventType.CLIENTE_PUNTOS_REDIMIDOS,</span>
+<span class="nc" id="L445">                    String.format(&quot;Cliente ID %d redimió %d puntos&quot;, clienteId, puntos),</span>
+                    this);
+
+<span class="nc" id="L448">            return true;</span>
+
+<span class="nc" id="L450">        } catch (Exception e) {</span>
+<span class="nc" id="L451">            logger.error(&quot;Error al redimir puntos: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L452">            return false;</span>
+        }
+    }
+
+    // ✅ VALIDACIONES DE NEGOCIO
+
+    /**
+     * ✅ SERVICE LAYER: Validaciones centralizadas de cliente
+     */
+    public void validarCliente(Cliente cliente) {
+<span class="nc bnc" id="L462" title="All 2 branches missed.">        if (cliente == null) {</span>
+<span class="nc" id="L463">            throw new IllegalArgumentException(&quot;Cliente no puede ser nulo&quot;);</span>
+        }
+
+<span class="nc" id="L466">        String tipo = cliente.getTipoCliente();</span>
+<span class="nc bnc" id="L467" title="All 2 branches missed.">        if (&quot;Natural&quot;.equalsIgnoreCase(tipo)) {</span>
+            // Validar documento (DNI)
+<span class="nc bnc" id="L469" title="All 4 branches missed.">            if (cliente.getDocumento() == null || cliente.getDocumento().trim().isEmpty()) {</span>
+<span class="nc" id="L470">                throw new IllegalArgumentException(&quot;DNI es obligatorio&quot;);</span>
+            }
+<span class="nc bnc" id="L472" title="All 2 branches missed.">            if (!PATTERN_DNI.matcher(cliente.getDocumento().trim()).matches()) {</span>
+<span class="nc" id="L473">                throw new IllegalArgumentException(&quot;DNI debe tener exactamente 8 dígitos numéricos&quot;);</span>
+            }
+            // Validar nombres
+<span class="nc bnc" id="L476" title="All 4 branches missed.">            if (cliente.getNombres() == null || cliente.getNombres().trim().isEmpty()) {</span>
+<span class="nc" id="L477">                throw new IllegalArgumentException(&quot;Nombres son obligatorios&quot;);</span>
+            }
+<span class="nc bnc" id="L479" title="All 2 branches missed.">            if (cliente.getNombres().trim().length() &lt; 2) {</span>
+<span class="nc" id="L480">                throw new IllegalArgumentException(&quot;Nombres deben tener al menos 2 caracteres&quot;);</span>
+            }
+            // Validar apellidos
+<span class="nc bnc" id="L483" title="All 4 branches missed.">            if (cliente.getApellidos() == null || cliente.getApellidos().trim().isEmpty()) {</span>
+<span class="nc" id="L484">                throw new IllegalArgumentException(&quot;Apellidos son obligatorios&quot;);</span>
+            }
+<span class="nc bnc" id="L486" title="All 2 branches missed.">            if (cliente.getApellidos().trim().length() &lt; 2) {</span>
+<span class="nc" id="L487">                throw new IllegalArgumentException(&quot;Apellidos deben tener al menos 2 caracteres&quot;);</span>
+            }
+<span class="nc bnc" id="L489" title="All 2 branches missed.">        } else if (&quot;Empresa&quot;.equalsIgnoreCase(tipo)) {</span>
+            // Validar documento (RUC)
+<span class="nc bnc" id="L491" title="All 4 branches missed.">            if (cliente.getDocumento() == null || cliente.getDocumento().trim().isEmpty()) {</span>
+<span class="nc" id="L492">                throw new IllegalArgumentException(&quot;RUC es obligatorio&quot;);</span>
+            }
+<span class="nc bnc" id="L494" title="All 2 branches missed.">            if (!cliente.getDocumento().trim().matches(&quot;\\d{11}&quot;)) {</span>
+<span class="nc" id="L495">                throw new IllegalArgumentException(&quot;RUC debe tener exactamente 11 dígitos numéricos&quot;);</span>
+            }
+            // Validar Razón Social
+<span class="nc bnc" id="L498" title="All 4 branches missed.">            if (cliente.getRazonSocial() == null || cliente.getRazonSocial().trim().isEmpty()) {</span>
+<span class="nc" id="L499">                throw new IllegalArgumentException(&quot;Razón Social es obligatoria&quot;);</span>
+            }
+<span class="nc bnc" id="L501" title="All 2 branches missed.">            if (cliente.getRazonSocial().trim().length() &lt; 2) {</span>
+<span class="nc" id="L502">                throw new IllegalArgumentException(&quot;Razón Social debe tener al menos 2 caracteres&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L505">            throw new IllegalArgumentException(&quot;Tipo de cliente inválido&quot;);</span>
+        }
+
+        // Validaciones opcionales
+<span class="nc" id="L509">        validarEmail(cliente.getEmail());</span>
+<span class="nc" id="L510">        validarTelefono(cliente.getTelefono());</span>
+<span class="nc" id="L511">        validarFechaNacimiento(cliente.getFechaNacimiento());</span>
+<span class="nc" id="L512">    }</span>
+
+    /**
+     * ✅ SERVICE LAYER: Validar email
+     */
+    public void validarEmail(String email) {
+<span class="nc bnc" id="L518" title="All 4 branches missed.">        if (email != null &amp;&amp; !email.trim().isEmpty()) {</span>
+<span class="nc bnc" id="L519" title="All 2 branches missed.">            if (!PATTERN_EMAIL.matcher(email.trim()).matches()) {</span>
+<span class="nc" id="L520">                throw new IllegalArgumentException(&quot;El formato del email es inválido&quot;);</span>
+            }
+        }
+<span class="nc" id="L523">    }</span>
+
+    /**
+     * ✅ SERVICE LAYER: Validar teléfono
+     */
+    public void validarTelefono(String telefono) {
+<span class="nc bnc" id="L529" title="All 4 branches missed.">        if (telefono != null &amp;&amp; !telefono.trim().isEmpty()) {</span>
+<span class="nc bnc" id="L530" title="All 2 branches missed.">            if (!PATTERN_TELEFONO.matcher(telefono.trim()).matches()) {</span>
+<span class="nc" id="L531">                throw new IllegalArgumentException(&quot;El teléfono debe tener entre 7 y 15 dígitos numéricos&quot;);</span>
+            }
+        }
+<span class="nc" id="L534">    }</span>
+
+    /**
+     * ✅ SERVICE LAYER: Validar fecha de nacimiento
+     */
+    public void validarFechaNacimiento(LocalDate fechaNacimiento) {
+<span class="nc bnc" id="L540" title="All 2 branches missed.">        if (fechaNacimiento != null) {</span>
+<span class="nc" id="L541">            LocalDate hoy = LocalDate.now();</span>
+<span class="nc bnc" id="L542" title="All 2 branches missed.">            if (fechaNacimiento.isAfter(hoy)) {</span>
+<span class="nc" id="L543">                throw new IllegalArgumentException(&quot;La fecha de nacimiento no puede ser futura&quot;);</span>
+            }
+<span class="nc" id="L545">            int edad = hoy.getYear() - fechaNacimiento.getYear();</span>
+<span class="nc bnc" id="L546" title="All 4 branches missed.">            if (edad &lt; 0 || edad &gt; 120) {</span>
+<span class="nc" id="L547">                throw new IllegalArgumentException(&quot;La edad debe estar entre 0 y 120 años&quot;);</span>
+            }
+        }
+<span class="nc" id="L550">    }</span>
+
+    // ✅ CONSULTAS ESPECIALIZADAS
+
+    /**
+     * ✅ SERVICE LAYER: Obtener clientes frecuentes
+     */
+    public List&lt;Cliente&gt; obtenerClientesFrecuentes() {
+        // Eliminado: lógica de clientes frecuentes
+<span class="nc" id="L559">        return List.of();</span>
+    }
+
+    /**
+     * ✅ SERVICE LAYER: Obtener estadísticas de clientes
+     */
+    public EstadisticasClientes obtenerEstadisticas() {
+        try {
+<span class="nc" id="L567">            List&lt;Cliente&gt; todos = obtenerTodos();</span>
+
+<span class="nc" id="L569">            int totalActivos = todos.size();</span>
+<span class="nc" id="L570">            int frecuentes = 0; // Eliminado: lógica de clientes frecuentes</span>
+<span class="nc" id="L571">            int nuevosDelMes = 0; // Por implementar con fecha_registro</span>
+<span class="nc" id="L572">            double promedioPuntos = todos.stream()</span>
+<span class="nc bnc" id="L573" title="All 2 branches missed.">                    .mapToInt(c -&gt; c.getPuntosDisponibles() != null ? c.getPuntosDisponibles() : 0)</span>
+<span class="nc" id="L574">                    .average()</span>
+<span class="nc" id="L575">                    .orElse(0.0);</span>
+
+<span class="nc" id="L577">            return new EstadisticasClientes(totalActivos, frecuentes, nuevosDelMes, promedioPuntos);</span>
+<span class="nc" id="L578">        } catch (Exception e) {</span>
+<span class="nc" id="L579">            logger.error(&quot;Error al obtener estadísticas de clientes: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L580">            return new EstadisticasClientes(0, 0, 0, 0.0);</span>
+        }
+    }
+
+    /**
+     * ✅ CLASE PARA ESTADÍSTICAS
+     */
+    public static class EstadisticasClientes {
+        private final int totalActivos;
+        private final int frecuentes;
+        private final int nuevosDelMes;
+        private final double promedioPuntos;
+
+<span class="nc" id="L593">        public EstadisticasClientes(int totalActivos, int frecuentes, int nuevosDelMes, double promedioPuntos) {</span>
+<span class="nc" id="L594">            this.totalActivos = totalActivos;</span>
+<span class="nc" id="L595">            this.frecuentes = frecuentes;</span>
+<span class="nc" id="L596">            this.nuevosDelMes = nuevosDelMes;</span>
+<span class="nc" id="L597">            this.promedioPuntos = promedioPuntos;</span>
+<span class="nc" id="L598">        }</span>
+
+        public int getTotalActivos() {
+<span class="nc" id="L601">            return totalActivos;</span>
+        }
+
+        public int getFrecuentes() {
+<span class="nc" id="L605">            return frecuentes;</span>
+        }
+
+        public int getNuevosDelMes() {
+<span class="nc" id="L609">            return nuevosDelMes;</span>
+        }
+
+        public double getPromedioPuntos() {
+<span class="nc" id="L613">            return promedioPuntos;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

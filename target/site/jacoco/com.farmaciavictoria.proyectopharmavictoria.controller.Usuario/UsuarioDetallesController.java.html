@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioDetallesController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Usuario</a> &gt; <span class="el_source">UsuarioDetallesController.java</span></div><h1>UsuarioDetallesController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Usuario;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.Alert;
+import javafx.stage.Stage;
+
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioAcceso;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioAuditoria;
+
+<span class="nc" id="L15">public class UsuarioDetallesController {</span>
+    @FXML
+    private Label lblTitulo;
+    @FXML
+    private Label lblUsername;
+    @FXML
+    private Label lblNombres;
+    @FXML
+    private Label lblApellidos;
+    @FXML
+    private Label lblDni;
+    @FXML
+    private Label lblTelefono;
+    @FXML
+    private Label lblEmail;
+    @FXML
+    private Label lblRol;
+    // ...existing code...
+    @FXML
+    private Label lblEstado;
+    @FXML
+    private Label lblUltimoAcceso;
+    @FXML
+    private TableView&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialAcceso&gt; accesosTable;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialAcceso, String&gt; colAccesoFecha;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialAcceso, String&gt; colAccesoIp;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialAcceso, String&gt; colAccesoDispositivo;
+    @FXML
+    private TableView&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio&gt; auditoriaTable;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio, String&gt; colAuditoriaFecha;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio, String&gt; colAuditoriaAccion;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio, String&gt; colAuditoriaUsuario;
+    @FXML
+    private TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio, String&gt; colAuditoriaDetalle;
+
+    private Usuario usuarioActual;
+
+    public void cargarUsuario(Usuario usuario) {
+<span class="nc" id="L59">        this.usuarioActual = usuario;</span>
+        // Validación y visualización de datos
+<span class="nc bnc" id="L61" title="All 6 branches missed.">        lblUsername.setText((usuario != null &amp;&amp; usuario.getUsername() != null &amp;&amp; !usuario.getUsername().isEmpty())</span>
+<span class="nc" id="L62">                ? usuario.getUsername()</span>
+<span class="nc" id="L63">                : &quot;-&quot;);</span>
+<span class="nc bnc" id="L64" title="All 6 branches missed.">        lblNombres.setText((usuario != null &amp;&amp; usuario.getNombres() != null &amp;&amp; !usuario.getNombres().isEmpty())</span>
+<span class="nc" id="L65">                ? usuario.getNombres()</span>
+<span class="nc" id="L66">                : &quot;-&quot;);</span>
+<span class="nc bnc" id="L67" title="All 6 branches missed.">        lblApellidos.setText((usuario != null &amp;&amp; usuario.getApellidos() != null &amp;&amp; !usuario.getApellidos().isEmpty())</span>
+<span class="nc" id="L68">                ? usuario.getApellidos()</span>
+<span class="nc" id="L69">                : &quot;-&quot;);</span>
+<span class="nc" id="L70">        lblDni.setText(</span>
+<span class="nc bnc" id="L71" title="All 6 branches missed.">                (usuario != null &amp;&amp; usuario.getDni() != null &amp;&amp; !usuario.getDni().isEmpty()) ? usuario.getDni() : &quot;-&quot;);</span>
+<span class="nc bnc" id="L72" title="All 6 branches missed.">        lblTelefono.setText((usuario != null &amp;&amp; usuario.getTelefono() != null &amp;&amp; !usuario.getTelefono().isEmpty())</span>
+<span class="nc" id="L73">                ? usuario.getTelefono()</span>
+<span class="nc" id="L74">                : &quot;-&quot;);</span>
+<span class="nc" id="L75">        lblEmail.setText(</span>
+<span class="nc bnc" id="L76" title="All 6 branches missed.">                (usuario != null &amp;&amp; usuario.getEmail() != null &amp;&amp; !usuario.getEmail().isEmpty()) ? usuario.getEmail()</span>
+<span class="nc" id="L77">                        : &quot;-&quot;);</span>
+<span class="nc bnc" id="L78" title="All 4 branches missed.">        lblRol.setText((usuario != null &amp;&amp; usuario.getRol() != null) ? usuario.getRol().name() : &quot;-&quot;);</span>
+        // ...existing code...
+<span class="nc" id="L80">        lblUltimoAcceso.setText(</span>
+<span class="nc bnc" id="L81" title="All 4 branches missed.">                (usuario != null &amp;&amp; usuario.getUltimoAcceso() != null) ? usuario.getUltimoAcceso().toString() : &quot;-&quot;);</span>
+
+        // Estado visual robusto
+<span class="nc bnc" id="L84" title="All 4 branches missed.">        lblEstado.setText((usuario != null &amp;&amp; usuario.isActivo()) ? &quot;Activo&quot; : &quot;Inactivo&quot;);</span>
+<span class="nc" id="L85">        lblEstado.getStyleClass().removeAll(&quot;estado-activo&quot;, &quot;estado-inactivo&quot;);</span>
+<span class="nc bnc" id="L86" title="All 4 branches missed.">        if (usuario != null &amp;&amp; usuario.isActivo()) {</span>
+<span class="nc" id="L87">            lblEstado.getStyleClass().add(&quot;estado-activo&quot;);</span>
+        } else {
+<span class="nc" id="L89">            lblEstado.getStyleClass().add(&quot;estado-inactivo&quot;);</span>
+        }
+
+        // Poblar tabla de accesos
+<span class="nc" id="L93">        accesosTable.getItems().clear();</span>
+<span class="nc bnc" id="L94" title="All 4 branches missed.">        if (usuario != null &amp;&amp; usuario.getId() != null) {</span>
+            // Recargar historial desde el servicio para asegurar datos actualizados
+            com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService usuarioService = com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService
+<span class="nc" id="L97">                    .getInstance();</span>
+<span class="nc" id="L98">            java.util.List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialAcceso&gt; accesos = usuarioService</span>
+<span class="nc" id="L99">                    .obtenerHistorialAccesos(usuario.getId());</span>
+<span class="nc bnc" id="L100" title="All 4 branches missed.">            if (accesos != null &amp;&amp; !accesos.isEmpty()) {</span>
+<span class="nc" id="L101">                accesosTable.getItems().addAll(accesos);</span>
+            }
+<span class="nc" id="L103">            java.util.List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio&gt; auditoria = usuarioService</span>
+<span class="nc" id="L104">                    .obtenerHistorialCambios(usuario.getId());</span>
+<span class="nc" id="L105">            auditoriaTable.getItems().clear();</span>
+<span class="nc bnc" id="L106" title="All 4 branches missed.">            if (auditoria != null &amp;&amp; !auditoria.isEmpty()) {</span>
+<span class="nc" id="L107">                auditoriaTable.getItems().addAll(auditoria);</span>
+            }
+        }
+<span class="nc" id="L110">    }</span>
+
+    @FXML
+    public void initialize() {
+        // boton cerrar removido del FXML: no es necesario manejarlo aquí
+
+        // Configurar columnas de accesos
+<span class="nc" id="L117">        colAccesoFecha.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">                data.getValue().getFechaAcceso() != null ? data.getValue().getFechaAcceso().toString() : &quot;-&quot;));</span>
+<span class="nc" id="L119">        colAccesoIp.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                data.getValue().getIpAddress() != null ? data.getValue().getIpAddress() : &quot;-&quot;));</span>
+<span class="nc" id="L121">        colAccesoDispositivo.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">                data.getValue().getUserAgent() != null ? data.getValue().getUserAgent() : &quot;-&quot;));</span>
+
+        // Configurar columnas de auditoría
+<span class="nc" id="L125">        colAuditoriaFecha.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">                data.getValue().getFecha() != null ? data.getValue().getFecha().toString() : &quot;-&quot;));</span>
+<span class="nc" id="L127">        colAuditoriaAccion.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">                data.getValue().getCampo_modificado() != null ? data.getValue().getCampo_modificado() : &quot;-&quot;));</span>
+<span class="nc" id="L129">        colAuditoriaUsuario.setCellValueFactory(data -&gt; {</span>
+<span class="nc" id="L130">            Integer id = data.getValue().getModificado_por();</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">            if (id == null)</span>
+<span class="nc" id="L132">                return new javafx.beans.property.SimpleStringProperty(&quot;-&quot;);</span>
+<span class="nc" id="L133">            com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository usuarioRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository();</span>
+<span class="nc" id="L134">            java.util.Optional&lt;com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario&gt; usuarioOpt = usuarioRepo</span>
+<span class="nc" id="L135">                    .findById(id.longValue());</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">            if (usuarioOpt.isPresent()) {</span>
+<span class="nc" id="L137">                com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario u = usuarioOpt.get();</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                String nombre = (u.getNombres() != null ? u.getNombres() : &quot;&quot;) + &quot; &quot;</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">                        + (u.getApellidos() != null ? u.getApellidos() : &quot;&quot;);</span>
+<span class="nc" id="L140">                return new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                        nombre.trim().isEmpty() ? u.getUsername() : nombre.trim());</span>
+            } else {
+<span class="nc" id="L143">                return new javafx.beans.property.SimpleStringProperty(String.valueOf(id));</span>
+            }
+        });
+<span class="nc" id="L146">        colAuditoriaDetalle.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">                (data.getValue().getValor_anterior() != null ? &quot;Anterior: &quot; + data.getValue().getValor_anterior() + &quot;\n&quot;</span>
+<span class="nc" id="L148">                        : &quot;&quot;) +</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">                        (data.getValue().getValor_nuevo() != null ? &quot;Nuevo: &quot; + data.getValue().getValor_nuevo()</span>
+<span class="nc" id="L150">                                : &quot;&quot;)));</span>
+
+        // Forzar estilo de los encabezados en tiempo de ejecución (override de hojas
+        // CSS cargadas después)
+<span class="nc" id="L154">        fixTableHeaders(accesosTable);</span>
+<span class="nc" id="L155">        fixTableHeaders(auditoriaTable);</span>
+
+        // Reemplazar los headers de las columnas por Labels con estilo inline (solución
+        // definitiva)
+<span class="nc" id="L159">        javafx.application.Platform.runLater(() -&gt; {</span>
+            try {
+<span class="nc" id="L161">                replaceColumnHeadersWithLabels(accesosTable);</span>
+<span class="nc" id="L162">                replaceColumnHeadersWithLabels(auditoriaTable);</span>
+<span class="nc" id="L163">            } catch (Exception ex) {</span>
+<span class="nc" id="L164">                System.err.println(&quot;Warning: no se pudieron reemplazar headers por labels: &quot; + ex.getMessage());</span>
+<span class="nc" id="L165">            }</span>
+<span class="nc" id="L166">        });</span>
+<span class="nc" id="L167">    }</span>
+
+    // Método auxiliar que busca los nodos de header en una TableView y aplica
+    // estilos inline
+    private void fixTableHeaders(javafx.scene.control.TableView&lt;?&gt; table) {
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        if (table == null)</span>
+<span class="nc" id="L173">            return;</span>
+        // Ejecutar más tarde para asegurar que la skin y los nodos estén creados
+<span class="nc" id="L175">        javafx.application.Platform.runLater(() -&gt; {</span>
+            try {
+<span class="nc" id="L177">                javafx.scene.Node header = table.lookup(&quot;.column-header&quot;);</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">                if (header != null) {</span>
+                    // buscar todas las labels dentro del header
+<span class="nc" id="L180">                    java.util.List&lt;javafx.scene.Node&gt; labels = header.lookupAll(&quot;.label&quot;).stream().toList();</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">                    for (javafx.scene.Node node : labels) {</span>
+<span class="nc" id="L182">                        node.setStyle(&quot;-fx-text-fill: #2C3E50; -fx-font-weight: bold;&quot;);</span>
+<span class="nc" id="L183">                    }</span>
+                }
+                // también intentar buscar columna header backgrounds
+<span class="nc" id="L186">                javafx.scene.Node ch = table.lookup(&quot;.column-header-background&quot;);</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                if (ch != null) {</span>
+<span class="nc" id="L188">                    ch.setStyle(&quot;-fx-background-color: white;&quot;);</span>
+                }
+<span class="nc" id="L190">            } catch (Exception ex) {</span>
+                // No bloquear UI si algo falla; el CSS seguirá intentando aplicar
+<span class="nc" id="L192">                System.err.println(&quot;Warning: no se pudieron ajustar headers runtime: &quot; + ex.getMessage());</span>
+<span class="nc" id="L193">            }</span>
+<span class="nc" id="L194">        });</span>
+<span class="nc" id="L195">    }</span>
+
+    // Reemplaza el header text de cada TableColumn por un Label con estilo inline
+    private void replaceColumnHeadersWithLabels(javafx.scene.control.TableView&lt;?&gt; table) {
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        if (table == null)</span>
+<span class="nc" id="L200">            return;</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        for (javafx.scene.control.TableColumn&lt;?, ?&gt; col : table.getColumns()) {</span>
+            try {
+<span class="nc" id="L203">                String text = col.getText();</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">                if (text == null)</span>
+<span class="nc" id="L205">                    text = &quot;&quot;;</span>
+<span class="nc" id="L206">                javafx.scene.control.Label lbl = new javafx.scene.control.Label(text);</span>
+<span class="nc" id="L207">                lbl.setStyle(&quot;-fx-text-fill: #2C3E50; -fx-font-weight: bold; -fx-font-size: 13px;&quot;);</span>
+                // mantener alignment similar al original
+<span class="nc" id="L209">                lbl.setAlignment(javafx.geometry.Pos.CENTER_LEFT);</span>
+<span class="nc" id="L210">                col.setGraphic(lbl);</span>
+<span class="nc" id="L211">                col.setText(&quot;&quot;);</span>
+<span class="nc" id="L212">            } catch (Exception ex) {</span>
+                // ignora columnas que no se puedan modificar
+<span class="nc" id="L214">            }</span>
+<span class="nc" id="L215">        }</span>
+<span class="nc" id="L216">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

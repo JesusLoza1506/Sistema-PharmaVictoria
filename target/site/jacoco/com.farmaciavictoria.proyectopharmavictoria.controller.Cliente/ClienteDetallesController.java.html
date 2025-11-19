@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClienteDetallesController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Cliente</a> &gt; <span class="el_source">ClienteDetallesController.java</span></div><h1>ClienteDetallesController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Cliente;
+
+import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
+import com.farmaciavictoria.proyectopharmavictoria.SessionManager;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+
+<span class="nc" id="L10">public class ClienteDetallesController {</span>
+        @FXML
+        private javafx.scene.layout.VBox comprasVBoxVentas;
+        @FXML
+        private javafx.scene.layout.VBox comprasVBox;
+        @FXML
+        private javafx.scene.layout.VBox cambiosVBox;
+        @FXML
+        private javafx.scene.layout.VBox comprasVBoxReal;
+        @FXML
+        private Label comprasLabel;
+        @FXML
+        private Label cambiosLabel;
+        private com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual;
+        @FXML
+        private javafx.scene.layout.GridPane empresaContactoGrid;
+        @FXML
+        private javafx.scene.layout.GridPane empresaAdicionalGrid;
+        @FXML
+        private javafx.scene.layout.GridPane naturalContactoGrid;
+        @FXML
+        private javafx.scene.layout.GridPane naturalAdicionalGrid;
+        @FXML
+        private javafx.scene.control.TableView&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio&gt; historialTable;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio, String&gt; colFecha;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio, String&gt; colUsuario;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio, String&gt; colCampo;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio, String&gt; colAnterior;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio, String&gt; colNuevo;
+
+        // Tabla de historial de puntos
+        @FXML
+        private javafx.scene.control.TableView&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos&gt; puntosTable;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, String&gt; colPuntosFecha;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, String&gt; colPuntosTipo;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, Integer&gt; colPuntosValor;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos, String&gt; colPuntosDescripcion;
+
+        // Tabla de historial de compras (ahora con modelo Venta)
+        @FXML
+        private javafx.scene.control.TableView&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta&gt; comprasTable;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String&gt; colCompraFecha;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, Integer&gt; colCompraVentaId;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String&gt; colCompraBoleta;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String&gt; colCompraTotal;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String&gt; colCompraEstado;
+        @FXML
+        private javafx.scene.control.TableColumn&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String&gt; colCompraPago;
+<span class="nc" id="L72">        @FXML</span>
+
+        private final com.farmaciavictoria.proyectopharmavictoria.service.ClienteService clienteService = new com.farmaciavictoria.proyectopharmavictoria.service.ClienteService(
+                        new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository());
+        @FXML
+        private Label subtituloLabel;
+        @FXML
+        private Label dniLabel;
+        @FXML
+        private Label nombresLabel;
+        @FXML
+        private Label apellidosLabel;
+        @FXML
+        private Label estadoLabel;
+        @FXML
+        private Label telefonoLabel;
+        @FXML
+        private Label emailLabel;
+        @FXML
+        private Label direccionLabel;
+        @FXML
+        private Label fechaNacimientoLabel;
+        @FXML
+        private Label puntosTotalesLabel;
+        @FXML
+        private Label fechaRegistroLabel;
+        @FXML
+        private Button btnCerrar;
+        @FXML
+        private javafx.scene.layout.GridPane naturalGrid;
+        @FXML
+        private javafx.scene.layout.GridPane empresaGrid;
+        @FXML
+        private Label rucLabel;
+        @FXML
+        private Label razonSocialLabel;
+        @FXML
+        private Label estadoEmpresaLabel;
+        @FXML
+        private Label telefonoEmpresaLabel;
+        @FXML
+        private Label emailEmpresaLabel;
+        @FXML
+        private Label direccionEmpresaLabel;
+        @FXML
+        private Label puntosEmpresaLabel;
+        // ...existing code...
+        @FXML
+        private Label fechaRegistroEmpresaLabel;
+
+        public void setCliente(Cliente cliente) {
+                // Obtener usuario actual (ajusta según tu método de sesión)
+<span class="nc" id="L124">                usuarioActual = SessionManager.getUsuarioActual();</span>
+<span class="nc" id="L125">                String tipo = cliente.getTipoCliente();</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">                if (&quot;Empresa&quot;.equalsIgnoreCase(tipo)) {</span>
+                        // Ocultar bloques de Natural
+<span class="nc" id="L128">                        naturalGrid.setVisible(false);</span>
+<span class="nc" id="L129">                        naturalGrid.setManaged(false);</span>
+<span class="nc" id="L130">                        naturalContactoGrid.setVisible(false);</span>
+<span class="nc" id="L131">                        naturalContactoGrid.setManaged(false);</span>
+<span class="nc" id="L132">                        naturalAdicionalGrid.setVisible(false);</span>
+<span class="nc" id="L133">                        naturalAdicionalGrid.setManaged(false);</span>
+                        // Mostrar bloques de Empresa
+<span class="nc" id="L135">                        empresaGrid.setVisible(true);</span>
+<span class="nc" id="L136">                        empresaGrid.setManaged(true);</span>
+<span class="nc" id="L137">                        empresaContactoGrid.setVisible(true);</span>
+<span class="nc" id="L138">                        empresaContactoGrid.setManaged(true);</span>
+<span class="nc" id="L139">                        empresaAdicionalGrid.setVisible(true);</span>
+<span class="nc" id="L140">                        empresaAdicionalGrid.setManaged(true);</span>
+                        // Asignar datos de Empresa
+<span class="nc" id="L142">                        rucLabel.setText(cliente.getDocumento());</span>
+<span class="nc" id="L143">                        razonSocialLabel.setText(cliente.getRazonSocial());</span>
+<span class="nc" id="L144">                        estadoEmpresaLabel.setText(&quot;ACTIVO&quot;);</span>
+<span class="nc" id="L145">                        estadoEmpresaLabel.getStyleClass().clear();</span>
+<span class="nc" id="L146">                        estadoEmpresaLabel.getStyleClass().add(&quot;estado-activo&quot;);</span>
+<span class="nc" id="L147">                        telefonoEmpresaLabel.setText(cliente.getTelefono());</span>
+<span class="nc" id="L148">                        emailEmpresaLabel.setText(cliente.getEmail());</span>
+<span class="nc" id="L149">                        direccionEmpresaLabel.setText(cliente.getDireccion());</span>
+<span class="nc" id="L150">                        puntosEmpresaLabel.setText(</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">                                        cliente.getPuntosTotales() != null ? String.valueOf(cliente.getPuntosTotales())</span>
+<span class="nc" id="L152">                                                        : &quot;0&quot;);</span>
+<span class="nc" id="L153">                        fechaRegistroEmpresaLabel.setText(</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">                                        cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : &quot;-&quot;);</span>
+                } else {
+                        // Ocultar bloques de Empresa
+<span class="nc" id="L157">                        empresaGrid.setVisible(false);</span>
+<span class="nc" id="L158">                        empresaGrid.setManaged(false);</span>
+<span class="nc" id="L159">                        empresaContactoGrid.setVisible(false);</span>
+<span class="nc" id="L160">                        empresaContactoGrid.setManaged(false);</span>
+<span class="nc" id="L161">                        empresaAdicionalGrid.setVisible(false);</span>
+<span class="nc" id="L162">                        empresaAdicionalGrid.setManaged(false);</span>
+                        // Mostrar bloques de Natural
+<span class="nc" id="L164">                        naturalGrid.setVisible(true);</span>
+<span class="nc" id="L165">                        naturalGrid.setManaged(true);</span>
+<span class="nc" id="L166">                        naturalContactoGrid.setVisible(true);</span>
+<span class="nc" id="L167">                        naturalContactoGrid.setManaged(true);</span>
+<span class="nc" id="L168">                        naturalAdicionalGrid.setVisible(true);</span>
+<span class="nc" id="L169">                        naturalAdicionalGrid.setManaged(true);</span>
+                        // Asignar datos de Natural
+<span class="nc" id="L171">                        dniLabel.setText(cliente.getDocumento());</span>
+<span class="nc" id="L172">                        nombresLabel.setText(cliente.getNombres());</span>
+<span class="nc" id="L173">                        apellidosLabel.setText(cliente.getApellidos());</span>
+<span class="nc" id="L174">                        estadoLabel.setText(&quot;ACTIVO&quot;);</span>
+<span class="nc" id="L175">                        estadoLabel.getStyleClass().clear();</span>
+<span class="nc" id="L176">                        estadoLabel.getStyleClass().add(&quot;estado-activo&quot;);</span>
+<span class="nc" id="L177">                        telefonoLabel.setText(cliente.getTelefono());</span>
+<span class="nc" id="L178">                        emailLabel.setText(cliente.getEmail());</span>
+<span class="nc" id="L179">                        direccionLabel.setText(cliente.getDireccion());</span>
+<span class="nc" id="L180">                        fechaNacimientoLabel.setText(</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">                                        cliente.getFechaNacimiento() != null ? cliente.getFechaNacimiento().toString()</span>
+<span class="nc" id="L182">                                                        : &quot;-&quot;);</span>
+<span class="nc" id="L183">                        puntosTotalesLabel.setText(</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">                                        cliente.getPuntosTotales() != null ? String.valueOf(cliente.getPuntosTotales())</span>
+<span class="nc" id="L185">                                                        : &quot;0&quot;);</span>
+<span class="nc" id="L186">                        fechaRegistroLabel.setText(</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                                        cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : &quot;-&quot;);</span>
+                }
+                // Control de visibilidad por rol
+<span class="nc bnc" id="L190" title="All 4 branches missed.">                if (usuarioActual != null &amp;&amp; usuarioActual.isVendedor()) {</span>
+                        // Ocultar historial de compras y cambios
+                        // Ocultar historial de compras (ventas) y cambios
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                        if (comprasVBoxVentas != null) {</span>
+<span class="nc" id="L194">                                comprasVBoxVentas.setVisible(false);</span>
+<span class="nc" id="L195">                                comprasVBoxVentas.setManaged(false);</span>
+                        }
+<span class="nc bnc" id="L197" title="All 2 branches missed.">                        if (cambiosVBox != null) {</span>
+<span class="nc" id="L198">                                cambiosVBox.setVisible(false);</span>
+<span class="nc" id="L199">                                cambiosVBox.setManaged(false);</span>
+                        }
+                        // Mostrar solo historial de puntos
+<span class="nc bnc" id="L202" title="All 2 branches missed.">                        if (comprasVBox != null) {</span>
+<span class="nc" id="L203">                                comprasVBox.setVisible(true);</span>
+<span class="nc" id="L204">                                comprasVBox.setManaged(true);</span>
+                        }
+                        // Ocultar títulos (busca los Label en FXML y agrégalos como @FXML)
+                        try {
+<span class="nc" id="L208">                                java.lang.reflect.Field comprasLabelField = this.getClass()</span>
+<span class="nc" id="L209">                                                .getDeclaredField(&quot;comprasLabel&quot;);</span>
+<span class="nc" id="L210">                                comprasLabelField.setAccessible(true);</span>
+<span class="nc" id="L211">                                Label comprasLabel = (Label) comprasLabelField.get(this);</span>
+<span class="nc" id="L212">                                comprasLabel.setVisible(false);</span>
+<span class="nc" id="L213">                                comprasLabel.setManaged(false);</span>
+<span class="nc" id="L214">                        } catch (Exception e) {</span>
+<span class="nc" id="L215">                        }</span>
+                        try {
+<span class="nc" id="L217">                                java.lang.reflect.Field cambiosLabelField = this.getClass()</span>
+<span class="nc" id="L218">                                                .getDeclaredField(&quot;cambiosLabel&quot;);</span>
+<span class="nc" id="L219">                                cambiosLabelField.setAccessible(true);</span>
+<span class="nc" id="L220">                                Label cambiosLabel = (Label) cambiosLabelField.get(this);</span>
+<span class="nc" id="L221">                                cambiosLabel.setVisible(false);</span>
+<span class="nc" id="L222">                                cambiosLabel.setManaged(false);</span>
+<span class="nc" id="L223">                        } catch (Exception e) {</span>
+<span class="nc" id="L224">                        }</span>
+                }
+                // Siempre mostrar historial de puntos
+<span class="nc bnc" id="L227" title="All 2 branches missed.">                if (puntosTable != null) {</span>
+<span class="nc" id="L228">                        puntosTable.setVisible(true);</span>
+<span class="nc" id="L229">                        puntosTable.setManaged(true);</span>
+                }
+                // Cargar datos
+<span class="nc" id="L232">                cargarHistorial(cliente.getId());</span>
+<span class="nc" id="L233">                cargarHistorialPuntos(cliente.getId());</span>
+<span class="nc" id="L234">                cargarHistorialCompras(cliente.getId());</span>
+<span class="nc" id="L235">        }</span>
+
+        private void cargarHistorial(Integer clienteId) {
+<span class="nc" id="L238">                java.util.List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio&gt; historial = clienteService</span>
+<span class="nc" id="L239">                                .obtenerHistorialDeCambios(clienteId);</span>
+                javafx.collections.ObservableList&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio&gt; items = javafx.collections.FXCollections
+<span class="nc" id="L241">                                .observableArrayList();</span>
+<span class="nc" id="L242">                java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter</span>
+<span class="nc" id="L243">                                .ofPattern(&quot;dd/MM/yyyy HH:mm&quot;);</span>
+<span class="nc" id="L244">                com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository usuarioRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository();</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">                for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.ClienteHistorialCambio cambio : historial) {</span>
+                        // Formatear fecha y campos igual que proveedores
+<span class="nc bnc" id="L247" title="All 2 branches missed.">                        cambio.setFechaFormateada(cambio.getFecha() != null ? cambio.getFecha().format(dtf) : &quot;&quot;);</span>
+                        // Buscar nombre completo del usuario
+<span class="nc" id="L249">                        String nombreCompleto = null;</span>
+<span class="nc bnc" id="L250" title="All 4 branches missed.">                        if (cambio.getUsuario() != null &amp;&amp; !cambio.getUsuario().isEmpty()) {</span>
+<span class="nc" id="L251">                                com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = usuarioRepo</span>
+<span class="nc" id="L252">                                                .findByUsername(cambio.getUsuario()).orElse(null);</span>
+<span class="nc bnc" id="L253" title="All 6 branches missed.">                                if (usuario != null &amp;&amp; usuario.getNombres() != null &amp;&amp; usuario.getApellidos() != null) {</span>
+<span class="nc" id="L254">                                        nombreCompleto = usuario.getNombres() + &quot; &quot; + usuario.getApellidos();</span>
+                                }
+                        }
+<span class="nc bnc" id="L257" title="All 2 branches missed.">                        cambio.setUsuario(nombreCompleto != null ? nombreCompleto : cambio.getUsuario());</span>
+<span class="nc" id="L258">                        items.add(cambio);</span>
+<span class="nc" id="L259">                }</span>
+<span class="nc" id="L260">                colFecha.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L261" title="All 2 branches missed.">                                data.getValue().getFechaFormateada() != null ? data.getValue().getFechaFormateada()</span>
+<span class="nc" id="L262">                                                : &quot;&quot;));</span>
+<span class="nc" id="L263">                colUsuario.setCellValueFactory(</span>
+<span class="nc" id="L264">                                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getUsuario()));</span>
+<span class="nc" id="L265">                colCampo.setCellValueFactory(</span>
+<span class="nc" id="L266">                                data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L267">                                                data.getValue().getCampoModificado()));</span>
+<span class="nc" id="L268">                colAnterior.setCellValueFactory(</span>
+<span class="nc" id="L269">                                data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L270">                                                data.getValue().getValorAnterior()));</span>
+<span class="nc" id="L271">                colNuevo.setCellValueFactory(</span>
+<span class="nc" id="L272">                                data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L273">                                                data.getValue().getValorNuevo()));</span>
+<span class="nc" id="L274">                historialTable.setItems(items);</span>
+<span class="nc" id="L275">        }</span>
+
+        private void cargarHistorialPuntos(Integer clienteId) {
+<span class="nc" id="L278">                com.farmaciavictoria.proyectopharmavictoria.service.TransaccionPuntosService puntosService = new com.farmaciavictoria.proyectopharmavictoria.service.TransaccionPuntosService();</span>
+<span class="nc" id="L279">                java.util.List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos&gt; movimientos = puntosService</span>
+<span class="nc" id="L280">                                .obtenerHistorialPuntosPorCliente(clienteId);</span>
+<span class="nc" id="L281">                javafx.collections.ObservableList&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos&gt; items = javafx.collections.FXCollections</span>
+<span class="nc" id="L282">                                .observableArrayList(movimientos);</span>
+<span class="nc" id="L283">                colPuntosFecha.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">                                data.getValue().getFecha() != null ? data.getValue().getFecha().toString() : &quot;&quot;));</span>
+<span class="nc" id="L285">                colPuntosTipo</span>
+<span class="nc" id="L286">                                .setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L287">                                                data.getValue().getTipo()));</span>
+<span class="nc" id="L288">                colPuntosValor.setCellValueFactory(</span>
+<span class="nc" id="L289">                                data -&gt; new javafx.beans.property.SimpleIntegerProperty(data.getValue().getPuntos())</span>
+<span class="nc" id="L290">                                                .asObject());</span>
+<span class="nc" id="L291">                colPuntosDescripcion.setCellValueFactory(</span>
+<span class="nc" id="L292">                                data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L293">                                                data.getValue().getDescripcion()));</span>
+<span class="nc" id="L294">                puntosTable.setItems(items);</span>
+<span class="nc" id="L295">        }</span>
+
+        private void cargarHistorialCompras(Integer clienteId) {
+                // Usar VentaServiceImpl para obtener ventas reales del cliente
+<span class="nc" id="L299">                com.farmaciavictoria.proyectopharmavictoria.service.Ventas.VentaServiceImpl ventaService = new com.farmaciavictoria.proyectopharmavictoria.service.Ventas.VentaServiceImpl(</span>
+                                new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.VentaRepositoryJdbcImpl(),
+                                null, null,
+                                null, null);
+<span class="nc" id="L303">                java.util.List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta&gt; ventas = ventaService</span>
+<span class="nc" id="L304">                                .listarVentasPorCliente(clienteId);</span>
+<span class="nc" id="L305">                javafx.collections.ObservableList&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta&gt; items = javafx.collections.FXCollections</span>
+<span class="nc" id="L306">                                .observableArrayList(ventas);</span>
+<span class="nc" id="L307">                java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter</span>
+<span class="nc" id="L308">                                .ofPattern(&quot;dd/MM/yyyy HH:mm&quot;);</span>
+<span class="nc" id="L309">                colCompraFecha.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">                                data.getValue().getFechaVenta() != null ? data.getValue().getFechaVenta().format(dtf)</span>
+<span class="nc" id="L311">                                                : &quot;&quot;));</span>
+<span class="nc" id="L312">                colCompraVentaId.setCellValueFactory(</span>
+<span class="nc" id="L313">                                data -&gt; new javafx.beans.property.SimpleIntegerProperty(data.getValue().getId())</span>
+<span class="nc" id="L314">                                                .asObject());</span>
+<span class="nc" id="L315">                colCompraBoleta.setCellValueFactory(</span>
+<span class="nc" id="L316">                                data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L317">                                                data.getValue().getNumeroBoleta()));</span>
+<span class="nc" id="L318">                colCompraTotal.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L319" title="All 2 branches missed.">                                data.getValue().getTotal() != null ? data.getValue().getTotal().toPlainString() : &quot;0&quot;));</span>
+<span class="nc" id="L320">                colCompraEstado.setCellValueFactory(</span>
+<span class="nc" id="L321">                                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getEstado()));</span>
+<span class="nc" id="L322">                colCompraPago.setCellValueFactory(</span>
+<span class="nc" id="L323">                                data -&gt; new javafx.beans.property.SimpleStringProperty(data.getValue().getTipoPago()));</span>
+
+<span class="nc" id="L325">                comprasTable.setItems(items);</span>
+<span class="nc" id="L326">        }</span>
+
+        @FXML
+        private void cerrarVentana() {
+<span class="nc" id="L330">                Stage stage = (Stage) btnCerrar.getScene().getWindow();</span>
+<span class="nc" id="L331">                stage.close();</span>
+<span class="nc" id="L332">        }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

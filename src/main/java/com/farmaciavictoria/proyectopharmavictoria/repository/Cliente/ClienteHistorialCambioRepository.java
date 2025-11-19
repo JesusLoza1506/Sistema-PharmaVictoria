@@ -8,9 +8,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Repository para historial de cambios de clientes
- */
 public class ClienteHistorialCambioRepository {
     private final DatabaseConfig databaseConfig;
 
@@ -22,7 +19,7 @@ public class ClienteHistorialCambioRepository {
     public boolean save(ClienteHistorialCambio historial) {
         String sql = "INSERT INTO cliente_historial_cambio (cliente_id, campo_modificado, valor_anterior, valor_nuevo, usuario, fecha) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, historial.getClienteId());
             stmt.setString(2, historial.getCampoModificado());
             stmt.setString(3, historial.getValorAnterior());
@@ -37,14 +34,11 @@ public class ClienteHistorialCambioRepository {
         }
     }
 
-    /**
-     * Obtiene el historial de cambios para un cliente específico
-     */
     public List<ClienteHistorialCambio> findByClienteId(int clienteId) {
         String sql = "SELECT * FROM cliente_historial_cambio WHERE cliente_id = ? ORDER BY fecha DESC";
         List<ClienteHistorialCambio> lista = new ArrayList<>();
         try (Connection conn = databaseConfig.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, clienteId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -56,7 +50,8 @@ public class ClienteHistorialCambioRepository {
                     h.setValorNuevo(rs.getString("valor_nuevo"));
                     h.setUsuario(rs.getString("usuario"));
                     Timestamp fecha = rs.getTimestamp("fecha");
-                    if (fecha != null) h.setFecha(fecha.toLocalDateTime());
+                    if (fecha != null)
+                        h.setFecha(fecha.toLocalDateTime());
                     lista.add(h);
                 }
             }

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VencimientoAlertaCardController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.configuracion</a> &gt; <span class="el_source">VencimientoAlertaCardController.java</span></div><h1>VencimientoAlertaCardController.java</h1><pre class="source lang-java linenums">// Controlador para la tarjeta de alerta de vencimiento de productos
+package com.farmaciavictoria.proyectopharmavictoria.controller.configuracion;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.geometry.Pos;
+import java.io.*;
+import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+<span class="nc" id="L21">public class VencimientoAlertaCardController {</span>
+    // Logger para registrar eventos y errores
+<span class="nc" id="L23">    private static final Logger logger = LoggerFactory.getLogger(VencimientoAlertaCardController.class);</span>
+
+    // Etiqueta para el título del card
+    @FXML
+    private Label lblTitulo;
+    // Etiqueta para el detalle del card
+    @FXML
+    private Label lblDetalle;
+
+    // Inicializa el controlador y asigna el evento de clic
+    @FXML
+    public void initialize() {
+        // Permite que todo el card sea clickeable
+<span class="nc" id="L36">        lblTitulo.getParent().addEventHandler(MouseEvent.MOUSE_CLICKED, this::mostrarDialogoEditarDias);</span>
+<span class="nc" id="L37">        actualizarDetalle();</span>
+<span class="nc" id="L38">    }</span>
+
+    // Actualiza el texto del detalle con los días configurados
+    private void actualizarDetalle() {
+<span class="nc" id="L42">        int dias = leerDiasAlerta();</span>
+<span class="nc" id="L43">        lblDetalle.setText(&quot;Días para alerta: &quot; + dias);</span>
+<span class="nc" id="L44">    }</span>
+
+    // Lee el valor actual de días de alerta desde el servicio
+    private int leerDiasAlerta() {
+<span class="nc" id="L48">        return com.farmaciavictoria.proyectopharmavictoria.service.ProductoService.getDiasVencimientoAlerta();</span>
+    }
+
+    // Guarda el nuevo valor de días de alerta y notifica el cambio
+    private void guardarDiasAlerta(int dias) {
+        try {
+<span class="nc" id="L54">            logger.info(&quot;[VencimientoAlertaCard] Guardando nuevo valor de días de alerta: {}&quot;, dias);</span>
+<span class="nc" id="L55">            com.farmaciavictoria.proyectopharmavictoria.service.ProductoService.setDiasVencimientoAlerta(dias);</span>
+<span class="nc" id="L56">            logger.info(&quot;[VencimientoAlertaCard] Valor actualizado en ProductoService&quot;);</span>
+<span class="nc" id="L57">            notificarActualizacionAlertas();</span>
+<span class="nc" id="L58">        } catch (Exception e) {</span>
+<span class="nc" id="L59">            logger.error(&quot;[VencimientoAlertaCard] Error al actualizar el valor en ProductoService&quot;, e);</span>
+<span class="nc" id="L60">            mostrarError(&quot;No se pudo actualizar el valor de días de alerta&quot;);</span>
+<span class="nc" id="L61">        }</span>
+<span class="nc" id="L62">    }</span>
+
+    // Notifica a los controladores principales para refrescar la lógica de
+    // productos próximos a vencer
+    private void notificarActualizacionAlertas() {
+<span class="nc" id="L67">        logger.info(&quot;[VencimientoAlertaCard] Notificando actualización de alertas de vencimiento&quot;);</span>
+<span class="nc" id="L68">        javafx.application.Platform.runLater(() -&gt; {</span>
+            try {
+<span class="nc" id="L70">                javafx.stage.Window window = lblTitulo.getScene().getWindow();</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">                if (window != null) {</span>
+<span class="nc" id="L72">                    logger.info(&quot;[VencimientoAlertaCard] Window encontrada: {}&quot;, window);</span>
+<span class="nc" id="L73">                    javafx.scene.Scene scene = window.getScene();</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">                    if (scene != null) {</span>
+<span class="nc" id="L75">                        logger.info(&quot;[VencimientoAlertaCard] Scene encontrada: {}&quot;, scene);</span>
+<span class="nc" id="L76">                        javafx.scene.Parent root = scene.getRoot();</span>
+<span class="nc" id="L77">                        logger.info(&quot;[VencimientoAlertaCard] Root encontrada: {}&quot;, root);</span>
+<span class="nc" id="L78">                        Object controller = root.getProperties().get(&quot;controller&quot;);</span>
+<span class="nc" id="L79">                        logger.info(&quot;[VencimientoAlertaCard] Propiedades del root: {}&quot;, root.getProperties());</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">                        if (controller instanceof com.farmaciavictoria.proyectopharmavictoria.controller.DashboardController dash) {</span>
+<span class="nc" id="L81">                            logger.info(&quot;[VencimientoAlertaCard] DashboardController encontrado, refrescando datos&quot;);</span>
+<span class="nc" id="L82">                            dash.refrescarDatos();</span>
+                        } else {
+<span class="nc" id="L84">                            logger.warn(&quot;[VencimientoAlertaCard] DashboardController no encontrado en root properties&quot;);</span>
+                        }
+<span class="nc" id="L86">                    } else {</span>
+<span class="nc" id="L87">                        logger.warn(&quot;[VencimientoAlertaCard] Scene es null&quot;);</span>
+                    }
+<span class="nc" id="L89">                } else {</span>
+<span class="nc" id="L90">                    logger.warn(&quot;[VencimientoAlertaCard] Window es null&quot;);</span>
+                }
+<span class="nc" id="L92">            } catch (Exception ex) {</span>
+<span class="nc" id="L93">                logger.error(&quot;[VencimientoAlertaCard] Error al notificar actualización de alertas&quot;, ex);</span>
+<span class="nc" id="L94">            }</span>
+<span class="nc" id="L95">        });</span>
+<span class="nc" id="L96">    }</span>
+
+    // Muestra el diálogo para editar los días de alerta
+    private void mostrarDialogoEditarDias(MouseEvent event) {
+<span class="nc" id="L100">        Stage dialog = new Stage();</span>
+<span class="nc" id="L101">        dialog.initModality(Modality.APPLICATION_MODAL);</span>
+<span class="nc" id="L102">        dialog.setTitle(&quot;Editar días de alerta de vencimiento&quot;);</span>
+
+<span class="nc" id="L104">        Label lbl = new Label(&quot;Días para alerta:&quot;);</span>
+<span class="nc" id="L105">        TextField txtDias = new TextField(String.valueOf(leerDiasAlerta()));</span>
+<span class="nc" id="L106">        txtDias.setPromptText(&quot;Ej: 10&quot;);</span>
+<span class="nc" id="L107">        txtDias.setMaxWidth(100);</span>
+<span class="nc" id="L108">        txtDias.setStyle(</span>
+                &quot;-fx-background-radius: 8; -fx-border-radius: 8; -fx-padding: 8 12; -fx-font-size: 15px; -fx-border-color: #bdbdbd;&quot;);
+
+<span class="nc" id="L111">        Button btnGuardar = new Button(&quot;Guardar&quot;);</span>
+<span class="nc" id="L112">        btnGuardar.setDefaultButton(true);</span>
+<span class="nc" id="L113">        btnGuardar.setStyle(</span>
+                &quot;-fx-background-color: #1976d2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 24; -fx-font-size: 15px; -fx-effect: dropshadow(gaussian, #1976d2, 8, 0.3, 0, 2);&quot;);
+
+<span class="nc" id="L116">        btnGuardar.setOnAction(e -&gt; {</span>
+            try {
+<span class="nc" id="L118">                int nuevoDias = Integer.parseInt(txtDias.getText());</span>
+<span class="nc bnc" id="L119" title="All 4 branches missed.">                if (nuevoDias &lt; 1 || nuevoDias &gt; 365) {</span>
+<span class="nc" id="L120">                    mostrarError(&quot;El valor debe estar entre 1 y 365 días.&quot;);</span>
+<span class="nc" id="L121">                    txtDias.setStyle(txtDias.getStyle() + &quot;-fx-border-color: #e53935;&quot;);</span>
+<span class="nc" id="L122">                    return;</span>
+                }
+<span class="nc" id="L124">                guardarDiasAlerta(nuevoDias);</span>
+<span class="nc" id="L125">                actualizarDetalle();</span>
+<span class="nc" id="L126">                dialog.close();</span>
+<span class="nc" id="L127">                mostrarInfo(&quot;Valor actualizado correctamente.&quot;);</span>
+<span class="nc" id="L128">            } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L129">                mostrarError(&quot;Ingrese un número válido.&quot;);</span>
+<span class="nc" id="L130">                txtDias.setStyle(txtDias.getStyle() + &quot;-fx-border-color: #e53935;&quot;);</span>
+<span class="nc" id="L131">            }</span>
+<span class="nc" id="L132">        });</span>
+
+<span class="nc" id="L134">        VBox vbox = new VBox(16, lbl, txtDias, btnGuardar);</span>
+<span class="nc" id="L135">        vbox.setAlignment(Pos.CENTER);</span>
+<span class="nc" id="L136">        vbox.setMinWidth(340);</span>
+<span class="nc" id="L137">        vbox.setStyle(</span>
+                &quot;-fx-background-color: #fff; -fx-background-radius: 16; -fx-padding: 32 32 24 32; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);&quot;);
+
+<span class="nc" id="L140">        Scene scene = new Scene(vbox);</span>
+<span class="nc" id="L141">        dialog.setScene(scene);</span>
+<span class="nc" id="L142">        dialog.showAndWait();</span>
+<span class="nc" id="L143">    }</span>
+
+    // Muestra un mensaje de error en la interfaz
+    private void mostrarError(String mensaje) {
+<span class="nc" id="L147">        Alert alert = new Alert(AlertType.ERROR);</span>
+<span class="nc" id="L148">        alert.setTitle(&quot;Error&quot;);</span>
+<span class="nc" id="L149">        alert.setHeaderText(null);</span>
+<span class="nc" id="L150">        alert.setContentText(mensaje);</span>
+<span class="nc" id="L151">        alert.showAndWait();</span>
+<span class="nc" id="L152">    }</span>
+
+    // Muestra un mensaje informativo en la interfaz
+    private void mostrarInfo(String mensaje) {
+<span class="nc" id="L156">        Alert alert = new Alert(AlertType.INFORMATION);</span>
+<span class="nc" id="L157">        alert.setTitle(&quot;Información&quot;);</span>
+<span class="nc" id="L158">        alert.setHeaderText(null);</span>
+<span class="nc" id="L159">        alert.setContentText(mensaje);</span>
+<span class="nc" id="L160">        alert.showAndWait();</span>
+<span class="nc" id="L161">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

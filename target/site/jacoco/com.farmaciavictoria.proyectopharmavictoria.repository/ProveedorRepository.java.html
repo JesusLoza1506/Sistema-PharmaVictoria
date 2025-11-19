@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProveedorRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.repository</a> &gt; <span class="el_source">ProveedorRepository.java</span></div><h1>ProveedorRepository.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.repository;
+
+import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="fc" id="L10">public class ProveedorRepository {</span>
+
+    public List&lt;Proveedor&gt; findAll() {
+<span class="nc" id="L13">        List&lt;Proveedor&gt; proveedores = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L14">        String sql = &quot;SELECT * FROM proveedores WHERE activo = TRUE ORDER BY id ASC&quot;;</span>
+
+<span class="nc" id="L16">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L17">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L18">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L20" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L21">                proveedores.add(mapResultSetToProveedor(rs));</span>
+            }
+<span class="nc" id="L23">        } catch (SQLException e) {</span>
+<span class="nc" id="L24">            System.err.println(&quot;Error al obtener proveedores: &quot; + e.getMessage());</span>
+<span class="nc" id="L25">        }</span>
+<span class="nc" id="L26">        return proveedores;</span>
+    }
+
+    public List&lt;Proveedor&gt; buscarProveedores(String texto) {
+<span class="nc" id="L30">        List&lt;Proveedor&gt; proveedores = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L31">        String sql = &quot;&quot;&quot;</span>
+                    SELECT * FROM proveedores
+                    WHERE activo = TRUE AND (
+                        razon_social LIKE ? OR
+                        ruc LIKE ? OR
+                        contacto LIKE ?
+                    )
+                    ORDER BY id ASC
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L41">        String patron = &quot;%&quot; + texto + &quot;%&quot;;</span>
+
+<span class="nc" id="L43">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L44">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L46">            stmt.setString(1, patron);</span>
+<span class="nc" id="L47">            stmt.setString(2, patron);</span>
+<span class="nc" id="L48">            stmt.setString(3, patron);</span>
+
+<span class="nc" id="L50">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc" id="L52">                    proveedores.add(mapResultSetToProveedor(rs));</span>
+                }
+            }
+<span class="nc" id="L55">        } catch (SQLException e) {</span>
+<span class="nc" id="L56">            System.err.println(&quot;Error al buscar proveedores: &quot; + e.getMessage());</span>
+<span class="nc" id="L57">        }</span>
+<span class="nc" id="L58">        return proveedores;</span>
+    }
+
+    public Proveedor findById(Integer id) {
+<span class="nc" id="L62">        String sql = &quot;SELECT * FROM proveedores WHERE id = ?&quot;;</span>
+
+<span class="nc" id="L64">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L65">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L67">            stmt.setInt(1, id);</span>
+
+<span class="nc" id="L69">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc" id="L71">                    return mapResultSetToProveedor(rs);</span>
+                }
+<span class="nc bnc" id="L73" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L74" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L75">            System.err.println(&quot;Error al obtener proveedor por ID: &quot; + e.getMessage());</span>
+<span class="nc" id="L76">        }</span>
+<span class="nc" id="L77">        return null;</span>
+    }
+
+    public Proveedor findByRuc(String ruc) {
+<span class="nc" id="L81">        String sql = &quot;SELECT * FROM proveedores WHERE ruc = ?&quot;;</span>
+
+<span class="nc" id="L83">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L84">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L86">            stmt.setString(1, ruc);</span>
+
+<span class="nc" id="L88">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc" id="L90">                    return mapResultSetToProveedor(rs);</span>
+                }
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L93" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L94">            System.err.println(&quot;Error al obtener proveedor por RUC: &quot; + e.getMessage());</span>
+<span class="nc" id="L95">        }</span>
+<span class="nc" id="L96">        return null;</span>
+    }
+
+    public boolean save(Proveedor proveedor) {
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (proveedor.getId() == null) {</span>
+<span class="nc" id="L101">            return insert(proveedor);</span>
+        } else {
+<span class="nc" id="L103">            return update(proveedor);</span>
+        }
+    }
+
+    private boolean insert(Proveedor proveedor) {
+<span class="nc" id="L108">        String sql = &quot;&quot;&quot;</span>
+                    INSERT INTO proveedores (razon_social, ruc, contacto, telefono, email,
+                                           direccion, condiciones_pago, observaciones, activo, tipo_producto)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                &quot;&quot;&quot;;
+<span class="nc" id="L113">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L114">                PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {</span>
+<span class="nc" id="L115">            stmt.setString(1, proveedor.getRazonSocial());</span>
+<span class="nc" id="L116">            stmt.setString(2, proveedor.getRuc());</span>
+<span class="nc" id="L117">            stmt.setString(3, proveedor.getContacto());</span>
+<span class="nc" id="L118">            stmt.setString(4, proveedor.getTelefono());</span>
+<span class="nc" id="L119">            stmt.setString(5, proveedor.getEmail());</span>
+<span class="nc" id="L120">            stmt.setString(6, proveedor.getDireccion());</span>
+<span class="nc" id="L121">            stmt.setString(7, proveedor.getCondicionesPago());</span>
+<span class="nc" id="L122">            stmt.setString(8, proveedor.getObservaciones());</span>
+<span class="nc" id="L123">            stmt.setBoolean(9, proveedor.getActivo());</span>
+<span class="nc" id="L124">            stmt.setString(10, proveedor.getTipoProducto());</span>
+<span class="nc" id="L125">            int rowsAffected = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (rowsAffected &gt; 0) {</span>
+<span class="nc" id="L127">                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">                    if (generatedKeys.next()) {</span>
+<span class="nc" id="L129">                        proveedor.setId(generatedKeys.getInt(1));</span>
+                    }
+                }
+<span class="nc" id="L132">                return true;</span>
+            }
+<span class="nc bnc" id="L134" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L135">            System.err.println(&quot;Error al insertar proveedor: &quot; + e.getMessage());</span>
+<span class="nc" id="L136">        }</span>
+<span class="nc" id="L137">        return false;</span>
+    }
+
+    public boolean update(Proveedor proveedor) {
+<span class="nc" id="L141">        String sql = &quot;&quot;&quot;</span>
+                    UPDATE proveedores SET razon_social=?, ruc=?, contacto=?, telefono=?,
+                                         email=?, direccion=?, condiciones_pago=?, observaciones=?, activo=?, tipo_producto=?
+                    WHERE id=?
+                &quot;&quot;&quot;;
+<span class="nc" id="L146">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L147">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L148">            stmt.setString(1, proveedor.getRazonSocial());</span>
+<span class="nc" id="L149">            stmt.setString(2, proveedor.getRuc());</span>
+<span class="nc" id="L150">            stmt.setString(3, proveedor.getContacto());</span>
+<span class="nc" id="L151">            stmt.setString(4, proveedor.getTelefono());</span>
+<span class="nc" id="L152">            stmt.setString(5, proveedor.getEmail());</span>
+<span class="nc" id="L153">            stmt.setString(6, proveedor.getDireccion());</span>
+<span class="nc" id="L154">            stmt.setString(7, proveedor.getCondicionesPago());</span>
+<span class="nc" id="L155">            stmt.setString(8, proveedor.getObservaciones());</span>
+<span class="nc" id="L156">            stmt.setBoolean(9, proveedor.getActivo());</span>
+<span class="nc" id="L157">            stmt.setString(10, proveedor.getTipoProducto());</span>
+<span class="nc" id="L158">            stmt.setInt(11, proveedor.getId());</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">            return stmt.executeUpdate() &gt; 0;</span>
+<span class="nc" id="L160">        } catch (SQLException e) {</span>
+<span class="nc" id="L161">            System.err.println(&quot;Error al actualizar proveedor: &quot; + e.getMessage());</span>
+        }
+<span class="nc" id="L163">        return false;</span>
+    }
+
+    public boolean delete(Integer id) {
+<span class="nc" id="L167">        String sql = &quot;UPDATE proveedores SET activo = FALSE WHERE id = ?&quot;;</span>
+
+<span class="nc" id="L169">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L170">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L172">            stmt.setInt(1, id);</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">            return stmt.executeUpdate() &gt; 0;</span>
+<span class="nc" id="L174">        } catch (SQLException e) {</span>
+<span class="nc" id="L175">            System.err.println(&quot;Error al eliminar proveedor: &quot; + e.getMessage());</span>
+        }
+<span class="nc" id="L177">        return false;</span>
+    }
+
+    private Proveedor mapResultSetToProveedor(ResultSet rs) throws SQLException {
+<span class="nc" id="L181">        Proveedor proveedor = new Proveedor();</span>
+<span class="nc" id="L182">        proveedor.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="nc" id="L183">        proveedor.setRazonSocial(rs.getString(&quot;razon_social&quot;));</span>
+<span class="nc" id="L184">        proveedor.setRuc(rs.getString(&quot;ruc&quot;));</span>
+<span class="nc" id="L185">        proveedor.setContacto(rs.getString(&quot;contacto&quot;));</span>
+<span class="nc" id="L186">        proveedor.setTelefono(rs.getString(&quot;telefono&quot;));</span>
+<span class="nc" id="L187">        proveedor.setEmail(rs.getString(&quot;email&quot;));</span>
+<span class="nc" id="L188">        proveedor.setDireccion(rs.getString(&quot;direccion&quot;));</span>
+<span class="nc" id="L189">        proveedor.setCondicionesPago(rs.getString(&quot;condiciones_pago&quot;));</span>
+<span class="nc" id="L190">        proveedor.setObservaciones(rs.getString(&quot;observaciones&quot;));</span>
+<span class="nc" id="L191">        proveedor.setActivo(rs.getBoolean(&quot;activo&quot;));</span>
+<span class="nc" id="L192">        proveedor.setTipoProducto(rs.getString(&quot;tipo_producto&quot;));</span>
+<span class="nc" id="L193">        Timestamp createdAt = rs.getTimestamp(&quot;created_at&quot;);</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">        if (createdAt != null) {</span>
+<span class="nc" id="L195">            proveedor.setCreatedAt(createdAt.toLocalDateTime());</span>
+        }
+<span class="nc" id="L197">        return proveedor;</span>
+    }
+
+    // Métodos para historial de cambios
+    public boolean registrarCambioProveedor(int proveedorId, String campo, String valorAnterior, String valorNuevo,
+            String usuario) {
+<span class="nc" id="L203">        String sql = &quot;INSERT INTO proveedor_historial_cambio (proveedor_id, campo_modificado, valor_anterior, valor_nuevo, usuario) VALUES (?, ?, ?, ?, ?)&quot;;</span>
+<span class="nc" id="L204">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L205">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L206">            stmt.setInt(1, proveedorId);</span>
+<span class="nc" id="L207">            stmt.setString(2, campo);</span>
+<span class="nc" id="L208">            stmt.setString(3, valorAnterior);</span>
+<span class="nc" id="L209">            stmt.setString(4, valorNuevo);</span>
+<span class="nc" id="L210">            stmt.setString(5, usuario);</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">            return stmt.executeUpdate() &gt; 0;</span>
+<span class="nc" id="L212">        } catch (SQLException e) {</span>
+<span class="nc" id="L213">            System.err.println(&quot;Error al registrar cambio de proveedor: &quot; + e.getMessage());</span>
+        }
+<span class="nc" id="L215">        return false;</span>
+    }
+
+    public List&lt;HistorialCambioDTO&gt; obtenerHistorialCambios(int proveedorId) {
+<span class="nc" id="L219">        List&lt;HistorialCambioDTO&gt; historial = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L220">        String sql = &quot;SELECT h.campo_modificado, h.valor_anterior, h.valor_nuevo, h.usuario, h.fecha, u.nombres, u.apellidos &quot;</span>
+                +
+                &quot;FROM proveedor_historial_cambio h &quot; +
+                &quot;LEFT JOIN usuarios u ON h.usuario = u.username &quot; +
+                &quot;WHERE h.proveedor_id = ? ORDER BY h.fecha DESC&quot;;
+<span class="nc" id="L225">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L226">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L227">            stmt.setInt(1, proveedorId);</span>
+<span class="nc" id="L228">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">                    String nombreCompleto = rs.getString(&quot;nombres&quot;) != null</span>
+<span class="nc" id="L231">                            ? rs.getString(&quot;nombres&quot;) + &quot; &quot; + rs.getString(&quot;apellidos&quot;)</span>
+<span class="nc" id="L232">                            : rs.getString(&quot;usuario&quot;);</span>
+<span class="nc" id="L233">                    historial.add(new HistorialCambioDTO(</span>
+<span class="nc" id="L234">                            rs.getString(&quot;campo_modificado&quot;),</span>
+<span class="nc" id="L235">                            rs.getString(&quot;valor_anterior&quot;),</span>
+<span class="nc" id="L236">                            rs.getString(&quot;valor_nuevo&quot;),</span>
+                            nombreCompleto,
+<span class="nc" id="L238">                            rs.getTimestamp(&quot;fecha&quot;)));</span>
+<span class="nc" id="L239">                }</span>
+            }
+<span class="nc" id="L241">        } catch (SQLException e) {</span>
+<span class="nc" id="L242">            System.err.println(&quot;Error al obtener historial de cambios: &quot; + e.getMessage());</span>
+<span class="nc" id="L243">        }</span>
+<span class="nc" id="L244">        return historial;</span>
+    }
+
+    public static class HistorialCambioDTO {
+        public final String campo;
+        public final String anterior;
+        public final String nuevo;
+        public final String usuario;
+        public final Timestamp fecha;
+
+<span class="nc" id="L254">        public HistorialCambioDTO(String campo, String anterior, String nuevo, String usuario, Timestamp fecha) {</span>
+<span class="nc" id="L255">            this.campo = campo;</span>
+<span class="nc" id="L256">            this.anterior = anterior;</span>
+<span class="nc" id="L257">            this.nuevo = nuevo;</span>
+<span class="nc" id="L258">            this.usuario = usuario;</span>
+<span class="nc" id="L259">            this.fecha = fecha;</span>
+<span class="nc" id="L260">        }</span>
+    }
+
+    public boolean deleteDefinitivamente(Integer id) {
+<span class="nc" id="L264">        String sql = &quot;DELETE FROM proveedores WHERE id = ?&quot;;</span>
+
+<span class="nc" id="L266">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L267">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L269">            stmt.setInt(1, id);</span>
+
+<span class="nc" id="L271">            int rowsAffected = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">            return rowsAffected &gt; 0;</span>
+
+<span class="nc" id="L274">        } catch (SQLException e) {</span>
+<span class="nc" id="L275">            System.err.println(&quot;Error al eliminar definitivamente proveedor: &quot; + e.getMessage());</span>
+<span class="nc" id="L276">            e.printStackTrace();</span>
+        }
+<span class="nc" id="L278">        return false;</span>
+    }
+
+    public List&lt;Proveedor&gt; findAllIncludingInactive() {
+<span class="nc" id="L282">        List&lt;Proveedor&gt; proveedores = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L283">        String sql = &quot;SELECT * FROM proveedores ORDER BY id ASC&quot;;</span>
+
+<span class="nc" id="L285">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L286">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L287">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L289" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L290">                proveedores.add(mapResultSetToProveedor(rs));</span>
+            }
+<span class="nc" id="L292">        } catch (SQLException e) {</span>
+<span class="nc" id="L293">            System.err.println(&quot;Error al obtener todos los proveedores: &quot; + e.getMessage());</span>
+<span class="nc" id="L294">        }</span>
+<span class="nc" id="L295">        return proveedores;</span>
+    }
+
+    public boolean existePorRazonSocial(String razonSocial, Integer idExcluir) {
+        String sql = &quot;SELECT COUNT(*) FROM proveedores WHERE LOWER(razon_social) = LOWER(?)&quot;
+<span class="nc bnc" id="L300" title="All 2 branches missed.">                + (idExcluir != null ? &quot; AND id &lt;&gt; ?&quot; : &quot;&quot;);</span>
+<span class="nc" id="L301">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L302">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L303">            stmt.setString(1, razonSocial);</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">            if (idExcluir != null)</span>
+<span class="nc" id="L305">                stmt.setInt(2, idExcluir);</span>
+<span class="nc" id="L306">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">                    return rs.getInt(1) &gt; 0;</span>
+                }
+<span class="nc bnc" id="L310" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L311" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L312">            System.err.println(&quot;Error al verificar razón social: &quot; + e.getMessage());</span>
+<span class="nc" id="L313">        }</span>
+<span class="nc" id="L314">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

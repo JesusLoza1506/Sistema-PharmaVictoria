@@ -12,25 +12,6 @@ import java.io.File;
 import java.util.List;
 
 public class ContactarProveedoresController {
-    @FXML
-    private ListView<String> listHistorial;
-    @FXML
-    private ComboBox<String> cmbPlantillas;
-    private ObservableList<String> plantillas = FXCollections.observableArrayList("Solicitud de cotización",
-            "Aviso de pago", "Mensaje personalizado");
-    private ObservableList<String> historialMensajes = FXCollections.observableArrayList();
-
-    // Inicializar plantillas y historial correctamente
-    private void initPlantillasYHistorial() {
-        cmbPlantillas.setItems(plantillas);
-        cmbPlantillas.getSelectionModel().selectFirst();
-        listHistorial.setItems(historialMensajes);
-    }
-
-    // Guardar historial de mensajes enviados (mockup)
-    private void guardarHistorial(String destinatario, String asunto, String mensaje) {
-        historialMensajes.add("A: " + destinatario + " | Asunto: " + asunto + " | " + mensaje);
-    }
 
     @FXML
     private TableView<Proveedor> tableSeleccionProveedores;
@@ -73,8 +54,6 @@ public class ContactarProveedoresController {
         ObservableList<Proveedor> data = FXCollections.observableArrayList(proveedores);
         tableSeleccionProveedores.setItems(data);
 
-        // Inicializar plantillas y historial
-        initPlantillasYHistorial();
     }
 
     @FXML
@@ -102,13 +81,13 @@ public class ContactarProveedoresController {
         }
         String asunto = txtAsunto.getText();
         String mensaje = txtMensaje.getText();
-        // Leer credenciales SMTP desde application.properties
+        // Leer credenciales SMTP desde smtp_proveedores.properties
         java.util.Properties config = new java.util.Properties();
         try {
-            java.io.InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties");
+            java.io.InputStream input = getClass().getClassLoader().getResourceAsStream("smtp_proveedores.properties");
             config.load(input);
         } catch (Exception ex) {
-            mostrarAlerta("Error de configuración SMTP", "No se pudo leer application.properties",
+            mostrarAlerta("Error de configuración SMTP", "No se pudo leer smtp_proveedores.properties",
                     Alert.AlertType.ERROR);
             return;
         }
@@ -117,14 +96,10 @@ public class ContactarProveedoresController {
         EmailService emailService = new EmailService(smtpUser, smtpPass);
         for (Proveedor proveedor : seleccionados) {
             try {
-                emailService.sendEmail(proveedor.getEmail(), asunto, mensaje, archivoAdjunto);
-                guardarHistorial(proveedor.getEmail(), asunto, mensaje);
+                emailService.sendProveedorEmail(proveedor.getEmail(), asunto, mensaje, archivoAdjunto);
             } catch (Exception e) {
                 mostrarAlerta("Error al enviar a " + proveedor.getEmail(), e.getMessage(), Alert.AlertType.ERROR);
             }
-        }
-        if (listHistorial != null) {
-            listHistorial.setItems(historialMensajes);
         }
         mostrarAlerta("Envío completado", "Correos enviados correctamente.", Alert.AlertType.INFORMATION);
     }

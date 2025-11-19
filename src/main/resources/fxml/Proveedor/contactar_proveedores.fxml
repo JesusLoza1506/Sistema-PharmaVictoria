@@ -8,14 +8,6 @@
         <VBox spacing="18.0" alignment="TOP_CENTER" styleClass="modal-vbox">
             <children>
                 <Label text="Contactar Proveedores" styleClass="modal-title" />
-                <HBox spacing="18.0" alignment="CENTER_LEFT">
-                    <children>
-                        <Label text="Plantilla:" styleClass="modal-label" />
-                        <ComboBox fx:id="cmbPlantillas" promptText="Selecciona plantilla" styleClass="modal-field" />
-                    </children>
-                </HBox>
-                <Label text="Historial de mensajes enviados:" styleClass="modal-label" />
-                <ListView fx:id="listHistorial" prefHeight="80.0" styleClass="modal-listview" />
                 <TableView fx:id="tableSeleccionProveedores" prefHeight="220.0" styleClass="modal-table">
                     <columns>
                         <TableColumn fx:id="colSeleccion" text="Seleccionar" />

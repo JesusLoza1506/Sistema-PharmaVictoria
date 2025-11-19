@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DashboardVendedorController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller</a> &gt; <span class="el_source">DashboardVendedorController.java</span></div><h1>DashboardVendedorController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller;
+
+import com.farmaciavictoria.proyectopharmavictoria.service.ProductoService;
+import com.farmaciavictoria.proyectopharmavictoria.service.ProveedorService;
+import com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer;
+import com.farmaciavictoria.proyectopharmavictoria.controller.Cliente.ClienteFormController;
+import com.farmaciavictoria.proyectopharmavictoria.controller.Usuario.UsuariosController;
+import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventObserver;
+import com.farmaciavictoria.proyectopharmavictoria.events.SystemEvent;
+import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager;
+import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
+import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.layout.StackPane;
+import java.io.StringWriter;
+import java.io.PrintWriter;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+<span class="nc" id="L47">public class DashboardVendedorController implements Initializable, SystemEventObserver {</span>
+
+<span class="nc" id="L49">    private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);</span>
+
+    @FXML
+    private Label fechaHoraLabel;
+    @FXML
+    private Label usuarioLabel;
+    @FXML
+    private Label rolLabel;
+    @FXML
+    private Button btnCerrarSesion;
+    @FXML
+    private Label ventasHoyLabel;
+    @FXML
+    private Label ventasHoyCountLabel;
+    @FXML
+    private Label productosLabel;
+    @FXML
+    private Label productosStockLabel;
+    @FXML
+    private Label clientesLabel;
+    @FXML
+    private Label clientesNuevosLabel;
+
+    private Timeline relojTimeline;
+<span class="nc" id="L73">    private SystemEventManager eventManager = SystemEventManager.getInstance();</span>
+<span class="nc" id="L74">    private ProductoService productoService = ServiceContainer.getInstance().getProductoService();</span>
+<span class="nc" id="L75">    private ProveedorService proveedorService = ServiceContainer.getInstance().getProveedorService();</span>
+    private Usuario usuarioLogueado;
+
+    // Manejador de evento para el botón de reporte de ventas en el dashboard.
+    public void reporteVentas(javafx.event.ActionEvent event) {
+<span class="nc" id="L80">        mostrarError(&quot;En desarrollo&quot;, &quot;Funcionalidad de reporte de ventas en desarrollo.&quot;);</span>
+<span class="nc" id="L81">    }</span>
+
+    // Event handlers para navegación
+    @FXML
+    private void navegarADashboard() {
+        try {
+<span class="nc" id="L87">            Stage stage = (Stage) fechaHoraLabel.getScene().getWindow();</span>
+<span class="nc" id="L88">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/dashboard-vendedor.fxml&quot;));</span>
+<span class="nc" id="L89">            Parent root = loader.load();</span>
+<span class="nc" id="L90">            DashboardVendedorController controller = loader.getController();</span>
+            com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
+<span class="nc" id="L92">                    .getUsuarioActual();</span>
+<span class="nc" id="L93">            controller.setUsuario(usuarioActual);</span>
+<span class="nc" id="L94">            Scene scene = new Scene(root);</span>
+<span class="nc" id="L95">            scene.getStylesheets().add(getClass().getResource(&quot;/css/styles.css&quot;).toExternalForm());</span>
+<span class="nc" id="L96">            stage.setScene(scene);</span>
+<span class="nc" id="L97">            stage.setTitle(&quot;PharmaVictoria - Menú Principal&quot;);</span>
+<span class="nc" id="L98">            stage.setResizable(true);</span>
+<span class="nc" id="L99">            stage.centerOnScreen();</span>
+<span class="nc" id="L100">            stage.setMaximized(true);</span>
+<span class="nc" id="L101">            controller.refrescarDatos();</span>
+<span class="nc" id="L102">            controller.marcarBotonActivo(&quot;dashboard&quot;);</span>
+<span class="nc" id="L103">        } catch (Exception e) {</span>
+<span class="nc" id="L104">            logger.error(&quot;Error navegando al dashboard vendedor: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L105">            mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el dashboard vendedor.&quot;);</span>
+<span class="nc" id="L106">        }</span>
+<span class="nc" id="L107">    }</span>
+
+    private void marcarBotonActivo(String modulo) {
+<span class="nc" id="L110">        Button[] botones = new Button[] {</span>
+<span class="nc" id="L111">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnDashboard&quot;),</span>
+<span class="nc" id="L112">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnInventario&quot;),</span>
+<span class="nc" id="L113">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnClientes&quot;),</span>
+<span class="nc" id="L114">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnProveedores&quot;),</span>
+<span class="nc" id="L115">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnVentas&quot;),</span>
+<span class="nc" id="L116">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnReportes&quot;),</span>
+<span class="nc" id="L117">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnConfiguracion&quot;),</span>
+<span class="nc" id="L118">                (Button) fechaHoraLabel.getScene().lookup(&quot;#btnUsuarios&quot;)</span>
+        };
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        for (Button btn : botones) {</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            if (btn != null) {</span>
+<span class="nc" id="L122">                btn.getStyleClass().remove(&quot;menu-button-active&quot;);</span>
+            }
+        }
+<span class="nc bnc" id="L125" title="All 9 branches missed.">        switch (modulo) {</span>
+            case &quot;dashboard&quot;:
+<span class="nc" id="L127">                Button btnDashboard = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnDashboard&quot;);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">                if (btnDashboard != null)</span>
+<span class="nc" id="L129">                    btnDashboard.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+            case &quot;inventario&quot;:
+<span class="nc" id="L132">                Button btnInventario = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnInventario&quot;);</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">                if (btnInventario != null)</span>
+<span class="nc" id="L134">                    btnInventario.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+            case &quot;clientes&quot;:
+<span class="nc" id="L137">                Button btnClientes = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnClientes&quot;);</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                if (btnClientes != null)</span>
+<span class="nc" id="L139">                    btnClientes.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+            case &quot;proveedores&quot;:
+<span class="nc" id="L142">                Button btnProveedores = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnProveedores&quot;);</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                if (btnProveedores != null)</span>
+<span class="nc" id="L144">                    btnProveedores.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+            case &quot;ventas&quot;:
+<span class="nc" id="L147">                Button btnVentas = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnVentas&quot;);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">                if (btnVentas != null)</span>
+<span class="nc" id="L149">                    btnVentas.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+            case &quot;reportes&quot;:
+<span class="nc" id="L152">                Button btnReportes = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnReportes&quot;);</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                if (btnReportes != null)</span>
+<span class="nc" id="L154">                    btnReportes.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+            case &quot;configuracion&quot;:
+<span class="nc" id="L157">                Button btnConfiguracion = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnConfiguracion&quot;);</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">                if (btnConfiguracion != null)</span>
+<span class="nc" id="L159">                    btnConfiguracion.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+            case &quot;usuarios&quot;:
+<span class="nc" id="L162">                Button btnUsuarios = (Button) fechaHoraLabel.getScene().lookup(&quot;#btnUsuarios&quot;);</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">                if (btnUsuarios != null)</span>
+<span class="nc" id="L164">                    btnUsuarios.getStyleClass().add(&quot;menu-button-active&quot;);</span>
+                break;
+        }
+<span class="nc" id="L167">    }</span>
+
+    private void configurarValoresIniciales() {
+        try {
+            // Configurar fecha/hora
+<span class="nc bnc" id="L172" title="All 2 branches missed.">            if (fechaHoraLabel != null) {</span>
+<span class="nc" id="L173">                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;dd/MM/yyyy HH:mm:ss&quot;);</span>
+<span class="nc" id="L174">                LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L175">                fechaHoraLabel.setText(now.format(formatter));</span>
+            }
+            // Configurar usuario y rol
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (usuarioLogueado != null) {</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">                if (usuarioLabel != null)</span>
+<span class="nc" id="L180">                    usuarioLabel.setText(usuarioLogueado.getNombreCompleto());</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">                if (rolLabel != null)</span>
+<span class="nc" id="L182">                    rolLabel.setText(usuarioLogueado.getRol().getDescripcion());</span>
+            } else {
+<span class="nc bnc" id="L184" title="All 2 branches missed.">                if (usuarioLabel != null)</span>
+<span class="nc" id="L185">                    usuarioLabel.setText(&quot;Usuario no identificado&quot;);</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                if (rolLabel != null)</span>
+<span class="nc" id="L187">                    rolLabel.setText(&quot;Sin rol&quot;);</span>
+            }
+
+            // Cargar solo datos de las tarjetas visibles para vendedor
+<span class="nc" id="L191">            cargarDatosVentasHoy();</span>
+<span class="nc" id="L192">            cargarDatosProductos();</span>
+<span class="nc" id="L193">            cargarDatosClientes();</span>
+<span class="nc" id="L194">        } catch (Exception e) {</span>
+<span class="nc" id="L195">            logger.error(&quot;Error configurando valores iniciales: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L196">        }</span>
+<span class="nc" id="L197">    }</span>
+
+    private void configurarRelojTiempoReal() {
+<span class="nc" id="L200">        relojTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -&gt; actualizarReloj()));</span>
+<span class="nc" id="L201">        relojTimeline.setCycleCount(Animation.INDEFINITE);</span>
+<span class="nc" id="L202">        relojTimeline.play();</span>
+<span class="nc" id="L203">    }</span>
+
+    private void actualizarReloj() {
+<span class="nc bnc" id="L206" title="All 2 branches missed.">        if (fechaHoraLabel != null) {</span>
+<span class="nc" id="L207">            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;dd/MM/yyyy HH:mm:ss&quot;);</span>
+<span class="nc" id="L208">            LocalDateTime now = LocalDateTime.now();</span>
+<span class="nc" id="L209">            fechaHoraLabel.setText(now.format(formatter));</span>
+        }
+<span class="nc" id="L211">    }</span>
+
+    public void refrescarDatos() {
+        // Asegurarse de que la actualización se haga en el hilo de la UI
+<span class="nc" id="L215">        Platform.runLater(this::configurarValoresIniciales);</span>
+<span class="nc" id="L216">    }</span>
+
+    private void cargarDatosProductos() {
+        try {
+<span class="nc" id="L220">            List&lt;Producto&gt; productos = productoService.obtenerTodos();</span>
+            // Total de productos
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            if (productosLabel != null) {</span>
+<span class="nc" id="L223">                productosLabel.setText(String.valueOf(productos.size()));</span>
+            }
+            // Sincronizar contador de stock bajo con la lista real
+<span class="nc" id="L226">            List&lt;Producto&gt; productosStockBajo = productoService.obtenerProductosStockBajo();</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">            if (productosStockLabel != null) {</span>
+<span class="nc" id="L228">                productosStockLabel.setText(productosStockBajo.size() + &quot; con stock bajo&quot;);</span>
+            }
+<span class="nc" id="L230">        } catch (Exception e) {</span>
+<span class="nc" id="L231">            logger.error(&quot;[ERROR STOCK BAJO] Fallo al cargar datos de productos: {}&quot;, e.getMessage(), e);</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">            if (productosLabel != null)</span>
+<span class="nc" id="L233">                productosLabel.setText(&quot;0&quot;);</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">            if (productosStockLabel != null)</span>
+<span class="nc" id="L235">                productosStockLabel.setText(&quot;0 con stock bajo&quot;);</span>
+<span class="nc" id="L236">        }</span>
+<span class="nc" id="L237">    }</span>
+
+    private void cargarDatosVentasHoy() {
+        try {
+            // Cambiar el título de la tarjeta
+<span class="nc" id="L242">            Label tituloTarjeta = (Label) ventasHoyLabel.getScene().lookup(&quot;#tituloVentasHoy&quot;);</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">            if (tituloTarjeta != null) {</span>
+<span class="nc" id="L244">                tituloTarjeta.setText(&quot;Mis Ventas Hoy&quot;);</span>
+            }
+<span class="nc" id="L246">            double monto = obtenerMontoMisVentasHoyDesdeBD();</span>
+<span class="nc" id="L247">            int cantidad = obtenerMisVentasHoyDesdeBD();</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">            if (ventasHoyLabel != null) {</span>
+<span class="nc" id="L249">                ventasHoyLabel.setText(&quot;S/ &quot; + String.format(&quot;%.2f&quot;, monto));</span>
+            }
+<span class="nc bnc" id="L251" title="All 2 branches missed.">            if (ventasHoyCountLabel != null) {</span>
+<span class="nc" id="L252">                ventasHoyCountLabel.setText(cantidad + &quot; ventas&quot;);</span>
+            }
+<span class="nc" id="L254">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">            if (ventasHoyLabel != null)</span>
+<span class="nc" id="L256">                ventasHoyLabel.setText(&quot;S/ 0.00&quot;);</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">            if (ventasHoyCountLabel != null)</span>
+<span class="nc" id="L258">                ventasHoyCountLabel.setText(&quot;0 ventas&quot;);</span>
+<span class="nc" id="L259">            logger.warn(&quot;Error al cargar datos de mis ventas hoy: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L260">        }</span>
+<span class="nc" id="L261">    }</span>
+
+    private void cargarDatosClientes() {
+        try {
+            // Total de clientes desde la BD
+<span class="nc" id="L266">            int totalClientes = obtenerClientesDesdeBD();</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">            if (clientesLabel != null) {</span>
+<span class="nc" id="L268">                clientesLabel.setText(String.valueOf(totalClientes));</span>
+            }
+
+            // Clientes nuevos esta semana desde la BD
+<span class="nc" id="L272">            int clientesNuevos = obtenerClientesNuevosDesdeBD();</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">            if (clientesNuevosLabel != null) {</span>
+<span class="nc" id="L274">                clientesNuevosLabel.setText(clientesNuevos + &quot; nuevos esta semana&quot;);</span>
+            }
+<span class="nc" id="L276">        } catch (Exception e) {</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">            if (clientesLabel != null)</span>
+<span class="nc" id="L278">                clientesLabel.setText(&quot;0&quot;);</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">            if (clientesNuevosLabel != null)</span>
+<span class="nc" id="L280">                clientesNuevosLabel.setText(&quot;0 nuevos esta semana&quot;);</span>
+<span class="nc" id="L281">            logger.warn(&quot;Error al cargar datos de clientes: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L282">        }</span>
+<span class="nc" id="L283">    }</span>
+
+    // Implementación de métodos requeridos por las interfaces
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Inicializar reloj
+<span class="nc" id="L289">        configurarRelojTiempoReal();</span>
+        // Refrescar usuario logueado desde AuthenticationService
+<span class="nc" id="L291">        this.usuarioLogueado = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService</span>
+<span class="nc" id="L292">                .getUsuarioActual();</span>
+        // Cargar datos iniciales
+<span class="nc" id="L294">        Platform.runLater(this::configurarValoresIniciales);</span>
+        // Suscribirse a eventos para actualizaciones en tiempo real
+<span class="nc" id="L296">        eventManager.subscribe(this);</span>
+<span class="nc" id="L297">    }</span>
+
+    @Override
+    public void onEvent(SystemEvent event) {
+<span class="nc" id="L301">        logger.info(&quot;Evento recibido: &quot; + event.toString());</span>
+
+<span class="nc bnc" id="L303" title="All 2 branches missed.">        if ((event.getTipo() == SystemEvent.EventType.VENTA_REGISTRADA) ||</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">                (event.getTipo() == SystemEvent.EventType.PRODUCTO_ACTUALIZADO) ||</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">                (event.getTipo() == SystemEvent.EventType.CLIENTE_ACTUALIZADO)) {</span>
+<span class="nc" id="L306">            refrescarDatos();</span>
+        }
+<span class="nc" id="L308">    }</span>
+
+    @Override
+    public String getObserverId() {
+<span class="nc" id="L312">        return &quot;DashboardController&quot;;</span>
+    }
+
+    @FXML
+    private void showClientes() {
+        try {
+            com.farmaciavictoria.proyectopharmavictoria.service.ClienteService clienteService = ServiceContainer
+<span class="nc" id="L319">                    .getInstance().getService(com.farmaciavictoria.proyectopharmavictoria.service.ClienteService.class);</span>
+<span class="nc" id="L320">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Cliente/clientes.fxml&quot;));</span>
+<span class="nc" id="L321">            Parent clientesView = loader.load();</span>
+<span class="nc" id="L322">            com.farmaciavictoria.proyectopharmavictoria.controller.Cliente.ClientesController clientesController = loader</span>
+<span class="nc" id="L323">                    .getController();</span>
+<span class="nc" id="L324">            clientesController.setClienteService(clienteService);</span>
+
+            try {
+<span class="nc" id="L327">                String css = getClass().getResource(&quot;/css/Cliente/clientes.css&quot;).toExternalForm();</span>
+<span class="nc" id="L328">                clientesView.getStylesheets().add(css);</span>
+<span class="nc" id="L329">            } catch (Exception e) {</span>
+<span class="nc" id="L330">                logger.warn(&quot;No se pudo cargar CSS de clientes: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L331">            }</span>
+<span class="nc" id="L332">            StackPane contentArea = (StackPane) fechaHoraLabel.getScene().lookup(&quot;#contentArea&quot;);</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">            if (contentArea != null) {</span>
+<span class="nc" id="L334">                contentArea.getChildren().setAll(clientesView);</span>
+<span class="nc" id="L335">                marcarBotonActivo(&quot;clientes&quot;);</span>
+            } else {
+<span class="nc" id="L337">                mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Clientes.&quot;);</span>
+            }
+<span class="nc" id="L339">        } catch (IOException e) {</span>
+<span class="nc" id="L340">            mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Clientes: &quot; + e.getMessage());</span>
+<span class="nc" id="L341">        } catch (Exception e) {</span>
+<span class="nc" id="L342">            mostrarError(&quot;Error&quot;, &quot;Error inesperado al mostrar Clientes: &quot; + e.getMessage());</span>
+<span class="nc" id="L343">        }</span>
+<span class="nc" id="L344">    }</span>
+
+    @FXML
+    private void showInventario() {
+        try {
+<span class="nc" id="L349">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Inventario/productos.fxml&quot;));</span>
+<span class="nc" id="L350">            Parent inventarioView = loader.load();</span>
+            try {
+<span class="nc" id="L352">                String css = getClass().getResource(&quot;/css/Inventario/productos.css&quot;).toExternalForm();</span>
+<span class="nc" id="L353">                inventarioView.getStylesheets().add(css);</span>
+<span class="nc" id="L354">            } catch (Exception e) {</span>
+<span class="nc" id="L355">                logger.warn(&quot;No se pudo cargar CSS de inventario: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L356">            }</span>
+<span class="nc" id="L357">            StackPane contentArea = (StackPane) fechaHoraLabel.getScene().lookup(&quot;#contentArea&quot;);</span>
+<span class="nc bnc" id="L358" title="All 2 branches missed.">            if (contentArea != null) {</span>
+<span class="nc" id="L359">                contentArea.getChildren().setAll(inventarioView);</span>
+<span class="nc" id="L360">                marcarBotonActivo(&quot;inventario&quot;);</span>
+            } else {
+<span class="nc" id="L362">                mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Inventario.&quot;);</span>
+            }
+<span class="nc" id="L364">        } catch (Exception e) {</span>
+<span class="nc" id="L365">            mostrarError(&quot;Error&quot;,</span>
+<span class="nc" id="L366">                    &quot;El módulo Inventario no está disponible o hubo un error de carga: &quot; + e.getMessage());</span>
+<span class="nc" id="L367">        }</span>
+<span class="nc" id="L368">    }</span>
+
+    @FXML
+    private void showProveedores() {
+        try {
+<span class="nc" id="L373">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Proveedor/proveedores.fxml&quot;));</span>
+<span class="nc" id="L374">            Parent proveedoresView = loader.load();</span>
+            try {
+<span class="nc" id="L376">                String css = getClass().getResource(&quot;/css/Proveedor/proveedores.css&quot;).toExternalForm();</span>
+<span class="nc" id="L377">                proveedoresView.getStylesheets().add(css);</span>
+<span class="nc" id="L378">            } catch (Exception e) {</span>
+<span class="nc" id="L379">                logger.warn(&quot;No se pudo cargar CSS de proveedores: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L380">            }</span>
+<span class="nc" id="L381">            StackPane contentArea = (StackPane) fechaHoraLabel.getScene().lookup(&quot;#contentArea&quot;);</span>
+<span class="nc bnc" id="L382" title="All 2 branches missed.">            if (contentArea != null) {</span>
+<span class="nc" id="L383">                contentArea.getChildren().setAll(proveedoresView);</span>
+<span class="nc" id="L384">                marcarBotonActivo(&quot;proveedores&quot;);</span>
+            } else {
+<span class="nc" id="L386">                mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Proveedores.&quot;);</span>
+            }
+<span class="nc" id="L388">        } catch (Exception e) {</span>
+<span class="nc" id="L389">            mostrarError(&quot;Error&quot;,</span>
+<span class="nc" id="L390">                    &quot;El módulo Proveedores no está disponible o hubo un error de carga: &quot; + e.getMessage());</span>
+<span class="nc" id="L391">        }</span>
+<span class="nc" id="L392">    }</span>
+
+    @FXML
+    private void showVentas() {
+        try {
+<span class="nc" id="L397">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Ventas/ventas.fxml&quot;));</span>
+<span class="nc" id="L398">            Parent ventasView = loader.load();</span>
+            try {
+<span class="nc" id="L400">                String css = getClass().getResource(&quot;/css/Ventas/ventas.css&quot;).toExternalForm();</span>
+<span class="nc" id="L401">                ventasView.getStylesheets().add(css);</span>
+<span class="nc" id="L402">            } catch (Exception e) {</span>
+<span class="nc" id="L403">                logger.warn(&quot;No se pudo cargar CSS de ventas: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L404">            }</span>
+<span class="nc" id="L405">            StackPane contentArea = (StackPane) fechaHoraLabel.getScene().lookup(&quot;#contentArea&quot;);</span>
+<span class="nc bnc" id="L406" title="All 2 branches missed.">            if (contentArea != null) {</span>
+<span class="nc" id="L407">                contentArea.getChildren().setAll(ventasView);</span>
+<span class="nc" id="L408">                marcarBotonActivo(&quot;ventas&quot;);</span>
+            } else {
+<span class="nc" id="L410">                mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Punto de Venta.&quot;);</span>
+            }
+<span class="nc" id="L412">        } catch (Exception e) {</span>
+            // Imprimir el stacktrace en el terminal
+<span class="nc" id="L414">            System.err.println(&quot;No se pudo mostrar el módulo de Punto de Venta:&quot;);</span>
+<span class="nc" id="L415">            e.printStackTrace();</span>
+<span class="nc" id="L416">            mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Punto de Venta. Ver detalles en la consola.&quot;);</span>
+<span class="nc" id="L417">        }</span>
+<span class="nc" id="L418">    }</span>
+
+    @FXML
+    private void showReportes() {
+        try {
+<span class="nc" id="L423">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/reportes/reportes.fxml&quot;));</span>
+<span class="nc" id="L424">            Parent reportesView = loader.load();</span>
+            try {
+<span class="nc" id="L426">                String css = getClass().getResource(&quot;/css/reportes.css&quot;).toExternalForm();</span>
+<span class="nc" id="L427">                reportesView.getStylesheets().add(css);</span>
+<span class="nc" id="L428">            } catch (Exception e) {</span>
+<span class="nc" id="L429">                logger.warn(&quot;No se pudo cargar CSS de reportes: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L430">            }</span>
+<span class="nc" id="L431">            StackPane contentArea = (StackPane) fechaHoraLabel.getScene().lookup(&quot;#contentArea&quot;);</span>
+<span class="nc bnc" id="L432" title="All 2 branches missed.">            if (contentArea != null) {</span>
+<span class="nc" id="L433">                contentArea.getChildren().setAll(reportesView);</span>
+<span class="nc" id="L434">                marcarBotonActivo(&quot;reportes&quot;);</span>
+            } else {
+<span class="nc" id="L436">                mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Reportes.&quot;);</span>
+            }
+<span class="nc" id="L438">        } catch (Exception e) {</span>
+<span class="nc" id="L439">            logger.error(&quot;Error al mostrar el módulo de Reportes: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L440">            mostrarError(&quot;Error&quot;,</span>
+                    &quot;No se pudo mostrar el módulo de Reportes. Verifica la estructura y los archivos FXML.&quot;);
+<span class="nc" id="L442">        }</span>
+<span class="nc" id="L443">    }</span>
+
+    @FXML
+    private void showConfiguracion() {
+        try {
+<span class="nc" id="L448">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/configuracion.fxml&quot;));</span>
+<span class="nc" id="L449">            Parent configuracionView = loader.load();</span>
+            try {
+<span class="nc" id="L451">                String css = getClass().getResource(&quot;/css/configuracion.css&quot;).toExternalForm();</span>
+<span class="nc" id="L452">                configuracionView.getStylesheets().add(css);</span>
+<span class="nc" id="L453">            } catch (Exception e) {</span>
+<span class="nc" id="L454">                logger.warn(&quot;No se pudo cargar CSS de configuración: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L455">            }</span>
+<span class="nc" id="L456">            StackPane contentArea = (StackPane) fechaHoraLabel.getScene().lookup(&quot;#contentArea&quot;);</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">            if (contentArea != null) {</span>
+<span class="nc" id="L458">                contentArea.getChildren().setAll(configuracionView);</span>
+<span class="nc" id="L459">                marcarBotonActivo(&quot;configuracion&quot;);</span>
+            } else {
+<span class="nc" id="L461">                mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Configuración.&quot;);</span>
+            }
+<span class="nc" id="L463">        } catch (Exception e) {</span>
+<span class="nc" id="L464">            logger.error(&quot;Error técnico al cargar módulo Configuración:&quot;, e);</span>
+<span class="nc" id="L465">            mostrarError(&quot;Error técnico&quot;,</span>
+<span class="nc" id="L466">                    &quot;No se pudo mostrar el módulo de Configuración.\n\nDetalles: &quot; + e.getMessage());</span>
+<span class="nc" id="L467">        }</span>
+<span class="nc" id="L468">    }</span>
+
+    @FXML
+    private void showUsuarios() {
+        try {
+<span class="nc" id="L473">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/Usuario/usuarios.fxml&quot;));</span>
+<span class="nc" id="L474">            Parent usuariosView = loader.load();</span>
+            // Pasar el usuario autenticado al controlador de usuarios
+<span class="nc" id="L476">            UsuariosController usuariosController = loader.getController();</span>
+<span class="nc bnc" id="L477" title="All 4 branches missed.">            if (usuariosController != null &amp;&amp; usuarioLogueado != null) {</span>
+<span class="nc" id="L478">                usuariosController.setUsuarioAutenticado(usuarioLogueado);</span>
+            }
+            try {
+<span class="nc" id="L481">                String css = getClass().getResource(&quot;/css/Usuario/usuarios.css&quot;).toExternalForm();</span>
+<span class="nc" id="L482">                usuariosView.getStylesheets().add(css);</span>
+<span class="nc" id="L483">            } catch (Exception e) {</span>
+<span class="nc" id="L484">                logger.warn(&quot;No se pudo cargar CSS de usuarios: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L485">            }</span>
+<span class="nc" id="L486">            StackPane contentArea = (StackPane) fechaHoraLabel.getScene().lookup(&quot;#contentArea&quot;);</span>
+<span class="nc bnc" id="L487" title="All 2 branches missed.">            if (contentArea != null) {</span>
+<span class="nc" id="L488">                contentArea.getChildren().setAll(usuariosView);</span>
+<span class="nc" id="L489">                marcarBotonActivo(&quot;usuarios&quot;);</span>
+            } else {
+<span class="nc" id="L491">                mostrarError(&quot;Error&quot;, &quot;No se pudo mostrar el módulo de Usuarios.&quot;);</span>
+            }
+<span class="nc" id="L493">        } catch (Exception e) {</span>
+<span class="nc" id="L494">            logger.error(&quot;Error técnico al cargar módulo Usuarios:&quot;, e);</span>
+<span class="nc" id="L495">            mostrarError(&quot;En desarrollo&quot;, &quot;El módulo Usuarios aún no está disponible.\n\nDetalles: &quot; + e.getMessage());</span>
+<span class="nc" id="L496">        }</span>
+<span class="nc" id="L497">    }</span>
+
+    @FXML
+    private void cerrarSesion() {
+<span class="nc" id="L501">        onCerrarSesion();</span>
+<span class="nc" id="L502">    }</span>
+
+    @FXML
+    private void onCerrarSesion() {
+        try {
+<span class="nc bnc" id="L507" title="All 2 branches missed.">            if (relojTimeline != null) {</span>
+<span class="nc" id="L508">                relojTimeline.stop();</span>
+            }
+<span class="nc" id="L510">            eventManager.unsubscribe(this);</span>
+<span class="nc" id="L511">            Stage stage = (Stage) btnCerrarSesion.getScene().getWindow();</span>
+            // Usar la misma lógica y animación que al inicio
+<span class="nc" id="L513">            PharmavictoriaApplication app = new PharmavictoriaApplication();</span>
+<span class="nc" id="L514">            Parent root = app.loadLoginScreenWithFade(stage);</span>
+<span class="nc" id="L515">            stage.setTitle(&quot;PHARMAVICTORIA - Iniciar Sesión&quot;);</span>
+<span class="nc" id="L516">            stage.setResizable(true);</span>
+<span class="nc" id="L517">            stage.setMaximized(true);</span>
+<span class="nc" id="L518">            stage.centerOnScreen();</span>
+<span class="nc" id="L519">            stage.show();</span>
+<span class="nc" id="L520">            logger.info(&quot;Sesión cerrada correctamente&quot;);</span>
+<span class="nc" id="L521">        } catch (Exception e) {</span>
+<span class="nc" id="L522">            logger.error(&quot;Error al cerrar sesión: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L523">            mostrarError(&quot;Error&quot;, &quot;No se pudo cerrar la sesión correctamente.&quot;);</span>
+<span class="nc" id="L524">        }</span>
+<span class="nc" id="L525">    }</span>
+
+    @FXML
+    private void nuevoCliente() {
+        try {
+<span class="nc" id="L530">            logger.info(&quot;Abriendo formulario de nuevo cliente...&quot;);</span>
+<span class="nc" id="L531">            FXMLLoader loader = new FXMLLoader(getClass().getResource(&quot;/fxml/cliente-form.fxml&quot;));</span>
+<span class="nc" id="L532">            Parent root = loader.load();</span>
+<span class="nc" id="L533">            ClienteFormController formController = loader.getController();</span>
+
+<span class="nc" id="L535">            Scene scene = new Scene(root);</span>
+<span class="nc" id="L536">            Stage stage = new Stage();</span>
+<span class="nc" id="L537">            stage.setTitle(&quot;Nuevo Cliente&quot;);</span>
+<span class="nc" id="L538">            stage.setScene(scene);</span>
+<span class="nc" id="L539">            stage.initModality(Modality.APPLICATION_MODAL);</span>
+<span class="nc" id="L540">            stage.setResizable(false);</span>
+<span class="nc" id="L541">            stage.showAndWait();</span>
+
+<span class="nc" id="L543">            Cliente nuevo = formController.getClienteFromForm();</span>
+<span class="nc bnc" id="L544" title="All 6 branches missed.">            if (nuevo != null &amp;&amp; nuevo.getNombres() != null &amp;&amp; !nuevo.getNombres().trim().isEmpty()) {</span>
+<span class="nc" id="L545">                ServiceContainer.getInstance().getClienteService().guardarCliente(nuevo);</span>
+                // ✅ CORRECCIÓN: Refrescar el dashboard para ver el nuevo cliente inmediatamente
+<span class="nc" id="L547">                refrescarDatos();</span>
+            }
+<span class="nc" id="L549">            logger.info(&quot;✅ Formulario de nuevo cliente iniciado&quot;);</span>
+<span class="nc" id="L550">        } catch (Exception e) {</span>
+<span class="nc" id="L551">            logger.error(&quot;❌ Error al abrir nuevo cliente: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L552">            mostrarError(&quot;Error&quot;, &quot;Error al crear nuevo cliente: &quot; + e.getMessage());</span>
+<span class="nc" id="L553">        }</span>
+<span class="nc" id="L554">    }</span>
+
+    @FXML
+    private void nuevaVenta() {
+<span class="nc" id="L558">        mostrarError(&quot;En desarrollo&quot;, &quot;La funcionalidad de nueva venta rápida aún no está disponible.&quot;);</span>
+<span class="nc" id="L559">    }</span>
+
+    @FXML
+    private void agregarProducto() {
+<span class="nc" id="L563">        mostrarError(&quot;En desarrollo&quot;, &quot;La funcionalidad de agregar producto rápido aún no está disponible.&quot;);</span>
+<span class="nc" id="L564">    }</span>
+
+    // Obtener monto total de ventas de hoy desde la BD
+    private double obtenerMontoMisVentasHoyDesdeBD() {
+<span class="nc bnc" id="L568" title="All 2 branches missed.">        if (usuarioLogueado == null)</span>
+<span class="nc" id="L569">            return 0.0;</span>
+<span class="nc" id="L570">        String sql = &quot;SELECT COALESCE(SUM(total), 0.0) as monto FROM ventas WHERE DATE(fecha_venta) = CURDATE() AND estado = 'REALIZADA' AND usuario_id = ?&quot;;</span>
+<span class="nc" id="L571">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L572">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L573">            stmt.setInt(1, usuarioLogueado.getId().intValue());</span>
+<span class="nc" id="L574">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L575" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc" id="L576">                    return rs.getDouble(&quot;monto&quot;);</span>
+                }
+<span class="nc bnc" id="L578" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L579" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L580">            logger.warn(&quot;Error al consultar monto de mis ventas hoy: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L581">            return 0.0;</span>
+<span class="nc" id="L582">        }</span>
+<span class="nc" id="L583">        return 0.0;</span>
+    }
+
+    // Obtener número real de transacciones de hoy desde la BD (número de boletas
+    // únicas)
+    private int obtenerMisVentasHoyDesdeBD() {
+<span class="nc bnc" id="L589" title="All 2 branches missed.">        if (usuarioLogueado == null)</span>
+<span class="nc" id="L590">            return 0;</span>
+<span class="nc" id="L591">        String sql = &quot;SELECT COUNT(DISTINCT numero_boleta) as total FROM ventas WHERE DATE(fecha_venta) = CURDATE() AND estado = 'REALIZADA' AND usuario_id = ?&quot;;</span>
+<span class="nc" id="L592">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L593">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L594">            stmt.setInt(1, usuarioLogueado.getId().intValue());</span>
+<span class="nc" id="L595">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L596" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc" id="L597">                    return rs.getInt(&quot;total&quot;);</span>
+                }
+<span class="nc bnc" id="L599" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L600" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L601">            logger.warn(&quot;Error al consultar cantidad de mis ventas hoy: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L602">            return 0;</span>
+<span class="nc" id="L603">        }</span>
+<span class="nc" id="L604">        return 0;</span>
+    }
+
+    // Obtener número real de clientes desde la BD
+    private int obtenerClientesDesdeBD() {
+<span class="nc" id="L609">        String sql = &quot;SELECT COUNT(*) as total FROM clientes WHERE dni &lt;&gt; '00000000' AND UPPER(nombres) &lt;&gt; 'GENÉRICO'&quot;;</span>
+
+<span class="nc" id="L611">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L612">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L613">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L615" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L616">                return rs.getInt(&quot;total&quot;);</span>
+            }
+<span class="nc bnc" id="L618" title="All 6 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L619">            logger.warn(&quot;Error al consultar tabla clientes: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L620">            return 0;</span>
+<span class="nc" id="L621">        }</span>
+<span class="nc" id="L622">        return 0;</span>
+    }
+
+    // Obtener número real de clientes nuevos del mes desde la BD
+    private int obtenerClientesNuevosDesdeBD() {
+<span class="nc" id="L627">        String sql = &quot;&quot;&quot;</span>
+                SELECT COUNT(*) as total
+                FROM clientes
+                WHERE YEAR(created_at) = YEAR(CURDATE())
+                AND MONTH(created_at) = MONTH(CURDATE())
+                AND dni &lt;&gt; '00000000'
+                AND UPPER(nombres) &lt;&gt; 'GENÉRICO'
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L636">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L637">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L638">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L640" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L641">                return rs.getInt(&quot;total&quot;);</span>
+            }
+<span class="nc bnc" id="L643" title="All 6 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L644">            logger.warn(&quot;Error al consultar clientes nuevos desde tabla clientes: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L645">            return 0;</span>
+<span class="nc" id="L646">        }</span>
+<span class="nc" id="L647">        return 0;</span>
+    }
+
+    // Establecer el usuario logueado y actualizar la interfaz
+    public void setUsuario(Usuario usuario) {
+<span class="nc" id="L652">        this.usuarioLogueado = usuario;</span>
+
+<span class="nc" id="L654">        Platform.runLater(() -&gt; {</span>
+<span class="nc bnc" id="L655" title="All 2 branches missed.">            if (usuarioLabel != null) {</span>
+<span class="nc" id="L656">                usuarioLabel.setText(</span>
+<span class="nc bnc" id="L657" title="All 2 branches missed.">                        usuarioLogueado != null ? usuarioLogueado.getNombreCompleto() : &quot;Usuario no identificado&quot;);</span>
+<span class="nc" id="L658">                logger.debug(&quot;Usuario establecido en dashboard: {}&quot;,</span>
+<span class="nc bnc" id="L659" title="All 2 branches missed.">                        usuarioLogueado != null ? usuarioLogueado.getNombreCompleto() : &quot;null&quot;);</span>
+            }
+
+<span class="nc bnc" id="L662" title="All 2 branches missed.">            if (rolLabel != null) {</span>
+<span class="nc bnc" id="L663" title="All 2 branches missed.">                rolLabel.setText(usuarioLogueado != null ? usuarioLogueado.getRol().getDescripcion() : &quot;Sin rol&quot;);</span>
+<span class="nc" id="L664">                logger.debug(&quot;Rol establecido en dashboard: {}&quot;,</span>
+<span class="nc bnc" id="L665" title="All 2 branches missed.">                        usuarioLogueado != null ? usuarioLogueado.getRol().getDescripcion() : &quot;null&quot;);</span>
+            }
+
+            // Refrescar datos después de asignar el usuario
+<span class="nc" id="L669">            refrescarDatos();</span>
+<span class="nc" id="L670">        });</span>
+<span class="nc" id="L671">    }</span>
+
+    private void mostrarError(String titulo, String mensaje) {
+<span class="nc" id="L674">        Platform.runLater(() -&gt; {</span>
+<span class="nc" id="L675">            Alert alert = new Alert(Alert.AlertType.ERROR);</span>
+<span class="nc" id="L676">            alert.setTitle(titulo);</span>
+<span class="nc" id="L677">            alert.setHeaderText(null);</span>
+<span class="nc" id="L678">            alert.setContentText(mensaje);</span>
+<span class="nc" id="L679">            alert.showAndWait();</span>
+<span class="nc" id="L680">        });</span>
+<span class="nc" id="L681">    }</span>
+
+    private int obtenerTransaccionesHoyDesdeBD() {
+<span class="nc" id="L684">        return obtenerMisVentasHoyDesdeBD();</span>
+    }
+
+    private List&lt;String&gt; obtenerStockBajoNombres() {
+<span class="nc" id="L688">        return productoService.obtenerProductosStockBajo().stream().map(Producto::getNombre).toList();</span>
+    }
+
+    // Clase modelo para las ventas recientes en el TableView
+    public static class VentaReciente {
+        private final String fechaHora;
+        private final String cliente;
+        private final String total;
+        private final String comprobanteSerie;
+
+<span class="nc" id="L698">        public VentaReciente(String fechaHora, String cliente, String total, String comprobanteSerie) {</span>
+<span class="nc" id="L699">            this.fechaHora = fechaHora;</span>
+<span class="nc" id="L700">            this.cliente = cliente;</span>
+<span class="nc" id="L701">            this.total = total;</span>
+<span class="nc" id="L702">            this.comprobanteSerie = comprobanteSerie;</span>
+<span class="nc" id="L703">        }</span>
+
+        public String getFechaHora() {
+<span class="nc" id="L706">            return fechaHora;</span>
+        }
+
+        public String getCliente() {
+<span class="nc" id="L710">            return cliente;</span>
+        }
+
+        public String getTotal() {
+<span class="nc" id="L714">            return total;</span>
+        }
+
+        public String getComprobanteSerie() {
+<span class="nc" id="L718">            return comprobanteSerie;</span>
+        }
+    }
+
+    // Clase modelo para los productos con stock bajo en el TableView
+    public static class ProductoStockBajo {
+        private final String producto;
+        private final String stockActual;
+        private final String stockMinimo;
+
+<span class="nc" id="L728">        public ProductoStockBajo(String producto, int stockActual, int stockMinimo) {</span>
+<span class="nc" id="L729">            this.producto = producto;</span>
+<span class="nc" id="L730">            this.stockActual = String.valueOf(stockActual);</span>
+<span class="nc" id="L731">            this.stockMinimo = String.valueOf(stockMinimo);</span>
+<span class="nc" id="L732">        }</span>
+
+        public String getProducto() {
+<span class="nc" id="L735">            return producto;</span>
+        }
+
+        public String getStockActual() {
+<span class="nc" id="L739">            return stockActual;</span>
+        }
+
+        public String getStockMinimo() {
+<span class="nc" id="L743">            return stockMinimo;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

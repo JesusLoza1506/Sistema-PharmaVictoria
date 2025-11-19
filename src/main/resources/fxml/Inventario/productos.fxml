@@ -108,7 +108,7 @@
                   <Label fx:id="lblPaginaActual" text="Página 1 de 1" />
                   <Button fx:id="btnPaginaSiguiente" text="Siguiente ⟩" onAction="#onPaginaSiguiente" />
                   <Label text="Mostrar:" styleClass="pagination-label" />
-                  <ComboBox fx:id="cmbTamanoPagina" prefWidth="80.0" styleClass="pagination-combo" />
+                  <ComboBox fx:id="cmbTamanoPagina" prefWidth="110.0" styleClass="pagination-combo" />
                   <Label text="por página" styleClass="pagination-label" />
                </children>
                <padding>

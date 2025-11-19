@@ -73,6 +73,7 @@ public class PermisosVendedorGestionController {
 
         private final UsuarioService usuarioService = UsuarioService.getInstance();
         // Ya no se usa vendedorId específico
+        private boolean permisosModificados = false;
 
         @FXML
         public void initialize() {
@@ -82,6 +83,35 @@ public class PermisosVendedorGestionController {
                 agregarListenersPermisosProveedores();
                 inicializarPermisosClientes();
                 agregarListenersPermisosClientes();
+                javafx.application.Platform.runLater(() -> {
+                        if (root != null && root.getScene() != null && root.getScene().getWindow() != null) {
+                                Stage stage = (Stage) root.getScene().getWindow();
+                                stage.setOnCloseRequest(event -> {
+                                        if (permisosModificados) {
+                                                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                                                                javafx.scene.control.Alert.AlertType.INFORMATION);
+                                                alert.setTitle("Permisos actualizados");
+                                                alert.setHeaderText(null);
+                                                alert.setContentText(
+                                                                "Los permisos han sido actualizados correctamente.");
+                                                alert.showAndWait();
+                                        }
+                                });
+                        }
+                });
+        }
+
+        public void setStage(Stage stage) {
+                stage.setOnCloseRequest(event -> {
+                        if (permisosModificados) {
+                                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                                                javafx.scene.control.Alert.AlertType.INFORMATION);
+                                alert.setTitle("Permisos actualizados");
+                                alert.setHeaderText(null);
+                                alert.setContentText("Los permisos han sido actualizados correctamente.");
+                                alert.showAndWait();
+                        }
+                });
         }
 
         private void inicializarPermisosClientes() {
@@ -229,5 +259,6 @@ public class PermisosVendedorGestionController {
                         permiso.setFechaAsignacion(LocalDateTime.now());
                         usuarioService.getPermisoRepository().save(permiso);
                 }
+                permisosModificados = true;
         }
 }

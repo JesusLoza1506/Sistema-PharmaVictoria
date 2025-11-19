@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExportarUsuariosPreviewController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Usuario</a> &gt; <span class="el_source">ExportarUsuariosPreviewController.java</span></div><h1>ExportarUsuariosPreviewController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Usuario;
+
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
+import com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService;
+import com.farmaciavictoria.proyectopharmavictoria.util.ExportFacade;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.stage.FileChooser;
+import java.util.List;
+
+<span class="nc" id="L14">public class ExportarUsuariosPreviewController {</span>
+    // Eliminados controles de filtro
+    @FXML
+    private TableView&lt;Usuario&gt; tablePreview;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colUsuario;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colNombres;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colApellidos;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colDni;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colTelefono;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colEmail;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colRol;
+    @FXML
+    private TableColumn&lt;Usuario, String&gt; colEstado;
+    @FXML
+    private Button btnExportarExcel;
+    @FXML
+    private Button btnExportarPDF;
+
+    private UsuarioService usuarioService;
+<span class="nc" id="L40">    private ObservableList&lt;Usuario&gt; usuariosFiltrados = FXCollections.observableArrayList();</span>
+
+    public void initialize() {
+<span class="nc" id="L43">        usuarioService = UsuarioService.getInstance();</span>
+<span class="nc" id="L44">        setupTableColumns();</span>
+<span class="nc" id="L45">        setupActions();</span>
+<span class="nc" id="L46">        tablePreview.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);</span>
+<span class="nc" id="L47">        cargarUsuarios();</span>
+<span class="nc" id="L48">    }</span>
+
+    private void setupTableColumns() {
+<span class="nc" id="L51">        colUsuario.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;username&quot;));</span>
+<span class="nc" id="L52">        colNombres.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;nombres&quot;));</span>
+<span class="nc" id="L53">        colApellidos.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;apellidos&quot;));</span>
+<span class="nc" id="L54">        colDni.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;dni&quot;));</span>
+<span class="nc" id="L55">        colTelefono.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;telefono&quot;));</span>
+<span class="nc" id="L56">        colEmail.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;email&quot;));</span>
+<span class="nc" id="L57">        colRol.setCellValueFactory(cellData -&gt; {</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">            if (cellData.getValue().getRol() != null) {</span>
+<span class="nc" id="L59">                return new javafx.beans.property.SimpleStringProperty(cellData.getValue().getRol().getDescripcion());</span>
+            }
+<span class="nc" id="L61">            return new javafx.beans.property.SimpleStringProperty(&quot;&quot;);</span>
+        });
+<span class="nc" id="L63">        colEstado.setCellValueFactory(cellData -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">                cellData.getValue().isActivo() ? &quot;Activo&quot; : &quot;Inactivo&quot;));</span>
+<span class="nc" id="L65">    }</span>
+
+    private void setupActions() {
+<span class="nc" id="L68">        btnExportarExcel.setOnAction(e -&gt; exportar(&quot;excel&quot;));</span>
+<span class="nc" id="L69">        btnExportarPDF.setOnAction(e -&gt; exportar(&quot;pdf&quot;));</span>
+<span class="nc" id="L70">    }</span>
+
+    // Eliminar método de filtros, solo mostrar todos los usuarios
+    private void cargarUsuarios() {
+<span class="nc" id="L74">        List&lt;Usuario&gt; usuarios = usuarioService.obtenerTodos();</span>
+<span class="nc" id="L75">        usuariosFiltrados.setAll(usuarios);</span>
+<span class="nc" id="L76">        tablePreview.setItems(usuariosFiltrados);</span>
+<span class="nc" id="L77">    }</span>
+
+    private void exportar(String tipo) {
+<span class="nc" id="L80">        String nombre = &quot;usuarios&quot;;</span>
+<span class="nc" id="L81">        FileChooser fileChooser = new FileChooser();</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        fileChooser.setInitialFileName(nombre + (tipo.equals(&quot;excel&quot;) ? &quot;.xlsx&quot; : &quot;.pdf&quot;));</span>
+<span class="nc" id="L83">        fileChooser.getExtensionFilters().clear();</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (tipo.equals(&quot;excel&quot;)) {</span>
+<span class="nc" id="L85">            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(&quot;Archivo Excel&quot;, &quot;*.xlsx&quot;));</span>
+        } else {
+<span class="nc" id="L87">            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(&quot;Archivo PDF&quot;, &quot;*.pdf&quot;));</span>
+        }
+<span class="nc" id="L89">        fileChooser.setTitle(&quot;Guardar reporte de usuarios&quot;);</span>
+<span class="nc" id="L90">        Stage stage = (Stage) btnExportarExcel.getScene().getWindow();</span>
+<span class="nc" id="L91">        java.io.File file = fileChooser.showSaveDialog(stage);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        if (file != null) {</span>
+<span class="nc" id="L93">            boolean exito = false;</span>
+            try {
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                if (tipo.equals(&quot;excel&quot;)) {</span>
+<span class="nc" id="L96">                    ExportFacade.exportarUsuariosExcel(usuariosFiltrados, file.getAbsolutePath().replace(&quot;.xlsx&quot;, &quot;&quot;));</span>
+                } else {
+<span class="nc" id="L98">                    ExportFacade.exportarUsuariosPDF(usuariosFiltrados, file.getAbsolutePath().replace(&quot;.pdf&quot;, &quot;&quot;));</span>
+                }
+<span class="nc" id="L100">                exito = true;</span>
+<span class="nc" id="L101">            } catch (Exception e) {</span>
+<span class="nc" id="L102">                exito = false;</span>
+<span class="nc" id="L103">            }</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            if (exito) {</span>
+<span class="nc" id="L105">                mostrarMensaje(&quot;Archivo exportado correctamente en:\n&quot; + file.getAbsolutePath());</span>
+<span class="nc" id="L106">                cerrar();</span>
+            } else {
+<span class="nc" id="L108">                mostrarMensaje(&quot;Error al exportar el archivo. Intente nuevamente.&quot;);</span>
+            }
+        }
+<span class="nc" id="L111">    }</span>
+
+    private void mostrarMensaje(String mensaje) {
+<span class="nc" id="L114">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L115">        alert.setTitle(&quot;Exportación de Usuarios&quot;);</span>
+<span class="nc" id="L116">        alert.setHeaderText(null);</span>
+<span class="nc" id="L117">        alert.setContentText(mensaje);</span>
+<span class="nc" id="L118">        alert.showAndWait();</span>
+<span class="nc" id="L119">    }</span>
+
+    private void cerrar() {
+<span class="nc" id="L122">        Stage stage = (Stage) btnExportarExcel.getScene().getWindow();</span>
+<span class="nc" id="L123">        stage.close();</span>
+<span class="nc" id="L124">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

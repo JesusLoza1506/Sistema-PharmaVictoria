@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Optional;
 
-/**
- * Controlador para la gestión de proveedores
- */
 public class ProveedoresController implements Initializable {
     @FXML
     private Button btnNuevoProveedor;
@@ -75,7 +72,6 @@ public class ProveedoresController implements Initializable {
 
     @FXML
     private void onEnviarCorreo() {
-        // Cargar credenciales desde application.properties
         String user = System.getProperty("mail.smtp.user", "TU_CORREO@gmail.com");
         String pass = System.getProperty("mail.smtp.password", "TU_CONTRASEÑA");
         com.farmaciavictoria.proyectopharmavictoria.service.EmailService emailService = new com.farmaciavictoria.proyectopharmavictoria.service.EmailService(
@@ -105,18 +101,14 @@ public class ProveedoresController implements Initializable {
     @FXML
     private javafx.scene.chart.PieChart pieChartEstadoProveedores;
 
-    /**
-     * Inicializa y carga las gráficas del dashboard inferior
-     */
+    // Inicializa y carga las gráficas del dashboard inferior
     private void inicializarDashboardGraficas() {
         cargarGraficaTopProveedores();
         cargarGraficaEstadoProveedores();
     }
 
-    /**
-     * Carga la gráfica de barras: Top proveedores con más productos asociados
-     * Utiliza ProductoService y mapeo por proveedorId/proveedorNombre
-     */
+    // Carga la gráfica de barras: Top proveedores con más productos asociados
+    // Utiliza ProductoService y mapeo por proveedorId/proveedorNombre
     private void cargarGraficaTopProveedores() {
         if (barChartTopProveedores == null)
             return;
@@ -126,9 +118,30 @@ public class ProveedoresController implements Initializable {
         barChartTopProveedores.getStylesheets()
                 .add(getClass().getResource("/css/Proveedor/barChart-custom.css").toExternalForm());
 
+        // Configurar el eje Y para mostrar solo enteros
+        if (barChartTopProveedores.getYAxis() instanceof javafx.scene.chart.NumberAxis yAxis) {
+            yAxis.setTickUnit(1);
+            yAxis.setMinorTickCount(0);
+            yAxis.setAutoRanging(true);
+            yAxis.setTickLabelFormatter(new javafx.util.StringConverter<Number>() {
+                @Override
+                public String toString(Number object) {
+                    return String.valueOf(object.intValue());
+                }
+
+                @Override
+                public Number fromString(String string) {
+                    try {
+                        return Integer.parseInt(string);
+                    } catch (Exception e) {
+                        return 0;
+                    }
+                }
+            });
+        }
+
         List<com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto> productos = ServiceContainer
                 .getInstance().getProductoService().obtenerTodos();
-        // Obtener proveedores activos
         List<com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor> proveedoresActivos = ServiceContainer
                 .getInstance().getProveedorService().obtenerTodos();
         java.util.Set<Integer> proveedoresValidos = new java.util.HashSet<>();
@@ -185,9 +198,7 @@ public class ProveedoresController implements Initializable {
         });
     }
 
-    /**
-     * Carga la gráfica de pastel: Distribución de proveedores por estado
-     */
+    // Carga la gráfica de pastel: Distribución de proveedores por estado
     private void cargarGraficaEstadoProveedores() {
         if (pieChartEstadoProveedores == null)
             return;
@@ -228,12 +239,9 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    // Logger
     private static final Logger logger = LoggerFactory.getLogger(ProveedoresController.class);
 
-    /**
-     * Evento para avanzar una página en la tabla de proveedores
-     */
+    // Evento para avanzar una página en la tabla de proveedores
     @FXML
     public void onPaginaSiguiente(javafx.event.ActionEvent event) {
         if (paginaActual < totalPaginas) {
@@ -245,36 +253,16 @@ public class ProveedoresController implements Initializable {
     // Variables de paginación
     private int paginaActual = 1;
     private int totalPaginas = 1;
-    private int tamanoPagina = 10;
+    private int tamanoPagina = -1; // -1 = Todos por defecto
 
-    /**
-     * Actualiza la paginación de la tabla de proveedores
-     */
+    // Actualiza la paginación de la tabla de proveedores
     private void actualizarPaginacion() {
-        // Calcular total de páginas
-        int total = proveedoresList != null ? proveedoresList.size() : 0;
-        totalPaginas = (int) Math.ceil((double) total / tamanoPagina);
-        if (paginaActual > totalPaginas)
-            paginaActual = totalPaginas;
-        if (paginaActual < 1)
-            paginaActual = 1;
-
-        // Obtener sublista para la página actual
-        int fromIndex = (paginaActual - 1) * tamanoPagina;
-        int toIndex = Math.min(fromIndex + tamanoPagina, total);
-        List<Proveedor> pagina = proveedoresList != null ? proveedoresList.subList(fromIndex, toIndex)
-                : java.util.Collections.emptyList();
-        if (tableProveedores != null)
-            tableProveedores.setItems(FXCollections.observableArrayList(pagina));
-
-        // Actualizar label de página
-        if (lblPaginaActual != null)
-            lblPaginaActual.setText("Página " + paginaActual + " de " + totalPaginas);
+        // Ahora solo llama a filtrarProveedores para que la paginación siempre respete
+        // el filtro
+        filtrarProveedores();
     }
 
-    /**
-     * Evento para retroceder una página en la tabla de proveedores
-     */
+    // Evento para retroceder una página en la tabla de proveedores
     @FXML
     public void onPaginaAnterior(javafx.event.ActionEvent event) {
         if (paginaActual > 1) {
@@ -283,9 +271,7 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    /**
-     * Maneja el evento de activar/desactivar el filtro de solo activos
-     */
+    // Maneja el evento de activar/desactivar el filtro de solo activos
     @FXML
     public void onToggleSoloActivos(javafx.event.ActionEvent event) {
         boolean soloActivos = chkSoloActivos.isSelected();
@@ -308,18 +294,16 @@ public class ProveedoresController implements Initializable {
     private ObservableList<Proveedor> proveedoresList;
     private ObservableList<Proveedor> proveedoresOriginales;
 
-    // FXML Elements - Filtros avanzados
     @FXML
     private ComboBox<String> cmbTipoFiltro;
 
-    /**
-     * Filtro avanzado usando Strategy Pattern
-     */
+    // Filtro avanzado usando Strategy Pattern
     private void aplicarFiltroAvanzado() {
         String criterio = txtBuscar.getText();
         String tipo = cmbTipoFiltro != null ? cmbTipoFiltro.getValue() : "Razón Social";
         List<Proveedor> base = proveedoresOriginales != null ? proveedoresOriginales : proveedoresList;
         com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor.ProveedorFilterStrategy strategy = null;
+        // Selección estricta del campo a filtrar
         switch (tipo) {
             case "Razón Social":
                 strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor.FiltroPorRazonSocial();
@@ -329,9 +313,6 @@ public class ProveedoresController implements Initializable {
                 break;
             case "Contacto":
                 strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor.FiltroPorContacto();
-                break;
-            case "Estado":
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor.FiltroPorEstado();
                 break;
             case "Tipo de Producto":
                 strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor.FiltroPorTipoProducto();
@@ -345,6 +326,7 @@ public class ProveedoresController implements Initializable {
         } else {
             filtrados = base;
         }
+        // Mostrar solo los filtrados, ignorando paginación
         proveedoresList.clear();
         proveedoresList.addAll(filtrados);
         actualizarEstadisticas();
@@ -370,8 +352,6 @@ public class ProveedoresController implements Initializable {
     private Label lblTotalVIP;
     @FXML
     private Label lblTotalObservacion;
-
-    // FXML Elements - Search
     @FXML
     private TextField txtBuscar;
     @FXML
@@ -380,14 +360,10 @@ public class ProveedoresController implements Initializable {
     private Button btnLimpiar;
     @FXML
     private Button btnHistorial;
-
-    // FXML Elements - Filters
     @FXML
     private ComboBox<String> cmbOrdenar;
     @FXML
     private CheckBox chkSoloActivos;
-
-    // FXML Elements - Table
     @FXML
     private TableView<Proveedor> tableProveedores;
     @FXML
@@ -402,15 +378,12 @@ public class ProveedoresController implements Initializable {
     private TableColumn<Proveedor, String> colTelefono;
     @FXML
     private TableColumn<Proveedor, String> colEmail;
-    // CoNOlumna 'Condiciones de Pago' eliminada por petición de UI
     @FXML
     private TableColumn<Proveedor, String> colTipoProducto;
     @FXML
     private TableColumn<Proveedor, String> colEstado;
     @FXML
     private TableColumn<Proveedor, Void> colAcciones;
-
-    // FXML Elements - Footer
     @FXML
     private Label lblEstadistica;
     @FXML
@@ -474,14 +447,18 @@ public class ProveedoresController implements Initializable {
         // Configurar ComboBox de tipo de búsqueda avanzada
         if (cmbTipoFiltro != null) {
             cmbTipoFiltro.setItems(FXCollections.observableArrayList(
-                    "Razón Social", "RUC", "Contacto", "Estado", "Tipo de Producto"));
+                    "Razón Social", "RUC", "Contacto", "Tipo de Producto"));
             cmbTipoFiltro.getSelectionModel().selectFirst();
-            cmbTipoFiltro.valueProperty().addListener((obs, oldVal, newVal) -> aplicarFiltroAvanzado());
+            cmbTipoFiltro.valueProperty().addListener((obs, oldVal, newVal) -> {
+                if (txtBuscar != null)
+                    txtBuscar.clear();
+                aplicarFiltroAvanzado();
+            });
         }
         txtBuscar.textProperty().addListener((obs, oldVal, newVal) -> aplicarFiltroAvanzado());
         System.out.println("Inicializando ProveedoresController...");
 
-        // ✅ DEPENDENCY INJECTION: Obtener services desde ServiceContainer
+        // Obtener services desde ServiceContainer
         ServiceContainer container = ServiceContainer.getInstance();
         this.proveedorService = container.getProveedorService();
         this.notificationService = container.getNotificationService();
@@ -492,14 +469,59 @@ public class ProveedoresController implements Initializable {
         // Configurar ComboBox de tamaño de página (paginación)
         if (cmbTamanoPagina != null) {
             cmbTamanoPagina.getItems().clear();
-            cmbTamanoPagina.getItems().addAll(5, 10, 20, 50);
-            cmbTamanoPagina.setValue(10);
+            cmbTamanoPagina.getItems().addAll(-1, 5, 10, 20, 50); // -1 = Todos
+            cmbTamanoPagina.setValue(-1);
+            cmbTamanoPagina.setConverter(new javafx.util.StringConverter<Integer>() {
+                @Override
+                public String toString(Integer value) {
+                    if (value == null || value == -1)
+                        return "Todos";
+                    return value.toString();
+                }
+
+                @Override
+                public Integer fromString(String string) {
+                    if ("Todos".equals(string))
+                        return -1;
+                    try {
+                        return Integer.parseInt(string);
+                    } catch (Exception e) {
+                        return -1;
+                    }
+                }
+            });
+            cmbTamanoPagina.setCellFactory(listView -> new javafx.scene.control.ListCell<Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item == -1 ? "Todos" : item.toString());
+                    }
+                }
+            });
+            cmbTamanoPagina.setButtonCell(new javafx.scene.control.ListCell<Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item == -1 ? "Todos" : item.toString());
+                    }
+                }
+            });
             cmbTamanoPagina.valueProperty().addListener((obs, oldVal, newVal) -> {
                 tamanoPagina = newVal;
                 paginaActual = 1;
                 actualizarPaginacion();
                 actualizarEstadisticas();
             });
+            // Mostrar todos por defecto al iniciar
+            paginaActual = 1;
+            actualizarPaginacion();
+            actualizarEstadisticas();
         }
 
         // Configurar tabla
@@ -517,9 +539,8 @@ public class ProveedoresController implements Initializable {
         System.out.println("ProveedoresController inicializado correctamente");
     }
 
-    /**
-     * Configurar la tabla de proveedores
-     */
+    // Configurar la tabla de proveedores
+
     private void configurarTabla() {
         // Configurar columnas
         colRazonSocial.setCellValueFactory(new PropertyValueFactory<>("razonSocial"));
@@ -571,9 +592,7 @@ public class ProveedoresController implements Initializable {
         tableProveedores.setItems(proveedoresList);
     }
 
-    /**
-     * Mostrar historial de cambios de un proveedor
-     */
+    // Mostrar historial de cambios de un proveedor
     private void mostrarHistorialProveedor(Proveedor proveedor) {
         List<ProveedorRepository.HistorialCambioDTO> historial = proveedorService
                 .obtenerHistorialCambios(proveedor.getId());
@@ -625,9 +644,7 @@ public class ProveedoresController implements Initializable {
         dialog.showAndWait();
     }
 
-    /**
-     * Configurar la columna de acciones
-     */
+    // Configurar la columna de acciones
     private void configurarColumnaAcciones() {
         // Reusar el patrón del módulo Inventario: Editar - Ver - Toggle - Eliminar
         colAcciones.setCellFactory(param -> new TableCell<>() {
@@ -672,7 +689,6 @@ public class ProveedoresController implements Initializable {
                 btnVer.setTooltip(new Tooltip("Ver detalles"));
                 btnEliminar.setTooltip(new Tooltip("Eliminar"));
 
-                // Acciones
                 btnEditar.setOnAction(e -> {
                     Proveedor proveedor = getTableView().getItems().get(getIndex());
                     editarProveedor(proveedor);
@@ -748,12 +764,9 @@ public class ProveedoresController implements Initializable {
 
     }
 
-    /**
-     * Búsqueda en tiempo real
-     */
+    // Búsqueda en tiempo real
     @FXML
     private void buscarProveedores(javafx.event.ActionEvent event) {
-        // Búsqueda en tiempo real
         txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 filtrarProveedores();
@@ -766,15 +779,13 @@ public class ProveedoresController implements Initializable {
         filtrarProveedores();
     }
 
-    /**
-     * ✅ SERVICE LAYER: Cargar proveedores usando ProveedorService
-     * Migrado de acceso directo a Repository hacia Service Layer
-     */
+    // SERVICE LAYER: Cargar proveedores usando ProveedorService
+    // Migrado de acceso directo a Repository hacia Service Layer
     private void cargarProveedores() {
         try {
             System.out.println("Cargando proveedores...");
 
-            // ✅ SERVICE LAYER: Cargando todos los proveedores (activos e inactivos) para
+            // SERVICE LAYER: Cargando todos los proveedores (activos e inactivos) para
             // filtros
             List<Proveedor> proveedores = proveedorService.obtenerTodosIncluyendoInactivos();
 
@@ -811,71 +822,94 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    /**
-     * Método público para refrescar la tabla (llamado desde formularios)
-     */
+    // Método público para refrescar la tabla (llamado desde formularios)
     public void refrescarTabla() {
         cargarProveedores();
     }
 
-    /**
-     * Filtrar proveedores según criterios (búsqueda simple)
-     */
+    // Filtrar proveedores según criterios (búsqueda simple)
     private void filtrarProveedores() {
         String textoBusqueda = txtBuscar.getText().toLowerCase().trim();
         boolean soloActivos = chkSoloActivos.isSelected();
+        String tipo = cmbTipoFiltro != null ? cmbTipoFiltro.getValue() : "Razón Social";
 
         List<Proveedor> proveedoresFiltrados = proveedoresOriginales.stream()
                 .filter(p -> {
-                    // Filtro por estado
                     if (soloActivos && !p.getActivo()) {
                         return false;
                     }
-
-                    // Filtro por texto de búsqueda
                     if (!textoBusqueda.isEmpty()) {
-                        return (p.getRazonSocial() != null && p.getRazonSocial().toLowerCase().contains(textoBusqueda))
-                                ||
-                                (p.getRuc() != null && p.getRuc().toLowerCase().contains(textoBusqueda)) ||
-                                (p.getContacto() != null && p.getContacto().toLowerCase().contains(textoBusqueda)) ||
-                                (p.getEmail() != null && p.getEmail().toLowerCase().contains(textoBusqueda));
+                        switch (tipo) {
+                            case "Razón Social":
+                                return p.getRazonSocial() != null
+                                        && p.getRazonSocial().toLowerCase().contains(textoBusqueda);
+                            case "RUC":
+                                return p.getRuc() != null && p.getRuc().toLowerCase().contains(textoBusqueda);
+                            case "Contacto":
+                                return p.getContacto() != null && p.getContacto().toLowerCase().contains(textoBusqueda);
+                            case "Tipo de Producto":
+                                return p.getTipoProducto() != null
+                                        && p.getTipoProducto().toLowerCase().contains(textoBusqueda);
+                            default:
+                                return true;
+                        }
                     }
-
                     return true;
                 })
                 .toList();
 
-        proveedoresList.clear();
-        proveedoresList.addAll(proveedoresFiltrados);
+        int total = proveedoresFiltrados.size();
+        if (tamanoPagina == -1) {
+            proveedoresList.clear();
+            proveedoresList.addAll(proveedoresFiltrados);
+            if (lblPaginaActual != null)
+                lblPaginaActual.setText("Mostrando todos");
+            if (btnPaginaAnterior != null)
+                btnPaginaAnterior.setDisable(true);
+            if (btnPaginaSiguiente != null)
+                btnPaginaSiguiente.setDisable(true);
+        } else {
+            totalPaginas = (int) Math.max(1, Math.ceil((double) total / tamanoPagina));
+            if (paginaActual > totalPaginas)
+                paginaActual = totalPaginas;
+            if (paginaActual < 1)
+                paginaActual = 1;
+            int fromIndex = (paginaActual - 1) * tamanoPagina;
+            int toIndex = Math.min(fromIndex + tamanoPagina, total);
+            List<Proveedor> pagina = proveedoresFiltrados.subList(fromIndex, toIndex);
+            proveedoresList.clear();
+            proveedoresList.addAll(pagina);
+            if (lblPaginaActual != null)
+                lblPaginaActual.setText("Página " + paginaActual + " de " + totalPaginas);
+            if (btnPaginaAnterior != null)
+                btnPaginaAnterior.setDisable(paginaActual <= 1);
+            if (btnPaginaSiguiente != null)
+                btnPaginaSiguiente.setDisable(paginaActual >= totalPaginas);
+        }
 
         actualizarEstadisticas();
     }
 
-    /**
-     * Actualizar estadísticas
-     */
+    // Actualizar estadísticas
     private void actualizarEstadisticas() {
-        int total = tableProveedores.getItems().size();
+        // Mostrar el total general de proveedores de la BD
+        int totalGeneral = proveedoresOriginales != null ? proveedoresOriginales.size() : 0;
         int activos = (int) tableProveedores.getItems().stream().filter(Proveedor::getActivo).count();
         if (lblContadorTotal != null) {
-            lblContadorTotal.setText("Total: " + total + " proveedores");
+            lblContadorTotal.setText("Total: " + totalGeneral + " proveedores");
         }
         if (lblEstadistica != null) {
-            lblEstadistica.setText(String.format("Total: %d proveedores (%d activos)", total, activos));
+            lblEstadistica.setText(String.format("Total: %d proveedores (%d activos)", totalGeneral, activos));
         }
     }
 
-    /**
-     * Actualizar timestamp de última actualización
-     */
+    // Actualizar timestamp de última actualización
     private void actualizarUltimaActualizacion() {
         if (lblUltimaActualizacion != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
             lblUltimaActualizacion.setText("Última actualización: " + LocalDateTime.now().format(formatter));
         }
     }
-
-    // MÉTODOS DE ACCIÓN
 
     @FXML
     private void limpiarBusqueda() {
@@ -893,18 +927,14 @@ public class ProveedoresController implements Initializable {
         abrirFormularioProveedor(null);
     }
 
-    /**
-     * Editar proveedor seleccionado
-     */
+    // Editar proveedor seleccionado
     private void editarProveedor(Proveedor proveedor) {
         if (proveedor != null) {
             abrirFormularioProveedor(proveedor);
         }
     }
 
-    /**
-     * Eliminar proveedor
-     */
+    // Eliminar proveedor
     private void eliminarProveedor(Proveedor proveedor) {
         Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
         confirmacion.setTitle("Confirmar Eliminación");
@@ -929,9 +959,7 @@ public class ProveedoresController implements Initializable {
         });
     }
 
-    /**
-     * ✅ NUEVO: Toggle rápido de estado activo/inactivo (sin confirmación)
-     */
+    // Toggle rápido de estado activo/inactivo (sin confirmación)
     private void toggleEstadoProveedor(Proveedor proveedor) {
         try {
             // Cambiar estado
@@ -959,9 +987,7 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    /**
-     * ✅ NUEVO: Eliminación DEFINITIVA con doble confirmación
-     */
+    // Eliminación DEFINITIVA con doble confirmación
     private void eliminarProveedorDefinitivo(Proveedor proveedor) {
         // Primera confirmación: moderna y coherente con productos
         Alert confirmacion1 = new Alert(Alert.AlertType.WARNING);
@@ -1049,9 +1075,6 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    /**
-     * ✅ ENTERPRISE PATTERN: Abrir formulario de proveedor
-     */
     private void abrirFormularioProveedor(Proveedor proveedor) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Proveedor/proveedor-form.fxml"));
@@ -1079,7 +1102,6 @@ public class ProveedoresController implements Initializable {
             stage.setTitle(proveedor == null ? "Nuevo Proveedor" : "Editar Proveedor");
             Scene scene = new Scene(root);
 
-            // Cargar CSS
             try {
                 String css = getClass().getResource("/css/Proveedor/proveedor-form.css").toExternalForm();
                 scene.getStylesheets().add(css);
@@ -1099,11 +1121,6 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    // MÉjesus 123456TODOS DE UTILIDAD
-
-    /**
-     * Mostrar diálogo de error
-     */
     private void mostrarError(String titulo, String header, String contenido) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
@@ -1116,9 +1133,7 @@ public class ProveedoresController implements Initializable {
         }
     }
 
-    /**
-     * Mostrar diálogo de información
-     */
+    // Mostrar diálogo de información
     private void mostrarInformacion(String titulo, String mensaje) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(titulo);
@@ -1127,9 +1142,7 @@ public class ProveedoresController implements Initializable {
         alert.showAndWait();
     }
 
-    /**
-     * Ver detalles del proveedor
-     */
+    // Ver detalles del proveedor
     public void verDetalles(Proveedor proveedor) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Proveedor/proveedor-detalles.fxml"));

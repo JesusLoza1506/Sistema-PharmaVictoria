@@ -230,7 +230,4 @@ public class ProveedorDetallesController {
         com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoRepository repo = new com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoRepository();
         return repo.findByFiltros(null, Long.valueOf(proveedorId), null, null);
     }
-
-    // boton cerrar eliminado del FXML; el cierre del modal se gestiona donde se
-    // abre
 }

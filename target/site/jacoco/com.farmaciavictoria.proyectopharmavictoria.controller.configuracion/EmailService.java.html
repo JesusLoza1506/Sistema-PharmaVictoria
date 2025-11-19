@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.configuracion</a> &gt; <span class="el_source">EmailService.java</span></div><h1>EmailService.java</h1><pre class="source lang-java linenums">// Servicio para el envío de correos electrónicos de notificación
+package com.farmaciavictoria.proyectopharmavictoria.controller.configuracion;
+
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import java.util.Properties;
+
+<span class="nc" id="L8">public class EmailService {</span>
+    /**
+     * Envía un correo electrónico usando la configuración proporcionada.
+     * 
+     * @param config  Configuración de correo
+     * @param asunto  Asunto del correo
+     * @param mensaje Mensaje del correo
+     * @throws Exception si ocurre un error en el envío
+     */
+    public static void enviarCorreo(EmailConfig config, String asunto, String mensaje) throws Exception {
+        try {
+<span class="nc" id="L19">            Properties props = new Properties();</span>
+<span class="nc" id="L20">            props.put(&quot;mail.smtp.host&quot;, config.getSmtpServer());</span>
+<span class="nc" id="L21">            props.put(&quot;mail.smtp.port&quot;, String.valueOf(config.getSmtpPort()));</span>
+<span class="nc" id="L22">            props.put(&quot;mail.smtp.auth&quot;, &quot;true&quot;);</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">            if (config.isUseSSL()) {</span>
+<span class="nc" id="L24">                props.put(&quot;mail.smtp.socketFactory.port&quot;, String.valueOf(config.getSmtpPort()));</span>
+<span class="nc" id="L25">                props.put(&quot;mail.smtp.socketFactory.class&quot;, &quot;javax.net.ssl.SSLSocketFactory&quot;);</span>
+            }
+<span class="nc bnc" id="L27" title="All 2 branches missed.">            if (config.isUseTLS()) {</span>
+<span class="nc" id="L28">                props.put(&quot;mail.smtp.starttls.enable&quot;, &quot;true&quot;);</span>
+            }
+<span class="nc" id="L30">            Session session = Session.getInstance(props, new Authenticator() {</span>
+                protected PasswordAuthentication getPasswordAuthentication() {
+<span class="nc" id="L32">                    return new PasswordAuthentication(config.getSmtpUser(), config.getSmtpPassword());</span>
+                }
+            });
+<span class="nc" id="L35">            Message message = new MimeMessage(session);</span>
+<span class="nc" id="L36">            message.setFrom(new InternetAddress(config.getSmtpUser()));</span>
+<span class="nc" id="L37">            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(config.getDestinatario()));</span>
+<span class="nc" id="L38">            message.setSubject(asunto);</span>
+<span class="nc" id="L39">            message.setText(mensaje);</span>
+<span class="nc" id="L40">            Transport.send(message);</span>
+<span class="nc" id="L41">            System.out.println(&quot;[EMAIL] Correo enviado correctamente a: &quot; + config.getDestinatario());</span>
+<span class="nc" id="L42">        } catch (Exception e) {</span>
+<span class="nc" id="L43">            System.err.println(&quot;[EMAIL][ERROR] No se pudo enviar el correo: &quot; + e.getMessage());</span>
+<span class="nc" id="L44">            e.printStackTrace();</span>
+<span class="nc" id="L45">            throw e;</span>
+<span class="nc" id="L46">        }</span>
+<span class="nc" id="L47">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

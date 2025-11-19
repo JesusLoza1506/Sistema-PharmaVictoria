@@ -1,0 +1,197 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Comprobante,ComprobanteFactory,3,17,0,2,1,3,1,2,1,1
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Comprobante,Boleta,0,32,0,0,0,13,0,7,0,7
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Comprobante,BoletaBuilder,0,38,0,0,0,10,0,5,0,5
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository,TransaccionPuntosRepository,369,0,26,0,104,0,17,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository,ProveedorRepository,721,3,60,0,185,1,44,1,14,1
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository,ProveedorRepository.HistorialCambioDTO,18,0,0,0,7,0,1,0,1,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Cliente,ClienteHistorialCambio,0,80,0,0,0,25,0,18,0,18
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Cliente,Cliente,71,384,39,43,14,102,34,54,0,47
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Cliente,ClienteExportAudit,0,45,0,0,0,13,0,13,0,13
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor,FiltroPorRazonSocial,0,36,2,6,0,6,2,5,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor,FiltroPorContacto,0,36,2,6,0,6,2,5,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor,FiltroPorTipoProducto,0,36,2,6,0,6,2,5,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Proveedor,FiltroPorRuc,0,34,2,6,0,6,2,5,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.events,SystemEvent.EventType,117,0,0,0,20,0,1,0,1,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.events,SystemEventManager,240,36,17,3,57,12,24,4,15,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.events,SystemEvent,60,0,0,0,15,0,8,0,8,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Inventario,CategoriaProducto,9,95,0,0,3,16,3,2,3,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Inventario,AjusteStockCommand,23,0,0,0,6,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Inventario,Producto,394,80,54,0,112,27,79,11,52,11
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Inventario,InventarioCommand,45,0,0,0,16,0,8,0,8,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Inventario,InventarioAuditoria,46,0,4,0,11,0,7,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Inventario,FormaFarmaceutica,6,81,0,0,2,14,2,2,2,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export,ExportadorExcelReporte,20,455,8,22,1,96,8,9,0,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export,ExportadorReporteFactory,3,52,0,12,1,11,1,8,1,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export,ExportadorExcelReporteProducto,1,263,0,8,1,67,0,6,0,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export,ExportadorPDFReporteProducto,1,161,0,4,1,37,0,4,0,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export,ExportadorPDFReporte,1,247,0,6,1,52,0,5,0,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export,ReporteTipo,0,33,0,0,0,6,0,1,0,1
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClienteDetallesController,715,0,48,0,170,0,45,0,21,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ExportarClientesController,297,0,16,0,61,0,23,0,15,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClienteFormController,1195,0,160,0,258,0,111,0,31,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClientesController.new ListCell() {...},26,0,6,0,6,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClientesController.new TableCell() {...},305,0,2,0,54,0,6,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClientesController.new StringConverter() {...},29,0,6,0,9,0,6,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClientesController.new ListCell() {...},26,0,6,0,6,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClientesController.new StringConverter() {...},15,0,0,0,5,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClientesController.new TableCell() {...},72,0,6,0,16,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Cliente,ClientesController,2040,0,201,0,498,0,154,0,52,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Usuario,UsuarioRepository,936,10,104,0,233,4,70,2,18,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Usuario,UsuarioHistorialAccesoRepository,185,10,2,0,40,4,3,2,2,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Usuario,UsuarioHistorialCambioRepository,216,10,10,0,45,4,7,2,2,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Usuario,UsuarioPermisoRepository,141,6,4,0,39,3,4,1,2,1
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Usuario,UsuarioAlertaRepository,118,6,2,0,33,3,3,1,2,1
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Inventario,ProductoRepository.ProductoRepositoryException,15,0,0,0,6,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Inventario,ProductoRepository,1554,7,128,0,360,2,86,2,22,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Inventario,ProductoHistorialCambioRepository.HistorialCambioDTO,18,0,0,0,7,0,1,0,1,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Inventario,ProductoHistorialCambioRepository,136,0,10,0,42,0,8,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Ventas,VentaHistorialCambioRepositoryJdbcImpl,207,0,16,0,54,0,14,0,6,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Ventas,ComprobanteRepositoryJdbcImpl,383,0,20,0,106,0,19,0,9,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Ventas,DetalleVentaRepositoryJdbcImpl,341,0,20,0,86,0,18,0,8,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Ventas,VentaRepositoryJdbcImpl,766,79,58,0,177,26,31,7,2,7
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedoresController.new StringConverter() {...},29,0,6,0,9,0,6,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedoresController.new ListCell() {...},26,0,6,0,6,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedoresController.new StringConverter() {...},15,0,0,0,5,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedoresController.new TableCell() {...},486,0,46,0,87,0,29,0,6,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedoresController.new ListCell() {...},26,0,6,0,6,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedoresController.new TableRow() {...},53,0,6,0,9,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ContactarProveedoresController,226,0,10,0,56,0,12,0,7,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ExportarProveedoresController,247,0,16,0,53,0,17,0,9,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedorDetallesController,567,0,74,0,117,0,54,0,17,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedorFormController,688,0,76,0,143,0,55,0,17,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor,ProveedoresController,2590,0,266,0,571,0,200,0,64,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new TableCell() {...},81,0,12,0,15,0,9,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new TableRow() {...},35,0,6,0,11,0,6,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new TableCell() {...},97,0,2,0,21,0,4,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new TableCell() {...},95,0,2,0,20,0,4,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new ListCell() {...},42,0,8,0,9,0,6,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new ListCell() {...},125,0,8,0,32,0,7,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new DecimalFormatSymbols() {...},12,0,0,0,4,0,1,0,1,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController.new ListCell() {...},42,0,8,0,9,0,6,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,TicketVentaController,591,0,24,0,119,0,16,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VistaPreviaComprobanteController,153,0,6,0,37,0,15,0,12,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,ComprobanteAccionesController.new Authenticator() {...},17,0,0,0,2,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,ComprobanteAccionesController,509,0,48,0,129,0,36,0,12,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VistaPreviaTicketController,132,0,12,0,36,0,11,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas,VentasController,5314,0,438,0,1127,0,270,0,51,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.command,RestablecerStockCommand,0,62,0,4,0,14,0,4,0,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto,ProductoDetalleDTO,0,45,0,0,0,19,0,13,0,13
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto,VentaReporteDTO,0,87,0,0,0,37,0,25,0,25
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Cliente,ClienteRepository,1340,10,120,0,272,4,75,2,15,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Cliente,ClienteHistorialCambioRepository,139,6,6,0,37,3,5,1,2,1
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.repository.Cliente,ClienteExportAuditRepository,51,0,0,0,15,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,DashboardController.VentaReciente,27,0,0,0,10,0,5,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,ResetPasswordController,66,0,6,0,17,0,7,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,DashboardController,1987,0,193,0,501,0,148,0,48,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,DashboardVendedorController.VentaReciente,27,0,0,0,10,0,5,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,DashboardVendedorController.ProductoStockBajo,23,0,0,0,8,0,4,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,DashboardVendedorController,1581,0,149,0,403,0,116,0,38,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,ForgotPasswordDialogController,145,0,4,0,46,0,12,0,10,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,LoginController,1108,0,50,0,270,0,69,0,44,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,DashboardController.ProductoStockBajo,23,0,0,0,8,0,4,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,LoginController.new Task() {...},17,0,0,0,5,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,LoginController.new Task() {...},18,0,0,0,3,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller,LoginController.new Task() {...},28,0,0,0,5,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Usuario,UsuariosController,1033,0,84,0,265,0,67,0,25,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Usuario,UsuarioDetallesController,538,0,102,0,111,0,65,0,14,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Usuario,UsuariosController.new TableCell() {...},374,0,6,0,63,0,9,0,6,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Usuario,UsuarioFormController,165,0,12,0,42,0,22,0,16,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Usuario,ExportarUsuariosPreviewController,274,0,14,0,61,0,19,0,12,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Usuario,RecuperarContraseñaController,81,0,10,0,22,0,10,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.repository,ReporteVentasPorProductoRepository,3,55,0,2,2,18,0,3,0,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria,SessionManager,3,5,0,0,1,3,1,2,1,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria,PharmavictoriaApplication,233,0,14,0,83,0,19,0,12,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Proveedor,Proveedor,7,168,4,10,0,60,3,36,0,32
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Proveedor,ProveedorAuditoria,0,52,0,0,0,11,0,6,0,6
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,UsuarioAcceso,21,0,0,0,8,0,4,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,UsuarioAlerta,45,0,0,0,20,0,13,0,13,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,Usuario,232,24,15,1,69,8,48,2,40,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,UsuarioAuditoria,27,0,0,0,10,0,5,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,Usuario.Rol,28,0,0,0,7,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,UsuarioHistorialAcceso,52,0,0,0,23,0,15,0,15,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,UsuarioPermiso,38,0,0,0,17,0,11,0,11,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Usuario,UsuarioHistorialCambio,52,0,0,0,23,0,15,0,15,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,EmailConfigService,93,0,12,0,26,0,10,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,EmailConfig,59,0,0,0,26,0,17,0,17,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,EmailService,98,0,4,0,24,0,4,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,VencimientoAlertaCardController,287,0,10,0,89,0,17,0,12,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,PermisosVendedorGestionController,670,0,30,0,153,0,54,0,39,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,PermisosVendedorCardController,54,0,0,0,18,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,ConfiguracionController,94,0,0,0,28,0,5,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,ConfiguracionNotificacionesController,196,0,2,0,46,0,8,0,7,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,EmailService.new Authenticator() {...},16,0,0,0,2,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.configuracion,NotificacionesCorreoCardController,41,0,0,0,14,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.strategy,ReporteVentasDetalleStrategy,6,170,0,4,4,44,0,6,0,4
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.strategy,ReporteVentasResumenStrategy,0,7,0,0,0,2,0,2,0,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.config,ServiceContainer,188,248,3,5,32,58,15,12,12,11
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.config,DatabaseConfig,106,148,10,4,26,40,12,7,6,6
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service.Ventas,VentaServiceImpl,63,176,14,10,14,54,11,8,1,6
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente,FiltroPorTelefono,0,36,2,6,0,6,2,5,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente,FiltroPorNombreRazonSocial,0,45,3,9,0,8,3,6,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente,FiltroPorEmail,0,36,2,6,0,6,2,5,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente,FiltroPorDocumento,0,36,2,6,0,7,2,5,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario,SearchByVencimientoStrategy,0,41,0,8,0,8,0,7,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario,SearchByLaboratorioStrategy,0,35,0,8,0,6,0,7,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario,SearchByNameStrategy,0,35,0,8,0,6,0,7,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario,SearchByProveedorStrategy,0,35,0,8,0,6,0,7,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario,SearchByLoteStrategy,0,35,0,8,0,6,0,7,0,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view,ReportesController,138,0,0,0,39,0,7,0,7,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view,ReporteVentasPorProductoDetalleController,202,0,4,0,46,0,11,0,9,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view,VentaPorProductoDTO,12,21,0,0,6,8,3,4,3,4
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view,ReporteVentasDetalleController,471,0,30,0,106,0,33,0,18,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view,ReporteVentasCardController,40,0,0,0,14,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view,ReporteVentasPorProductoCardController,46,0,0,0,16,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,StockVencimientoEmailObserver,125,0,13,0,35,0,14,0,7,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,ComprobanteUtils.DetalleVenta,3,0,0,0,1,0,1,0,1,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,MailService,135,0,0,0,32,0,3,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,ExportFacade,764,2720,106,64,133,538,72,23,2,8
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,PasswordUtil,8,0,0,0,2,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,MailService.new Authenticator() {...},16,0,0,0,2,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,ComprobanteUtils.Cliente,3,0,0,0,1,0,1,0,1,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,AlertaCorreoTracker,31,0,0,0,12,0,7,0,7,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,ComprobanteUtils,56,0,2,0,20,0,3,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,DatabaseUpdater,165,0,10,0,58,0,9,0,4,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.util,AlertaCorreoPersistente,86,0,0,0,28,0,10,0,10,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,ClienteService.EstadisticasClientes,27,0,0,0,10,0,5,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,ProveedorService,900,22,116,0,186,8,78,2,20,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,HistorialComprasService,31,0,4,0,7,0,5,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,EmailService,274,0,22,0,60,0,18,0,7,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,UsuarioService,585,36,69,1,147,10,57,2,22,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,AuthenticationService,296,12,48,0,66,5,34,3,10,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,ClienteHistorialCambioService,11,8,0,0,3,3,2,1,2,1
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,NotificationService,176,13,6,0,72,5,14,2,11,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,TransaccionPuntosService,13,0,0,0,3,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,ProductoService,1218,44,151,3,286,15,105,3,28,3
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,ClienteService,1296,30,168,0,268,10,113,2,29,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,CodigoGeneratorService,537,71,88,0,115,16,54,2,10,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,EmailService.new Authenticator() {...},16,0,0,0,2,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.service,EmailService.new Authenticator() {...},16,0,0,0,2,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController,3069,0,309,0,734,0,244,0,87,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductoFormController,2296,41,250,0,531,13,167,2,42,2
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,HistorialInventarioController,117,0,2,0,26,0,12,0,11,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductoDetallesController,492,0,68,0,87,0,48,0,14,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new ListCell() {...},26,0,6,0,6,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new ListCell() {...},26,0,6,0,6,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new StringConverter() {...},29,0,6,0,9,0,6,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new Callback() {...},11,0,0,0,2,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new StringConverter() {...},12,0,2,0,3,0,4,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new TableCell() {...},35,0,6,0,11,0,5,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new TableCell() {...},26,0,4,0,6,0,4,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ExportarInventarioController,544,0,60,0,104,0,50,0,20,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.new Task() {...},59,0,0,0,14,0,5,0,5,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductoFormController.new StringConverter() {...},12,0,2,0,3,0,4,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductoFormController.new StringConverter() {...},12,0,2,0,3,0,4,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductoFormController.new StringConverter() {...},45,0,10,0,9,0,8,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,ProductosController.7.new TableCell() {...},605,0,28,0,108,0,25,0,11,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,EdicionMasivaWizardController.new TableCell() {...},47,0,2,0,13,0,4,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,EdicionMasivaWizardController.new TableCell() {...},47,0,2,0,13,0,4,0,3,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.controller.Inventario,EdicionMasivaWizardController,1407,0,85,0,277,0,101,0,48,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,VentaHistorialCambio,19,26,0,0,6,7,6,7,6,7
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,VentaBuilder,119,0,0,0,40,0,20,0,20,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,Venta,82,47,0,0,32,23,25,12,25,12
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,DetalleVenta,66,0,0,0,19,0,19,0,19,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,FacturaFactory,12,0,0,0,4,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,Comprobante,59,0,0,0,17,0,17,0,17,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,BoletaFactory,12,0,0,0,4,0,2,0,2,0
+proyectopharmavictoria,com.farmaciavictoria.proyectopharmavictoria.model.Ventas,TransaccionPuntos,59,0,0,0,25,0,17,0,17,0

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceContainer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.config</a> &gt; <span class="el_source">ServiceContainer.java</span></div><h1>ServiceContainer.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.config;
+
+import com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService;
+import com.farmaciavictoria.proyectopharmavictoria.repository.ProveedorRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository;
+import com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService;
+import com.farmaciavictoria.proyectopharmavictoria.service.CodigoGeneratorService;
+import com.farmaciavictoria.proyectopharmavictoria.service.NotificationService;
+import com.farmaciavictoria.proyectopharmavictoria.service.ProveedorService;
+import com.farmaciavictoria.proyectopharmavictoria.service.ProductoService;
+import com.farmaciavictoria.proyectopharmavictoria.service.ClienteService;
+import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+
+// Contenedor central de servicios y repositorios para la aplicación (Inyección de dependencias)
+public class ServiceContainer {
+    // Devuelve la instancia de UsuarioService
+    public com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService getUsuarioService() {
+<span class="nc" id="L25">        return getService(com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService.class);</span>
+    }
+
+<span class="fc" id="L28">    private static final Logger logger = LoggerFactory.getLogger(ServiceContainer.class);</span>
+
+    // Instancia única (Singleton)
+    private static ServiceContainer instance;
+    // Almacena servicios registrados
+<span class="fc" id="L33">    private final Map&lt;Class&lt;?&gt;, Object&gt; services = new HashMap&lt;&gt;();</span>
+    // Almacena repositorios registrados
+<span class="fc" id="L35">    private final Map&lt;Class&lt;?&gt;, Object&gt; repositories = new HashMap&lt;&gt;();</span>
+
+    // Constructor privado: inicializa el contenedor
+<span class="fc" id="L38">    private ServiceContainer() {</span>
+<span class="fc" id="L39">        initializeContainer();</span>
+<span class="fc" id="L40">    }</span>
+
+    // Devuelve la instancia única del contenedor
+    public static ServiceContainer getInstance() {
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (instance == null) {</span>
+<span class="fc" id="L45">            synchronized (ServiceContainer.class) {</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">                if (instance == null) {</span>
+<span class="fc" id="L47">                    instance = new ServiceContainer();</span>
+                }
+<span class="fc" id="L49">            }</span>
+        }
+<span class="fc" id="L51">        return instance;</span>
+    }
+
+    // Inicializa todos los servicios y repositorios
+    private void initializeContainer() {
+        try {
+<span class="fc" id="L57">            logger.info(&quot;Inicializando contenedor de dependencias...&quot;);</span>
+<span class="fc" id="L58">            SystemEventManager.getInstance();</span>
+<span class="fc" id="L59">            registerRepositories();</span>
+<span class="fc" id="L60">            registerServices();</span>
+<span class="fc" id="L61">            logger.info(&quot;Contenedor de dependencias inicializado exitosamente&quot;);</span>
+<span class="fc" id="L62">        } catch (Exception e) {</span>
+<span class="fc" id="L63">            logger.error(&quot;Error al inicializar contenedor de dependencias: {}&quot;, e.getMessage(), e);</span>
+<span class="fc" id="L64">            throw new RuntimeException(&quot;Fallo crítico en inicialización del contenedor DI&quot;, e);</span>
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">    }</span>
+
+    // Registra los repositorios principales
+    private void registerRepositories() {
+<span class="fc" id="L70">        logger.debug(&quot;Registrando repositories...&quot;);</span>
+<span class="fc" id="L71">        repositories.put(UsuarioRepository.class, new UsuarioRepository());</span>
+<span class="fc" id="L72">        repositories.put(ProveedorRepository.class, new ProveedorRepository());</span>
+<span class="fc" id="L73">        repositories.put(ProductoRepository.class, new ProductoRepository());</span>
+<span class="fc" id="L74">        repositories.put(ClienteRepository.class, new ClienteRepository());</span>
+<span class="fc" id="L75">        logger.debug(&quot;Repositories registrados: {}&quot;, repositories.size());</span>
+<span class="fc" id="L76">    }</span>
+
+    // Registra los servicios principales
+    private void registerServices() {
+<span class="fc" id="L80">        logger.debug(&quot;Registrando services...&quot;);</span>
+<span class="fc" id="L81">        UsuarioRepository usuarioRepo = getRepository(UsuarioRepository.class);</span>
+<span class="fc" id="L82">        ProveedorRepository proveedorRepo = getRepository(ProveedorRepository.class);</span>
+<span class="fc" id="L83">        ProductoRepository productoRepo = getRepository(ProductoRepository.class);</span>
+<span class="fc" id="L84">        ClienteRepository clienteRepo = getRepository(ClienteRepository.class);</span>
+<span class="fc" id="L85">        CodigoGeneratorService codigoService = new CodigoGeneratorService();</span>
+<span class="fc" id="L86">        ProductoService productoService = new ProductoService(productoRepo, codigoService);</span>
+<span class="fc" id="L87">        ClienteService clienteService = new ClienteService(clienteRepo);</span>
+<span class="fc" id="L88">        UsuarioService usuarioService = UsuarioService.getInstance();</span>
+<span class="fc" id="L89">        services.put(UsuarioService.class, usuarioService);</span>
+<span class="fc" id="L90">        services.put(AuthenticationService.class, new AuthenticationService(usuarioRepo));</span>
+<span class="fc" id="L91">        services.put(ProveedorService.class, new ProveedorService(proveedorRepo));</span>
+<span class="fc" id="L92">        services.put(ProductoService.class, productoService);</span>
+<span class="fc" id="L93">        services.put(CodigoGeneratorService.class, codigoService);</span>
+<span class="fc" id="L94">        services.put(ClienteService.class, clienteService);</span>
+<span class="fc" id="L95">        services.put(NotificationService.class, new NotificationService(productoService));</span>
+<span class="fc" id="L96">        logger.debug(&quot;Services registrados: {}&quot;, services.size());</span>
+<span class="fc" id="L97">    }</span>
+
+    // Devuelve un servicio por tipo (clase)
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T getService(Class&lt;T&gt; serviceClass) {
+        try {
+<span class="fc" id="L103">            T service = (T) services.get(serviceClass);</span>
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">            if (service == null) {</span>
+<span class="nc" id="L105">                logger.error(&quot;Service no encontrado: {}&quot;, serviceClass.getSimpleName());</span>
+<span class="nc" id="L106">                throw new IllegalArgumentException(&quot;Service no registrado: &quot; + serviceClass.getSimpleName());</span>
+            }
+<span class="fc" id="L108">            logger.debug(&quot;Service obtenido: {}&quot;, serviceClass.getSimpleName());</span>
+<span class="fc" id="L109">            return service;</span>
+<span class="nc" id="L110">        } catch (Exception e) {</span>
+<span class="nc" id="L111">            logger.error(&quot;Error al obtener service {}: {}&quot;, serviceClass.getSimpleName(), e.getMessage(), e);</span>
+<span class="nc" id="L112">            throw new RuntimeException(&quot;Error en inyección de dependencias&quot;, e);</span>
+        }
+    }
+
+    // Devuelve un repositorio por tipo (clase)
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public &lt;T&gt; T getRepository(Class&lt;T&gt; repositoryClass) {
+        try {
+<span class="fc" id="L120">            T repository = (T) repositories.get(repositoryClass);</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            if (repository == null) {</span>
+<span class="nc" id="L122">                logger.error(&quot;Repository no encontrado: {}&quot;, repositoryClass.getSimpleName());</span>
+<span class="nc" id="L123">                throw new IllegalArgumentException(&quot;Repository no registrado: &quot; + repositoryClass.getSimpleName());</span>
+            }
+<span class="fc" id="L125">            logger.debug(&quot;Repository obtenido: {}&quot;, repositoryClass.getSimpleName());</span>
+<span class="fc" id="L126">            return repository;</span>
+<span class="nc" id="L127">        } catch (Exception e) {</span>
+<span class="nc" id="L128">            logger.error(&quot;Error al obtener repository {}: {}&quot;, repositoryClass.getSimpleName(), e.getMessage(), e);</span>
+<span class="nc" id="L129">            throw new RuntimeException(&quot;Error en inyección de dependencias&quot;, e);</span>
+        }
+    }
+
+    // Métodos de conveniencia para obtener servicios comunes
+    public AuthenticationService getAuthenticationService() {
+<span class="nc" id="L135">        return getService(AuthenticationService.class);</span>
+    }
+
+    public ProveedorService getProveedorService() {
+<span class="fc" id="L139">        return getService(ProveedorService.class);</span>
+    }
+
+    public ProductoService getProductoService() {
+<span class="fc" id="L143">        return getService(ProductoService.class);</span>
+    }
+
+    public NotificationService getNotificationService() {
+<span class="nc" id="L147">        return getService(NotificationService.class);</span>
+    }
+
+    public CodigoGeneratorService getCodigoGeneratorService() {
+<span class="fc" id="L151">        return getService(CodigoGeneratorService.class);</span>
+    }
+
+    // Métodos de conveniencia para obtener repositorios comunes
+    public UsuarioRepository getUsuarioRepository() {
+<span class="nc" id="L156">        return getRepository(UsuarioRepository.class);</span>
+    }
+
+    public ProveedorRepository getProveedorRepository() {
+<span class="nc" id="L160">        return getRepository(ProveedorRepository.class);</span>
+    }
+
+    public ProductoRepository getProductoRepository() {
+<span class="nc" id="L164">        return getRepository(ProductoRepository.class);</span>
+    }
+
+    public ClienteService getClienteService() {
+<span class="nc" id="L168">        return getService(ClienteService.class);</span>
+    }
+
+    // Muestra en el log todos los servicios y repositorios registrados
+    public void logRegisteredServices() {
+<span class="nc" id="L173">        logger.info(&quot;=== SERVICIOS REGISTRADOS ===&quot;);</span>
+<span class="nc" id="L174">        logger.info(&quot;Services ({}):&quot;, services.size());</span>
+<span class="nc" id="L175">        services.keySet().forEach(clazz -&gt; logger.info(&quot;  - {}&quot;, clazz.getSimpleName()));</span>
+<span class="nc" id="L176">        logger.info(&quot;Repositories ({}):&quot;, repositories.size());</span>
+<span class="nc" id="L177">        repositories.keySet().forEach(clazz -&gt; logger.info(&quot;  - {}&quot;, clazz.getSimpleName()));</span>
+<span class="nc" id="L178">        logger.info(&quot;==============================&quot;);</span>
+<span class="nc" id="L179">    }</span>
+
+    // Reinicializa el contenedor (útil para pruebas o recarga)
+    public void reinitialize() {
+<span class="nc" id="L183">        logger.info(&quot;Reinicializando contenedor de dependencias...&quot;);</span>
+<span class="nc" id="L184">        services.clear();</span>
+<span class="nc" id="L185">        repositories.clear();</span>
+<span class="nc" id="L186">        initializeContainer();</span>
+<span class="nc" id="L187">        logger.info(&quot;Contenedor reinicializado exitosamente&quot;);</span>
+<span class="nc" id="L188">    }</span>
+
+    // Devuelve información resumida del contenedor
+    public String getContainerInfo() {
+<span class="nc" id="L192">        return String.format(&quot;ServiceContainer - Services: %d, Repositories: %d&quot;,</span>
+<span class="nc" id="L193">                services.size(), repositories.size());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

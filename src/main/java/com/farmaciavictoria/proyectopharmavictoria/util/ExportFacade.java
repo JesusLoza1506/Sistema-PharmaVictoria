@@ -217,7 +217,7 @@ public class ExportFacade {
             Sheet sheet = workbook.createSheet("Clientes");
             String[] headers = { "Documento", "Tipo", "Razón Social / Nombre", "Teléfono", "Email", "Dirección",
                     "Fecha Nacimiento",
-                    "Puntos Totales", "Puntos Usados", "Puntos Disponibles", "Frecuente" };
+                    "Puntos Totales", "Puntos Usados", "Puntos Disponibles" };
             short verdeA = IndexedColors.BRIGHT_GREEN.getIndex();
             // Logo
             int logoRow = 0;
@@ -305,7 +305,7 @@ public class ExportFacade {
                 row.createCell(7).setCellValue(c.getPuntosTotales() != null ? c.getPuntosTotales() : 0);
                 row.createCell(8).setCellValue(c.getPuntosUsados() != null ? c.getPuntosUsados() : 0);
                 row.createCell(9).setCellValue(c.getPuntosDisponibles() != null ? c.getPuntosDisponibles() : 0);
-                row.createCell(10).setCellValue(Boolean.TRUE.equals(c.isFrecuente()) ? "Sí" : "No");
+                // Eliminada columna "Frecuente"
                 for (int j = 0; j < headers.length; j++) {
                     row.getCell(j).setCellStyle(cellStyle);
                 }
@@ -370,7 +370,7 @@ public class ExportFacade {
             // Tabla con cabecera estilizada
             String[] headers = { "Documento", "Tipo", "Razón Social / Nombre", "Teléfono", "Email", "Dirección",
                     "Fecha Nacimiento",
-                    "Puntos Totales", "Puntos Usados", "Puntos Disponibles", "Frecuente" };
+                    "Puntos Totales", "Puntos Usados", "Puntos Disponibles" };
             com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(headers.length);
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
@@ -418,8 +418,7 @@ public class ExportFacade {
                         c.getPuntosUsados() != null ? c.getPuntosUsados().toString() : "0", cellFont));
                 table.addCell(new com.itextpdf.text.Phrase(
                         c.getPuntosDisponibles() != null ? c.getPuntosDisponibles().toString() : "0", cellFont));
-                table.addCell(
-                        new com.itextpdf.text.Phrase(Boolean.TRUE.equals(c.isFrecuente()) ? "Sí" : "No", cellFont));
+                // Eliminada columna "Frecuente"
             }
             document.add(table);
             float[] columnWidths = { 1.5f, 2f, 1.5f, 1.5f, 2f, 2f, 1.3f, 1.3f, 1.3f, 1.3f, 1.2f };

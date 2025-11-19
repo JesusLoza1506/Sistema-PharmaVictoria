@@ -1,3 +1,15 @@
+/* Mensaje de error de credenciales con estilo similar al de éxito pero color rojizo */
+.login-warning-label {
+    -fx-text-fill: #b71c1c;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-color: #ffebee;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px 12px;
+    -fx-border-color: #ffcdd2;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+}
 /* Estilos armónicos para tablas del dashboard */
 .info-panel-table {
     -fx-background-color: #f8f9fa;

@@ -21,23 +21,15 @@ import java.net.URL;
 import java.util.*;
 
 public class VentasController implements Initializable {
-    /**
-     * Calcula los puntos ganados por una venta (ejemplo: 1 punto por cada sol
-     * gastado)
-     */
+
     private int calcularPuntosPorVenta(Venta venta) {
         if (venta == null || venta.getTotal() == null)
             return 0;
-        // Puedes ajustar la lógica aquí: 1 punto por cada sol gastado
         return venta.getTotal().intValue();
     }
 
     private final com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository transaccionPuntosRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository();
 
-    /**
-     * Consulta el saldo actual de puntos del cliente sumando y restando
-     * movimientos.
-     */
     private int consultarPuntosCliente(int clienteId) {
         int saldo = 0;
         List<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos> movimientos = transaccionPuntosRepository
@@ -175,7 +167,6 @@ public class VentasController implements Initializable {
                 }
             }
         });
-        // Íconos editar/eliminar con fondo blanco y borde verde/rojo
         colEditar.setCellFactory(tc -> new TableCell<DetalleVenta, Void>() {
             private final Button btn = new Button();
             {
@@ -405,7 +396,7 @@ public class VentasController implements Initializable {
         cargarClientes();
         comboPago.setItems(FXCollections.observableArrayList("EFECTIVO", "TARJETA", "TRANSFERENCIA", "MIXTO"));
         comboPago.setPromptText("Seleccionar método de pago");
-        comboComprobante.setItems(FXCollections.observableArrayList("BOLETA", "FACTURA"));
+        comboComprobante.setItems(FXCollections.observableArrayList("BOLETA", "FACTURA", "TICKET"));
         comboComprobante.setPromptText("Selecciona comprobante");
         comboComprobante.setVisibleRowCount(2);
         tablaCarrito.setItems(carrito);
@@ -466,10 +457,7 @@ public class VentasController implements Initializable {
     }
 
     private void agregarProductoDesdeBuscador() {
-        // Usar variable final para producto seleccionado
         final Producto seleccionado;
-        // Si hay selección en el ListView, usarla solo si la lista no está vacía y el
-        // índice es válido
         if (!listSugerencias.getItems().isEmpty() && listSugerencias.getSelectionModel().getSelectedIndex() >= 0
                 && listSugerencias.getSelectionModel().getSelectedIndex() < listSugerencias.getItems().size()) {
             seleccionado = listSugerencias.getSelectionModel().getSelectedItem();
@@ -619,14 +607,11 @@ public class VentasController implements Initializable {
     }
 
     private void anularVenta() {
-        // Lógica mínima: solo muestra mensaje (implementación real requiere selección
-        // de venta)
         mostrarMensaje("Funcionalidad de anulación implementada.");
     }
 
     private void mostrarMensaje(String msg) {
 
-        // Solo mostrar mensajes amigables, nunca logs técnicos ni errores de depuración
         if (msg != null && (msg.startsWith("[DEBUG") || msg.startsWith("[ERROR") || msg.contains("Exception")
                 || msg.contains("IndexOutOfBounds"))) {
             // Solo log en terminal
@@ -676,10 +661,10 @@ public class VentasController implements Initializable {
         return letras + String.format(" CON %02d/100 SOLES", parteDecimal);
     }
 
-    /**
-     * Muestra un listado de ventas de las últimas 24 horas en una ventana modal.
-     * Incluye botón para revertir/anular cada venta (solo si no está anulada).
-     */
+    // Muestra un listado de ventas de las últimas 24 horas en una ventana
+    // modal.Incluye botón para revertir/anular cada venta (solo si no está
+    // anulada).
+
     private void mostrarHistorialVentas24h() {
         // Obtener fecha límite (hace 24 horas)
         java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
@@ -769,9 +754,15 @@ public class VentasController implements Initializable {
             if (optGenerico.isPresent()) {
                 clienteActual = optGenerico.get();
             } else {
-                mostrarMensaje(
-                        "No se encontró el cliente genérico en la base de datos. Verifique que exista el registro con documento 00000000.");
-                return;
+                // Crear cliente genérico automáticamente como 'CONSUMIDOR FINAL'
+                com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente clienteGenerico = new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente();
+                clienteGenerico.setDocumento("00000000");
+                clienteGenerico.setNombreCompleto("CONSUMIDOR FINAL");
+                clienteGenerico.setTipoCliente("NATURAL");
+                clienteGenerico.setRazonSocial("");
+                // Si hay otros campos requeridos, inicialízalos aquí
+                clienteRepo.save(clienteGenerico); // O el método correcto para guardar
+                clienteActual = clienteGenerico;
             }
         }
         // Calcular totales antes de crear boleta y venta
@@ -817,6 +808,19 @@ public class VentasController implements Initializable {
             }
         }
         String tipoComprobante = comboComprobante.getValue();
+        if ("TICKET".equalsIgnoreCase(tipoComprobante)) {
+            // Lógica para registrar venta tipo TICKET
+            com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.TicketVentaController ticketController = new com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.TicketVentaController();
+            Venta ventaGuardada = ticketController.registrarVentaTicket(new ArrayList<>(carrito), metodoPago,
+                    SessionManager.getUsuarioActual().getUsername(), "Farmacia Victoria", clienteActual);
+            // Mostrar vista previa del ticket
+            String textoTicket = ticketController.generarTextoTicket(ventaGuardada, "Farmacia Victoria");
+            ticketController.mostrarVistaPreviaTicket(textoTicket);
+            carrito.clear();
+            actualizarTotales();
+            mostrarMensaje("Venta tipo TICKET registrada correctamente.");
+            return;
+        }
         if ("FACTURA".equalsIgnoreCase(tipoComprobante)) {
             // Validar que el cliente seleccionado tenga datos completos de empresa
             if (clienteActual == null || clienteActual.getRuc() == null || clienteActual.getRazonSocial() == null
@@ -952,8 +956,8 @@ public class VentasController implements Initializable {
                         factura.put("venta_al_credito", new java.util.ArrayList<>());
                         String jsonFactura = new com.google.gson.Gson().toJson(factura);
                         System.out.println("[DEBUG JSON FACTURA] JSON generado para NubeFacT:\n" + jsonFactura);
-                        String apiUrl = "https://api.nubefact.com/api/v1/b1f7ac80-5d5e-4fd9-8c8d-7b00c2638da0";
-                        String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
+                        String apiUrl = "https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127";
+                        String apiToken = "54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e";
                         String respuesta = ComprobanteUtils.enviarFacturaNubeFact(jsonFactura, apiUrl, apiToken);
                         String hashSunat = "";
                         String estadoSunat = "";
@@ -977,8 +981,6 @@ public class VentasController implements Initializable {
                             System.err.println("[ERROR NubeFacT] " + ex.getMessage());
                             ex.printStackTrace();
                         }
-                        // 1. Crear y guardar la venta antes de crear el comprobante
-                        // 1. Crear comprobante usando Factory
                         com.farmaciavictoria.proyectopharmavictoria.model.Ventas.ComprobanteFactory comprobanteFactory = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.FacturaFactory();
                         com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante comprobante = comprobanteFactory
                                 .crearComprobante();
@@ -988,7 +990,6 @@ public class VentasController implements Initializable {
                         comprobante.setEstadoSunat("GENERADO");
                         comprobante.setFechaEmision(java.time.LocalDateTime.now());
 
-                        // 2. Construir venta usando Builder
                         com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
                                 .getUsuarioActual();
                         java.time.LocalDateTime now = java.time.LocalDateTime.now();
@@ -1153,7 +1154,6 @@ public class VentasController implements Initializable {
                 javafx.stage.Stage stage = new javafx.stage.Stage();
                 stage.setTitle("Vista Previa de Boleta Electrónica");
                 stage.setScene(new javafx.scene.Scene(root));
-                // Convertir Cliente y DetalleVenta locales a tipos PharmavictoriaApplication
                 ComprobanteUtils.Cliente clienteJsonPreview = new ComprobanteUtils.Cliente();
                 clienteJsonPreview.tipo_documento = "1";
                 clienteJsonPreview.numero_documento = clienteActual.getDni();
@@ -1177,7 +1177,6 @@ public class VentasController implements Initializable {
                     det.total = d.getSubtotal().doubleValue() + igvDetalle;
                     detallesPreview.add(det);
                 }
-                // Obtener el siguiente número de boleta para la serie
                 String serieBoleta = "BBB1";
                 String numeroBoleta = obtenerSiguienteNumeroBoleta(serieBoleta);
                 previewController.setDatos(clienteJsonPreview, "BOLETA", serieBoleta, numeroBoleta,
@@ -1269,8 +1268,8 @@ public class VentasController implements Initializable {
                         boleta.put("venta_al_credito", new java.util.ArrayList<>());
                         String jsonBoleta = new com.google.gson.Gson().toJson(boleta);
                         System.out.println("[DEBUG JSON BOLETA] JSON generado para NubeFacT:\n" + jsonBoleta);
-                        String apiUrl = "https://api.nubefact.com/api/v1/b1f7ac80-5d5e-4fd9-8c8d-7b00c2638da0";
-                        String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
+                        String apiUrl = "https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127";
+                        String apiToken = "54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e";
                         String respuesta = com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils
                                 .enviarFacturaNubeFact(jsonBoleta, apiUrl, apiToken);
                         // Mostrar JSON y respuesta NubeFacT solo en terminal para diagnóstico
@@ -1490,15 +1489,14 @@ public class VentasController implements Initializable {
         }
     }
 
-    /**
-     * Anula una venta y restaura el stock de los productos vendidos.
-     * Actualiza el estado en la BD y registra el historial de cambio.
-     */
+    // Anula una venta y restaura el stock de los productos vendidos. Actualiza el
+    // estado en la BD y registra el historial de cambio.
     private void anularVentaDesdeHistorial(Venta venta) {
         if (venta == null || "ANULADA".equalsIgnoreCase(venta.getEstado())) {
             mostrarMensaje("La venta ya está anulada.");
             return;
         }
+        boolean esTicket = "TICKET".equalsIgnoreCase(venta.getTipoComprobante());
         try {
             // Cambiar estado de la venta
             venta.setEstado("ANULADA");
@@ -1508,6 +1506,23 @@ public class VentasController implements Initializable {
             venta.setUsuario(usuarioActual);
             ventaRepository.update(venta);
 
+            // Restar puntos ganados por la venta anulada
+            if (venta.getCliente() != null) {
+                int puntosGanados = calcularPuntosPorVenta(venta);
+                if (puntosGanados > 0) {
+                    com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos movExpirado = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();
+                    movExpirado.setClienteId(venta.getCliente().getId());
+                    movExpirado.setVentaId(venta.getId());
+                    movExpirado.setTipo("EXPIRADO");
+                    movExpirado.setPuntos(puntosGanados);
+                    movExpirado.setDescripcion("Puntos expirados por anulación de venta");
+                    movExpirado.setFecha(java.time.LocalDateTime.now());
+                    movExpirado.setUsuarioId(usuarioActual != null
+                            ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)
+                            : null);
+                    transaccionPuntosRepository.save(movExpirado);
+                }
+            }
             // Restaurar stock de cada producto consultando el stock real en BD y mostrando
             // logs
             if (venta.getDetalles() != null) {
@@ -1566,72 +1581,78 @@ public class VentasController implements Initializable {
             historialCambioRepository.save(historial);
 
             // Enviar anulación a NubeFacT/SUNAT
-            String apiUrl = "https://api.nubefact.com/api/v1/b1f7ac80-5d5e-4fd9-8c8d-7b00c2638da0";
-            String apiToken = "3e15b81cab1b46dc9881d4979e343a273d7abde7bb3e406686eb92f84f6bebd1";
-            java.util.LinkedHashMap<String, Object> jsonAnulacion = new java.util.LinkedHashMap<>();
-            jsonAnulacion.put("operacion", "generar_anulacion");
-            int tipoComprobante = "FACTURA".equalsIgnoreCase(venta.getTipoComprobante()) ? 1 : 2;
-            jsonAnulacion.put("tipo_de_comprobante", tipoComprobante);
-            String serie = "";
-            if (venta.getComprobante() != null && venta.getComprobante().getSerie() != null
-                    && !venta.getComprobante().getSerie().isEmpty()) {
-                serie = venta.getComprobante().getSerie();
-            } else if (venta.getSerie() != null && !venta.getSerie().isEmpty()) {
-                serie = venta.getSerie();
+            if (esTicket) {
+                mostrarMensaje("Venta tipo ticket anulada correctamente.");
             } else {
-                mostrarMensaje("No se encontró la serie del comprobante para la anulación. Verifique la venta.");
-                return;
-            }
-            String numero = null;
-            if (venta.getComprobante() != null && venta.getComprobante().getNumero() != null
-                    && !venta.getComprobante().getNumero().isEmpty()) {
-                numero = venta.getComprobante().getNumero();
-            } else if (venta.getNumeroBoleta() != null && !venta.getNumeroBoleta().isEmpty()) {
-                numero = venta.getNumeroBoleta();
-            } else {
-                mostrarMensaje("No se encontró el número de comprobante para la anulación. Verifique la venta.");
-                return;
-            }
-            if (numero != null) {
-                numero = numero.replaceFirst("^0+", "");
-            }
-            jsonAnulacion.put("serie", serie);
-            jsonAnulacion.put("numero", numero);
-            jsonAnulacion.put("motivo", "ERROR DEL SISTEMA");
-            jsonAnulacion.put("codigo_unico", "");
-            String json = new com.google.gson.Gson().toJson(jsonAnulacion);
-            String respuestaNubeFact = ComprobanteUtils.enviarFacturaNubeFact(json, apiUrl, apiToken);
-            if (respuestaNubeFact != null) {
-                System.out.println("[NUBEFACT ANULACION] Respuesta: " + respuestaNubeFact);
-                com.google.gson.JsonObject jsonResp = null;
-                try {
-                    jsonResp = new com.google.gson.JsonParser().parse(respuestaNubeFact).getAsJsonObject();
-                } catch (Exception e) {
-                    mostrarMensaje("No se pudo procesar la respuesta de NubeFacT. Respuesta: " + respuestaNubeFact);
+                String apiUrl = "https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127";
+                String apiToken = "54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e";
+                java.util.LinkedHashMap<String, Object> jsonAnulacion = new java.util.LinkedHashMap<>();
+                jsonAnulacion.put("operacion", "generar_anulacion");
+                int tipoComprobante = "FACTURA".equalsIgnoreCase(venta.getTipoComprobante()) ? 1 : 2;
+                jsonAnulacion.put("tipo_de_comprobante", tipoComprobante);
+                String serie = "";
+                if (venta.getComprobante() != null && venta.getComprobante().getSerie() != null
+                        && !venta.getComprobante().getSerie().isEmpty()) {
+                    serie = venta.getComprobante().getSerie();
+                } else if (venta.getSerie() != null && !venta.getSerie().isEmpty()) {
+                    serie = venta.getSerie();
+                } else {
+                    mostrarMensaje("No se encontró la serie del comprobante para la anulación. Verifique la venta.");
                     return;
                 }
-                boolean aceptadaPorSunat = false;
-                if (jsonResp.has("aceptada_por_sunat")) {
-                    aceptadaPorSunat = jsonResp.get("aceptada_por_sunat").getAsBoolean();
+                String numero = null;
+                if (venta.getComprobante() != null && venta.getComprobante().getNumero() != null
+                        && !venta.getComprobante().getNumero().isEmpty()) {
+                    numero = venta.getComprobante().getNumero();
+                } else if (venta.getNumeroBoleta() != null && !venta.getNumeroBoleta().isEmpty()) {
+                    numero = venta.getNumeroBoleta();
+                } else {
+                    mostrarMensaje("No se encontró el número de comprobante para la anulación. Verifique la venta.");
+                    return;
                 }
-                String enlace = jsonResp.has("enlace") ? jsonResp.get("enlace").getAsString() : "";
-                String ticket = "";
-                if (jsonResp.has("sunat_ticket_numero") && !jsonResp.get("sunat_ticket_numero").isJsonNull()) {
+                if (numero != null) {
+                    numero = numero.replaceFirst("^0+", "");
+                }
+                jsonAnulacion.put("serie", serie);
+                jsonAnulacion.put("numero", numero);
+                jsonAnulacion.put("motivo", "ERROR DEL SISTEMA");
+                jsonAnulacion.put("codigo_unico", "");
+                String json = new com.google.gson.Gson().toJson(jsonAnulacion);
+                String respuestaNubeFact = ComprobanteUtils.enviarFacturaNubeFact(json, apiUrl, apiToken);
+                if (respuestaNubeFact != null) {
+                    System.out.println("[NUBEFACT ANULACION] Respuesta: " + respuestaNubeFact);
+                    com.google.gson.JsonObject jsonResp = null;
                     try {
-                        ticket = jsonResp.get("sunat_ticket_numero").getAsString();
-                    } catch (Exception ex) {
-                        ticket = "";
+                        jsonResp = new com.google.gson.JsonParser().parse(respuestaNubeFact).getAsJsonObject();
+                    } catch (Exception e) {
+                        mostrarMensaje("No se pudo procesar la respuesta de NubeFacT. Respuesta: " + respuestaNubeFact);
+                        return;
                     }
+                    boolean aceptadaPorSunat = false;
+                    if (jsonResp.has("aceptada_por_sunat")) {
+                        aceptadaPorSunat = jsonResp.get("aceptada_por_sunat").getAsBoolean();
+                    }
+                    String enlace = jsonResp.has("enlace") ? jsonResp.get("enlace").getAsString() : "";
+                    String ticket = "";
+                    if (jsonResp.has("sunat_ticket_numero") && !jsonResp.get("sunat_ticket_numero").isJsonNull()) {
+                        try {
+                            ticket = jsonResp.get("sunat_ticket_numero").getAsString();
+                        } catch (Exception ex) {
+                            ticket = "";
+                        }
+                    }
+                    String estadoSunat = aceptadaPorSunat ? "Aceptada"
+                            : (ticket.isEmpty() ? "Pendiente" : "En proceso");
+                    String mensaje = "Venta anulada correctamente en NubeFacT. Estado SUNAT: " + estadoSunat
+                            + ".\nEnlace: "
+                            + enlace;
+                    if (!ticket.isEmpty()) {
+                        mensaje += "\nTicket SUNAT: " + ticket;
+                    }
+                    mostrarMensaje(mensaje);
+                } else {
+                    mostrarMensaje("No se pudo anular la venta en SUNAT/NubeFacT. Respuesta: null");
                 }
-                String estadoSunat = aceptadaPorSunat ? "Aceptada" : (ticket.isEmpty() ? "Pendiente" : "En proceso");
-                String mensaje = "Venta anulada correctamente en NubeFacT. Estado SUNAT: " + estadoSunat + ".\nEnlace: "
-                        + enlace;
-                if (!ticket.isEmpty()) {
-                    mensaje += "\nTicket SUNAT: " + ticket;
-                }
-                mostrarMensaje(mensaje);
-            } else {
-                mostrarMensaje("No se pudo anular la venta en SUNAT/NubeFacT. Respuesta: null");
             }
         } catch (Exception ex) {
             mostrarMensaje("Error al anular la venta: " + ex.getMessage());

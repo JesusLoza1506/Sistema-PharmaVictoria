@@ -31,23 +31,16 @@ public class ExportarClientesController {
     private TableColumn<Cliente, String> colPuntosUsados;
     @FXML
     private TableColumn<Cliente, String> colPuntosDisponibles;
-    @FXML
-    private TableColumn<Cliente, String> colFrecuente;
+    // Columna 'Frecuente' eliminada
     @FXML
     private Button btnExportarExcel;
     @FXML
     private Button btnExportarPDF;
-    @FXML
-    private ComboBox<String> cmbTipoFiltro;
+    // Eliminado ComboBox cmbTipoFiltro
 
     private ObservableList<Cliente> clientesFiltrados = FXCollections.observableArrayList();
 
     public void initialize() {
-        if (cmbTipoFiltro != null) {
-            cmbTipoFiltro.getItems().clear();
-            cmbTipoFiltro.getItems().addAll("Documento", "Nombre / Razón social", "Teléfono", "Email");
-            cmbTipoFiltro.setValue("Nombre / Razón social");
-        }
         colTipoCliente.setCellValueFactory(
                 cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().getTipoCliente()));
         colDocumento.setCellValueFactory(
@@ -63,8 +56,6 @@ public class ExportarClientesController {
                 String.valueOf(cellData.getValue().getPuntosUsados())));
         colPuntosDisponibles.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
                 String.valueOf(cellData.getValue().getPuntosDisponibles())));
-        colFrecuente.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
-                cellData.getValue().isFrecuente() ? "Sí" : "No"));
         tablePreview.setItems(clientesFiltrados);
         tablePreview.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         btnExportarExcel.setOnAction(e -> exportar("excel"));

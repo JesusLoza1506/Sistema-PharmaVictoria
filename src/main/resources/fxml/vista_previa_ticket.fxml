@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.VistaPreviaTicketController" spacing="10" alignment="CENTER" style="-fx-padding: 20;">
+    <Label text="Vista previa del ticket" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2a3b4c;" />
+    <TextArea fx:id="ticketTextArea" editable="false" wrapText="true" prefRowCount="24" prefColumnCount="80" style="-fx-font-family: 'Consolas', 'monospace'; -fx-font-size: 15; -fx-background-color: #f8f8f8; -fx-border-radius: 8; -fx-border-color: #b0b0b0;" />
+    <HBox spacing="18" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+        <Button fx:id="btnImprimir" text="Imprimir" onAction="#onImprimir" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 160;" />
+        <Button fx:id="btnGuardarPDF" text="Guardar como PDF" onAction="#onGuardarPDF" style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 200;" />
+    </HBox>
+</VBox>

@@ -69,12 +69,10 @@ public class ClienteDetallesController {
         private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraEstado;
         @FXML
         private javafx.scene.control.TableColumn<com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta, String> colCompraPago;
-        // Columna de sucursal eliminada
         @FXML
 
         private final com.farmaciavictoria.proyectopharmavictoria.service.ClienteService clienteService = new com.farmaciavictoria.proyectopharmavictoria.service.ClienteService(
                         new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository());
-        // Eliminado comprasService porque no se usa
         @FXML
         private Label subtituloLabel;
         @FXML
@@ -95,8 +93,6 @@ public class ClienteDetallesController {
         private Label fechaNacimientoLabel;
         @FXML
         private Label puntosTotalesLabel;
-        @FXML
-        private Label frecuenteLabel;
         @FXML
         private Label fechaRegistroLabel;
         @FXML
@@ -119,8 +115,7 @@ public class ClienteDetallesController {
         private Label direccionEmpresaLabel;
         @FXML
         private Label puntosEmpresaLabel;
-        @FXML
-        private Label frecuenteEmpresaLabel;
+        // ...existing code...
         @FXML
         private Label fechaRegistroEmpresaLabel;
 
@@ -155,7 +150,6 @@ public class ClienteDetallesController {
                         puntosEmpresaLabel.setText(
                                         cliente.getPuntosTotales() != null ? String.valueOf(cliente.getPuntosTotales())
                                                         : "0");
-                        frecuenteEmpresaLabel.setText(cliente.isFrecuente() ? "Sí" : "No");
                         fechaRegistroEmpresaLabel.setText(
                                         cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : "-");
                 } else {
@@ -189,7 +183,6 @@ public class ClienteDetallesController {
                         puntosTotalesLabel.setText(
                                         cliente.getPuntosTotales() != null ? String.valueOf(cliente.getPuntosTotales())
                                                         : "0");
-                        frecuenteLabel.setText(cliente.isFrecuente() ? "Sí" : "No");
                         fechaRegistroLabel.setText(
                                         cliente.getCreatedAt() != null ? cliente.getCreatedAt().toString() : "-");
                 }

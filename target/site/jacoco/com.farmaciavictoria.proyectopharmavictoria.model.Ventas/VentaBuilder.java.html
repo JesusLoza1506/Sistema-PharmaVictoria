@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VentaBuilder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.model.Ventas</a> &gt; <span class="el_source">VentaBuilder.java</span></div><h1>VentaBuilder.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.model.Ventas;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
+// import eliminado: Sucursal
+import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta;
+import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante;
+
+public class VentaBuilder {
+    private final Venta venta;
+
+<span class="nc" id="L15">    public VentaBuilder() {</span>
+<span class="nc" id="L16">        this.venta = new Venta();</span>
+<span class="nc" id="L17">    }</span>
+
+    public VentaBuilder conId(int id) {
+<span class="nc" id="L20">        venta.setId(id);</span>
+<span class="nc" id="L21">        return this;</span>
+    }
+
+    public VentaBuilder conCliente(Cliente cliente) {
+<span class="nc" id="L25">        venta.setCliente(cliente);</span>
+<span class="nc" id="L26">        return this;</span>
+    }
+
+    public VentaBuilder conUsuario(Usuario usuario) {
+<span class="nc" id="L30">        venta.setUsuario(usuario);</span>
+<span class="nc" id="L31">        return this;</span>
+    }
+
+    // Método conSucursal eliminado
+    public VentaBuilder conDetalles(List&lt;DetalleVenta&gt; detalles) {
+<span class="nc" id="L36">        venta.setDetalles(detalles);</span>
+<span class="nc" id="L37">        return this;</span>
+    }
+
+    public VentaBuilder conComprobante(Comprobante comprobante) {
+<span class="nc" id="L41">        venta.setComprobante(comprobante);</span>
+<span class="nc" id="L42">        return this;</span>
+    }
+
+    public VentaBuilder conSubtotal(BigDecimal subtotal) {
+<span class="nc" id="L46">        venta.setSubtotal(subtotal);</span>
+<span class="nc" id="L47">        return this;</span>
+    }
+
+    public VentaBuilder conDescuentoMonto(BigDecimal descuento) {
+<span class="nc" id="L51">        venta.setDescuentoMonto(descuento);</span>
+<span class="nc" id="L52">        return this;</span>
+    }
+
+    public VentaBuilder conIgvMonto(BigDecimal igv) {
+<span class="nc" id="L56">        venta.setIgvMonto(igv);</span>
+<span class="nc" id="L57">        return this;</span>
+    }
+
+    public VentaBuilder conTotal(BigDecimal total) {
+<span class="nc" id="L61">        venta.setTotal(total);</span>
+<span class="nc" id="L62">        return this;</span>
+    }
+
+    public VentaBuilder conTipoPago(String tipoPago) {
+<span class="nc" id="L66">        venta.setTipoPago(tipoPago);</span>
+<span class="nc" id="L67">        return this;</span>
+    }
+
+    public VentaBuilder conTipoComprobante(String tipoComprobante) {
+<span class="nc" id="L71">        venta.setTipoComprobante(tipoComprobante);</span>
+<span class="nc" id="L72">        return this;</span>
+    }
+
+    public VentaBuilder conNumeroBoleta(String numeroBoleta) {
+<span class="nc" id="L76">        venta.setNumeroBoleta(numeroBoleta);</span>
+<span class="nc" id="L77">        return this;</span>
+    }
+
+    public VentaBuilder conSerie(String serie) {
+<span class="nc" id="L81">        venta.setSerie(serie);</span>
+<span class="nc" id="L82">        return this;</span>
+    }
+
+    public VentaBuilder conFechaVenta(LocalDateTime fechaVenta) {
+<span class="nc" id="L86">        venta.setFechaVenta(fechaVenta);</span>
+<span class="nc" id="L87">        return this;</span>
+    }
+
+    public VentaBuilder conEstado(String estado) {
+<span class="nc" id="L91">        venta.setEstado(estado);</span>
+<span class="nc" id="L92">        return this;</span>
+    }
+
+    public VentaBuilder conObservaciones(String observaciones) {
+<span class="nc" id="L96">        venta.setObservaciones(observaciones);</span>
+<span class="nc" id="L97">        return this;</span>
+    }
+
+    public VentaBuilder conCreatedAt(LocalDateTime createdAt) {
+<span class="nc" id="L101">        venta.setCreatedAt(createdAt);</span>
+<span class="nc" id="L102">        return this;</span>
+    }
+
+    public VentaBuilder conUpdatedAt(LocalDateTime updatedAt) {
+<span class="nc" id="L106">        venta.setUpdatedAt(updatedAt);</span>
+<span class="nc" id="L107">        return this;</span>
+    }
+
+    public Venta build() {
+<span class="nc" id="L111">        return venta;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

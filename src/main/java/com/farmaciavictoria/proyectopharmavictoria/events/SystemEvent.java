@@ -25,7 +25,7 @@ public class SystemEvent {
         CLIENTE_PUNTOS_AGREGADOS,
         CLIENTE_PUNTOS_REDIMIDOS,
 
-        // ✅ EVENTOS DE VENTA AGREGADOS
+        // EVENTOS DE VENTA AGREGADOS
         VENTA_REGISTRADA,
         VENTA_ANULADA,
 

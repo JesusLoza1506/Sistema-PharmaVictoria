@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ContactarProveedoresController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor</a> &gt; <span class="el_source">ContactarProveedoresController.java</span></div><h1>ContactarProveedoresController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Proveedor;
+
+import com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor;
+import com.farmaciavictoria.proyectopharmavictoria.service.EmailService;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import java.io.File;
+import java.util.List;
+
+<span class="nc" id="L14">public class ContactarProveedoresController {</span>
+
+    @FXML
+    private TableView&lt;Proveedor&gt; tableSeleccionProveedores;
+    @FXML
+    private TableColumn&lt;Proveedor, CheckBox&gt; colSeleccion;
+    // Mapa para saber qué proveedor está seleccionado
+<span class="nc" id="L21">    private java.util.Map&lt;Proveedor, CheckBox&gt; seleccionMap = new java.util.HashMap&lt;&gt;();</span>
+    @FXML
+    private TableColumn&lt;Proveedor, String&gt; colRazonSocial;
+    @FXML
+    private TableColumn&lt;Proveedor, String&gt; colCorreo;
+    @FXML
+    private TextField txtAsunto;
+    @FXML
+    private TextArea txtMensaje;
+    @FXML
+    private Button btnAdjuntar;
+    @FXML
+    private Label lblArchivoAdjunto;
+    @FXML
+    private Button btnEnviar;
+    @FXML
+    private Button btnCancelar;
+
+    private File archivoAdjunto;
+
+    public void initialize() {
+        // Configurar columnas
+<span class="nc" id="L43">        colRazonSocial.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;razonSocial&quot;));</span>
+<span class="nc" id="L44">        colCorreo.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory&lt;&gt;(&quot;email&quot;));</span>
+<span class="nc" id="L45">        colSeleccion.setCellValueFactory(param -&gt; {</span>
+<span class="nc" id="L46">            CheckBox checkBox = new CheckBox();</span>
+<span class="nc" id="L47">            seleccionMap.put(param.getValue(), checkBox);</span>
+<span class="nc" id="L48">            return new javafx.beans.property.SimpleObjectProperty&lt;&gt;(checkBox);</span>
+        });
+
+        // Cargar proveedores reales desde el ServiceContainer
+<span class="nc" id="L52">        List&lt;Proveedor&gt; proveedores = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer.getInstance()</span>
+<span class="nc" id="L53">                .getProveedorService().obtenerTodos();</span>
+<span class="nc" id="L54">        ObservableList&lt;Proveedor&gt; data = FXCollections.observableArrayList(proveedores);</span>
+<span class="nc" id="L55">        tableSeleccionProveedores.setItems(data);</span>
+
+<span class="nc" id="L57">    }</span>
+
+    @FXML
+    private void onAdjuntar() {
+<span class="nc" id="L61">        FileChooser fileChooser = new FileChooser();</span>
+<span class="nc" id="L62">        fileChooser.setTitle(&quot;Seleccionar archivo adjunto&quot;);</span>
+<span class="nc" id="L63">        Stage stage = (Stage) btnAdjuntar.getScene().getWindow();</span>
+<span class="nc" id="L64">        archivoAdjunto = fileChooser.showOpenDialog(stage);</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (archivoAdjunto != null) {</span>
+<span class="nc" id="L66">            lblArchivoAdjunto.setText(archivoAdjunto.getName());</span>
+        } else {
+<span class="nc" id="L68">            lblArchivoAdjunto.setText(&quot;Sin archivo adjunto&quot;);</span>
+        }
+<span class="nc" id="L70">    }</span>
+
+    @FXML
+    private void onEnviarCorreo() {
+        // Obtener proveedores seleccionados
+<span class="nc" id="L75">        ObservableList&lt;Proveedor&gt; seleccionados = FXCollections.observableArrayList();</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        for (Proveedor proveedor : tableSeleccionProveedores.getItems()) {</span>
+<span class="nc" id="L77">            CheckBox check = seleccionMap.get(proveedor);</span>
+<span class="nc bnc" id="L78" title="All 4 branches missed.">            if (check != null &amp;&amp; check.isSelected()) {</span>
+<span class="nc" id="L79">                seleccionados.add(proveedor);</span>
+            }
+<span class="nc" id="L81">        }</span>
+<span class="nc" id="L82">        String asunto = txtAsunto.getText();</span>
+<span class="nc" id="L83">        String mensaje = txtMensaje.getText();</span>
+        // Leer credenciales SMTP desde smtp_proveedores.properties
+<span class="nc" id="L85">        java.util.Properties config = new java.util.Properties();</span>
+        try {
+<span class="nc" id="L87">            java.io.InputStream input = getClass().getClassLoader().getResourceAsStream(&quot;smtp_proveedores.properties&quot;);</span>
+<span class="nc" id="L88">            config.load(input);</span>
+<span class="nc" id="L89">        } catch (Exception ex) {</span>
+<span class="nc" id="L90">            mostrarAlerta(&quot;Error de configuración SMTP&quot;, &quot;No se pudo leer smtp_proveedores.properties&quot;,</span>
+                    Alert.AlertType.ERROR);
+<span class="nc" id="L92">            return;</span>
+<span class="nc" id="L93">        }</span>
+<span class="nc" id="L94">        String smtpUser = config.getProperty(&quot;mail.smtp.user&quot;, &quot;&quot;);</span>
+<span class="nc" id="L95">        String smtpPass = config.getProperty(&quot;mail.smtp.password&quot;, &quot;&quot;);</span>
+<span class="nc" id="L96">        EmailService emailService = new EmailService(smtpUser, smtpPass);</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        for (Proveedor proveedor : seleccionados) {</span>
+            try {
+<span class="nc" id="L99">                emailService.sendProveedorEmail(proveedor.getEmail(), asunto, mensaje, archivoAdjunto);</span>
+<span class="nc" id="L100">            } catch (Exception e) {</span>
+<span class="nc" id="L101">                mostrarAlerta(&quot;Error al enviar a &quot; + proveedor.getEmail(), e.getMessage(), Alert.AlertType.ERROR);</span>
+<span class="nc" id="L102">            }</span>
+<span class="nc" id="L103">        }</span>
+<span class="nc" id="L104">        mostrarAlerta(&quot;Envío completado&quot;, &quot;Correos enviados correctamente.&quot;, Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L105">    }</span>
+
+    @FXML
+    private void onCancelar() {
+<span class="nc" id="L109">        Stage stage = (Stage) btnCancelar.getScene().getWindow();</span>
+<span class="nc" id="L110">        stage.close();</span>
+<span class="nc" id="L111">    }</span>
+
+    private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {
+<span class="nc" id="L114">        Alert alert = new Alert(tipo);</span>
+<span class="nc" id="L115">        alert.setTitle(titulo);</span>
+<span class="nc" id="L116">        alert.setHeaderText(null);</span>
+<span class="nc" id="L117">        alert.setContentText(mensaje);</span>
+<span class="nc" id="L118">        alert.showAndWait();</span>
+<span class="nc" id="L119">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

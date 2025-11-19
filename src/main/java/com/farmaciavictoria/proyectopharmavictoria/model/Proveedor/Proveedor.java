@@ -2,9 +2,6 @@ package com.farmaciavictoria.proyectopharmavictoria.model.Proveedor;
 
 import java.time.LocalDateTime;
 
-/**
- * Entidad Proveedor que corresponde al esquema de base de datos actual
- */
 public class Proveedor {
     private Integer id;
     private String razonSocial;
@@ -15,15 +12,13 @@ public class Proveedor {
     private String direccion;
     private String condicionesPago;
     private String observaciones;
-    private String tipo; // Nuevo campo para filtro por tipo
+    private String tipo;
     private Boolean activo;
     private LocalDateTime createdAt;
 
-    // Constructor vacío
     public Proveedor() {
     }
 
-    // Constructor completo
     public Proveedor(String razonSocial, String ruc, String contacto, String telefono,
             String email, String direccion, String condicionesPago, String observaciones) {
         this();
@@ -38,7 +33,7 @@ public class Proveedor {
     }
     // Mejoras sugeridas
 
-    private String tipoProducto; // Opcional, para filtrar por tipo de producto
+    private String tipoProducto;
 
     public String getTipoProducto() {
         return tipoProducto;

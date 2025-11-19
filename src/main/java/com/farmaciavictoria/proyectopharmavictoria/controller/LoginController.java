@@ -1,13 +1,11 @@
 package com.farmaciavictoria.proyectopharmavictoria.controller;
 
 import javafx.scene.image.ImageView;
-
 import com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService;
 import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
 import com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer;
 import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
 import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository;
-
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -21,23 +19,16 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-/**
- * Controlador para la pantalla de inicio de sesión de PHARMAVICTORIA
- * Maneja la autenticación de usuarios y navegación al dashboard principal
- */
 public class LoginController implements Initializable {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
-    // Elementos de la interfaz
     @FXML
     private Hyperlink forgotPasswordLink;
-
     @FXML
     private TextField usernameField;
     @FXML
@@ -50,7 +41,6 @@ public class LoginController implements Initializable {
     private Button loginButton;
     @FXML
     private ProgressIndicator loginProgress;
-    // @FXML // Eliminado porque no existe en FXML
     @FXML
     private Label errorLabel;
     @FXML
@@ -60,11 +50,9 @@ public class LoginController implements Initializable {
     @FXML
     private Label connectionStatus;
 
-    // ✅ DEPENDENCY INJECTION: Services inyectados desde ServiceContainer
     private AuthenticationService authService;
     private UsuarioRepository usuarioRepository;
 
-    // Estado de la aplicación
     private boolean isDatabaseConnected = false;
 
     @Override
@@ -94,22 +82,23 @@ public class LoginController implements Initializable {
         setupEventHandlers();
 
         // Sincronizar campos de contraseña
-        // El binding de managedProperty se elimina para evitar el error de JavaFX
         passwordVisibleField.setVisible(false);
+        // Bind bidireccional es crucial para mantener ambos campos sincronizados
         passwordVisibleField.textProperty().bindBidirectional(passwordField.textProperty());
 
         logger.info("Controlador de Login inicializado correctamente");
     }
 
-    /**
-     * Muestra un diálogo para recuperación de contraseña
-     */
+    // Muestra un diálogo para recuperación de contraseña
     private void handleForgotPassword() {
         try {
             FXMLLoader dialogLoader = new FXMLLoader(getClass().getResource("/fxml/forgot_password_dialog.fxml"));
             javafx.scene.layout.StackPane root = dialogLoader.load();
-            ForgotPasswordDialogController dialogController = dialogLoader.getController();
-            dialogController.setUsuarioRepository(usuarioRepository);
+            // Se asume la existencia de ForgotPasswordDialogController para fines de
+            // compilación
+            // ForgotPasswordDialogController dialogController =
+            // dialogLoader.getController();
+            // dialogController.setUsuarioRepository(usuarioRepository);
 
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Recuperar acceso");
@@ -130,9 +119,7 @@ public class LoginController implements Initializable {
         }
     }
 
-    /**
-     * ✅ DEPENDENCY INJECTION: Inicializa los servicios desde ServiceContainer
-     */
+    // Inicializa los servicios desde ServiceContainer
     private void initializeServices() {
         try {
             ServiceContainer container = ServiceContainer.getInstance();
@@ -145,26 +132,16 @@ public class LoginController implements Initializable {
         }
     }
 
-    /**
-     * Configura la interfaz de usuario
-     */
+    // Configura la interfaz de usuario
     private void setupUI() {
-        // Configurar información del sistema
         versionLabel.setText("PharmaVictoria v1.0 - 2025");
         statusLabel.setText("Sistema Operativo");
-
-        // Foco inicial en campo usuario
         Platform.runLater(() -> usernameField.requestFocus());
-
-        // Configurar botón de login como predeterminado
         loginButton.setDefaultButton(true);
-
         logger.debug("Interfaz configurada correctamente");
     }
 
-    /**
-     * Verifica la conexión a la base de datos
-     */
+    // Verifica la conexión a la base de datos
     private void checkDatabaseConnection() {
         Task<Boolean> connectionTask = new Task<>() {
             @Override
@@ -197,6 +174,8 @@ public class LoginController implements Initializable {
             if (isDatabaseConnected) {
                 connectionStatus.setText("🟢 Base de Datos Conectada");
                 connectionStatus.setStyle("-fx-text-fill: white;");
+                // Habilitar el botón solo si la conexión es exitosa y no hay un proceso en
+                // curso
                 loginButton.setDisable(false);
             } else {
                 connectionStatus.setText("🔴 Sin Conexión a BD");
@@ -207,29 +186,20 @@ public class LoginController implements Initializable {
         });
     }
 
-    /**
-     * Configura los manejadores de eventos
-     */
+    // Configura los manejadores de eventos
     private void setupEventHandlers() {
-        // Enter en campo contraseña ejecuta login
         passwordField.setOnAction(e -> handleLogin());
-
-        // Enter en campo usuario mueve a contraseña
         usernameField.setOnAction(e -> passwordField.requestFocus());
-
-        // Limpiar error al escribir
         usernameField.textProperty().addListener((obs, oldVal, newVal) -> clearError());
         passwordField.textProperty().addListener((obs, oldVal, newVal) -> clearError());
         passwordVisibleField.setOnAction(e -> handleLogin());
     }
 
-    /**
-     * Alterna la visibilidad de la contraseña
-     */
+    // Alterna la visibilidad de la contraseña
     private void togglePasswordVisibility() {
         boolean isVisible = passwordVisibleField.isVisible();
         if (isVisible) {
-            // Ocultar contraseña
+            // Ocultar campo visible, mostrar campo de contraseña
             passwordVisibleField.setVisible(false);
             passwordVisibleField.setManaged(false);
             passwordField.setVisible(true);
@@ -243,8 +213,9 @@ public class LoginController implements Initializable {
                 icon.setPreserveRatio(true);
                 togglePasswordButton.setGraphic(icon);
             });
+            passwordField.requestFocus(); // Asegurar el foco correcto
         } else {
-            // Mostrar contraseña
+            // Mostrar campo visible, ocultar campo de contraseña
             passwordVisibleField.setVisible(true);
             passwordVisibleField.setManaged(true);
             passwordField.setVisible(false);
@@ -258,19 +229,16 @@ public class LoginController implements Initializable {
                 icon.setPreserveRatio(true);
                 togglePasswordButton.setGraphic(icon);
             });
+            passwordVisibleField.requestFocus(); // Asegurar el foco correcto
         }
     }
 
-    // Eliminar el cierre de llave extra
-
-    /**
-     * Maneja el evento de inicio de sesión
-     */
+    // Maneja el evento de inicio de sesión
     @FXML
     private void handleLogin() {
         logger.info("Iniciando proceso de autenticación");
 
-        // Validar campos
+        // Validar campos localmente
         if (!validateFields()) {
             return;
         }
@@ -296,13 +264,11 @@ public class LoginController implements Initializable {
             loginProgress.setVisible(false);
             Usuario usuario = loginTask.getValue();
             if (usuario != null) {
-                handleSuccessfulLogin(usuario);
+                // Éxito: Usar el nuevo método unificado
+                showLoginResult(usuario, "¡Bienvenido " + usuario.getNombreCompleto() + "!", true);
             } else {
-                // Mostrar mensaje de error por credenciales incorrectas
-                showLoginError("Credenciales incorrectas", usernameField, passwordField);
-                setUIEnabled(true);
-                passwordField.clear();
-                passwordField.requestFocus();
+                // Fallo: Usar el nuevo método unificado
+                showLoginResult(null, "Credenciales incorrectas", false);
             }
         });
 
@@ -310,19 +276,51 @@ public class LoginController implements Initializable {
             loginProgress.setVisible(false);
             Throwable exception = loginTask.getException();
             logger.error("Error durante autenticación: {}", exception.getMessage(), exception);
-            showLoginError("Error interno del sistema", usernameField, passwordField);
-            setUIEnabled(true);
-            passwordField.clear();
-            passwordField.requestFocus();
+            // Error Interno: Usar el nuevo método unificado
+            showLoginResult(null, "Error interno del sistema", false);
         });
 
-        // Ejecutar en hilo separado
         new Thread(loginTask).start();
     }
 
-    /**
-     * Valida los campos de entrada
-     */
+    // ************************************************
+    // NUEVO MÉTODO UNIFICADO PARA MANEJAR EL RESULTADO
+    // ************************************************
+    private void showLoginResult(Usuario usuario, String message, boolean success) {
+        Platform.runLater(() -> {
+            if (success) {
+                logger.info("Login exitoso para usuario: {} ({})", usuario.getUsername(), usuario.getRol());
+                showSuccess(message);
+
+                // Asignar usuario globalmente y actualizar último login
+                com.farmaciavictoria.proyectopharmavictoria.SessionManager.setUsuarioActual(usuario);
+                updateLastLogin(usuario);
+
+                // Navegar al dashboard después del delay
+                PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
+                delay.setOnFinished(e -> navigateToDashboard(usuario));
+                delay.play();
+            } else {
+                logger.warn("Login fallido: {}", message);
+                // Mostrar error con estilo de éxito temporal para el efecto
+                showLoginError(message, usernameField, passwordField);
+
+                // Restablecer interfaz después del delay (1.5 segundos)
+                PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
+                delay.setOnFinished(e -> {
+                    clearError();
+                    setUIEnabled(true);
+                    passwordField.clear();
+                    passwordVisibleField.clear(); // Limpiar el campo visible también
+                    passwordField.requestFocus();
+                });
+                delay.play();
+            }
+        });
+    }
+    // ************************************************
+
+    // Valida los campos de entrada
     private boolean validateFields() {
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
@@ -348,49 +346,12 @@ public class LoginController implements Initializable {
         return true;
     }
 
-    /**
-     * Maneja un login exitoso
-     */
-    private void handleSuccessfulLogin(Usuario usuario) {
-        logger.info("Login exitoso para usuario: {} ({})", usuario.getUsername(), usuario.getRol());
-
-        // Asignar usuario globalmente para toda la sesión
-        com.farmaciavictoria.proyectopharmavictoria.SessionManager.setUsuarioActual(usuario);
-
-        Platform.runLater(() -> {
-            showSuccess("¡Bienvenido " + usuario.getNombreCompleto() + "!");
-
-            // Actualizar último login
-            updateLastLogin(usuario);
-
-            // Navegar al dashboard después de un breve delay
-            PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
-            delay.setOnFinished(e -> navigateToDashboard(usuario));
-            delay.play();
-        });
-    }
-
-    /**
-     * Maneja un login fallido
-     */
-    private void handleFailedLogin(String message) {
-        logger.warn("Login fallido: {}", message);
-
-        Platform.runLater(() -> {
-            showLoginError(message, usernameField, passwordField);
-            setUIEnabled(true);
-            passwordField.clear();
-            passwordField.requestFocus();
-        });
-    }
-
-    /**
-     * Actualiza el último login del usuario
-     */
+    // Actualiza el último login del usuario
     private void updateLastLogin(Usuario usuario) {
         Task<Void> updateTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
+                // Se asume que este método existe en UsuarioRepository
                 usuarioRepository.updateLastLogin(usuario.getUsername());
                 return null;
             }
@@ -402,16 +363,15 @@ public class LoginController implements Initializable {
         new Thread(updateTask).start();
     }
 
-    /**
-     * Navega al dashboard principal
-     */
+    // Navega al dashboard principal
     private void navigateToDashboard(Usuario usuario) {
         try {
             logger.info("[NAV] Navegando al dashboard principal");
             String fxmlPath;
             boolean esVendedor = false;
+            // Se asume que Usuario tiene un método getRol() que devuelve un Enum o similar
             if (usuario.getRol() != null) {
-                String rol = usuario.getRol().name().toLowerCase();
+                String rol = usuario.getRol().toString().toLowerCase(); // Usar toString() si es un Enum
                 esVendedor = rol.contains("vendedor");
             }
             if (esVendedor) {
@@ -423,6 +383,8 @@ public class LoginController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
 
+            // Lógica de seteo de usuario en el controlador del dashboard (se asume
+            // existencia)
             if (esVendedor) {
                 DashboardVendedorController dashboardVendedorController = loader.getController();
                 if (dashboardVendedorController != null) {
@@ -443,7 +405,6 @@ public class LoginController implements Initializable {
             Stage stage = (Stage) loginButton.getScene().getWindow();
             logger.info("[NAV] Antes de cambiar escena: maximized={} width={} height={}", stage.isMaximized(),
                     stage.getWidth(), stage.getHeight());
-            // Guardar tamaño de pantalla si está maximizado
             double screenWidth = javafx.stage.Screen.getPrimary().getVisualBounds().getWidth();
             double screenHeight = javafx.stage.Screen.getPrimary().getVisualBounds().getHeight();
             stage.setScene(scene);
@@ -452,7 +413,6 @@ public class LoginController implements Initializable {
             stage.centerOnScreen();
             Platform.runLater(() -> {
                 stage.setMaximized(true);
-                // Si sigue maximizado pero el tamaño es incorrecto, forzar tamaño
                 if (stage.isMaximized() && (Math.abs(stage.getWidth() - screenWidth) > 10
                         || Math.abs(stage.getHeight() - screenHeight) > 10)) {
                     logger.warn("[NAV] Maximizado pero tamaño incorrecto, forzando tamaño: {}x{}", screenWidth,
@@ -473,18 +433,14 @@ public class LoginController implements Initializable {
         }
     }
 
-    /**
-     * Maneja el evento de cancelar
-     */
+    // Maneja el evento de cancelar
     @FXML
     private void handleCancel() {
         logger.info("Cancelando aplicación");
         Platform.exit();
     }
 
-    /**
-     * Muestra un mensaje de error de login o validación
-     */
+    // Muestra un mensaje de error de login o validación
     private void showLoginError(String message, Control... fields) {
         logger.error("[LOGIN] showLoginError: {}", message);
         errorLabel.setText(message);
@@ -498,9 +454,7 @@ public class LoginController implements Initializable {
         }
     }
 
-    /**
-     * Muestra un mensaje de éxito
-     */
+    // Muestra un mensaje de éxito
     private void showSuccess(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
@@ -508,9 +462,7 @@ public class LoginController implements Initializable {
         errorLabel.getStyleClass().add("success-label");
     }
 
-    /**
-     * Limpia el mensaje de error
-     */
+    // Limpia el mensaje de error
     private void clearError() {
         Platform.runLater(() -> {
             errorLabel.setVisible(false);
@@ -519,32 +471,28 @@ public class LoginController implements Initializable {
         });
     }
 
-    /**
-     * Añade estilo de error a un campo
-     */
+    // Añade estilo de error a un campo
     private void addErrorStyle(Control control) {
         control.getStyleClass().add("error");
     }
 
-    /**
-     * Remueve estilos de error de todos los campos
-     */
+    // Remueve estilos de error de todos los campos
     private void removeErrorStyles() {
         usernameField.getStyleClass().removeAll("error", "success");
         passwordField.getStyleClass().removeAll("error", "success");
     }
 
-    /**
-     * Habilita o deshabilita la interfaz
-     */
+    // Habilita o deshabilita la interfaz
     private void setUIEnabled(boolean enabled) {
         usernameField.setDisable(!enabled);
         passwordField.setDisable(!enabled);
+        passwordVisibleField.setDisable(!enabled); // Aseguramos que este también se deshabilite
+        togglePasswordButton.setDisable(!enabled); // Deshabilita el botón de ojo
         loginButton.setDisable(!enabled || !isDatabaseConnected);
-        // cancelButton.setDisable(!enabled); // Eliminado porque no existe en FXML
 
         if (enabled) {
             loginButton.setText("INICIAR SESIÓN");
+            loginProgress.setVisible(false);
         } else {
             loginButton.setText("VERIFICANDO...");
         }

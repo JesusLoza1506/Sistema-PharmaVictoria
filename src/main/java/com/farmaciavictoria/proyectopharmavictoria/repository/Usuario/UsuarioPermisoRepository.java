@@ -7,9 +7,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Repository para permisos granulares de usuario
- */
 public class UsuarioPermisoRepository {
     private final DatabaseConfig databaseConfig;
 

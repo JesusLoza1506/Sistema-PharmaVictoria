@@ -3,25 +3,26 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Nov 01, 2025 at 04:06 AM
+-- Generation Time: Nov 18, 2025 at 12:58 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.26
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */
-;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */
-;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */
-;
-/*!40101 SET NAMES utf8mb4 */
-;
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
 --
 -- Database: `pharmavictoria`
 --
 
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `clientes`
 --
@@ -42,10 +43,12 @@ CREATE TABLE `clientes` (
   `es_frecuente` tinyint(1) DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `tipo_cliente` enum('Natural', 'Empresa') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Natural',
+  `tipo_cliente` enum('Natural','Empresa') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Natural',
   `documento` varchar(20) COLLATE utf8mb4_general_ci NOT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `cliente_historial_cambio`
 --
@@ -58,8 +61,27 @@ CREATE TABLE `cliente_historial_cambio` (
   `valor_nuevo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `usuario` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- --------------------------------------------------------
+
+--
+-- Table structure for table `cliente_puntos_historial`
+--
+
+CREATE TABLE `cliente_puntos_historial` (
+  `id` int NOT NULL,
+  `cliente_id` int NOT NULL,
+  `tipo_movimiento` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
+  `puntos` int NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fecha` datetime DEFAULT CURRENT_TIMESTAMP,
+  `usuario_id` int NOT NULL,
+  `venta_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `comprobantes`
 --
@@ -67,14 +89,16 @@ CREATE TABLE `cliente_historial_cambio` (
 CREATE TABLE `comprobantes` (
   `id` int NOT NULL,
   `venta_id` int NOT NULL,
-  `tipo` enum('BOLETA', 'FACTURA') COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo` enum('BOLETA','FACTURA','TICKET') COLLATE utf8mb4_general_ci NOT NULL,
   `serie` varchar(10) COLLATE utf8mb4_general_ci NOT NULL,
   `numero` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
   `hash_sunat` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `estado_sunat` enum('GENERADO', 'ENVIADO', 'ACEPTADO', 'RECHAZADO') COLLATE utf8mb4_general_ci DEFAULT 'GENERADO',
+  `estado_sunat` enum('GENERADO','ENVIADO','ACEPTADO','RECHAZADO') COLLATE utf8mb4_general_ci DEFAULT 'GENERADO',
   `fecha_emision` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `configuracion`
 --
@@ -84,12 +108,14 @@ CREATE TABLE `configuracion` (
   `clave` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `valor` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `tipo_dato` enum('STRING', 'INTEGER', 'DECIMAL', 'BOOLEAN', 'JSON') COLLATE utf8mb4_unicode_ci DEFAULT 'STRING',
+  `tipo_dato` enum('STRING','INTEGER','DECIMAL','BOOLEAN','JSON') COLLATE utf8mb4_unicode_ci DEFAULT 'STRING',
   `categoria` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `updated_by` int DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Configuraciones del sistema';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Configuraciones del sistema';
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `configuracion_codigos`
 --
@@ -100,8 +126,10 @@ CREATE TABLE `configuracion_codigos` (
   `prefijo` varchar(5) COLLATE utf8mb4_general_ci NOT NULL,
   `ultimo_numero` int DEFAULT '0',
   `longitud_numero` int DEFAULT '3'
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `detalle_ventas`
 --
@@ -111,13 +139,15 @@ CREATE TABLE `detalle_ventas` (
   `venta_id` int NOT NULL,
   `producto_id` int NOT NULL,
   `cantidad` int NOT NULL,
-  `precio_unitario` decimal(10, 2) NOT NULL,
-  `descuento` decimal(10, 2) DEFAULT '0.00',
-  `subtotal` decimal(10, 2) NOT NULL,
+  `precio_unitario` decimal(10,2) NOT NULL,
+  `descuento` decimal(10,2) DEFAULT '0.00',
+  `subtotal` decimal(10,2) NOT NULL,
   `lote` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `fecha_vencimiento` date DEFAULT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `productos`
 --
@@ -130,33 +160,14 @@ CREATE TABLE `productos` (
   `principio_activo` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `concentracion` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `forma_farmaceutica` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `precio_compra` decimal(10, 2) NOT NULL,
-  `precio_venta` decimal(10, 2) NOT NULL,
-  `margen_ganancia` decimal(5, 2) GENERATED ALWAYS AS (
-    (
-      (
-        (`precio_venta` - `precio_compra`) / `precio_compra`
-      ) * 100
-    )
-  ) STORED,
+  `precio_compra` decimal(10,2) NOT NULL,
+  `precio_venta` decimal(10,2) NOT NULL,
+  `margen_ganancia` decimal(5,2) GENERATED ALWAYS AS ((((`precio_venta` - `precio_compra`) / `precio_compra`) * 100)) STORED,
   `stock_actual` int DEFAULT '0',
   `stock_minimo` int DEFAULT '5',
   `stock_maximo` int DEFAULT '100',
   `proveedor_id` int DEFAULT NULL,
-  `categoria` enum(
-    'ANALGESICOS',
-    'ANTIBIOTICOS',
-    'ANTIINFLAMATORIOS',
-    'VITAMINAS',
-    'ANTIACIDOS',
-    'ANTIHISTAMINICOS',
-    'ANTIHIPERTENSIVOS',
-    'DIABETES',
-    'RESPIRATORIO',
-    'DERMATOLOGIA',
-    'HIGIENE',
-    'OTROS'
-  ) COLLATE utf8mb4_general_ci DEFAULT 'OTROS',
+  `categoria` enum('ANALGESICOS','ANTIBIOTICOS','ANTIINFLAMATORIOS','VITAMINAS','ANTIACIDOS','ANTIHISTAMINICOS','ANTIHIPERTENSIVOS','DIABETES','RESPIRATORIO','DERMATOLOGIA','HIGIENE','OTROS') COLLATE utf8mb4_general_ci DEFAULT 'OTROS',
   `ubicacion` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `lote` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `fecha_vencimiento` date DEFAULT NULL,
@@ -167,8 +178,10 @@ CREATE TABLE `productos` (
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `laboratorio` varchar(100) COLLATE utf8mb4_general_ci DEFAULT '',
   `fecha_fabricacion` date DEFAULT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `producto_historial_cambio`
 --
@@ -181,8 +194,10 @@ CREATE TABLE `producto_historial_cambio` (
   `valor_nuevo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `usuario` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `proveedores`
 --
@@ -200,8 +215,10 @@ CREATE TABLE `proveedores` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `observaciones` text COLLATE utf8mb4_unicode_ci,
   `tipo_producto` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Proveedores de medicamentos y productos';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Proveedores de medicamentos y productos';
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `proveedor_historial_cambio`
 --
@@ -214,8 +231,10 @@ CREATE TABLE `proveedor_historial_cambio` (
   `valor_nuevo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `usuario` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `usuarios`
 --
@@ -224,7 +243,7 @@ CREATE TABLE `usuarios` (
   `id` int NOT NULL,
   `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password_hash` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `rol` enum('ADMIN', 'VENDEDOR') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rol` enum('ADMIN','VENDEDOR') COLLATE utf8mb4_unicode_ci NOT NULL,
   `nombres` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `apellidos` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `dni` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -235,8 +254,10 @@ CREATE TABLE `usuarios` (
   `last_login` timestamp NULL DEFAULT NULL,
   `recovery_token` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `recovery_token_expiry` datetime DEFAULT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'Usuarios del sistema con roles ADMIN y VENDEDOR';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Usuarios del sistema con roles ADMIN y VENDEDOR';
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `usuario_historial_acceso`
 --
@@ -249,8 +270,10 @@ CREATE TABLE `usuario_historial_acceso` (
   `user_agent` varchar(255) DEFAULT NULL,
   `exito` tinyint(1) DEFAULT NULL,
   `motivo_fallo` text
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `usuario_historial_cambio`
 --
@@ -263,8 +286,24 @@ CREATE TABLE `usuario_historial_cambio` (
   `valor_nuevo` text,
   `modificado_por` int DEFAULT NULL,
   `fecha` timestamp NOT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- --------------------------------------------------------
+
+--
+-- Table structure for table `usuario_permisos`
+--
+
+CREATE TABLE `usuario_permisos` (
+  `id` bigint NOT NULL,
+  `usuario_id` int NOT NULL,
+  `permiso` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor` tinyint(1) NOT NULL,
+  `fecha_asignacion` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
 --
 -- Table structure for table `ventas`
 --
@@ -273,21 +312,23 @@ CREATE TABLE `ventas` (
   `id` int NOT NULL,
   `cliente_id` int DEFAULT NULL,
   `usuario_id` int NOT NULL,
-  `subtotal` decimal(10, 2) NOT NULL,
-  `descuento_monto` decimal(10, 2) DEFAULT '0.00',
-  `igv_monto` decimal(10, 2) DEFAULT '0.00',
-  `total` decimal(10, 2) NOT NULL,
-  `tipo_pago` enum('EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'MIXTO') COLLATE utf8mb4_general_ci NOT NULL,
-  `tipo_comprobante` enum('BOLETA', 'FACTURA') COLLATE utf8mb4_general_ci NOT NULL,
+  `subtotal` decimal(10,2) NOT NULL,
+  `descuento_monto` decimal(10,2) DEFAULT '0.00',
+  `igv_monto` decimal(10,2) DEFAULT '0.00',
+  `total` decimal(10,2) NOT NULL,
+  `tipo_pago` enum('EFECTIVO','TARJETA','TRANSFERENCIA','MIXTO') COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo_comprobante` enum('BOLETA','FACTURA','TICKET') COLLATE utf8mb4_general_ci NOT NULL,
   `numero_boleta` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `serie` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `fecha_venta` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `estado` enum('REALIZADA', 'ANULADA', 'PENDIENTE') COLLATE utf8mb4_general_ci DEFAULT 'REALIZADA',
+  `estado` enum('REALIZADA','ANULADA','PENDIENTE') COLLATE utf8mb4_general_ci DEFAULT 'REALIZADA',
   `observaciones` text COLLATE utf8mb4_general_ci,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Table structure for table `venta_historial_cambio`
 --
@@ -295,75 +336,69 @@ CREATE TABLE `ventas` (
 CREATE TABLE `venta_historial_cambio` (
   `id` int NOT NULL,
   `venta_id` int NOT NULL,
-  `tipo_cambio` enum('CREACION', 'ANULACION', 'EDICION') COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo_cambio` enum('CREACION','ANULACION','EDICION') COLLATE utf8mb4_general_ci NOT NULL,
   `motivo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `usuario_id` int NOT NULL,
   `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
+
 --
 -- Stand-in structure for view `vw_busqueda_productos`
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_busqueda_productos` (
-`id` int,
-`codigo` varchar(20),
-`nombre` varchar(150),
-`descripcion` text,
-`principio_activo` varchar(100),
-`concentracion` varchar(50),
-`forma_farmaceutica` varchar(20),
-`precio_venta` decimal(10, 2),
-`stock_actual` int,
-`categoria` enum(
-  'ANALGESICOS',
-  'ANTIBIOTICOS',
-  'ANTIINFLAMATORIOS',
-  'VITAMINAS',
-  'ANTIACIDOS',
-  'ANTIHISTAMINICOS',
-  'ANTIHIPERTENSIVOS',
-  'DIABETES',
-  'RESPIRATORIO',
-  'DERMATOLOGIA',
-  'HIGIENE',
-  'OTROS'
-),
-`ubicacion` varchar(20),
-`requiere_receta` tinyint(1),
-`codigo_nombre` varchar(173),
-`texto_busqueda` varchar(302)
+`id` int
+,`codigo` varchar(20)
+,`nombre` varchar(150)
+,`descripcion` text
+,`principio_activo` varchar(100)
+,`concentracion` varchar(50)
+,`forma_farmaceutica` varchar(20)
+,`precio_venta` decimal(10,2)
+,`stock_actual` int
+,`categoria` enum('ANALGESICOS','ANTIBIOTICOS','ANTIINFLAMATORIOS','VITAMINAS','ANTIACIDOS','ANTIHISTAMINICOS','ANTIHIPERTENSIVOS','DIABETES','RESPIRATORIO','DERMATOLOGIA','HIGIENE','OTROS')
+,`ubicacion` varchar(20)
+,`requiere_receta` tinyint(1)
+,`codigo_nombre` varchar(173)
+,`texto_busqueda` varchar(302)
 );
+
 -- --------------------------------------------------------
+
 --
 -- Stand-in structure for view `vw_inventario_alertas`
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_inventario_alertas` (
-`id_producto` int,
-`nombre_producto` varchar(150),
-`stock_actual` int,
-`stock_minimo` int,
-`fecha_vencimiento` date
+`id_producto` int
+,`nombre_producto` varchar(150)
+,`stock_actual` int
+,`stock_minimo` int
+,`fecha_vencimiento` date
 );
+
 -- --------------------------------------------------------
+
 --
 -- Stand-in structure for view `vw_resumen_ventas`
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_resumen_ventas` (
-`id` int,
-`numero_boleta` varchar(20),
-`serie` varchar(10),
-`fecha_venta` datetime,
-`cliente` varchar(201),
-`vendedor` varchar(201),
-`subtotal` decimal(10, 2),
-`descuento_monto` decimal(10, 2),
-`total` decimal(10, 2),
-`tipo_pago` enum('EFECTIVO', 'TARJETA', 'TRANSFERENCIA', 'MIXTO'),
-`estado` enum('REALIZADA', 'ANULADA', 'PENDIENTE')
+`id` int
+,`numero_boleta` varchar(20)
+,`serie` varchar(10)
+,`fecha_venta` datetime
+,`cliente` varchar(201)
+,`vendedor` varchar(201)
+,`subtotal` decimal(10,2)
+,`descuento_monto` decimal(10,2)
+,`total` decimal(10,2)
+,`tipo_pago` enum('EFECTIVO','TARJETA','TRANSFERENCIA','MIXTO')
+,`estado` enum('REALIZADA','ANULADA','PENDIENTE')
 );
+
 --
 -- Indexes for dumped tables
 --
@@ -372,53 +407,67 @@ CREATE TABLE `vw_resumen_ventas` (
 -- Indexes for table `clientes`
 --
 ALTER TABLE `clientes`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `dni` (`dni`),
   ADD KEY `idx_dni` (`dni`),
-  ADD KEY `idx_nombres` (`nombres`, `apellidos`),
+  ADD KEY `idx_nombres` (`nombres`,`apellidos`),
   ADD KEY `idx_puntos` (`puntos_disponibles`),
   ADD KEY `idx_frecuente` (`es_frecuente`),
-  ADD KEY `idx_clientes_puntos_frecuente` (`puntos_disponibles`, `es_frecuente`);
+  ADD KEY `idx_clientes_puntos_frecuente` (`puntos_disponibles`,`es_frecuente`);
+
 --
 -- Indexes for table `cliente_historial_cambio`
 --
 ALTER TABLE `cliente_historial_cambio`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `cliente_id` (`cliente_id`);
+
+--
+-- Indexes for table `cliente_puntos_historial`
+--
+ALTER TABLE `cliente_puntos_historial`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `cliente_id` (`cliente_id`),
+  ADD KEY `venta_id` (`venta_id`);
+
 --
 -- Indexes for table `comprobantes`
 --
 ALTER TABLE `comprobantes`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `venta_id` (`venta_id`);
+
 --
 -- Indexes for table `configuracion`
 --
 ALTER TABLE `configuracion`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `clave` (`clave`),
   ADD KEY `updated_by` (`updated_by`),
   ADD KEY `idx_clave` (`clave`),
   ADD KEY `idx_categoria` (`categoria`);
+
 --
 -- Indexes for table `configuracion_codigos`
 --
 ALTER TABLE `configuracion_codigos`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `categoria` (`categoria`),
   ADD KEY `idx_categoria` (`categoria`);
+
 --
 -- Indexes for table `detalle_ventas`
 --
 ALTER TABLE `detalle_ventas`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `venta_id` (`venta_id`),
   ADD KEY `producto_id` (`producto_id`);
+
 --
 -- Indexes for table `productos`
 --
 ALTER TABLE `productos`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `codigo` (`codigo`),
   ADD UNIQUE KEY `idx_codigo` (`codigo`),
   ADD KEY `idx_nombre` (`nombre`),
@@ -427,67 +476,82 @@ ADD PRIMARY KEY (`id`),
   ADD KEY `idx_categoria` (`categoria`),
   ADD KEY `idx_proveedor` (`proveedor_id`),
   ADD KEY `idx_activo` (`activo`),
-  ADD KEY `idx_productos_categoria_activo` (`categoria`, `activo`);
-ALTER TABLE `productos`
-ADD FULLTEXT KEY `idx_busqueda_texto` (`nombre`, `descripcion`, `principio_activo`);
+  ADD KEY `idx_productos_categoria_activo` (`categoria`,`activo`);
+ALTER TABLE `productos` ADD FULLTEXT KEY `idx_busqueda_texto` (`nombre`,`descripcion`,`principio_activo`);
+
 --
 -- Indexes for table `producto_historial_cambio`
 --
 ALTER TABLE `producto_historial_cambio`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `producto_id` (`producto_id`);
+
 --
 -- Indexes for table `proveedores`
 --
 ALTER TABLE `proveedores`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `ruc` (`ruc`),
   ADD UNIQUE KEY `ruc_2` (`ruc`),
   ADD UNIQUE KEY `ruc_3` (`ruc`),
   ADD KEY `idx_ruc` (`ruc`),
   ADD KEY `idx_razon_social` (`razon_social`),
   ADD KEY `idx_activo` (`activo`);
+
 --
 -- Indexes for table `proveedor_historial_cambio`
 --
 ALTER TABLE `proveedor_historial_cambio`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `proveedor_id` (`proveedor_id`);
+
 --
 -- Indexes for table `usuarios`
 --
 ALTER TABLE `usuarios`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `dni` (`dni`),
   ADD KEY `idx_username` (`username`),
   ADD KEY `idx_rol` (`rol`),
   ADD KEY `idx_activo` (`activo`),
   ADD KEY `idx_dni` (`dni`);
+
 --
 -- Indexes for table `usuario_historial_acceso`
 --
 ALTER TABLE `usuario_historial_acceso`
-ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`);
+
 --
 -- Indexes for table `usuario_historial_cambio`
 --
 ALTER TABLE `usuario_historial_cambio`
-ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `usuario_permisos`
+--
+ALTER TABLE `usuario_permisos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_usuario_id` (`usuario_id`);
+
 --
 -- Indexes for table `ventas`
 --
 ALTER TABLE `ventas`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `cliente_id` (`cliente_id`),
   ADD KEY `usuario_id` (`usuario_id`);
+
 --
 -- Indexes for table `venta_historial_cambio`
 --
 ALTER TABLE `venta_historial_cambio`
-ADD PRIMARY KEY (`id`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `venta_id` (`venta_id`),
   ADD KEY `usuario_id` (`usuario_id`);
+
 --
 -- AUTO_INCREMENT for dumped tables
 --
@@ -496,156 +560,131 @@ ADD PRIMARY KEY (`id`),
 -- AUTO_INCREMENT for table `clientes`
 --
 ALTER TABLE `clientes`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `cliente_historial_cambio`
 --
 ALTER TABLE `cliente_historial_cambio`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cliente_puntos_historial`
+--
+ALTER TABLE `cliente_puntos_historial`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `comprobantes`
 --
 ALTER TABLE `comprobantes`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `configuracion`
 --
 ALTER TABLE `configuracion`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `configuracion_codigos`
 --
 ALTER TABLE `configuracion_codigos`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `detalle_ventas`
 --
 ALTER TABLE `detalle_ventas`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `productos`
 --
 ALTER TABLE `productos`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `producto_historial_cambio`
 --
 ALTER TABLE `producto_historial_cambio`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `proveedores`
 --
 ALTER TABLE `proveedores`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `proveedor_historial_cambio`
 --
 ALTER TABLE `proveedor_historial_cambio`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `usuarios`
 --
 ALTER TABLE `usuarios`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `usuario_historial_acceso`
 --
 ALTER TABLE `usuario_historial_acceso`
-MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `usuario_historial_cambio`
 --
 ALTER TABLE `usuario_historial_cambio`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `usuario_permisos`
+--
+ALTER TABLE `usuario_permisos`
+  MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `ventas`
 --
 ALTER TABLE `ventas`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 --
 -- AUTO_INCREMENT for table `venta_historial_cambio`
 --
 ALTER TABLE `venta_historial_cambio`
-MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
 -- --------------------------------------------------------
+
 --
 -- Structure for view `vw_busqueda_productos`
 --
 DROP TABLE IF EXISTS `vw_busqueda_productos`;
-CREATE ALGORITHM = UNDEFINED DEFINER = `root` @`localhost` SQL SECURITY DEFINER VIEW `vw_busqueda_productos` AS
-SELECT `p`.`id` AS `id`,
-  `p`.`codigo` AS `codigo`,
-  `p`.`nombre` AS `nombre`,
-  `p`.`descripcion` AS `descripcion`,
-  `p`.`principio_activo` AS `principio_activo`,
-  `p`.`concentracion` AS `concentracion`,
-  `p`.`forma_farmaceutica` AS `forma_farmaceutica`,
-  `p`.`precio_venta` AS `precio_venta`,
-  `p`.`stock_actual` AS `stock_actual`,
-  `p`.`categoria` AS `categoria`,
-  `p`.`ubicacion` AS `ubicacion`,
-  `p`.`requiere_receta` AS `requiere_receta`,
-  concat(`p`.`codigo`, ' - ', `p`.`nombre`) AS `codigo_nombre`,
-  concat(
-    `p`.`nombre`,
-    ' ',
-    ifnull(`p`.`principio_activo`, ''),
-    ' ',
-    ifnull(`p`.`concentracion`, '')
-  ) AS `texto_busqueda`
-FROM `productos` AS `p`
-WHERE (`p`.`activo` = 1);
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_busqueda_productos`  AS SELECT `p`.`id` AS `id`, `p`.`codigo` AS `codigo`, `p`.`nombre` AS `nombre`, `p`.`descripcion` AS `descripcion`, `p`.`principio_activo` AS `principio_activo`, `p`.`concentracion` AS `concentracion`, `p`.`forma_farmaceutica` AS `forma_farmaceutica`, `p`.`precio_venta` AS `precio_venta`, `p`.`stock_actual` AS `stock_actual`, `p`.`categoria` AS `categoria`, `p`.`ubicacion` AS `ubicacion`, `p`.`requiere_receta` AS `requiere_receta`, concat(`p`.`codigo`,' - ',`p`.`nombre`) AS `codigo_nombre`, concat(`p`.`nombre`,' ',ifnull(`p`.`principio_activo`,''),' ',ifnull(`p`.`concentracion`,'')) AS `texto_busqueda` FROM `productos` AS `p` WHERE (`p`.`activo` = 1) ;
+
 -- --------------------------------------------------------
+
 --
 -- Structure for view `vw_inventario_alertas`
 --
 DROP TABLE IF EXISTS `vw_inventario_alertas`;
-CREATE ALGORITHM = UNDEFINED DEFINER = `root` @`localhost` SQL SECURITY DEFINER VIEW `vw_inventario_alertas` AS
-SELECT `p`.`id` AS `id_producto`,
-  `p`.`nombre` AS `nombre_producto`,
-  `p`.`stock_actual` AS `stock_actual`,
-  `p`.`stock_minimo` AS `stock_minimo`,
-  `p`.`fecha_vencimiento` AS `fecha_vencimiento`
-FROM `productos` AS `p`
-WHERE (
-    (`p`.`activo` = 1)
-    AND (
-      (`p`.`stock_actual` <= `p`.`stock_minimo`)
-      OR (
-        (
-          to_days(`p`.`fecha_vencimiento`) - to_days(curdate())
-        ) <= 30
-      )
-    )
-  );
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_inventario_alertas`  AS SELECT `p`.`id` AS `id_producto`, `p`.`nombre` AS `nombre_producto`, `p`.`stock_actual` AS `stock_actual`, `p`.`stock_minimo` AS `stock_minimo`, `p`.`fecha_vencimiento` AS `fecha_vencimiento` FROM `productos` AS `p` WHERE ((`p`.`activo` = 1) AND ((`p`.`stock_actual` <= `p`.`stock_minimo`) OR ((to_days(`p`.`fecha_vencimiento`) - to_days(curdate())) <= 30))) ;
+
 -- --------------------------------------------------------
+
 --
 -- Structure for view `vw_resumen_ventas`
 --
 DROP TABLE IF EXISTS `vw_resumen_ventas`;
-CREATE ALGORITHM = UNDEFINED DEFINER = `root` @`localhost` SQL SECURITY DEFINER VIEW `vw_resumen_ventas` AS
-SELECT `v`.`id` AS `id`,
-  `v`.`numero_boleta` AS `numero_boleta`,
-  `v`.`serie` AS `serie`,
-  `v`.`fecha_venta` AS `fecha_venta`,
-  concat(
-    ifnull(`c`.`nombres`, 'SIN'),
-    ' ',
-    ifnull(`c`.`apellidos`, 'CLIENTE')
-  ) AS `cliente`,
-  concat(`u`.`nombres`, ' ', `u`.`apellidos`) AS `vendedor`,
-  `v`.`subtotal` AS `subtotal`,
-  `v`.`descuento_monto` AS `descuento_monto`,
-  `v`.`total` AS `total`,
-  `v`.`tipo_pago` AS `tipo_pago`,
-  `v`.`estado` AS `estado`
-FROM (
-    (
-      `ventas` `v`
-      left join `clientes` `c` on((`v`.`cliente_id` = `c`.`id`))
-    )
-    join `usuarios` `u` on((`v`.`usuario_id` = `u`.`id`))
-  );
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_resumen_ventas`  AS SELECT `v`.`id` AS `id`, `v`.`numero_boleta` AS `numero_boleta`, `v`.`serie` AS `serie`, `v`.`fecha_venta` AS `fecha_venta`, concat(ifnull(`c`.`nombres`,'SIN'),' ',ifnull(`c`.`apellidos`,'CLIENTE')) AS `cliente`, concat(`u`.`nombres`,' ',`u`.`apellidos`) AS `vendedor`, `v`.`subtotal` AS `subtotal`, `v`.`descuento_monto` AS `descuento_monto`, `v`.`total` AS `total`, `v`.`tipo_pago` AS `tipo_pago`, `v`.`estado` AS `estado` FROM ((`ventas` `v` left join `clientes` `c` on((`v`.`cliente_id` = `c`.`id`))) join `usuarios` `u` on((`v`.`usuario_id` = `u`.`id`))) ;
+
 --
 -- Constraints for dumped tables
 --
@@ -654,56 +693,73 @@ FROM (
 -- Constraints for table `cliente_historial_cambio`
 --
 ALTER TABLE `cliente_historial_cambio`
-ADD CONSTRAINT `cliente_historial_cambio_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`);
+  ADD CONSTRAINT `cliente_historial_cambio_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`);
+
+--
+-- Constraints for table `cliente_puntos_historial`
+--
+ALTER TABLE `cliente_puntos_historial`
+  ADD CONSTRAINT `cliente_puntos_historial_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`),
+  ADD CONSTRAINT `cliente_puntos_historial_ibfk_2` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`);
+
 --
 -- Constraints for table `comprobantes`
 --
 ALTER TABLE `comprobantes`
-ADD CONSTRAINT `comprobantes_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `comprobantes_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`) ON DELETE CASCADE;
+
 --
 -- Constraints for table `configuracion`
 --
 ALTER TABLE `configuracion`
-ADD CONSTRAINT `configuracion_ibfk_1` FOREIGN KEY (`updated_by`) REFERENCES `usuarios` (`id`) ON DELETE
-SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `configuracion_ibfk_1` FOREIGN KEY (`updated_by`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 --
 -- Constraints for table `detalle_ventas`
 --
 ALTER TABLE `detalle_ventas`
-ADD CONSTRAINT `detalle_ventas_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detalle_ventas_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `detalle_ventas_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`);
+
 --
 -- Constraints for table `productos`
 --
 ALTER TABLE `productos`
-ADD CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE
-SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
 --
 -- Constraints for table `producto_historial_cambio`
 --
 ALTER TABLE `producto_historial_cambio`
-ADD CONSTRAINT `producto_historial_cambio_ibfk_1` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`);
+  ADD CONSTRAINT `producto_historial_cambio_ibfk_1` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`);
+
 --
 -- Constraints for table `proveedor_historial_cambio`
 --
 ALTER TABLE `proveedor_historial_cambio`
-ADD CONSTRAINT `proveedor_historial_cambio_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `proveedor_historial_cambio_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `usuario_permisos`
+--
+ALTER TABLE `usuario_permisos`
+  ADD CONSTRAINT `fk_usuario_permisos_usuario_id` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE;
+
 --
 -- Constraints for table `ventas`
 --
 ALTER TABLE `ventas`
-ADD CONSTRAINT `ventas_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`),
+  ADD CONSTRAINT `ventas_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`),
   ADD CONSTRAINT `ventas_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
+
 --
 -- Constraints for table `venta_historial_cambio`
 --
 ALTER TABLE `venta_historial_cambio`
-ADD CONSTRAINT `venta_historial_cambio_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `venta_historial_cambio_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `venta_historial_cambio_ibfk_2` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 COMMIT;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
-;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */
-;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */
-;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

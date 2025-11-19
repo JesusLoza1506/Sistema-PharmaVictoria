@@ -106,7 +106,9 @@
                 <Label text="Método de pago:" styleClass="pago-label" />
                 <ComboBox fx:id="comboPago" promptText="Seleccionar método de pago" styleClass="combo-box" />
                 <Label text="Tipo de comprobante:" styleClass="cliente-label" />
-                <ComboBox fx:id="comboComprobante" promptText="Selecciona comprobante" styleClass="combo-box" />
+                <ComboBox fx:id="comboComprobante" promptText="Selecciona comprobante" styleClass="combo-box">
+                    <!-- Los items se inicializan en el controlador Java -->
+                </ComboBox>
             </HBox>
             <HBox spacing="32.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
                 <VBox spacing="10.0" style="-fx-padding: 0 0 0 0;">

@@ -8,17 +8,23 @@ import javafx.scene.control.Button;
 import javafx.fxml.Initializable;
 import java.net.URL;
 import java.util.ResourceBundle;
-
 import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
-
-import javafx.scene.control.CheckBox;
+// import javafx.scene.control.CheckBox; // Eliminado
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 
 public class ClientesController implements Initializable {
-    // Dashboard: Gráficas
+
+    public void setBarChartTopClientes(javafx.scene.chart.BarChart<String, Number> barChart) {
+        this.barChartTopClientes = barChart;
+    }
+
+    public void setLblAlertasClientes(Label label) {
+        this.lblAlertasClientes = label;
+    }
+
     @FXML
     private javafx.scene.chart.BarChart<String, Number> barChartTopClientes;
     @FXML
@@ -73,7 +79,6 @@ public class ClientesController implements Initializable {
                     ex.printStackTrace();
                 }
             }
-            // ...existing code...
         } catch (Exception e) {
             System.err.println("[DASHBOARD ERROR] Error general en cargarTopClientesConMasCompras: " + e.getMessage());
             e.printStackTrace();
@@ -117,6 +122,32 @@ public class ClientesController implements Initializable {
             series.getData().add(data);
         }
         barChartTopClientes.getData().add(series);
+        // Configurar el eje Y para mostrar solo enteros y rango adecuado
+        if (barChartTopClientes.getYAxis() instanceof javafx.scene.chart.NumberAxis yAxis) {
+            int maxCompras = series.getData().stream()
+                    .mapToInt(d -> d.getYValue().intValue())
+                    .max().orElse(2);
+            yAxis.setAutoRanging(false);
+            yAxis.setLowerBound(0);
+            yAxis.setUpperBound(Math.max(2, maxCompras));
+            yAxis.setTickUnit(1);
+            yAxis.setMinorTickCount(0);
+            yAxis.setTickLabelFormatter(new javafx.util.StringConverter<Number>() {
+                @Override
+                public String toString(Number object) {
+                    return String.valueOf(object.intValue());
+                }
+
+                @Override
+                public Number fromString(String string) {
+                    try {
+                        return Integer.parseInt(string);
+                    } catch (Exception e) {
+                        return 0;
+                    }
+                }
+            });
+        }
         javafx.application.Platform.runLater(() -> {
             for (javafx.scene.chart.XYChart.Data<String, Number> data : series.getData()) {
                 if (data.getNode() != null) {
@@ -133,13 +164,10 @@ public class ClientesController implements Initializable {
                 }
             }
         });
-        // Eliminado código de alertas no relevante para el dashboard
     }
 
-    // Panel/label para alertas persistentes
     @FXML
     private Label lblAlertasClientes;
-    // Paginación
     @FXML
     private Button btnPaginaAnterior;
     @FXML
@@ -150,30 +178,13 @@ public class ClientesController implements Initializable {
     private ComboBox<Integer> cmbTamanoPagina;
     private int paginaActual = 1;
     private int totalPaginas = 1;
-    private int tamanoPagina = 10;
-    @FXML
-    private CheckBox chkFrecuentes;
+    private int tamanoPagina = -1; // -1 significa mostrar todos
 
     @FXML
-    private void onToggleFrecuentes() {
-        if (chkFrecuentes != null && chkFrecuentes.isSelected()) {
-            javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtrados = javafx.collections.FXCollections
-                    .observableArrayList();
-            for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c : clientesList) {
-                if (c.isFrecuente() && (c.getDocumento() == null || !c.getDocumento().equals("00000000"))) {
-                    filtrados.add(c);
-                }
-            }
-            tablaClientes.setItems(filtrados);
-        } else {
-            tablaClientes.setItems(clientesList);
-        }
-    }
+    private ComboBox<String> cmbEstado; // Se mantiene pero se elimina su funcionalidad de filtro
 
-    @FXML
-    private ComboBox<String> cmbEstado;
-
-    // Handler para filtrar por estado
+    // Handler para filtrar por estado (Actualizado para eliminar lógica de
+    // Frecuente/No frecuente)
     @FXML
     private void onFiltrarEstado() {
         String filtro = cmbEstado != null && cmbEstado.getValue() != null ? cmbEstado.getValue() : "Todos";
@@ -188,16 +199,12 @@ public class ClientesController implements Initializable {
             tablaClientes.setItems(filtrados);
             return;
         }
-        javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtrados = javafx.collections.FXCollections
-                .observableArrayList();
-        for (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c : clientesList) {
-            if ("Frecuente".equalsIgnoreCase(filtro) && c.isFrecuente()) {
-                filtrados.add(c);
-            } else if ("No frecuente".equalsIgnoreCase(filtro) && !c.isFrecuente()) {
-                filtrados.add(c);
-            }
-        }
-        tablaClientes.setItems(filtrados);
+        // Lógica de "Frecuente" / "No frecuente" eliminada. Si el filtro no es "Todos",
+        // no se filtra nada.
+        // Para mantener la consistencia visual si un usuario selecciona un valor,
+        // simplemente no hacemos nada
+        // y mostramos todos los clientes (excepto genérico).
+        onRefrescar(); // O simplemente forzamos a refrescar o buscar sin el filtro de estado
     }
 
     // Handler para el botón Actualizar
@@ -206,7 +213,6 @@ public class ClientesController implements Initializable {
         refrescarDatos();
     }
 
-    // === FXML Elements para la nueva UI ===
     @FXML
     private TextField txtBuscar;
     // Eliminados ComboBox y CheckBox redundantes: cbFiltroTipo, cbOrdenar,
@@ -230,18 +236,16 @@ public class ClientesController implements Initializable {
     @FXML
     private Label lblTotalClientes;
     @FXML
-    private Label lblClientesFrecuentes;
+    private Label lblClientesFrecuentes; // Eliminado
     @FXML
     private Label lblNuevosEsteMes;
     @FXML
     private Label lblPuntosPromedio;
-    @FXML
-    private Label lblUltimaActualizacion;
+    // Eliminado lblUltimaActualizacion
 
     @FXML
     private ComboBox<String> cbTipoBusqueda;
 
-    // Inyección de dependencias vía setter
     private com.farmaciavictoria.proyectopharmavictoria.service.ClienteService clienteService;
 
     public void setClienteService(com.farmaciavictoria.proyectopharmavictoria.service.ClienteService clienteService) {
@@ -300,7 +304,6 @@ public class ClientesController implements Initializable {
                 }
             }
         });
-        // ...existing code...
         colTipoCliente.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(String tipo, boolean empty) {
@@ -346,7 +349,7 @@ public class ClientesController implements Initializable {
             com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
                     .getInstance()
                     .getAuthenticationService().getUsuarioActual();
-            boolean esAdmin = usuario != null && usuario.isAdmin();
+            // boolean esAdmin = usuario != null && usuario.isAdmin(); // No se usa
             if (tablaClientes != null && tablaClientes.getScene() != null) {
                 javafx.scene.control.Button btnNuevoCliente = (javafx.scene.control.Button) tablaClientes.getScene()
                         .lookup("#btnNuevoCliente");
@@ -381,7 +384,7 @@ public class ClientesController implements Initializable {
             lblTotalClientes.setStyle("-fx-text-fill: #1bb934; -fx-font-weight: bold;");
         }
         if (cmbEstado != null) {
-            cmbEstado.setItems(FXCollections.observableArrayList("Todos", "Frecuente", "No frecuente"));
+            cmbEstado.setItems(FXCollections.observableArrayList("Todos")); // Solo queda "Todos"
             cmbEstado.setValue("Todos");
         }
         if (cbTipoBusqueda != null) {
@@ -396,8 +399,51 @@ public class ClientesController implements Initializable {
         }
         if (cmbTamanoPagina != null) {
             cmbTamanoPagina.getItems().clear();
-            cmbTamanoPagina.getItems().addAll(5, 10, 20, 50);
-            cmbTamanoPagina.setValue(10);
+            cmbTamanoPagina.getItems().addAll(-1, 5, 10, 20, 50); // -1 = Todos
+            cmbTamanoPagina.setValue(-1);
+            cmbTamanoPagina.setConverter(new javafx.util.StringConverter<Integer>() {
+                @Override
+                public String toString(Integer value) {
+                    if (value == null || value == -1)
+                        return "Todos";
+                    return value.toString();
+                }
+
+                @Override
+                public Integer fromString(String string) {
+                    if ("Todos".equals(string))
+                        return -1;
+                    try {
+                        return Integer.parseInt(string);
+                    } catch (Exception e) {
+                        return -1;
+                    }
+                }
+            });
+            // CellFactory personalizada para mostrar correctamente el label en el menú
+            // desplegable y el botón
+            cmbTamanoPagina.setCellFactory(listView -> new javafx.scene.control.ListCell<Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item == -1 ? "Todos" : item.toString());
+                    }
+                }
+            });
+            cmbTamanoPagina.setButtonCell(new javafx.scene.control.ListCell<Integer>() {
+                @Override
+                protected void updateItem(Integer item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(item == -1 ? "Todos" : item.toString());
+                    }
+                }
+            });
             cmbTamanoPagina.valueProperty().addListener((obs, oldVal, newVal) -> {
                 tamanoPagina = newVal;
                 paginaActual = 1;
@@ -413,14 +459,10 @@ public class ClientesController implements Initializable {
         if (tablaClientes != null && clientesList != null) {
             tablaClientes.setItems(clientesList);
         }
-        // cargarTopClientesConMasCompras(); // Se ejecuta solo tras inyección
     }
 
     private void inicializarDashboardGraficas() {
-        // --- BarChart: Top clientes con más compras ---
-        // ...existing code...
 
-        // --- PieChart: Distribución real por rango de edad ---
         if (pieChartRangoEdad != null && clienteService != null) {
             pieChartRangoEdad.getData().clear();
             java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> clientes = clienteService
@@ -531,7 +573,7 @@ public class ClientesController implements Initializable {
                             com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
                                     .getInstance()
                                     .getAuthenticationService().getUsuarioActual();
-                            boolean esAdmin = usuario != null && usuario.isAdmin();
+                            // boolean esAdmin = usuario != null && usuario.isAdmin(); // No se usa
                             btnEditar.setVisible(permisoEditarCliente);
                             btnEditar.setManaged(permisoEditarCliente);
                             btnEliminar.setVisible(permisoEliminarCliente);
@@ -545,15 +587,10 @@ public class ClientesController implements Initializable {
                 });
     }
 
-    // Acción para activar/inactivar cliente y registrar en historial
     private void toggleActivoCliente(com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente cliente) {
-        boolean nuevoEstado = !cliente.isFrecuente();
-        cliente.setEsFrecuente(nuevoEstado);
-        clienteService.actualizarCliente(cliente); // El service debe registrar el cambio en historial
-        refrescarDatos();
     }
 
-    // Nuevo método para feedback visual y manejo de errores
+    // Nuevo método para feedback visual y manejo de errores (Parte 2)
     private void eliminarClienteConFeedback(com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente cliente,
             javafx.scene.control.Button btnEliminar) {
         javafx.scene.control.Alert confirmacion = new javafx.scene.control.Alert(
@@ -670,11 +707,9 @@ public class ClientesController implements Initializable {
         }
     }
 
-    // === Listas observables para la tabla de clientes ===
     private javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> clientesList = javafx.collections.FXCollections
             .observableArrayList();
 
-    // === Métodos para enlazar con FXML ===
     @FXML
     public void refrescarDatos() {
         // Recargar lista completa de clientes desde la base de datos
@@ -689,44 +724,53 @@ public class ClientesController implements Initializable {
             paginaActual = 1;
         }
         actualizarPaginacion();
-        lblUltimaActualizacion.setText("Última actualización: " + java.time.LocalDateTime.now().withNano(0));
+        // Eliminada lógica de última actualización
         inicializarDashboardGraficas(); // Actualiza las gráficas con los datos actuales
     }
 
     private void actualizarPaginacion() {
-        int total = clientesList.size();
-        totalPaginas = (int) Math.ceil((double) total / tamanoPagina);
-        if (totalPaginas < 1)
-            totalPaginas = 1;
-        if (paginaActual < 1)
-            paginaActual = 1;
-        if (paginaActual > totalPaginas)
-            paginaActual = totalPaginas;
-        int desde = (paginaActual - 1) * tamanoPagina;
-        int hasta = Math.min(desde + tamanoPagina, total);
+        // Filtrar clientes válidos (sin genéricos) antes de paginar
+        java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> clientesValidos = clientesList
+                .stream()
+                .filter(c -> c.getDocumento() == null || !c.getDocumento().equals("00000000"))
+                .toList();
+        int total = clientesValidos.size();
         javafx.collections.ObservableList<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> pagina = javafx.collections.FXCollections
                 .observableArrayList();
-        for (int i = desde; i < hasta; i++) {
-            com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c = clientesList.get(i);
-            if (c.getDocumento() == null || !c.getDocumento().equals("00000000")) {
-                pagina.add(c);
+        if (tamanoPagina == -1) {
+            pagina.addAll(clientesValidos);
+            tablaClientes.setItems(pagina);
+            configurarColumnaAcciones();
+            if (lblPaginaActual != null) {
+                lblPaginaActual.setText("Mostrando todos");
             }
+            if (btnPaginaAnterior != null)
+                btnPaginaAnterior.setDisable(true);
+            if (btnPaginaSiguiente != null)
+                btnPaginaSiguiente.setDisable(true);
+        } else {
+            totalPaginas = (int) Math.ceil((double) total / tamanoPagina);
+            if (totalPaginas < 1)
+                totalPaginas = 1;
+            if (paginaActual < 1)
+                paginaActual = 1;
+            if (paginaActual > totalPaginas)
+                paginaActual = totalPaginas;
+            int desde = (paginaActual - 1) * tamanoPagina;
+            int hasta = Math.min(desde + tamanoPagina, total);
+            for (int i = desde; i < hasta; i++) {
+                pagina.add(clientesValidos.get(i));
+            }
+            tablaClientes.setItems(pagina);
+            configurarColumnaAcciones();
+            if (lblPaginaActual != null) {
+                lblPaginaActual.setText("Página " + paginaActual + " de " + totalPaginas);
+            }
+            if (btnPaginaAnterior != null)
+                btnPaginaAnterior.setDisable(paginaActual <= 1);
+            if (btnPaginaSiguiente != null)
+                btnPaginaSiguiente.setDisable(paginaActual >= totalPaginas);
         }
-        tablaClientes.setItems(pagina);
-        // Reasignar el cell factory de acciones para asegurar que los botones siempre
-        // se muestren correctamente
-        configurarColumnaAcciones();
-        if (lblPaginaActual != null) {
-            lblPaginaActual.setText("Página " + paginaActual + " de " + totalPaginas);
-        }
-        if (btnPaginaAnterior != null) {
-            btnPaginaAnterior.setDisable(paginaActual <= 1);
-        }
-        if (btnPaginaSiguiente != null) {
-            btnPaginaSiguiente.setDisable(paginaActual >= totalPaginas);
-        }
-        // ...actualización de métricas eliminada, si se requiere se puede implementar
-        // aquí...
     }
 
     @FXML
@@ -742,8 +786,6 @@ public class ClientesController implements Initializable {
         String criterio = txtBuscar.getText().trim().toLowerCase();
         String tipo = cbTipoBusqueda != null && cbTipoBusqueda.getValue() != null ? cbTipoBusqueda.getValue()
                 : "Nombre";
-        String estado = cmbEstado != null && cmbEstado.getValue() != null ? cmbEstado.getValue() : "Todos";
-        boolean soloFrecuentes = chkFrecuentes != null && chkFrecuentes.isSelected();
 
         // Estrategia unificada para Documento y Nombre/Razón social
         com.farmaciavictoria.proyectopharmavictoria.strategy.Cliente.ClienteFilterStrategy strategy;
@@ -770,17 +812,12 @@ public class ClientesController implements Initializable {
         java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtrados = strategy
                 .filtrar(base, criterio);
 
-        // Filtrar por estado
-        if ("Frecuente".equalsIgnoreCase(estado)) {
-            filtrados = filtrados.stream().filter(c -> c.isFrecuente()).toList();
-        } else if ("No frecuente".equalsIgnoreCase(estado)) {
-            filtrados = filtrados.stream().filter(c -> !c.isFrecuente()).toList();
-        }
-
-        // Filtrar por solo frecuentes
-        if (soloFrecuentes) {
-            filtrados = filtrados.stream().filter(c -> c.isFrecuente()).toList();
-        }
+        // Eliminación de lógica de filtro por estado / solo frecuentes:
+        // if ("Frecuente".equalsIgnoreCase(estado)) { ...
+        // } else if ("No frecuente".equalsIgnoreCase(estado)) { ...
+        // }
+        // if (soloFrecuentes) { ...
+        // }
 
         // Filtrar cliente genérico
         java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtradosSinGenerico = filtrados

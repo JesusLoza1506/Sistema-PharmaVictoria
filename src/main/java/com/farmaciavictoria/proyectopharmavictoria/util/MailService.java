@@ -23,12 +23,12 @@ public class MailService {
     private final String password;
 
     public MailService() {
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("application.properties")) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("recuperacion_email.properties")) {
             props.load(input);
             username = props.getProperty("mail.smtp.user");
             password = props.getProperty("mail.smtp.password");
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo cargar configuración SMTP", e);
+            throw new RuntimeException("No se pudo cargar configuración SMTP de recuperación", e);
         }
     }
 

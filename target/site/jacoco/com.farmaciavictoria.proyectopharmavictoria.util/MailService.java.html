@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MailService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.util</a> &gt; <span class="el_source">MailService.java</span></div><h1>MailService.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.util;
+
+import java.util.Properties;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import java.io.InputStream;
+
+public class MailService {
+    /**
+     * Envía el correo de recuperación con el token
+     */
+    public void sendRecoveryTokenEmail(String to, String token) throws MessagingException {
+<span class="nc" id="L13">        String subject = &quot;Recuperación de contraseña - PharmaVictoria&quot;;</span>
+<span class="nc" id="L14">        String body = &quot;Hola,\n\nTu código de recuperación es: &quot; + token</span>
+                + &quot;\n\nEste código es válido por 15 minutos.\nSi no solicitaste este cambio, ignora este mensaje.&quot;;
+<span class="nc" id="L16">        System.out.println(&quot;Enviando correo de recuperación a: &quot; + to + &quot; con token: &quot; + token);</span>
+<span class="nc" id="L17">        sendRecoveryEmail(to, subject, body);</span>
+<span class="nc" id="L18">        System.out.println(&quot;Correo de recuperación enviado (si no hay error en consola).&quot;);</span>
+<span class="nc" id="L19">    }</span>
+
+<span class="nc" id="L21">    private final Properties props = new Properties();</span>
+    private final String username;
+    private final String password;
+
+<span class="nc" id="L25">    public MailService() {</span>
+<span class="nc" id="L26">        try (InputStream input = getClass().getClassLoader().getResourceAsStream(&quot;recuperacion_email.properties&quot;)) {</span>
+<span class="nc" id="L27">            props.load(input);</span>
+<span class="nc" id="L28">            username = props.getProperty(&quot;mail.smtp.user&quot;);</span>
+<span class="nc" id="L29">            password = props.getProperty(&quot;mail.smtp.password&quot;);</span>
+<span class="nc" id="L30">        } catch (Exception e) {</span>
+<span class="nc" id="L31">            throw new RuntimeException(&quot;No se pudo cargar configuración SMTP de recuperación&quot;, e);</span>
+<span class="nc" id="L32">        }</span>
+<span class="nc" id="L33">    }</span>
+
+    public void sendRecoveryEmail(String to, String subject, String body) throws MessagingException {
+<span class="nc" id="L36">        Properties mailProps = new Properties();</span>
+<span class="nc" id="L37">        mailProps.put(&quot;mail.smtp.auth&quot;, props.getProperty(&quot;mail.smtp.auth&quot;));</span>
+<span class="nc" id="L38">        mailProps.put(&quot;mail.smtp.starttls.enable&quot;, props.getProperty(&quot;mail.smtp.starttls.enable&quot;));</span>
+<span class="nc" id="L39">        mailProps.put(&quot;mail.smtp.host&quot;, props.getProperty(&quot;mail.smtp.host&quot;));</span>
+<span class="nc" id="L40">        mailProps.put(&quot;mail.smtp.port&quot;, props.getProperty(&quot;mail.smtp.port&quot;));</span>
+
+<span class="nc" id="L42">        Session session = Session.getInstance(mailProps, new Authenticator() {</span>
+            protected PasswordAuthentication getPasswordAuthentication() {
+<span class="nc" id="L44">                return new PasswordAuthentication(username, password);</span>
+            }
+        });
+
+<span class="nc" id="L48">        Message message = new MimeMessage(session);</span>
+        try {
+<span class="nc" id="L50">            message.setFrom(new InternetAddress(username, &quot;PharmaVictoria&quot;));</span>
+<span class="nc" id="L51">        } catch (java.io.UnsupportedEncodingException e) {</span>
+<span class="nc" id="L52">            throw new MessagingException(&quot;Error de codificación en el remitente&quot;, e);</span>
+<span class="nc" id="L53">        }</span>
+<span class="nc" id="L54">        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));</span>
+<span class="nc" id="L55">        message.setSubject(subject);</span>
+<span class="nc" id="L56">        message.setText(body);</span>
+
+<span class="nc" id="L58">        Transport.send(message);</span>
+<span class="nc" id="L59">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

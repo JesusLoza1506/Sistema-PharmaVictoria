@@ -316,7 +316,7 @@
     -fx-font-weight: bold;
     -fx-text-fill: #28a745;
     -fx-padding: 2px 8px;
-    -fx-pref-width: 80px;
+    -fx-pref-width: 110px;
 }
 .pagination-combo:focused {
     -fx-border-color: #43e97b;

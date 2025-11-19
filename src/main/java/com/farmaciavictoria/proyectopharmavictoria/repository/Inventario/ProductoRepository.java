@@ -16,16 +16,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Repository para gestión de productos en la base de datos
- */
 public class ProductoRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductoRepository.class);
 
-    /**
-     * Excepción personalizada para errores en el repositorio de productos
-     */
     class ProductoRepositoryException extends RuntimeException {
         public ProductoRepositoryException(String message, Throwable cause) {
             super(message, cause);
@@ -36,13 +30,6 @@ public class ProductoRepository {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // BÚSQUEDA Y LECTURA (READ OPERATIONS)
-    // -------------------------------------------------------------------------
-
-    /**
-     * Obtener todos los productos activos
-     */
     public List<Producto> findAll() {
         List<Producto> productos = new ArrayList<>();
         String sql = """
@@ -127,9 +114,6 @@ public class ProductoRepository {
         return productos;
     }
 
-    /**
-     * Buscar producto por ID
-     */
     public Optional<Producto> findById(Long id) {
         String sql = """
                     SELECT p.*, pr.razon_social as proveedor_nombre
@@ -155,9 +139,6 @@ public class ProductoRepository {
         return Optional.empty();
     }
 
-    /**
-     * Buscar producto por código
-     */
     public Optional<Producto> findByCodigo(String codigo) {
         String sql = """
                     SELECT p.*, pr.razon_social as proveedor_nombre
@@ -183,9 +164,6 @@ public class ProductoRepository {
         return Optional.empty();
     }
 
-    /**
-     * Buscar productos por nombre
-     */
     public List<Producto> findByNombre(String nombre) {
         List<Producto> productos = new ArrayList<>();
         String sql = """
@@ -213,10 +191,6 @@ public class ProductoRepository {
         return productos;
     }
 
-    /**
-     * Buscar productos por categoría (usa columna 'categoria' en lugar de
-     * 'categoria_id')
-     */
     public List<Producto> findByCategoria(String categoria) {
         List<Producto> productos = new ArrayList<>();
         String sql = """
@@ -244,19 +218,9 @@ public class ProductoRepository {
         return productos;
     }
 
-    /**
-     * Buscar productos por filtros avanzados: categoría, proveedor, rango de
-     * precios
-     * NOTA: El filtro usa `categoria_id` en el SQL, pero el mapeo usa la columna
-     * `categoria` (String/Enum).
-     * Se mantiene el uso original del código.
-     */
     public List<Producto> findByFiltros(Long categoriaId, Long proveedorId, BigDecimal precioMin,
             BigDecimal precioMax) {
         List<Producto> productos = new ArrayList<>();
-        // Asumiendo que `categoria_id` en el WHERE es la ID numérica de la categoría,
-        // aunque `findByCategoria` usa el nombre (String). Mantenemos la lógica
-        // original.
         StringBuilder sql = new StringBuilder(
                 "SELECT p.*, pr.razon_social as proveedor_nombre FROM productos p LEFT JOIN proveedores pr ON p.proveedor_id = pr.id WHERE p.activo = TRUE");
 
@@ -295,13 +259,6 @@ public class ProductoRepository {
         return productos;
     }
 
-    // -------------------------------------------------------------------------
-    // ESTADÍSTICAS E INFORMES (REPORTING)
-    // -------------------------------------------------------------------------
-
-    /**
-     * Obtener productos vencidos
-     */
     public List<Producto> findVencidos() {
         List<Producto> productos = new ArrayList<>();
         String sql = """
@@ -326,9 +283,6 @@ public class ProductoRepository {
         return productos;
     }
 
-    /**
-     * Obtener productos próximos a vencer según el umbral de días recibido
-     */
     public List<Producto> findProximosVencer(int dias) {
         List<Producto> productos = new ArrayList<>();
         String sql = "SELECT p.*, pr.razon_social as proveedor_nombre FROM productos p LEFT JOIN proveedores pr ON p.proveedor_id = pr.id WHERE p.fecha_vencimiento > CURDATE() AND p.fecha_vencimiento <= DATE_ADD(CURDATE(), INTERVAL "
@@ -346,9 +300,6 @@ public class ProductoRepository {
         return productos;
     }
 
-    /**
-     * Obtener productos con stock bajo
-     */
     public List<Producto> findStockBajo() {
         List<Producto> productos = new ArrayList<>();
         String sql = """
@@ -373,9 +324,6 @@ public class ProductoRepository {
         return productos;
     }
 
-    /**
-     * Contar productos por estado
-     */
     public Map<String, Integer> countByEstado() {
         Map<String, Integer> estadisticas = new HashMap<>();
 
@@ -416,13 +364,6 @@ public class ProductoRepository {
         return estadisticas;
     }
 
-    // -------------------------------------------------------------------------
-    // CREACIÓN Y ACTUALIZACIÓN (WRITE OPERATIONS)
-    // -------------------------------------------------------------------------
-
-    /**
-     * Guardar nuevo producto
-     */
     public boolean save(Producto producto) {
         String sql = """
                     INSERT INTO productos (codigo, nombre, categoria, descripcion, principio_activo,
@@ -480,9 +421,6 @@ public class ProductoRepository {
         return false;
     }
 
-    /**
-     * Actualizar producto existente
-     */
     public boolean update(Producto producto) {
         String sql = """
                     UPDATE productos SET
@@ -532,13 +470,6 @@ public class ProductoRepository {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // ELIMINACIÓN (DELETE OPERATIONS)
-    // -------------------------------------------------------------------------
-
-    /**
-     * Eliminar producto (soft delete)
-     */
     public boolean delete(Integer id) {
         String sql = "UPDATE productos SET activo = FALSE, updated_at = ? WHERE id = ?";
 
@@ -556,10 +487,6 @@ public class ProductoRepository {
         }
     }
 
-    /**
-     * ✅ ELIMINACIÓN DEFINITIVA: Hard delete del producto (IRREVERSIBLE)
-     * ⚠️ USAR CON PRECAUCIÓN: Esta operación elimina físicamente el registro
-     */
     public boolean deleteDefinitivamente(Integer id) {
         String sql = "DELETE FROM productos WHERE id = ?";
 
@@ -577,13 +504,6 @@ public class ProductoRepository {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // MÉTODOS DE UTILIDAD
-    // -------------------------------------------------------------------------
-
-    /**
-     * Obtener último número de código para un prefijo
-     */
     public int getUltimoNumeroCodigo(String prefijo) {
         // La columna `codigo` es un String, se asume que el formato es `XXXNNNNN...`
         String sql = "SELECT COALESCE(MAX(CAST(SUBSTRING(codigo, 4) AS UNSIGNED)), 0) as ultimo_numero FROM productos WHERE codigo LIKE ?";
@@ -605,9 +525,6 @@ public class ProductoRepository {
         return 0;
     }
 
-    /**
-     * Verifica si ya existe un producto con el mismo nombre (case-insensitive)
-     */
     public boolean existsByNombre(String nombre) {
         String sql = "SELECT COUNT(*) FROM productos WHERE LOWER(nombre) = LOWER(?)";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
@@ -625,9 +542,6 @@ public class ProductoRepository {
         return false;
     }
 
-    /**
-     * Mapear ResultSet a Producto
-     */
     private Producto mapResultSetToProducto(ResultSet rs) throws SQLException {
         Producto producto = new Producto();
 
@@ -721,17 +635,11 @@ public class ProductoRepository {
         return producto;
     }
 
-    /**
-     * Método para crear productos inactivos de prueba
-     */
     public void crearProductosInactivosDePrueba() {
         // Método para crear productos de prueba si es necesario
         System.out.println("Método crearProductosInactivosDePrueba() ejecutado");
     }
 
-    /**
-     * Actualiza solo el stock_actual de un producto por su ID
-     */
     public boolean updateStock(Integer id, int nuevoStock) {
         String sql = "UPDATE productos SET stock_actual = ? WHERE id = ?";
         try (Connection connection = DatabaseConfig.getInstance().getConnection();
@@ -746,9 +654,6 @@ public class ProductoRepository {
         }
     }
 
-    /**
-     * Método para corregir prefijos de configuración
-     */
     public void corregirPrefijosConfiguracion() {
         // Método para corregir prefijos de configuración
         System.out.println("Método corregirPrefijosConfiguracion() ejecutado");

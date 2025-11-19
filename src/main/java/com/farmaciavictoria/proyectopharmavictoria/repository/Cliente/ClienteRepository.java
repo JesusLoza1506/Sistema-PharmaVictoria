@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * ✅ REPOSITORY PATTERN - Repository para gestión de clientes
+ * REPOSITORY PATTERN - Repository para gestión de clientes
  * Implementa patrón Repository para operaciones CRUD de clientes
  * Incluye búsquedas especializadas y queries optimizadas
  * 
@@ -30,11 +30,6 @@ public class ClienteRepository {
         this.databaseConfig = DatabaseConfig.getInstance();
     }
 
-    // ✅ CRUD OPERATIONS
-
-    /**
-     * Obtener todos los clientes (con opción de paginación)
-     */
     public List<Cliente> findAll(int offset, int limit) {
         String sql = "SELECT * FROM clientes ORDER BY id ASC LIMIT ? OFFSET ?";
         List<Cliente> clientes = new ArrayList<>();
@@ -55,9 +50,6 @@ public class ClienteRepository {
         return clientes;
     }
 
-    /**
-     * Buscar cliente por ID
-     */
     public Optional<Cliente> findById(Integer id) {
         String sql = "SELECT * FROM clientes WHERE id = ?";
 
@@ -81,9 +73,6 @@ public class ClienteRepository {
         return Optional.empty();
     }
 
-    /**
-     * Buscar cliente por código interno
-     */
     public Optional<Cliente> findByCodigo(String codigo) {
         String sql = "SELECT * FROM clientes WHERE codigo = ? AND activo = true";
 
@@ -107,9 +96,6 @@ public class ClienteRepository {
         return Optional.empty();
     }
 
-    /**
-     * Buscar clientes por nombre o apellidos (búsqueda parcial)
-     */
     public List<Cliente> findByNombreOApellido(String texto) {
         String sql = "SELECT * FROM clientes WHERE LOWER(nombres) LIKE ? OR LOWER(apellidos) LIKE ? ORDER BY nombres, apellidos";
         List<Cliente> clientes = new ArrayList<>();
@@ -130,9 +116,6 @@ public class ClienteRepository {
         return clientes;
     }
 
-    /**
-     * Buscar clientes por categoría
-     */
     public List<Cliente> findByCategoria(String categoria) {
         String sql = """
                 SELECT * FROM clientes
@@ -162,9 +145,6 @@ public class ClienteRepository {
         return clientes;
     }
 
-    /**
-     * Obtener clientes VIP (descuento >= 10% o categoría VIP)
-     */
     public List<Cliente> findClientesVip() {
         String sql = """
                 SELECT * FROM clientes
@@ -192,9 +172,6 @@ public class ClienteRepository {
         return clientes;
     }
 
-    /**
-     * Guardar cliente (crear o actualizar)
-     */
     public boolean save(Cliente cliente) {
         if (cliente.getId() == null) {
             return insert(cliente);
@@ -203,11 +180,8 @@ public class ClienteRepository {
         }
     }
 
-    /**
-     * Insertar nuevo cliente
-     */
     private boolean insert(Cliente cliente) {
-        String sql = "INSERT INTO clientes (documento, tipo_cliente, razon_social, nombres, apellidos, telefono, email, direccion, fecha_nacimiento, puntos_totales, puntos_usados, es_frecuente, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (documento, tipo_cliente, razon_social, nombres, apellidos, telefono, email, direccion, fecha_nacimiento, puntos_totales, puntos_usados, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             String tipo = cliente.getTipoCliente();
@@ -215,10 +189,10 @@ public class ClienteRepository {
             String documento = "Empresa".equalsIgnoreCase(tipo) ? cliente.getRuc() : cliente.getDni();
             String razonSocial = "Empresa".equalsIgnoreCase(tipo) ? cliente.getRazonSocial() : null;
             logger.info(
-                    "[INSERT] Datos recibidos: documento={}, tipo_cliente={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, puntos_totales={}, puntos_usados={}, es_frecuente={}",
+                    "[INSERT] Datos recibidos: documento={}, tipo_cliente={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, puntos_totales={}, puntos_usados{}",
                     documento, tipo, razonSocial, cliente.getNombres(), cliente.getApellidos(), cliente.getTelefono(),
                     cliente.getEmail(), cliente.getDireccion(), cliente.getFechaNacimiento(),
-                    cliente.getPuntosTotales(), cliente.getPuntosUsados(), cliente.isFrecuente());
+                    cliente.getPuntosTotales(), cliente.getPuntosUsados());
             stmt.setString(1, documento); // documento
             stmt.setString(2, tipo); // tipo_cliente
             if (razonSocial != null && !razonSocial.trim().isEmpty()) {
@@ -238,9 +212,8 @@ public class ClienteRepository {
             }
             stmt.setInt(10, cliente.getPuntosTotales() != null ? cliente.getPuntosTotales() : 0);
             stmt.setInt(11, cliente.getPuntosUsados() != null ? cliente.getPuntosUsados() : 0);
-            stmt.setBoolean(12, cliente.isFrecuente());
+            stmt.setTimestamp(12, new java.sql.Timestamp(System.currentTimeMillis()));
             stmt.setTimestamp(13, new java.sql.Timestamp(System.currentTimeMillis()));
-            stmt.setTimestamp(14, new java.sql.Timestamp(System.currentTimeMillis()));
             int rowsAffected = stmt.executeUpdate();
             logger.info("[INSERT] Filas afectadas: {}", rowsAffected);
             if (rowsAffected > 0) {
@@ -261,21 +234,18 @@ public class ClienteRepository {
         return false;
     }
 
-    /**
-     * Actualizar cliente existente
-     */
     private boolean update(Cliente cliente) {
-        String sql = "UPDATE clientes SET documento = ?, tipo_cliente = ?, razon_social = ?, nombres = ?, apellidos = ?, telefono = ?, email = ?, direccion = ?, fecha_nacimiento = ?, puntos_totales = ?, puntos_usados = ?, es_frecuente = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        String sql = "UPDATE clientes SET documento = ?, tipo_cliente = ?, razon_social = ?, nombres = ?, apellidos = ?, telefono = ?, email = ?, direccion = ?, fecha_nacimiento = ?, puntos_totales = ?, puntos_usados = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             int idx = 1;
             logger.info(
-                    "[UPDATE] Datos recibidos: documento={}, tipo_cliente={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, puntos_totales={}, puntos_usados={}, es_frecuente={}, id={}",
+                    "[UPDATE] Datos recibidos: documento={}, tipo_cliente={}, razon_social={}, nombres={}, apellidos={}, telefono={}, email={}, direccion={}, fecha_nacimiento={}, puntos_totales={}, puntos_usados={}, id={}",
                     cliente.getDocumento(), cliente.getTipoCliente(),
                     "Empresa".equalsIgnoreCase(cliente.getTipoCliente()) ? cliente.getRazonSocial() : null,
                     cliente.getNombres(), cliente.getApellidos(), cliente.getTelefono(), cliente.getEmail(),
                     cliente.getDireccion(), cliente.getFechaNacimiento(), cliente.getPuntosTotales(),
-                    cliente.getPuntosUsados(), cliente.isFrecuente(), cliente.getId());
+                    cliente.getPuntosUsados(), cliente.getId());
             stmt.setString(idx++, cliente.getDocumento());
             stmt.setString(idx++, cliente.getTipoCliente());
             String tipo = cliente.getTipoCliente();
@@ -297,7 +267,6 @@ public class ClienteRepository {
             }
             stmt.setInt(idx++, cliente.getPuntosTotales() != null ? cliente.getPuntosTotales() : 0);
             stmt.setInt(idx++, cliente.getPuntosUsados() != null ? cliente.getPuntosUsados() : 0);
-            stmt.setBoolean(idx++, cliente.isFrecuente());
             stmt.setInt(idx++, cliente.getId());
             int rowsAffected = stmt.executeUpdate();
             logger.info("[UPDATE] Filas afectadas: {}", rowsAffected);
@@ -314,10 +283,6 @@ public class ClienteRepository {
         return false;
     }
 
-    /**
-     * Eliminar cliente (soft delete: elimina físicamente porque no hay campo
-     * activo)
-     */
     public boolean delete(Integer id) {
         String sql = "DELETE FROM clientes WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
@@ -334,9 +299,6 @@ public class ClienteRepository {
         return false;
     }
 
-    /**
-     * Reactivar cliente
-     */
     public boolean reactivate(Integer id) {
         String sql = "UPDATE clientes SET activo = true WHERE id = ?";
 
@@ -359,11 +321,6 @@ public class ClienteRepository {
         return false;
     }
 
-    // ✅ QUERIES ESPECIALIZADAS
-
-    /**
-     * Contar total de clientes activos
-     */
     public int countClientesActivos() {
         String sql = "SELECT COUNT(*) FROM clientes WHERE activo = true";
 
@@ -382,9 +339,6 @@ public class ClienteRepository {
         return 0;
     }
 
-    /**
-     * Contar clientes nuevos del mes actual
-     */
     public int countClientesNuevosDelMes() {
         String sql = """
                 SELECT COUNT(*) FROM clientes
@@ -408,9 +362,6 @@ public class ClienteRepository {
         return 0;
     }
 
-    /**
-     * Obtener clientes por categoría con conteo
-     */
     public List<Object[]> getClientesPorCategoria() {
         String sql = """
                 SELECT categoria_cliente, COUNT(*) as cantidad
@@ -440,20 +391,7 @@ public class ClienteRepository {
         return resultado;
     }
 
-    // ✅ MÉTODOS DE UTILIDAD
-
-    /**
-     * Establecer parámetros del cliente en PreparedStatement
-     */
-    private void setClienteParameters(PreparedStatement stmt, Cliente cliente) throws SQLException {
-        // Ya no se usa, el update ahora setea los parámetros directamente
-    }
-
-    /**
-     * Mapear ResultSet a objeto Cliente
-     */
     private Cliente mapResultSetToCliente(ResultSet rs) throws SQLException {
-        // LOGS DE DEPURACIÓN AVANZADA
         try {
             String tipoRaw = rs.getString("tipo_cliente");
             String documentoRaw = rs.getString("documento");
@@ -502,7 +440,6 @@ public class ClienteRepository {
         }
         cliente.setPuntosTotales(rs.getInt("puntos_totales"));
         cliente.setPuntosUsados(rs.getInt("puntos_usados"));
-        cliente.setEsFrecuente(rs.getBoolean("es_frecuente"));
         Timestamp created = rs.getTimestamp("created_at");
         if (created != null)
             cliente.setCreatedAt(created.toLocalDateTime());

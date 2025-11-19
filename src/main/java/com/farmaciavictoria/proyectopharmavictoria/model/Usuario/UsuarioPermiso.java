@@ -2,9 +2,6 @@ package com.farmaciavictoria.proyectopharmavictoria.model.Usuario;
 
 import java.time.LocalDateTime;
 
-/**
- * Permiso granular asignado a un usuario
- */
 public class UsuarioPermiso {
     private Long id;
     private Long usuarioId;
@@ -12,17 +9,47 @@ public class UsuarioPermiso {
     private boolean valor;
     private LocalDateTime fechaAsignacion;
 
-    public UsuarioPermiso() {}
+    public UsuarioPermiso() {
+    }
 
     // Getters y setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Long getUsuarioId() { return usuarioId; }
-    public void setUsuarioId(Long usuarioId) { this.usuarioId = usuarioId; }
-    public String getPermiso() { return permiso; }
-    public void setPermiso(String permiso) { this.permiso = permiso; }
-    public boolean isValor() { return valor; }
-    public void setValor(boolean valor) { this.valor = valor; }
-    public LocalDateTime getFechaAsignacion() { return fechaAsignacion; }
-    public void setFechaAsignacion(LocalDateTime fechaAsignacion) { this.fechaAsignacion = fechaAsignacion; }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
+    }
+
+    public String getPermiso() {
+        return permiso;
+    }
+
+    public void setPermiso(String permiso) {
+        this.permiso = permiso;
+    }
+
+    public boolean isValor() {
+        return valor;
+    }
+
+    public void setValor(boolean valor) {
+        this.valor = valor;
+    }
+
+    public LocalDateTime getFechaAsignacion() {
+        return fechaAsignacion;
+    }
+
+    public void setFechaAsignacion(LocalDateTime fechaAsignacion) {
+        this.fechaAsignacion = fechaAsignacion;
+    }
 }

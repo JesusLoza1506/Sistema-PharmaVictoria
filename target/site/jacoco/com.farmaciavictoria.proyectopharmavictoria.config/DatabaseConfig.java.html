@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.config</a> &gt; <span class="el_source">DatabaseConfig.java</span></div><h1>DatabaseConfig.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.config;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Properties;
+
+// Configuración y gestión de la base de datos (Singleton)
+public class DatabaseConfig {
+
+    // Logger para registrar eventos y errores
+<span class="fc" id="L19">    private static final Logger logger = LoggerFactory.getLogger(DatabaseConfig.class);</span>
+    // Instancia única
+    private static DatabaseConfig instance;
+    // Pool de conexiones
+    private static HikariDataSource dataSource;
+    // Propiedades de configuración
+    private static Properties properties;
+
+    // Constructor privado: carga configuración y pool
+<span class="fc" id="L28">    private DatabaseConfig() {</span>
+<span class="fc" id="L29">        loadProperties();</span>
+<span class="fc" id="L30">        initializeDataSource();</span>
+<span class="fc" id="L31">    }</span>
+
+    // Devuelve la instancia única
+    public static synchronized DatabaseConfig getInstance() {
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (instance == null) {</span>
+<span class="fc" id="L36">            instance = new DatabaseConfig();</span>
+        }
+<span class="fc" id="L38">        return instance;</span>
+    }
+
+    // Carga las propiedades desde el archivo application.properties
+    private void loadProperties() {
+<span class="fc" id="L43">        properties = new Properties();</span>
+<span class="fc" id="L44">        try (InputStream input = getClass().getClassLoader().getResourceAsStream(&quot;application.properties&quot;)) {</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">            if (input == null) {</span>
+<span class="nc" id="L46">                throw new RuntimeException(&quot;No se pudo encontrar application.properties&quot;);</span>
+            }
+<span class="fc" id="L48">            properties.load(input);</span>
+<span class="fc" id="L49">            logger.info(&quot;Propiedades de configuración cargadas correctamente&quot;);</span>
+<span class="nc" id="L50">        } catch (IOException e) {</span>
+<span class="nc" id="L51">            logger.error(&quot;Error al cargar propiedades de configuración&quot;, e);</span>
+<span class="nc" id="L52">            throw new RuntimeException(&quot;Error al cargar configuración&quot;, e);</span>
+<span class="fc" id="L53">        }</span>
+<span class="fc" id="L54">    }</span>
+
+    // Inicializa el pool de conexiones HikariCP
+    private void initializeDataSource() {
+        try {
+<span class="fc" id="L59">            HikariConfig config = new HikariConfig();</span>
+<span class="fc" id="L60">            config.setJdbcUrl(properties.getProperty(&quot;db.url&quot;));</span>
+<span class="fc" id="L61">            config.setUsername(properties.getProperty(&quot;db.username&quot;));</span>
+<span class="fc" id="L62">            config.setPassword(properties.getProperty(&quot;db.password&quot;));</span>
+<span class="fc" id="L63">            config.setDriverClassName(properties.getProperty(&quot;db.driver&quot;));</span>
+<span class="fc" id="L64">            config.setMaximumPoolSize(Integer.parseInt(properties.getProperty(&quot;db.pool.maximum-pool-size&quot;, &quot;3&quot;)));</span>
+<span class="fc" id="L65">            config.setMinimumIdle(Integer.parseInt(properties.getProperty(&quot;db.pool.minimum-idle&quot;, &quot;1&quot;)));</span>
+<span class="fc" id="L66">            config.setConnectionTimeout(Long.parseLong(properties.getProperty(&quot;db.pool.connection-timeout&quot;, &quot;30000&quot;)));</span>
+<span class="fc" id="L67">            config.setIdleTimeout(Long.parseLong(properties.getProperty(&quot;db.pool.idle-timeout&quot;, &quot;600000&quot;)));</span>
+<span class="fc" id="L68">            config.setMaxLifetime(Long.parseLong(properties.getProperty(&quot;db.pool.max-lifetime&quot;, &quot;1800000&quot;)));</span>
+<span class="fc" id="L69">            config.setConnectionTestQuery(properties.getProperty(&quot;db.pool.connection-test-query&quot;, &quot;SELECT 1&quot;));</span>
+<span class="fc" id="L70">            config.setPoolName(&quot;PharmavictoriaPool&quot;);</span>
+<span class="fc" id="L71">            config.setRegisterMbeans(true);</span>
+<span class="fc" id="L72">            config.setLeakDetectionThreshold(60000);</span>
+<span class="fc" id="L73">            dataSource = new HikariDataSource(config);</span>
+<span class="fc" id="L74">            logger.info(&quot;Conexión a base de datos inicializada correctamente&quot;);</span>
+<span class="fc" id="L75">            logger.info(&quot;Pool configurado - Max: {}, Min: {}&quot;,</span>
+<span class="fc" id="L76">                    config.getMaximumPoolSize(), config.getMinimumIdle());</span>
+<span class="fc" id="L77">        } catch (Exception e) {</span>
+<span class="fc" id="L78">            logger.error(&quot;Error al inicializar conexión a base de datos&quot;, e);</span>
+<span class="fc" id="L79">            throw new RuntimeException(&quot;Error de conexión a BD&quot;, e);</span>
+<span class="fc" id="L80">        }</span>
+<span class="fc" id="L81">    }</span>
+
+    // Obtiene una conexión del pool
+    public Connection getConnection() throws SQLException {
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (dataSource == null) {</span>
+<span class="nc" id="L86">            throw new SQLException(&quot;DataSource no inicializado&quot;);</span>
+        }
+<span class="fc" id="L88">        return dataSource.getConnection();</span>
+    }
+
+    // Devuelve el DataSource para uso externo
+    public DataSource getDataSource() {
+<span class="nc" id="L93">        return dataSource;</span>
+    }
+
+    // Prueba la conexión a la base de datos
+    public boolean testConnection() {
+<span class="nc" id="L98">        try (Connection connection = getConnection()) {</span>
+<span class="nc" id="L99">            boolean isValid = connection.isValid(5);</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">            logger.info(&quot;Test de conexión: {}&quot;, isValid ? &quot;EXITOSO&quot; : &quot;FALLIDO&quot;);</span>
+<span class="nc" id="L101">            return isValid;</span>
+<span class="nc" id="L102">        } catch (SQLException e) {</span>
+<span class="nc" id="L103">            logger.error(&quot;Error en test de conexión&quot;, e);</span>
+<span class="nc" id="L104">            return false;</span>
+        }
+    }
+
+    // Devuelve información del estado del pool
+    public String getPoolStatus() {
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (dataSource != null) {</span>
+<span class="nc" id="L111">            return String.format(</span>
+                    &quot;Pool Status - Active: %d, Idle: %d, Total: %d, Waiting: %d&quot;,
+<span class="nc" id="L113">                    dataSource.getHikariPoolMXBean().getActiveConnections(),</span>
+<span class="nc" id="L114">                    dataSource.getHikariPoolMXBean().getIdleConnections(),</span>
+<span class="nc" id="L115">                    dataSource.getHikariPoolMXBean().getTotalConnections(),</span>
+<span class="nc" id="L116">                    dataSource.getHikariPoolMXBean().getThreadsAwaitingConnection());</span>
+        }
+<span class="nc" id="L118">        return &quot;Pool no inicializado&quot;;</span>
+    }
+
+    // Obtiene una propiedad de configuración
+    public String getProperty(String key) {
+<span class="nc" id="L123">        return properties.getProperty(key);</span>
+    }
+
+    // Obtiene una propiedad con valor por defecto
+    public String getProperty(String key, String defaultValue) {
+<span class="nc" id="L128">        return properties.getProperty(key, defaultValue);</span>
+    }
+
+    // Cierra el pool de conexiones
+    public void close() {
+<span class="nc bnc" id="L133" title="All 4 branches missed.">        if (dataSource != null &amp;&amp; !dataSource.isClosed()) {</span>
+<span class="nc" id="L134">            dataSource.close();</span>
+<span class="nc" id="L135">            logger.info(&quot;Pool de conexiones cerrado&quot;);</span>
+        }
+<span class="nc" id="L137">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -32,6 +32,8 @@ public class ExportarProveedoresController {
     @FXML
     private Button btnExportarPDF;
 
+    // Se eliminan referencias a filtros superiores (txtBuscar, cmbTipoFiltro,
+    // cmbEstadoFiltro, chkSoloActivos, lblContadorTotal)
     private ObservableList<Proveedor> proveedoresFiltrados = FXCollections.observableArrayList();
 
     public void initialize() {
@@ -47,6 +49,7 @@ public class ExportarProveedoresController {
         tablePreview.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         btnExportarExcel.setOnAction(e -> exportar("excel"));
         btnExportarPDF.setOnAction(e -> exportar("pdf"));
+        // Se elimina toda lógica asociada a los filtros superiores
     }
 
     public void setProveedoresFiltrados(List<Proveedor> lista) {

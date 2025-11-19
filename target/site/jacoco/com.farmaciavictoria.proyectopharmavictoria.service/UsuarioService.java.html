@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UsuarioService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.service</a> &gt; <span class="el_source">UsuarioService.java</span></div><h1>UsuarioService.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.service;
+
+import java.time.LocalDateTime;
+
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioAlerta;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialAcceso;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioHistorialCambio;
+import com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioPermiso;
+import com.farmaciavictoria.proyectopharmavictoria.repository.*;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioAlertaRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioHistorialAccesoRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioHistorialCambioRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioPermisoRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Usuario.UsuarioRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service Layer para gestión de usuarios
+ * Lógica de negocio, validaciones, auditoría y alertas
+ */
+public class UsuarioService {
+    /**
+     * Verifica si el usuario tiene el permiso granular especificado para el módulo
+     * dado
+     */
+    public boolean tienePermiso(Long usuarioId, String modulo, String accion) {
+        // Ejemplo: permiso = &quot;proveedores.nuevo&quot;, &quot;proveedores.exportar&quot;, etc.
+<span class="nc" id="L31">        String clavePermiso = modulo + &quot;.&quot; + accion;</span>
+<span class="nc" id="L32">        List&lt;UsuarioPermiso&gt; permisos = obtenerPermisos(usuarioId);</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        for (UsuarioPermiso permiso : permisos) {</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">            if (permiso.getPermiso().equalsIgnoreCase(clavePermiso)) {</span>
+<span class="nc" id="L35">                return permiso.isValor();</span>
+            }
+<span class="nc" id="L37">        }</span>
+<span class="nc" id="L38">        return false;</span>
+    }
+
+    public UsuarioPermisoRepository getPermisoRepository() {
+<span class="nc" id="L42">        return permisoRepository;</span>
+    }
+
+    /**
+     * Restablece la contraseña usando el token de recuperación.
+     */
+    public boolean restablecerPasswordConToken(String token, String nuevaPassword) {
+<span class="nc" id="L49">        Usuario usuario = usuarioRepository.buscarPorTokenRecuperacion(token);</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (usuario == null)</span>
+<span class="nc" id="L51">            return false;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        if (usuario.getRecoveryTokenExpiry() == null</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">                || usuario.getRecoveryTokenExpiry().isBefore(java.time.LocalDateTime.now())) {</span>
+<span class="nc" id="L54">            return false;</span>
+        }
+<span class="nc" id="L56">        String hash = com.farmaciavictoria.proyectopharmavictoria.util.PasswordUtil.hashPassword(nuevaPassword);</span>
+<span class="nc" id="L57">        boolean ok = usuarioRepository.actualizarPasswordYLimpiarToken(usuario.getId(), hash);</span>
+<span class="nc" id="L58">        return ok;</span>
+    }
+
+    /**
+     * Valida el token y actualiza la contraseña si es correcto y no expiró
+     */
+    public boolean validarYActualizarPassword(String email, String token, String nuevaPassword) {
+<span class="nc" id="L65">        Usuario usuario = usuarioRepository.findByEmail(email);</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (usuario == null)</span>
+<span class="nc" id="L67">            return false;</span>
+<span class="nc bnc" id="L68" title="All 4 branches missed.">        if (usuario.getRecoveryToken() == null || usuario.getRecoveryTokenExpiry() == null)</span>
+<span class="nc" id="L69">            return false;</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (!usuario.getRecoveryToken().equals(token))</span>
+<span class="nc" id="L71">            return false;</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (usuario.getRecoveryTokenExpiry().isBefore(java.time.LocalDateTime.now()))</span>
+<span class="nc" id="L73">            return false;</span>
+        // Actualizar contraseña (hash)
+<span class="nc" id="L75">        String hash = hashPassword(nuevaPassword);</span>
+<span class="nc" id="L76">        boolean ok = usuarioRepository.setPassword(usuario.getId(), hash);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (ok) {</span>
+            // Limpiar token
+<span class="nc" id="L79">            usuarioRepository.setRecoveryToken(usuario.getId(), null, null);</span>
+        }
+<span class="nc" id="L81">        return ok;</span>
+    }
+
+    // Utilidad para hashear contraseña (puedes adaptar a tu método real)
+    private String hashPassword(String password) {
+        // Ejemplo simple, reemplaza por tu lógica real (BCrypt, Argon2, etc.)
+<span class="nc" id="L87">        return Integer.toHexString(password.hashCode());</span>
+    }
+
+    /**
+     * Genera un token alfanumérico de 6 caracteres
+     */
+    public String generarTokenRecuperacion() {
+<span class="nc" id="L94">        String chars = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789&quot;;</span>
+<span class="nc" id="L95">        StringBuilder token = new StringBuilder();</span>
+<span class="nc" id="L96">        java.util.Random rnd = new java.util.Random();</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        for (int i = 0; i &lt; 6; i++) {</span>
+<span class="nc" id="L98">            token.append(chars.charAt(rnd.nextInt(chars.length())));</span>
+        }
+<span class="nc" id="L100">        return token.toString();</span>
+    }
+
+    /**
+     * Inicia el proceso de recuperación: genera y guarda el token
+     */
+    public boolean iniciarRecuperacion(String email) {
+<span class="nc" id="L107">        System.out.println(&quot;[Recuperación] Iniciando recuperación para: &quot; + email);</span>
+<span class="nc" id="L108">        Usuario usuario = usuarioRepository.findByEmail(email);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (usuario == null) {</span>
+<span class="nc" id="L110">            System.out.println(&quot;[Recuperación] Usuario no encontrado para el email: &quot; + email);</span>
+<span class="nc" id="L111">            return false;</span>
+        }
+<span class="nc" id="L113">        String token = generarTokenRecuperacion();</span>
+<span class="nc" id="L114">        LocalDateTime expiry = LocalDateTime.now().plusMinutes(15);</span>
+<span class="nc" id="L115">        boolean ok = usuarioRepository.setRecoveryToken(usuario.getId(), token, expiry);</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        if (ok) {</span>
+<span class="nc" id="L117">            usuario.setRecoveryToken(token);</span>
+<span class="nc" id="L118">            usuario.setRecoveryTokenExpiry(expiry);</span>
+<span class="nc" id="L119">            System.out.println(&quot;[Recuperación] Token generado: &quot; + token + &quot; Expira: &quot; + expiry);</span>
+            try {
+<span class="nc" id="L121">                new com.farmaciavictoria.proyectopharmavictoria.util.MailService()</span>
+<span class="nc" id="L122">                        .sendRecoveryTokenEmail(usuario.getEmail(), token);</span>
+<span class="nc" id="L123">            } catch (jakarta.mail.MessagingException e) {</span>
+<span class="nc" id="L124">                System.out.println(&quot;[Recuperación] Error al enviar correo:&quot;);</span>
+<span class="nc" id="L125">                e.printStackTrace();</span>
+<span class="nc" id="L126">            }</span>
+        } else {
+<span class="nc" id="L128">            System.out.println(&quot;[Recuperación] No se pudo guardar el token en la base de datos.&quot;);</span>
+        }
+<span class="nc" id="L130">        return ok;</span>
+    }
+
+    // Actualizar estado activo/inactivo (alias para compatibilidad con controlador)
+    public void actualizarEstado(Long usuarioId, boolean activo, String usuarioActual) {
+        // adminId: usar valor por defecto si no se puede obtener
+<span class="nc" id="L136">        Long adminId = 1L; // Puedes cambiar esto por la lógica real si tienes el usuario actual</span>
+<span class="nc" id="L137">        cambiarEstadoUsuario(usuarioId, activo, adminId);</span>
+<span class="nc" id="L138">    }</span>
+
+    private final UsuarioRepository usuarioRepository;
+    private final UsuarioHistorialCambioRepository historialCambioRepository;
+    private final UsuarioHistorialAccesoRepository historialAccesoRepository;
+    private final UsuarioAlertaRepository alertaRepository;
+    private final UsuarioPermisoRepository permisoRepository;
+    private static UsuarioService instance;
+
+<span class="fc" id="L147">    private UsuarioService() {</span>
+<span class="fc" id="L148">        this.usuarioRepository = new UsuarioRepository();</span>
+<span class="fc" id="L149">        this.historialCambioRepository = new UsuarioHistorialCambioRepository();</span>
+<span class="fc" id="L150">        this.historialAccesoRepository = new UsuarioHistorialAccesoRepository();</span>
+<span class="fc" id="L151">        this.alertaRepository = new UsuarioAlertaRepository();</span>
+<span class="fc" id="L152">        this.permisoRepository = new UsuarioPermisoRepository();</span>
+<span class="fc" id="L153">    }</span>
+    // Eliminada inicialización de SucursalRepository
+
+    public static UsuarioService getInstance() {
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">        if (instance == null) {</span>
+<span class="fc" id="L158">            instance = new UsuarioService();</span>
+        }
+<span class="fc" id="L160">        return instance;</span>
+    }
+
+    // Registrar usuario
+    public String registrarUsuario(Usuario usuario, Long adminId) {
+        // Validaciones: username único, email único, DNI único
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        if (usuarioRepository.existsByUsername(usuario.getUsername())) {</span>
+<span class="nc" id="L167">            return &quot;Ya existe un usuario con ese nombre de usuario.&quot;;</span>
+        }
+<span class="nc bnc" id="L169" title="All 4 branches missed.">        if (usuario.getEmail() != null &amp;&amp; !usuario.getEmail().isEmpty()) {</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">            if (usuarioRepository.existsByEmail(usuario.getEmail())) {</span>
+<span class="nc" id="L171">                return &quot;Ya existe un usuario con ese email.&quot;;</span>
+            }
+        }
+<span class="nc bnc" id="L174" title="All 4 branches missed.">        if (usuario.getDni() != null &amp;&amp; !usuario.getDni().isEmpty()) {</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">            if (usuarioRepository.existsByDni(usuario.getDni())) {</span>
+<span class="nc" id="L176">                return &quot;Ya existe un usuario con ese DNI.&quot;;</span>
+            }
+        }
+<span class="nc" id="L179">        Usuario guardado = usuarioRepository.save(usuario);</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        if (guardado == null) {</span>
+<span class="nc" id="L181">            return &quot;No se pudo guardar el usuario en la base de datos.&quot;;</span>
+        }
+<span class="nc" id="L183">        UsuarioHistorialCambio cambio = new UsuarioHistorialCambio();</span>
+<span class="nc" id="L184">        cambio.setUsuario_id((int) guardado.getId().longValue());</span>
+<span class="nc" id="L185">        cambio.setCampo_modificado(&quot;CREACION&quot;);</span>
+<span class="nc" id="L186">        cambio.setValor_anterior(null);</span>
+<span class="nc" id="L187">        cambio.setValor_nuevo(&quot;Usuario creado&quot;);</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        cambio.setModificado_por(adminId != null ? adminId.intValue() : null);</span>
+<span class="nc" id="L189">        cambio.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L190">        historialCambioRepository.save(cambio);</span>
+<span class="nc" id="L191">        return null;</span>
+    }
+
+    // Editar usuario
+    public void editarUsuario(Usuario usuario, String campo, String valorAnterior, String valorNuevo, Long adminId) {
+<span class="nc" id="L196">        usuarioRepository.update(usuario);</span>
+<span class="nc" id="L197">        UsuarioHistorialCambio cambio = new UsuarioHistorialCambio();</span>
+<span class="nc" id="L198">        cambio.setUsuario_id((int) usuario.getId().longValue());</span>
+<span class="nc" id="L199">        cambio.setCampo_modificado(campo);</span>
+<span class="nc" id="L200">        cambio.setValor_anterior(valorAnterior);</span>
+<span class="nc" id="L201">        cambio.setValor_nuevo(valorNuevo);</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">        cambio.setModificado_por(adminId != null ? adminId.intValue() : null);</span>
+<span class="nc" id="L203">        cambio.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L204">        historialCambioRepository.save(cambio);</span>
+<span class="nc" id="L205">    }</span>
+
+    // Eliminar usuario
+    public void eliminarUsuario(Long usuarioId, Long adminId) {
+<span class="nc" id="L209">        usuarioRepository.delete(usuarioId);</span>
+<span class="nc" id="L210">        UsuarioHistorialCambio cambio = new UsuarioHistorialCambio();</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        cambio.setUsuario_id(usuarioId != null ? usuarioId.intValue() : 0);</span>
+<span class="nc" id="L212">        cambio.setCampo_modificado(&quot;ELIMINACION&quot;);</span>
+<span class="nc" id="L213">        cambio.setValor_anterior(&quot;Usuario activo&quot;);</span>
+<span class="nc" id="L214">        cambio.setValor_nuevo(&quot;Usuario eliminado&quot;);</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        cambio.setModificado_por(adminId != null ? adminId.intValue() : null);</span>
+<span class="nc" id="L216">        cambio.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L217">        historialCambioRepository.save(cambio);</span>
+<span class="nc" id="L218">    }</span>
+
+    // Cambiar estado activo/inactivo
+    public void cambiarEstadoUsuario(Long usuarioId, boolean activo, Long adminId) {
+<span class="nc" id="L222">        usuarioRepository.setActivo(usuarioId, activo);</span>
+<span class="nc" id="L223">        UsuarioHistorialCambio cambio = new UsuarioHistorialCambio();</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        cambio.setUsuario_id(usuarioId != null ? usuarioId.intValue() : 0);</span>
+<span class="nc" id="L225">        cambio.setCampo_modificado(&quot;ESTADO&quot;);</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        cambio.setValor_anterior(activo ? &quot;Inactivo&quot; : &quot;Activo&quot;);</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        cambio.setValor_nuevo(activo ? &quot;Activo&quot; : &quot;Inactivo&quot;);</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">        cambio.setModificado_por(adminId != null ? adminId.intValue() : null);</span>
+<span class="nc" id="L229">        cambio.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L230">        historialCambioRepository.save(cambio);</span>
+<span class="nc" id="L231">    }</span>
+
+    // Cambiar contraseña
+    public void cambiarContrasena(Long usuarioId, String nuevaHash, Long adminId) {
+<span class="nc" id="L235">        usuarioRepository.setPassword(usuarioId, nuevaHash);</span>
+<span class="nc" id="L236">        UsuarioHistorialCambio cambio = new UsuarioHistorialCambio();</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">        cambio.setUsuario_id(usuarioId != null ? usuarioId.intValue() : 0);</span>
+<span class="nc" id="L238">        cambio.setCampo_modificado(&quot;CONTRASENA&quot;);</span>
+<span class="nc" id="L239">        cambio.setValor_anterior(&quot;-&quot;);</span>
+<span class="nc" id="L240">        cambio.setValor_nuevo(&quot;Hash actualizado&quot;);</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        cambio.setModificado_por(adminId != null ? adminId.intValue() : null);</span>
+<span class="nc" id="L242">        cambio.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L243">        historialCambioRepository.save(cambio);</span>
+<span class="nc" id="L244">    }</span>
+    // Devuelve nombre y apellido del usuario por su ID
+    // Eliminado: obtenerNombreCompletoUsuario
+
+    // Registrar acceso
+    public void registrarAcceso(Long usuarioId, boolean exito, String ip, String userAgent, String motivoFallo) {
+<span class="nc" id="L250">        UsuarioHistorialAcceso acceso = new UsuarioHistorialAcceso();</span>
+<span class="nc" id="L251">        acceso.setUsuarioId(usuarioId);</span>
+<span class="nc" id="L252">        acceso.setFechaAcceso(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L253">        acceso.setIpAddress(ip);</span>
+<span class="nc" id="L254">        acceso.setUserAgent(userAgent);</span>
+<span class="nc" id="L255">        acceso.setExito(exito);</span>
+<span class="nc" id="L256">        acceso.setMotivoFallo(motivoFallo);</span>
+<span class="nc" id="L257">        historialAccesoRepository.save(acceso);</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (!exito) {</span>
+<span class="nc" id="L259">            UsuarioAlerta alerta = new UsuarioAlerta();</span>
+<span class="nc" id="L260">            alerta.setUsuarioId(usuarioId);</span>
+<span class="nc" id="L261">            alerta.setTipoAlerta(&quot;ACCESO_FALLIDO&quot;);</span>
+<span class="nc" id="L262">            alerta.setMensaje(&quot;Intento fallido: &quot; + motivoFallo);</span>
+<span class="nc" id="L263">            alerta.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L264">            alerta.setLeida(false);</span>
+<span class="nc" id="L265">            alertaRepository.save(alerta);</span>
+        }
+<span class="nc" id="L267">    }</span>
+
+    // Obtener usuarios, historial, alertas, permisos
+    public List&lt;Usuario&gt; obtenerUsuarios() {
+<span class="nc" id="L271">        return usuarioRepository.findAll();</span>
+    }
+
+    public Optional&lt;Usuario&gt; buscarPorUsername(String username) {
+<span class="nc" id="L275">        return usuarioRepository.findByUsername(username);</span>
+    }
+
+    public List&lt;UsuarioHistorialCambio&gt; obtenerHistorialCambios(Long usuarioId) {
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        return historialCambioRepository.findByUsuarioId(usuarioId != null ? usuarioId.intValue() : 0);</span>
+    }
+
+    public List&lt;UsuarioHistorialAcceso&gt; obtenerHistorialAccesos(Long usuarioId) {
+<span class="nc" id="L283">        return historialAccesoRepository.findByUsuarioId(usuarioId);</span>
+    }
+
+    public List&lt;UsuarioAlerta&gt; obtenerAlertas(Long usuarioId) {
+<span class="nc" id="L287">        return alertaRepository.findByUsuarioId(usuarioId);</span>
+    }
+
+    public List&lt;UsuarioPermiso&gt; obtenerPermisos(Long usuarioId) {
+<span class="nc" id="L291">        return permisoRepository.findByUsuarioId(usuarioId);</span>
+    }
+
+    // Devuelve lista de nombres de sucursales activas
+    public List&lt;String&gt; obtenerNombresSucursales() {
+<span class="nc" id="L296">        List&lt;String&gt; nombres = new java.util.ArrayList&lt;&gt;();</span>
+
+        // Método obtenerNombresSucursales eliminado
+<span class="nc" id="L299">        return nombres;</span>
+    }
+
+    // Devuelve todos los usuarios
+    public List&lt;Usuario&gt; obtenerTodos() {
+<span class="nc" id="L304">        return obtenerUsuarios();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

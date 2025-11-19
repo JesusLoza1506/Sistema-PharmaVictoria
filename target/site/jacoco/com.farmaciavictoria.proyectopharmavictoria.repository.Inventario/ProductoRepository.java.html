@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductoRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.repository.Inventario</a> &gt; <span class="el_source">ProductoRepository.java</span></div><h1>ProductoRepository.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.repository.Inventario;
+
+import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
+import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto;
+import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.FormaFarmaceutica;
+import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
+
+import java.math.BigDecimal;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+<span class="fc" id="L19">public class ProductoRepository {</span>
+
+<span class="fc" id="L21">    private static final Logger logger = LoggerFactory.getLogger(ProductoRepository.class);</span>
+
+    class ProductoRepositoryException extends RuntimeException {
+<span class="nc" id="L24">        public ProductoRepositoryException(String message, Throwable cause) {</span>
+<span class="nc" id="L25">            super(message, cause);</span>
+<span class="nc" id="L26">        }</span>
+
+<span class="nc" id="L28">        public ProductoRepositoryException(String message) {</span>
+<span class="nc" id="L29">            super(message);</span>
+<span class="nc" id="L30">        }</span>
+    }
+
+    public List&lt;Producto&gt; findAll() {
+<span class="nc" id="L34">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L35">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.activo = TRUE
+                    ORDER BY p.codigo
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L43">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L44">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L45">                ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L47">                productos.add(mapResultSetToProducto(rs));</span>
+            }
+<span class="nc" id="L49">        } catch (SQLException e) {</span>
+<span class="nc" id="L50">            logger.error(&quot;Error al obtener productos: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L51">            throw new ProductoRepositoryException(&quot;Error al obtener productos&quot;, e);</span>
+<span class="nc" id="L52">        }</span>
+<span class="nc" id="L53">        return productos;</span>
+    }
+
+    /**
+     * Obtener productos paginados
+     * 
+     * @param page número de página (empezando en 0)
+     * @param size cantidad de productos por página
+     */
+    public List&lt;Producto&gt; findAllPaged(int page, int size) {
+<span class="nc" id="L63">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L64">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.activo = TRUE
+                    ORDER BY p.codigo
+                    LIMIT ? OFFSET ?
+                &quot;&quot;&quot;;
+<span class="nc" id="L72">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L73">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L74">            stmt.setInt(1, size);</span>
+<span class="nc" id="L75">            stmt.setInt(2, page * size);</span>
+<span class="nc" id="L76">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc" id="L78">                    productos.add(mapResultSetToProducto(rs));</span>
+                }
+            }
+<span class="nc" id="L81">        } catch (SQLException e) {</span>
+<span class="nc" id="L82">            logger.error(&quot;Error al obtener productos paginados: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L83">            throw new ProductoRepositoryException(&quot;Error al obtener productos paginados&quot;, e);</span>
+<span class="nc" id="L84">        }</span>
+<span class="nc" id="L85">        return productos;</span>
+    }
+
+    /**
+     * Obtener todos los productos incluyendo inactivos
+     */
+    public List&lt;Producto&gt; findAllIncludingInactive() {
+<span class="nc" id="L92">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L93">        String sql = &quot;&quot;&quot;</span>
+                SELECT p.*, pr.razon_social as proveedor_nombre
+                FROM productos p
+                LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                ORDER BY p.codigo
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L100">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L101">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L102">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L105">                productos.add(mapResultSetToProducto(rs));</span>
+            }
+
+<span class="nc" id="L108">        } catch (SQLException e) {</span>
+<span class="nc" id="L109">            logger.error(&quot;Error al obtener todos los productos: {}&quot;, e.getMessage(), e);</span>
+            // Uso de ProductoRepositoryException consistente con findAll()
+<span class="nc" id="L111">            throw new ProductoRepositoryException(&quot;Error al obtener todos los productos&quot;, e);</span>
+<span class="nc" id="L112">        }</span>
+
+<span class="nc" id="L114">        return productos;</span>
+    }
+
+    public Optional&lt;Producto&gt; findById(Long id) {
+<span class="nc" id="L118">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.id = ?
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L125">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L126">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L128">            stmt.setLong(1, id);</span>
+
+<span class="nc" id="L130">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc" id="L132">                    return Optional.of(mapResultSetToProducto(rs));</span>
+                }
+<span class="nc bnc" id="L134" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L135" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L136">            logger.error(&quot;Error al buscar producto por ID: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L137">            throw new ProductoRepositoryException(&quot;Error al buscar producto por ID&quot;, e);</span>
+<span class="nc" id="L138">        }</span>
+<span class="nc" id="L139">        return Optional.empty();</span>
+    }
+
+    public Optional&lt;Producto&gt; findByCodigo(String codigo) {
+<span class="nc" id="L143">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.codigo = ?
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L150">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L151">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L153">            stmt.setString(1, codigo);</span>
+
+<span class="nc" id="L155">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc" id="L157">                    return Optional.of(mapResultSetToProducto(rs));</span>
+                }
+<span class="nc bnc" id="L159" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L160" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L161">            logger.error(&quot;Error al buscar producto por código: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L162">            throw new ProductoRepositoryException(&quot;Error al buscar producto por código&quot;, e);</span>
+<span class="nc" id="L163">        }</span>
+<span class="nc" id="L164">        return Optional.empty();</span>
+    }
+
+    public List&lt;Producto&gt; findByNombre(String nombre) {
+<span class="nc" id="L168">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L169">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.nombre LIKE ? AND p.activo = TRUE
+                    ORDER BY p.nombre
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L177">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L178">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L180">            stmt.setString(1, &quot;%&quot; + nombre + &quot;%&quot;);</span>
+
+<span class="nc" id="L182">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc" id="L184">                    productos.add(mapResultSetToProducto(rs));</span>
+                }
+            }
+<span class="nc" id="L187">        } catch (SQLException e) {</span>
+<span class="nc" id="L188">            logger.error(&quot;Error al buscar productos por nombre: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L189">            throw new ProductoRepositoryException(&quot;Error al buscar productos por nombre&quot;, e);</span>
+<span class="nc" id="L190">        }</span>
+<span class="nc" id="L191">        return productos;</span>
+    }
+
+    public List&lt;Producto&gt; findByCategoria(String categoria) {
+<span class="nc" id="L195">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L196">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.categoria = ? AND p.activo = TRUE
+                    ORDER BY p.nombre
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L204">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L205">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L207">            stmt.setString(1, categoria);</span>
+
+<span class="nc" id="L209">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc" id="L211">                    productos.add(mapResultSetToProducto(rs));</span>
+                }
+            }
+<span class="nc" id="L214">        } catch (SQLException e) {</span>
+<span class="nc" id="L215">            logger.error(&quot;Error al buscar productos por categoría: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L216">            throw new ProductoRepositoryException(&quot;Error al buscar productos por categoría&quot;, e);</span>
+<span class="nc" id="L217">        }</span>
+<span class="nc" id="L218">        return productos;</span>
+    }
+
+    public List&lt;Producto&gt; findByFiltros(Long categoriaId, Long proveedorId, BigDecimal precioMin,
+            BigDecimal precioMax) {
+<span class="nc" id="L223">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L224">        StringBuilder sql = new StringBuilder(</span>
+                &quot;SELECT p.*, pr.razon_social as proveedor_nombre FROM productos p LEFT JOIN proveedores pr ON p.proveedor_id = pr.id WHERE p.activo = TRUE&quot;);
+
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        if (categoriaId != null)</span>
+<span class="nc" id="L228">            sql.append(&quot; AND p.categoria_id = ?&quot;);</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        if (proveedorId != null)</span>
+<span class="nc" id="L230">            sql.append(&quot; AND p.proveedor_id = ?&quot;);</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (precioMin != null)</span>
+<span class="nc" id="L232">            sql.append(&quot; AND p.precio_venta &gt;= ?&quot;);</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        if (precioMax != null)</span>
+<span class="nc" id="L234">            sql.append(&quot; AND p.precio_venta &lt;= ?&quot;);</span>
+<span class="nc" id="L235">        sql.append(&quot; ORDER BY p.nombre&quot;);</span>
+
+<span class="nc" id="L237">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L238">                PreparedStatement stmt = connection.prepareStatement(sql.toString())) {</span>
+
+<span class="nc" id="L240">            int idx = 1;</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">            if (categoriaId != null)</span>
+<span class="nc" id="L242">                stmt.setLong(idx++, categoriaId);</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">            if (proveedorId != null)</span>
+<span class="nc" id="L244">                stmt.setLong(idx++, proveedorId);</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">            if (precioMin != null)</span>
+<span class="nc" id="L246">                stmt.setBigDecimal(idx++, precioMin);</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">            if (precioMax != null)</span>
+<span class="nc" id="L248">                stmt.setBigDecimal(idx++, precioMax);</span>
+
+<span class="nc" id="L250">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L251" title="All 2 branches missed.">                while (rs.next()) {</span>
+<span class="nc" id="L252">                    productos.add(mapResultSetToProducto(rs));</span>
+                }
+            }
+<span class="nc" id="L255">        } catch (SQLException e) {</span>
+<span class="nc" id="L256">            logger.error(&quot;Error al buscar productos por filtros: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L257">            throw new ProductoRepositoryException(&quot;Error al buscar productos por filtros&quot;, e);</span>
+<span class="nc" id="L258">        }</span>
+<span class="nc" id="L259">        return productos;</span>
+    }
+
+    public List&lt;Producto&gt; findVencidos() {
+<span class="nc" id="L263">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L264">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.fecha_vencimiento &lt; CURDATE() AND p.activo = TRUE
+                    ORDER BY p.fecha_vencimiento
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L272">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L273">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L274">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L276" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L277">                productos.add(mapResultSetToProducto(rs));</span>
+            }
+<span class="nc" id="L279">        } catch (SQLException e) {</span>
+<span class="nc" id="L280">            logger.error(&quot;Error al obtener productos vencidos: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L281">            throw new ProductoRepositoryException(&quot;Error al obtener productos vencidos&quot;, e);</span>
+<span class="nc" id="L282">        }</span>
+<span class="nc" id="L283">        return productos;</span>
+    }
+
+    public List&lt;Producto&gt; findProximosVencer(int dias) {
+<span class="nc" id="L287">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L288">        String sql = &quot;SELECT p.*, pr.razon_social as proveedor_nombre FROM productos p LEFT JOIN proveedores pr ON p.proveedor_id = pr.id WHERE p.fecha_vencimiento &gt; CURDATE() AND p.fecha_vencimiento &lt;= DATE_ADD(CURDATE(), INTERVAL &quot;</span>
+                + dias + &quot; DAY) AND p.activo = TRUE ORDER BY p.fecha_vencimiento&quot;;
+<span class="nc" id="L290">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L291">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L292">                ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L293" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L294">                productos.add(mapResultSetToProducto(rs));</span>
+            }
+<span class="nc" id="L296">        } catch (SQLException e) {</span>
+<span class="nc" id="L297">            logger.error(&quot;Error al obtener productos próximos a vencer: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L298">            throw new ProductoRepositoryException(&quot;Error al obtener productos próximos a vencer&quot;, e);</span>
+<span class="nc" id="L299">        }</span>
+<span class="nc" id="L300">        return productos;</span>
+    }
+
+    public List&lt;Producto&gt; findStockBajo() {
+<span class="nc" id="L304">        List&lt;Producto&gt; productos = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L305">        String sql = &quot;&quot;&quot;</span>
+                    SELECT p.*, pr.razon_social as proveedor_nombre
+                    FROM productos p
+                    LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
+                    WHERE p.stock_actual &lt;= p.stock_minimo AND p.activo = TRUE
+                    ORDER BY (p.stock_actual - p.stock_minimo)
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L313">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L314">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L315">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L317" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L318">                productos.add(mapResultSetToProducto(rs));</span>
+            }
+<span class="nc" id="L320">        } catch (SQLException e) {</span>
+<span class="nc" id="L321">            logger.error(&quot;Error al obtener productos con stock bajo: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L322">            throw new ProductoRepositoryException(&quot;Error al obtener productos con stock bajo&quot;, e);</span>
+<span class="nc" id="L323">        }</span>
+<span class="nc" id="L324">        return productos;</span>
+    }
+
+    public Map&lt;String, Integer&gt; countByEstado() {
+<span class="nc" id="L328">        Map&lt;String, Integer&gt; estadisticas = new HashMap&lt;&gt;();</span>
+
+        // Inicializar contadores
+<span class="nc" id="L331">        estadisticas.put(&quot;TOTAL&quot;, 0);</span>
+<span class="nc" id="L332">        estadisticas.put(&quot;VENCIDOS&quot;, 0);</span>
+<span class="nc" id="L333">        estadisticas.put(&quot;PROXIMOS_VENCER&quot;, 0);</span>
+<span class="nc" id="L334">        estadisticas.put(&quot;STOCK_BAJO&quot;, 0);</span>
+<span class="nc" id="L335">        estadisticas.put(&quot;SIN_STOCK&quot;, 0);</span>
+
+<span class="nc" id="L337">        String sql = &quot;&quot;&quot;</span>
+                    SELECT
+                        COUNT(*) as total,
+                        COUNT(CASE WHEN fecha_vencimiento &lt; CURDATE() THEN 1 END) as vencidos,
+                        COUNT(CASE WHEN fecha_vencimiento BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 END) as proximos_vencer,
+                        COUNT(CASE WHEN stock_actual &lt;= stock_minimo AND stock_actual &gt; 0 THEN 1 END) as stock_bajo,
+                        COUNT(CASE WHEN stock_actual = 0 THEN 1 END) as sin_stock
+                    FROM productos
+                    WHERE activo = TRUE
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L348">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L349">                PreparedStatement stmt = connection.prepareStatement(sql);</span>
+<span class="nc" id="L350">                ResultSet rs = stmt.executeQuery()) {</span>
+
+<span class="nc bnc" id="L352" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L353">                estadisticas.put(&quot;TOTAL&quot;, rs.getInt(&quot;total&quot;));</span>
+<span class="nc" id="L354">                estadisticas.put(&quot;VENCIDOS&quot;, rs.getInt(&quot;vencidos&quot;));</span>
+<span class="nc" id="L355">                estadisticas.put(&quot;PROXIMOS_VENCER&quot;, rs.getInt(&quot;proximos_vencer&quot;));</span>
+<span class="nc" id="L356">                estadisticas.put(&quot;STOCK_BAJO&quot;, rs.getInt(&quot;stock_bajo&quot;));</span>
+<span class="nc" id="L357">                estadisticas.put(&quot;SIN_STOCK&quot;, rs.getInt(&quot;sin_stock&quot;));</span>
+            }
+<span class="nc" id="L359">        } catch (SQLException e) {</span>
+<span class="nc" id="L360">            logger.error(&quot;Error al contar productos por estado: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L361">            throw new ProductoRepositoryException(&quot;Error al contar productos por estado&quot;, e);</span>
+<span class="nc" id="L362">        }</span>
+
+<span class="nc" id="L364">        return estadisticas;</span>
+    }
+
+    public boolean save(Producto producto) {
+<span class="nc" id="L368">        String sql = &quot;&quot;&quot;</span>
+                    INSERT INTO productos (codigo, nombre, categoria, descripcion, principio_activo,
+                                         concentracion, forma_farmaceutica, precio_compra, precio_venta, stock_actual, stock_minimo,
+                                         fecha_vencimiento, lote, ubicacion, laboratorio, fecha_fabricacion, proveedor_id, activo,
+                                         requiere_receta, es_controlado, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L376">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L377">                PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {</span>
+
+<span class="nc" id="L379">            stmt.setString(1, producto.getCodigo());</span>
+<span class="nc" id="L380">            stmt.setString(2, producto.getNombre());</span>
+<span class="nc" id="L381">            stmt.setString(3, producto.getCategoria().name());</span>
+<span class="nc" id="L382">            stmt.setString(4, producto.getDescripcion());</span>
+<span class="nc" id="L383">            stmt.setString(5, producto.getPrincipioActivo());</span>
+<span class="nc" id="L384">            stmt.setString(6, producto.getConcentracion());</span>
+<span class="nc bnc" id="L385" title="All 2 branches missed.">            stmt.setString(7, producto.getFormaFarmaceutica() != null ? producto.getFormaFarmaceutica().name() : &quot;&quot;);</span>
+<span class="nc bnc" id="L386" title="All 2 branches missed.">            stmt.setBigDecimal(8, producto.getPrecioCompra() != null ? producto.getPrecioCompra() : BigDecimal.ZERO);</span>
+<span class="nc" id="L387">            stmt.setBigDecimal(9, producto.getPrecioVenta());</span>
+<span class="nc" id="L388">            stmt.setInt(10, producto.getStockActual());</span>
+<span class="nc" id="L389">            stmt.setInt(11, producto.getStockMinimo());</span>
+<span class="nc" id="L390">            stmt.setDate(12, Date.valueOf(producto.getFechaVencimiento()));</span>
+<span class="nc" id="L391">            stmt.setString(13, producto.getLote());</span>
+<span class="nc" id="L392">            stmt.setString(14, producto.getUbicacion());</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">            stmt.setString(15, producto.getLaboratorio() != null ? producto.getLaboratorio() : &quot;&quot;);</span>
+<span class="nc bnc" id="L394" title="All 2 branches missed.">            if (producto.getFechaFabricacion() != null) {</span>
+<span class="nc" id="L395">                stmt.setDate(16, Date.valueOf(producto.getFechaFabricacion()));</span>
+            } else {
+<span class="nc" id="L397">                stmt.setNull(16, java.sql.Types.DATE);</span>
+            }
+<span class="nc" id="L399">            stmt.setInt(17, producto.getProveedorId());</span>
+<span class="nc" id="L400">            stmt.setBoolean(18, true); // activo por defecto</span>
+<span class="nc bnc" id="L401" title="All 2 branches missed.">            stmt.setBoolean(19, producto.getRequiereReceta() != null ? producto.getRequiereReceta() : false);</span>
+<span class="nc bnc" id="L402" title="All 2 branches missed.">            stmt.setBoolean(20, producto.getEsControlado() != null ? producto.getEsControlado() : false);</span>
+<span class="nc" id="L403">            stmt.setTimestamp(21, Timestamp.valueOf(LocalDateTime.now()));</span>
+
+<span class="nc" id="L405">            int rowsAffected = stmt.executeUpdate();</span>
+
+<span class="nc bnc" id="L407" title="All 2 branches missed.">            if (rowsAffected &gt; 0) {</span>
+<span class="nc" id="L408">                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">                    if (generatedKeys.next()) {</span>
+                        // Se asume que el ID es un Integer basado en cómo se usa en el objeto Producto
+<span class="nc" id="L411">                        producto.setId(generatedKeys.getInt(1));</span>
+                    }
+                }
+<span class="nc" id="L414">                return true;</span>
+            }
+
+<span class="nc bnc" id="L417" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L418">            logger.error(&quot;Error al guardar producto: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L419">            throw new ProductoRepositoryException(&quot;Error al guardar producto&quot;, e);</span>
+<span class="nc" id="L420">        }</span>
+<span class="nc" id="L421">        return false;</span>
+    }
+
+    public boolean update(Producto producto) {
+<span class="nc" id="L425">        String sql = &quot;&quot;&quot;</span>
+                    UPDATE productos SET
+                        codigo = ?, nombre = ?, categoria = ?, descripcion = ?, principio_activo = ?,
+                        concentracion = ?, forma_farmaceutica = ?, precio_compra = ?, precio_venta = ?, stock_actual = ?, stock_minimo = ?, stock_maximo = ?,
+                        fecha_vencimiento = ?, lote = ?, ubicacion = ?, laboratorio = ?, fecha_fabricacion = ?, proveedor_id = ?, activo = ?,
+                        requiere_receta = ?, es_controlado = ?, updated_at = ?
+                    WHERE id = ?
+                &quot;&quot;&quot;;
+
+<span class="nc" id="L434">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L435">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L437">            stmt.setString(1, producto.getCodigo());</span>
+<span class="nc" id="L438">            stmt.setString(2, producto.getNombre());</span>
+<span class="nc" id="L439">            stmt.setString(3, producto.getCategoria().name());</span>
+<span class="nc" id="L440">            stmt.setString(4, producto.getDescripcion());</span>
+<span class="nc" id="L441">            stmt.setString(5, producto.getPrincipioActivo());</span>
+<span class="nc" id="L442">            stmt.setString(6, producto.getConcentracion());</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">            stmt.setString(7, producto.getFormaFarmaceutica() != null ? producto.getFormaFarmaceutica().name() : &quot;&quot;);</span>
+<span class="nc bnc" id="L444" title="All 2 branches missed.">            stmt.setBigDecimal(8, producto.getPrecioCompra() != null ? producto.getPrecioCompra() : BigDecimal.ZERO);</span>
+<span class="nc" id="L445">            stmt.setBigDecimal(9, producto.getPrecioVenta());</span>
+<span class="nc" id="L446">            stmt.setInt(10, producto.getStockActual());</span>
+<span class="nc" id="L447">            stmt.setInt(11, producto.getStockMinimo());</span>
+<span class="nc" id="L448">            stmt.setInt(12, producto.getStockMaximo());</span>
+<span class="nc" id="L449">            stmt.setDate(13, Date.valueOf(producto.getFechaVencimiento()));</span>
+<span class="nc" id="L450">            stmt.setString(14, producto.getLote());</span>
+<span class="nc" id="L451">            stmt.setString(15, producto.getUbicacion());</span>
+<span class="nc bnc" id="L452" title="All 2 branches missed.">            stmt.setString(16, producto.getLaboratorio() != null ? producto.getLaboratorio() : &quot;&quot;);</span>
+<span class="nc bnc" id="L453" title="All 2 branches missed.">            if (producto.getFechaFabricacion() != null) {</span>
+<span class="nc" id="L454">                stmt.setDate(17, Date.valueOf(producto.getFechaFabricacion()));</span>
+            } else {
+<span class="nc" id="L456">                stmt.setNull(17, java.sql.Types.DATE);</span>
+            }
+<span class="nc" id="L458">            stmt.setInt(18, producto.getProveedorId());</span>
+<span class="nc" id="L459">            stmt.setBoolean(19, producto.getActivo());</span>
+<span class="nc bnc" id="L460" title="All 2 branches missed.">            stmt.setBoolean(20, producto.getRequiereReceta() != null ? producto.getRequiereReceta() : false);</span>
+<span class="nc bnc" id="L461" title="All 2 branches missed.">            stmt.setBoolean(21, producto.getEsControlado() != null ? producto.getEsControlado() : false);</span>
+<span class="nc" id="L462">            stmt.setTimestamp(22, Timestamp.valueOf(LocalDateTime.now()));</span>
+<span class="nc" id="L463">            stmt.setInt(23, producto.getId());</span>
+
+<span class="nc bnc" id="L465" title="All 2 branches missed.">            return stmt.executeUpdate() &gt; 0;</span>
+
+<span class="nc" id="L467">        } catch (SQLException e) {</span>
+<span class="nc" id="L468">            logger.error(&quot;Error al actualizar producto: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L469">            throw new ProductoRepositoryException(&quot;Error al actualizar producto&quot;, e);</span>
+        }
+    }
+
+    public boolean delete(Integer id) {
+<span class="nc" id="L474">        String sql = &quot;UPDATE productos SET activo = FALSE, updated_at = ? WHERE id = ?&quot;;</span>
+
+<span class="nc" id="L476">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L477">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L479">            stmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));</span>
+<span class="nc" id="L480">            stmt.setInt(2, id); // Se asume que el ID es Integer</span>
+
+<span class="nc bnc" id="L482" title="All 2 branches missed.">            return stmt.executeUpdate() &gt; 0;</span>
+
+<span class="nc" id="L484">        } catch (SQLException e) {</span>
+<span class="nc" id="L485">            logger.error(&quot;Error al eliminar producto (soft delete): {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L486">            throw new ProductoRepositoryException(&quot;Error al eliminar producto (soft delete)&quot;, e);</span>
+        }
+    }
+
+    public boolean deleteDefinitivamente(Integer id) {
+<span class="nc" id="L491">        String sql = &quot;DELETE FROM productos WHERE id = ?&quot;;</span>
+
+<span class="nc" id="L493">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L494">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L496">            stmt.setInt(1, id);</span>
+
+<span class="nc" id="L498">            int rowsAffected = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L499" title="All 2 branches missed.">            return rowsAffected &gt; 0;</span>
+
+<span class="nc" id="L501">        } catch (SQLException e) {</span>
+<span class="nc" id="L502">            logger.error(&quot;Error al eliminar definitivamente producto: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L503">            throw new ProductoRepositoryException(&quot;Error al eliminar definitivamente producto&quot;, e);</span>
+        }
+    }
+
+    public int getUltimoNumeroCodigo(String prefijo) {
+        // La columna `codigo` es un String, se asume que el formato es `XXXNNNNN...`
+<span class="nc" id="L509">        String sql = &quot;SELECT COALESCE(MAX(CAST(SUBSTRING(codigo, 4) AS UNSIGNED)), 0) as ultimo_numero FROM productos WHERE codigo LIKE ?&quot;;</span>
+
+<span class="nc" id="L511">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L512">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+
+<span class="nc" id="L514">            stmt.setString(1, prefijo + &quot;%&quot;);</span>
+
+<span class="nc" id="L516">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L517" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc" id="L518">                    return rs.getInt(&quot;ultimo_numero&quot;);</span>
+                }
+<span class="nc bnc" id="L520" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L521" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L522">            logger.error(&quot;Error al obtener último número de código: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L523">            throw new ProductoRepositoryException(&quot;Error al obtener último número de código&quot;, e);</span>
+<span class="nc" id="L524">        }</span>
+<span class="nc" id="L525">        return 0;</span>
+    }
+
+    public boolean existsByNombre(String nombre) {
+<span class="nc" id="L529">        String sql = &quot;SELECT COUNT(*) FROM productos WHERE LOWER(nombre) = LOWER(?)&quot;;</span>
+<span class="nc" id="L530">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L531">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L532">            stmt.setString(1, nombre);</span>
+<span class="nc" id="L533">            try (ResultSet rs = stmt.executeQuery()) {</span>
+<span class="nc bnc" id="L534" title="All 2 branches missed.">                if (rs.next()) {</span>
+<span class="nc bnc" id="L535" title="All 2 branches missed.">                    return rs.getInt(1) &gt; 0;</span>
+                }
+<span class="nc bnc" id="L537" title="All 2 branches missed.">            }</span>
+<span class="nc bnc" id="L538" title="All 4 branches missed.">        } catch (SQLException e) {</span>
+<span class="nc" id="L539">            logger.error(&quot;Error al verificar unicidad de nombre de producto: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L540">            throw new ProductoRepositoryException(&quot;Error al verificar unicidad de nombre&quot;, e);</span>
+<span class="nc" id="L541">        }</span>
+<span class="nc" id="L542">        return false;</span>
+    }
+
+    private Producto mapResultSetToProducto(ResultSet rs) throws SQLException {
+<span class="nc" id="L546">        Producto producto = new Producto();</span>
+
+<span class="nc" id="L548">        producto.setId(rs.getInt(&quot;id&quot;));</span>
+<span class="nc" id="L549">        producto.setCodigo(rs.getString(&quot;codigo&quot;));</span>
+<span class="nc" id="L550">        producto.setNombre(rs.getString(&quot;nombre&quot;));</span>
+
+        // Mapeo seguro de categoria
+        try {
+            // Asume que CategoriaProducto es un Enum
+<span class="nc" id="L555">            String categoriaStr = rs.getString(&quot;categoria&quot;);</span>
+<span class="nc bnc" id="L556" title="All 2 branches missed.">            if (categoriaStr != null) {</span>
+<span class="nc" id="L557">                producto.setCategoria(CategoriaProducto.valueOf(categoriaStr));</span>
+            }
+<span class="nc" id="L559">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L560">            producto.setCategoria(CategoriaProducto.OTROS); // Valor por defecto</span>
+<span class="nc" id="L561">        }</span>
+
+<span class="nc" id="L563">        producto.setDescripcion(rs.getString(&quot;descripcion&quot;));</span>
+<span class="nc" id="L564">        producto.setPrincipioActivo(rs.getString(&quot;principio_activo&quot;));</span>
+<span class="nc" id="L565">        producto.setConcentracion(rs.getString(&quot;concentracion&quot;));</span>
+
+        // Mapeo seguro de forma farmaceutica
+        try {
+            // Asume que FormaFarmaceutica es un Enum
+<span class="nc" id="L570">            String formaFarmaceuticaStr = rs.getString(&quot;forma_farmaceutica&quot;);</span>
+<span class="nc bnc" id="L571" title="All 2 branches missed.">            if (formaFarmaceuticaStr != null) {</span>
+<span class="nc" id="L572">                producto.setFormaFarmaceutica(FormaFarmaceutica.valueOf(formaFarmaceuticaStr));</span>
+            }
+<span class="nc" id="L574">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L575">            producto.setFormaFarmaceutica(FormaFarmaceutica.TABLETA); // Valor por defecto</span>
+<span class="nc" id="L576">        }</span>
+
+<span class="nc" id="L578">        producto.setPrecioVenta(rs.getBigDecimal(&quot;precio_venta&quot;));</span>
+<span class="nc" id="L579">        producto.setPrecioCompra(rs.getBigDecimal(&quot;precio_compra&quot;));</span>
+        // Calcular margen de ganancia al mapear
+<span class="nc bnc" id="L581" title="All 4 branches missed.">        if (producto.getPrecioCompra() != null &amp;&amp; producto.getPrecioVenta() != null</span>
+<span class="nc bnc" id="L582" title="All 2 branches missed.">                &amp;&amp; producto.getPrecioCompra().compareTo(BigDecimal.ZERO) &gt; 0) {</span>
+<span class="nc" id="L583">            BigDecimal margen = producto.getPrecioVenta()</span>
+<span class="nc" id="L584">                    .subtract(producto.getPrecioCompra())</span>
+<span class="nc" id="L585">                    .divide(producto.getPrecioCompra(), 4, java.math.RoundingMode.HALF_UP)</span>
+<span class="nc" id="L586">                    .multiply(new BigDecimal(100));</span>
+<span class="nc" id="L587">            producto.setMargenGanancia(margen);</span>
+<span class="nc" id="L588">        } else {</span>
+<span class="nc" id="L589">            producto.setMargenGanancia(BigDecimal.ZERO);</span>
+        }
+<span class="nc" id="L591">        producto.setStockActual(rs.getInt(&quot;stock_actual&quot;));</span>
+<span class="nc" id="L592">        producto.setStockMinimo(rs.getInt(&quot;stock_minimo&quot;));</span>
+
+        // El campo stock_maximo fue agregado en el mapeo aunque no aparece en todos los
+        // SELECTs
+        try {
+<span class="nc" id="L597">            producto.setStockMaximo(rs.getInt(&quot;stock_maximo&quot;));</span>
+<span class="nc" id="L598">        } catch (SQLException e) {</span>
+            // Se ignora si la columna no existe en el ResultSet (no está en el SELECT)
+<span class="nc" id="L600">        }</span>
+
+<span class="nc" id="L602">        Date vencimiento = rs.getDate(&quot;fecha_vencimiento&quot;);</span>
+<span class="nc bnc" id="L603" title="All 2 branches missed.">        if (vencimiento != null) {</span>
+<span class="nc" id="L604">            producto.setFechaVencimiento(vencimiento.toLocalDate());</span>
+        }
+
+<span class="nc" id="L607">        producto.setLote(rs.getString(&quot;lote&quot;));</span>
+<span class="nc" id="L608">        producto.setUbicacion(rs.getString(&quot;ubicacion&quot;));</span>
+
+<span class="nc" id="L610">        producto.setLaboratorio(rs.getString(&quot;laboratorio&quot;));</span>
+
+<span class="nc" id="L612">        Date fechaFabricacion = rs.getDate(&quot;fecha_fabricacion&quot;);</span>
+<span class="nc bnc" id="L613" title="All 2 branches missed.">        if (fechaFabricacion != null) {</span>
+<span class="nc" id="L614">            producto.setFechaFabricacion(fechaFabricacion.toLocalDate());</span>
+        }
+
+<span class="nc" id="L617">        producto.setProveedorId(rs.getInt(&quot;proveedor_id&quot;));</span>
+        // El campo proveedor_nombre viene del JOIN
+<span class="nc" id="L619">        producto.setProveedorNombre(rs.getString(&quot;proveedor_nombre&quot;));</span>
+
+<span class="nc" id="L621">        producto.setRequiereReceta(rs.getBoolean(&quot;requiere_receta&quot;));</span>
+<span class="nc" id="L622">        producto.setEsControlado(rs.getBoolean(&quot;es_controlado&quot;));</span>
+<span class="nc" id="L623">        producto.setActivo(rs.getBoolean(&quot;activo&quot;));</span>
+
+<span class="nc" id="L625">        Timestamp createdAt = rs.getTimestamp(&quot;created_at&quot;);</span>
+<span class="nc bnc" id="L626" title="All 2 branches missed.">        if (createdAt != null) {</span>
+<span class="nc" id="L627">            producto.setCreatedAt(createdAt.toLocalDateTime());</span>
+        }
+
+<span class="nc" id="L630">        Timestamp updatedAt = rs.getTimestamp(&quot;updated_at&quot;);</span>
+<span class="nc bnc" id="L631" title="All 2 branches missed.">        if (updatedAt != null) {</span>
+<span class="nc" id="L632">            producto.setUpdatedAt(updatedAt.toLocalDateTime());</span>
+        }
+
+<span class="nc" id="L635">        return producto;</span>
+    }
+
+    public void crearProductosInactivosDePrueba() {
+        // Método para crear productos de prueba si es necesario
+<span class="nc" id="L640">        System.out.println(&quot;Método crearProductosInactivosDePrueba() ejecutado&quot;);</span>
+<span class="nc" id="L641">    }</span>
+
+    public boolean updateStock(Integer id, int nuevoStock) {
+<span class="nc" id="L644">        String sql = &quot;UPDATE productos SET stock_actual = ? WHERE id = ?&quot;;</span>
+<span class="nc" id="L645">        try (Connection connection = DatabaseConfig.getInstance().getConnection();</span>
+<span class="nc" id="L646">                PreparedStatement stmt = connection.prepareStatement(sql)) {</span>
+<span class="nc" id="L647">            stmt.setInt(1, nuevoStock);</span>
+<span class="nc" id="L648">            stmt.setInt(2, id);</span>
+<span class="nc" id="L649">            int rowsAffected = stmt.executeUpdate();</span>
+<span class="nc bnc" id="L650" title="All 2 branches missed.">            return rowsAffected &gt; 0;</span>
+<span class="nc" id="L651">        } catch (SQLException e) {</span>
+<span class="nc" id="L652">            logger.error(&quot;Error al actualizar stock del producto {}: {}&quot;, id, e.getMessage(), e);</span>
+<span class="nc" id="L653">            throw new ProductoRepositoryException(&quot;Error al actualizar stock del producto&quot;, e);</span>
+        }
+    }
+
+    public void corregirPrefijosConfiguracion() {
+        // Método para corregir prefijos de configuración
+<span class="nc" id="L659">        System.out.println(&quot;Método corregirPrefijosConfiguracion() ejecutado&quot;);</span>
+<span class="nc" id="L660">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

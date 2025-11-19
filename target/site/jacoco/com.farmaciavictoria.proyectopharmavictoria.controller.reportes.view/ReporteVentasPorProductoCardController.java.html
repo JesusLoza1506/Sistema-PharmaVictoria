@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReporteVentasPorProductoCardController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view</a> &gt; <span class="el_source">ReporteVentasPorProductoCardController.java</span></div><h1>ReporteVentasPorProductoCardController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.MouseEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+
+<span class="nc" id="L13">public class ReporteVentasPorProductoCardController {</span>
+    @FXML
+    private Label lblTitulo;
+    @FXML
+    private Label lblDetalle;
+    @FXML
+    private ImageView imgIcono;
+    @FXML
+    private AnchorPane root;
+
+    @FXML
+    public void initialize() {
+        // Puedes personalizar el card aquí si lo necesitas
+<span class="nc" id="L26">        root.setOnMouseClicked(this::abrirDetalle);</span>
+<span class="nc" id="L27">    }</span>
+
+    private void abrirDetalle(MouseEvent event) {
+        try {
+<span class="nc" id="L31">            FXMLLoader loader = new FXMLLoader(</span>
+<span class="nc" id="L32">                    getClass().getResource(&quot;/fxml/reportes/ReporteVentasPorProductoDetalle.fxml&quot;));</span>
+<span class="nc" id="L33">            Parent detalleRoot = loader.load();</span>
+<span class="nc" id="L34">            Stage stage = new Stage();</span>
+<span class="nc" id="L35">            stage.setTitle(&quot;Reporte de Ventas por Producto&quot;);</span>
+<span class="nc" id="L36">            stage.setScene(new Scene(detalleRoot));</span>
+<span class="nc" id="L37">            stage.setResizable(true);</span>
+<span class="nc" id="L38">            stage.centerOnScreen();</span>
+<span class="nc" id="L39">            stage.show();</span>
+<span class="nc" id="L40">        } catch (Exception e) {</span>
+<span class="nc" id="L41">            e.printStackTrace();</span>
+<span class="nc" id="L42">        }</span>
+<span class="nc" id="L43">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

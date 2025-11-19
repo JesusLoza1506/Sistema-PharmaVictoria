@@ -1,4 +1,3 @@
-// Clase que representa la configuración de correo electrónico para notificaciones
 package com.farmaciavictoria.proyectopharmavictoria.controller.configuracion;
 
 import java.io.Serializable;

@@ -17,6 +17,8 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -26,6 +28,8 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 public class ProductoFormController implements Initializable {
+    // Listener de filtrado de proveedores
+    private javafx.beans.value.ChangeListener<String> proveedorFiltroListener;
     @FXML
     private javafx.scene.image.ImageView imgConfiguracion;
     private static final Logger logger = LoggerFactory.getLogger(ProductoFormController.class);
@@ -79,8 +83,7 @@ public class ProductoFormController implements Initializable {
     private Button btnGuardar;
     @FXML
     private Button btnLimpiar;
-    @FXML
-    private Button btnCancelar;
+    // Botón Cancelar eliminado
     @FXML
     private Button btnCerrar;
     @FXML
@@ -111,7 +114,6 @@ public class ProductoFormController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Cargar imagen manualmente y loguear error si falla
         if (imgConfiguracion != null) {
             try {
                 javafx.scene.image.Image img = new javafx.scene.image.Image(
@@ -176,7 +178,8 @@ public class ProductoFormController implements Initializable {
                     }
                 });
 
-        // Configurar combo de proveedores
+        // Configurar combo de proveedores editable y con búsqueda
+        cmbProveedor.setEditable(true);
         cmbProveedor.setConverter(new StringConverter<Proveedor>() {
             @Override
             public String toString(Proveedor proveedor) {
@@ -185,12 +188,70 @@ public class ProductoFormController implements Initializable {
 
             @Override
             public Proveedor fromString(String string) {
+                // Permite que el usuario escriba libremente
+                // Si coincide con algún proveedor, lo retorna; si no, retorna null
+                if (string == null || string.trim().isEmpty())
+                    return null;
+                for (Proveedor p : cmbProveedor.getItems()) {
+                    if (p.getRazonSocial().equalsIgnoreCase(string.trim())) {
+                        return p;
+                    }
+                }
                 return null;
             }
         });
 
-        // Configurar campos numéricos
-        setupNumericFields();
+        // Listener para filtrar proveedores en tiempo real (solo se agrega una vez)
+        proveedorFiltroListener = (obs, oldText, newText) -> filtrarProveedoresComboBox(newText);
+        cmbProveedor.getEditor().textProperty().addListener(proveedorFiltroListener);
+
+        // Mantener la lista desplegada al escribir
+        cmbProveedor.getEditor().focusedProperty().addListener((obs, wasFocused, isFocused) -> {
+            if (isFocused)
+                cmbProveedor.show();
+        });
+
+        // Permitir selección libre (si el usuario escribe y presiona Enter)
+        cmbProveedor.getEditor().setOnAction(e -> {
+            String texto = cmbProveedor.getEditor().getText();
+            Proveedor seleccionado = cmbProveedor.getConverter().fromString(texto);
+            cmbProveedor.setValue(seleccionado);
+        });
+        // ...existing code...
+    }
+
+    // Filtra proveedores en el ComboBox según el texto ingresado (multi-palabra)
+    private void filtrarProveedoresComboBox(String texto) {
+        // Evitar ciclo infinito: en modo edición, solo filtrar si el ComboBox está
+        // desplegado
+        if (modoEdicion && !cmbProveedor.isShowing()) {
+            return;
+        }
+        String textoActual = cmbProveedor.getEditor().getText();
+        Proveedor seleccionado = cmbProveedor.getValue();
+        java.util.List<Proveedor> proveedores;
+        if (texto == null || texto.trim().isEmpty()) {
+            proveedores = proveedorService.obtenerTodos();
+        } else {
+            String[] palabras = texto.toLowerCase().split("\\s+");
+            proveedores = proveedorService.obtenerTodos().stream()
+                    .filter(p -> {
+                        String nombre = p.getRazonSocial().toLowerCase();
+                        return java.util.Arrays.stream(palabras).allMatch(nombre::contains);
+                    })
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        cmbProveedor.setItems(FXCollections.observableArrayList(proveedores));
+        cmbProveedor.getEditor().setText(textoActual);
+        // Solo modificar la selección si el ComboBox está desplegado o no está en modo
+        // edición
+        if (cmbProveedor.isShowing() || !modoEdicion) {
+            if (seleccionado != null && proveedores.contains(seleccionado)) {
+                cmbProveedor.setValue(seleccionado);
+            } else {
+                cmbProveedor.setValue(null);
+            }
+        }
     }
 
     private void setupNumericFields() {
@@ -273,9 +334,6 @@ public class ProductoFormController implements Initializable {
         return false;
     }
 
-    /**
-     * ✅ SERVICE LAYER: Cargar datos de ComboBox usando service layer
-     */
     private void loadComboBoxData() {
         try {
             // ✅ SERVICE LAYER: Cargar proveedores usando service layer
@@ -325,7 +383,6 @@ public class ProductoFormController implements Initializable {
                 spnStockMaximo.getValueFactory().setValue(spnStockMinimo.getValue());
             }
         }
-        // Ya no se muestra advertencia ni se bloquea el botón aquí
     }
 
     public void setProducto(Producto producto) {
@@ -338,7 +395,9 @@ public class ProductoFormController implements Initializable {
         }
 
         if (modoEdicion) {
-            lblTitulo.setText("✏️ EDITAR PRODUCTO");
+            lblTitulo.setText("EDITAR PRODUCTO");
+            if (btnGuardar != null)
+                btnGuardar.setText("Actualizar Producto");
             cargarDatosProducto();
             // El spinner de stock máximo se inicializa SOLO en cargarDatosProducto
             txtCodigo.setEditable(false); // No permitir cambiar código en edición
@@ -347,6 +406,8 @@ public class ProductoFormController implements Initializable {
             }
         } else {
             lblTitulo.setText("NUEVO PRODUCTO");
+            if (btnGuardar != null)
+                btnGuardar.setText("Guardar Producto");
             limpiarCampos();
             txtCodigo.setEditable(true); // Permitir editar código en nuevo producto
             if (btnGenerarCodigo != null) {
@@ -376,13 +437,22 @@ public class ProductoFormController implements Initializable {
         txtPrecioVenta.setText(productoActual.getPrecioVenta().toString());
         txtLaboratorio.setText(productoActual.getLaboratorio() != null ? productoActual.getLaboratorio() : "");
 
-        // Buscar y seleccionar proveedor
+        // --- Solución robusta: cargar lista completa y limpiar filtro antes de
+        // seleccionar proveedor ---
+        // --- Desactivar temporalmente el listener de filtrado para evitar ciclo de
+        // eventos ---
+        cmbProveedor.getEditor().textProperty().removeListener(proveedorFiltroListener);
+        List<Proveedor> proveedoresFull = proveedorService.obtenerTodos();
+        cmbProveedor.setItems(FXCollections.observableArrayList(proveedoresFull));
+        cmbProveedor.getEditor().setText("");
         if (productoActual.getProveedorId() != null) {
-            cmbProveedor.getItems().stream()
+            proveedoresFull.stream()
                     .filter(p -> p.getId().equals(productoActual.getProveedorId()))
                     .findFirst()
                     .ifPresent(cmbProveedor::setValue);
         }
+        // Agregar listener solo después de cargar y seleccionar
+        cmbProveedor.getEditor().textProperty().addListener(proveedorFiltroListener);
 
         // Control de inventario
         spnStockActual.getValueFactory().setValue(productoActual.getStockActual());
@@ -638,12 +708,11 @@ public class ProductoFormController implements Initializable {
                             "Producto guardado/actualizado",
                             productoGuardado.getId());
 
-                    // Refrescar datos del dashboard
-                    // DashboardController.refrescarDashboard(); // Método no existe, se comenta
-                    // para evitar error
-
-                    // Cerrar ventana
-                    cerrarVentana();
+                    // Cerrar el formulario automáticamente
+                    Stage stage = (Stage) btnGuardar.getScene().getWindow();
+                    if (stage != null) {
+                        stage.close();
+                    }
                 } else {
                     showError("Error", "No se pudo guardar el producto en la base de datos.");
                 }
@@ -666,15 +735,8 @@ public class ProductoFormController implements Initializable {
         }
     }
 
-    @FXML
-    private void onCancelar(ActionEvent event) {
-        cerrarVentana();
-    }
-
-    @FXML
-    private void onCerrar(ActionEvent event) {
-        cerrarVentana();
-    }
+    // Método onCancelar eliminado
+    // Método onCerrar eliminado si no se usa
 
     private void limpiarCampos() {
         // Información básica
@@ -813,10 +875,7 @@ public class ProductoFormController implements Initializable {
         // Los campos opcionales NO se limpian porque nunca deben marcar error
     }
 
-    private void cerrarVentana() {
-        Stage stage = (Stage) btnCancelar.getScene().getWindow();
-        stage.close();
-    }
+    // Método cerrarVentana eliminado completamente
 
     // Setter para el callback
     public void setOnProductoGuardado(Consumer<Producto> callback) {
@@ -848,11 +907,6 @@ public class ProductoFormController implements Initializable {
         alert.showAndWait();
     }
 
-    // 🚀 ================ MÉTODOS DEL GENERADOR DE CÓDIGOS ================
-
-    /**
-     * 🎯 Genera un código automático basado en la categoría seleccionada
-     */
     private void generarCodigoAutomatico() {
         try {
             CategoriaProducto categoria = cmbCategoria.getValue();
@@ -872,9 +926,7 @@ public class ProductoFormController implements Initializable {
         }
     }
 
-    /**
-     * 💡 Sugiere un código basado en el nombre y categoría
-     */
+    // Sugiere un código basado en el nombre y categoría
     private void sugerirCodigo() {
         try {
             String nombre = txtNombre.getText();
@@ -894,9 +946,7 @@ public class ProductoFormController implements Initializable {
         }
     }
 
-    /**
-     * ✅ Valida el código ingresado
-     */
+    // Valida el código ingresado
     private void validarCodigo(String codigo) {
         if (lblValidacionCodigo == null)
             return; // Si no existe el label, no validar
@@ -931,9 +981,7 @@ public class ProductoFormController implements Initializable {
         }
     }
 
-    /**
-     * 📋 Actualiza la información de la categoría seleccionada
-     */
+    // 📋 Actualiza la información de la categoría seleccionada
     private void actualizarInfoCategoria() {
         if (lblUltimoCodigo == null)
             return; // Si no existe el label, no actualizar

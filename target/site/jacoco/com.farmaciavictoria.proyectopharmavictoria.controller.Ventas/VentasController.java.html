@@ -1,0 +1,1662 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VentasController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">proyectopharmavictoria</a> &gt; <a href="index.source.html" class="el_package">com.farmaciavictoria.proyectopharmavictoria.controller.Ventas</a> &gt; <span class="el_source">VentasController.java</span></div><h1>VentasController.java</h1><pre class="source lang-java linenums">package com.farmaciavictoria.proyectopharmavictoria.controller.Ventas;
+
+import com.farmaciavictoria.proyectopharmavictoria.SessionManager;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.layout.HBox;
+import com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils;
+import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
+import com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente;
+import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetalleVenta;
+import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta;
+import com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante;
+import com.farmaciavictoria.proyectopharmavictoria.service.Ventas.VentaServiceImpl;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoRepository;
+import com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.util.*;
+
+public class VentasController implements Initializable {
+
+    private int calcularPuntosPorVenta(Venta venta) {
+<span class="nc bnc" id="L26" title="All 4 branches missed.">        if (venta == null || venta.getTotal() == null)</span>
+<span class="nc" id="L27">            return 0;</span>
+<span class="nc" id="L28">        return venta.getTotal().intValue();</span>
+    }
+
+<span class="nc" id="L31">    private final com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository transaccionPuntosRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.TransaccionPuntosRepository();</span>
+
+    private int consultarPuntosCliente(int clienteId) {
+<span class="nc" id="L34">        int saldo = 0;</span>
+<span class="nc" id="L35">        List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos&gt; movimientos = transaccionPuntosRepository</span>
+<span class="nc" id="L36">                .findByClienteId(clienteId);</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos mov : movimientos) {</span>
+<span class="nc bnc" id="L38" title="All 4 branches missed.">            if (&quot;GANADO&quot;.equalsIgnoreCase(mov.getTipo()) || &quot;AJUSTE&quot;.equalsIgnoreCase(mov.getTipo())) {</span>
+<span class="nc" id="L39">                saldo += mov.getPuntos();</span>
+<span class="nc bnc" id="L40" title="All 4 branches missed.">            } else if (&quot;USADO&quot;.equalsIgnoreCase(mov.getTipo()) || &quot;EXPIRADO&quot;.equalsIgnoreCase(mov.getTipo())) {</span>
+<span class="nc" id="L41">                saldo -= mov.getPuntos();</span>
+            }
+<span class="nc" id="L43">        }</span>
+<span class="nc" id="L44">        return Math.max(saldo, 0);</span>
+    }
+
+    @FXML
+    private TextField txtTipoCliente;
+    @FXML
+    private HBox panelPuntosCliente;
+    @FXML
+    private Label lblNombreCliente;
+    @FXML
+    private Label lblPuntosDisponibles;
+    @FXML
+    private Label lblEquivalenteSoles;
+    @FXML
+    private TextField txtDocumento;
+    @FXML
+    private TextField txtNombreRazon;
+    @FXML
+    private HBox panelDatosCliente;
+    @FXML
+    private TextField txtBuscarProducto;
+    @FXML
+    private ListView&lt;Producto&gt; listSugerencias;
+    @FXML
+    private Spinner&lt;Integer&gt; spinnerCantidad;
+    @FXML
+    private TableView&lt;DetalleVenta&gt; tablaCarrito;
+    @FXML
+    private TableColumn&lt;DetalleVenta, String&gt; colCodigo;
+    @FXML
+    private TableColumn&lt;DetalleVenta, String&gt; colNombre;
+    @FXML
+    private TableColumn&lt;DetalleVenta, Integer&gt; colCantidad;
+    @FXML
+    private TableColumn&lt;DetalleVenta, BigDecimal&gt; colPrecioUnitario;
+    @FXML
+    private TableColumn&lt;DetalleVenta, BigDecimal&gt; colSubtotal;
+    @FXML
+    private TableColumn&lt;DetalleVenta, Void&gt; colEditar;
+    @FXML
+    private TableColumn&lt;DetalleVenta, Void&gt; colEliminar;
+    @FXML
+    private ComboBox&lt;Cliente&gt; comboClientes;
+    @FXML
+    private ComboBox&lt;String&gt; comboPago;
+    @FXML
+    private ComboBox&lt;String&gt; comboComprobante;
+    @FXML
+    private Label lblSubtotal;
+    @FXML
+    private Label lblDescuento;
+    @FXML
+    private Label lblIGV;
+    @FXML
+    private Label lblTotal;
+    @FXML
+    private Button btnConfirmarVenta;
+    @FXML
+    private Button btnHistorial;
+    @FXML
+    private Button btnAgregarProducto;
+
+<span class="nc" id="L106">    private final ProductoRepository productoRepository = new ProductoRepository();</span>
+<span class="nc" id="L107">    private final ClienteRepository clienteRepository = new ClienteRepository();</span>
+    private final VentaServiceImpl ventaService;
+<span class="nc" id="L109">    private final com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.VentaRepositoryJdbcImpl ventaRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.VentaRepositoryJdbcImpl();</span>
+<span class="nc" id="L110">    private final com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetalleVentaRepositoryJdbcImpl detalleVentaRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetalleVentaRepositoryJdbcImpl();</span>
+<span class="nc" id="L111">    private final com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.ComprobanteRepositoryJdbcImpl comprobanteRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.ComprobanteRepositoryJdbcImpl();</span>
+<span class="nc" id="L112">    private final com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.VentaHistorialCambioRepositoryJdbcImpl historialCambioRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.VentaHistorialCambioRepositoryJdbcImpl();</span>
+<span class="nc" id="L113">    private final ObservableList&lt;Producto&gt; productos = FXCollections.observableArrayList();</span>
+<span class="nc" id="L114">    private final ObservableList&lt;DetalleVenta&gt; carrito = FXCollections.observableArrayList();</span>
+
+<span class="nc" id="L116">    public VentasController() {</span>
+<span class="nc" id="L117">        this.ventaService = new VentaServiceImpl(</span>
+                ventaRepository,
+                detalleVentaRepository,
+                comprobanteRepository,
+                historialCambioRepository,
+                productoRepository);
+<span class="nc" id="L123">    }</span>
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Estilos modernos para tabla de ventas
+<span class="nc" id="L128">        btnHistorial.setOnAction(e -&gt; mostrarHistorialVentas24h());</span>
+<span class="nc" id="L129">        tablaCarrito.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);</span>
+<span class="nc" id="L130">        tablaCarrito.setStyle(</span>
+                &quot;-fx-background-color: #f8f9fa; -fx-border-color: #26a69a; -fx-border-radius: 12px; -fx-effect: dropshadow(gaussian, #26a69a, 16, 0.4, 0, 2);&quot;);
+<span class="nc" id="L132">        tablaCarrito.getStylesheets().clear();</span>
+<span class="nc" id="L133">        tablaCarrito.getStylesheets().add(getClass().getResource(&quot;/css/Proveedor/proveedores.css&quot;).toExternalForm());</span>
+<span class="nc" id="L134">        tablaCarrito.getStyleClass().setAll(&quot;productos-table&quot;, &quot;ventas-table&quot;);</span>
+<span class="nc" id="L135">        tablaCarrito.setPlaceholder(new Label(&quot;Tabla sin contenido. Busca y agrega productos al carrito.&quot;));</span>
+        // Configurar CellValueFactory para mostrar texto en las columnas
+<span class="nc" id="L137">        colCodigo.setCellValueFactory(cellData -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L138">                cellData.getValue().getProducto().getCodigo()));</span>
+<span class="nc" id="L139">        colNombre.setCellValueFactory(cellData -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc" id="L140">                cellData.getValue().getProducto().getNombre()));</span>
+<span class="nc" id="L141">        colCantidad.setCellValueFactory(</span>
+<span class="nc" id="L142">                cellData -&gt; new javafx.beans.property.SimpleIntegerProperty(cellData.getValue().getCantidad())</span>
+<span class="nc" id="L143">                        .asObject());</span>
+<span class="nc" id="L144">        colPrecioUnitario.setCellValueFactory(</span>
+<span class="nc" id="L145">                cellData -&gt; new javafx.beans.property.SimpleObjectProperty&lt;&gt;(cellData.getValue().getPrecioUnitario()));</span>
+<span class="nc" id="L146">        colSubtotal.setCellValueFactory(</span>
+<span class="nc" id="L147">                cellData -&gt; new javafx.beans.property.SimpleObjectProperty&lt;&gt;(cellData.getValue().getSubtotal()));</span>
+        // Encabezados con alto contraste y fuente grande
+<span class="nc" id="L149">        tablaCarrito.lookupAll(&quot;.column-header&quot;).forEach(node -&gt; node.setStyle(</span>
+                &quot;-fx-background-color: #26a69a; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;&quot;));
+        // Filas con efecto hover y fuente grande
+<span class="nc" id="L152">        tablaCarrito.setRowFactory(tv -&gt; new TableRow&lt;DetalleVenta&gt;() {</span>
+            @Override
+            protected void updateItem(DetalleVenta item, boolean empty) {
+<span class="nc" id="L155">                super.updateItem(item, empty);</span>
+<span class="nc bnc" id="L156" title="All 4 branches missed.">                if (empty || item == null) {</span>
+<span class="nc" id="L157">                    setStyle(&quot;&quot;);</span>
+                } else {
+<span class="nc" id="L159">                    setStyle(&quot;-fx-font-size: 15px; -fx-font-weight: bold; -fx-background-color: white;&quot;);</span>
+<span class="nc" id="L160">                    this.hoverProperty().addListener((obs, wasHover, isHover) -&gt; {</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">                        if (isHover) {</span>
+<span class="nc" id="L162">                            setStyle(&quot;-fx-background-color: #e0f7fa; -fx-font-size: 15px; -fx-font-weight: bold;&quot;);</span>
+                        } else {
+<span class="nc" id="L164">                            setStyle(&quot;-fx-background-color: white; -fx-font-size: 15px; -fx-font-weight: bold;&quot;);</span>
+                        }
+<span class="nc" id="L166">                    });</span>
+                }
+<span class="nc" id="L168">            }</span>
+        });
+<span class="nc" id="L170">        colEditar.setCellFactory(tc -&gt; new TableCell&lt;DetalleVenta, Void&gt;() {</span>
+<span class="nc" id="L171">            private final Button btn = new Button();</span>
+            {
+<span class="nc" id="L173">                javafx.scene.image.ImageView iconEditar = new javafx.scene.image.ImageView(</span>
+<span class="nc" id="L174">                        getClass().getResource(&quot;/icons/editar.png&quot;).toExternalForm());</span>
+<span class="nc" id="L175">                iconEditar.setFitWidth(24);</span>
+<span class="nc" id="L176">                iconEditar.setFitHeight(24);</span>
+<span class="nc" id="L177">                btn.setGraphic(iconEditar);</span>
+<span class="nc" id="L178">                btn.setStyle(</span>
+                        &quot;-fx-background-color: white; -fx-border-color: #26a69a; -fx-border-width: 2px; -fx-border-radius: 8px;&quot;);
+<span class="nc" id="L180">                btn.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-add&quot;);</span>
+<span class="nc" id="L181">                btn.setPrefWidth(35);</span>
+<span class="nc" id="L182">                btn.setPrefHeight(35);</span>
+<span class="nc" id="L183">                btn.setOnAction(e -&gt; {</span>
+<span class="nc" id="L184">                    tablaCarrito.getSelectionModel().select(getTableView().getItems().get(getIndex()));</span>
+<span class="nc" id="L185">                    editarCantidadProducto();</span>
+<span class="nc" id="L186">                    tablaCarrito.refresh();</span>
+<span class="nc" id="L187">                });</span>
+<span class="nc" id="L188">            }</span>
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+<span class="nc" id="L192">                super.updateItem(item, empty);</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                setGraphic(empty ? null : btn);</span>
+<span class="nc" id="L194">            }</span>
+        });
+        // Listener para actualizar el panel dinámico de datos de cliente
+<span class="nc" id="L197">        comboClientes.getSelectionModel().selectedItemProperty().addListener((obs, oldCliente, newCliente) -&gt; {</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">            if (newCliente != null) {</span>
+<span class="nc" id="L199">                String tipo = newCliente.getTipoCliente();</span>
+<span class="nc" id="L200">                String doc = newCliente.getDocumento();</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                String nombre = (&quot;EMPRESA&quot;.equals(tipo)) ? newCliente.getRazonSocial()</span>
+<span class="nc" id="L202">                        : newCliente.getNombreCompleto();</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">                txtTipoCliente.setText(tipo != null ? tipo : &quot;&quot;);</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">                txtDocumento.setText(doc != null ? doc : &quot;&quot;);</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">                txtNombreRazon.setText(nombre != null ? nombre : &quot;&quot;);</span>
+<span class="nc" id="L206">                panelDatosCliente.setVisible(true);</span>
+<span class="nc" id="L207">                panelDatosCliente.setManaged(true);</span>
+
+                // Mostrar panel de puntos solo para clientes NATURAL
+<span class="nc bnc" id="L210" title="All 2 branches missed.">                if (&quot;NATURAL&quot;.equalsIgnoreCase(tipo)) {</span>
+<span class="nc" id="L211">                    panelPuntosCliente.setVisible(true);</span>
+<span class="nc" id="L212">                    panelPuntosCliente.setManaged(true);</span>
+<span class="nc" id="L213">                    lblNombreCliente.setText(&quot;Cliente: &quot; + nombre);</span>
+                    // TODO: Consultar puntos del cliente desde la BD
+<span class="nc" id="L215">                    int puntos = consultarPuntosCliente(newCliente.getId());</span>
+<span class="nc" id="L216">                    lblPuntosDisponibles.setText(&quot;Puntos disponibles: &quot; + puntos);</span>
+<span class="nc" id="L217">                    double soles = puntos / 100.0;</span>
+<span class="nc" id="L218">                    lblEquivalenteSoles.setText(String.format(&quot;Equivalente: S/%.2f&quot;, soles));</span>
+<span class="nc" id="L219">                } else {</span>
+<span class="nc" id="L220">                    panelPuntosCliente.setVisible(false);</span>
+<span class="nc" id="L221">                    panelPuntosCliente.setManaged(false);</span>
+                }
+<span class="nc" id="L223">            } else {</span>
+<span class="nc" id="L224">                txtTipoCliente.clear();</span>
+<span class="nc" id="L225">                txtDocumento.clear();</span>
+<span class="nc" id="L226">                txtNombreRazon.clear();</span>
+<span class="nc" id="L227">                panelDatosCliente.setVisible(false);</span>
+<span class="nc" id="L228">                panelDatosCliente.setManaged(false);</span>
+<span class="nc" id="L229">                panelPuntosCliente.setVisible(false);</span>
+<span class="nc" id="L230">                panelPuntosCliente.setManaged(false);</span>
+            }
+<span class="nc" id="L232">        });</span>
+        // Inicialmente ocultar el panel de datos de cliente
+<span class="nc" id="L234">        panelDatosCliente.setVisible(false);</span>
+<span class="nc" id="L235">        panelDatosCliente.setManaged(false);</span>
+<span class="nc" id="L236">        colEliminar.setCellFactory(tc -&gt; new TableCell&lt;DetalleVenta, Void&gt;() {</span>
+<span class="nc" id="L237">            private final Button btn = new Button();</span>
+            {
+<span class="nc" id="L239">                javafx.scene.image.ImageView iconEliminar = new javafx.scene.image.ImageView(</span>
+<span class="nc" id="L240">                        getClass().getResource(&quot;/icons/eliminar.png&quot;).toExternalForm());</span>
+<span class="nc" id="L241">                iconEliminar.setFitWidth(24);</span>
+<span class="nc" id="L242">                iconEliminar.setFitHeight(24);</span>
+<span class="nc" id="L243">                btn.setGraphic(iconEliminar);</span>
+<span class="nc" id="L244">                btn.setStyle(</span>
+                        &quot;-fx-background-color: white; -fx-border-color: #d32f2f; -fx-border-width: 2px; -fx-border-radius: 8px;&quot;);
+<span class="nc" id="L246">                btn.getStyleClass().setAll(&quot;btn-action&quot;, &quot;btn-trash&quot;);</span>
+<span class="nc" id="L247">                btn.setPrefWidth(35);</span>
+<span class="nc" id="L248">                btn.setPrefHeight(35);</span>
+<span class="nc" id="L249">                btn.setOnAction(e -&gt; {</span>
+<span class="nc" id="L250">                    DetalleVenta detalle = getTableView().getItems().get(getIndex());</span>
+<span class="nc" id="L251">                    tablaCarrito.getSelectionModel().select(detalle);</span>
+<span class="nc" id="L252">                    eliminarProductoDelCarrito();</span>
+<span class="nc" id="L253">                    tablaCarrito.refresh();</span>
+<span class="nc" id="L254">                });</span>
+<span class="nc" id="L255">            }</span>
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+<span class="nc" id="L259">                super.updateItem(item, empty);</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">                setGraphic(empty ? null : btn);</span>
+<span class="nc" id="L261">            }</span>
+        });
+        // Buscar productos al escribir
+<span class="nc" id="L264">        txtBuscarProducto.textProperty().addListener((obs, oldText, newText) -&gt; {</span>
+<span class="nc bnc" id="L265" title="All 4 branches missed.">            if (newText == null || newText.isEmpty()) {</span>
+<span class="nc" id="L266">                limpiarSugerencias();</span>
+<span class="nc" id="L267">                btnAgregarProducto.setDisable(true);</span>
+<span class="nc" id="L268">                return;</span>
+            }
+<span class="nc" id="L270">            ObservableList&lt;Producto&gt; filtrados = productos</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">                    .filtered(p -&gt; p.getNombre().toLowerCase().contains(newText.trim().toLowerCase()) ||</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">                            p.getCodigo().toLowerCase().contains(newText.trim().toLowerCase()) ||</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">                            (p.getPrincipioActivo() != null</span>
+<span class="nc bnc" id="L274" title="All 2 branches missed.">                                    &amp;&amp; p.getPrincipioActivo().toLowerCase().contains(newText.trim().toLowerCase())));</span>
+<span class="nc" id="L275">            listSugerencias.setItems(filtrados);</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">            listSugerencias.setVisible(!filtrados.isEmpty());</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">            listSugerencias.setManaged(!filtrados.isEmpty());</span>
+<span class="nc" id="L278">            listSugerencias.setDisable(filtrados.isEmpty());</span>
+            // Habilitar el botón solo si el texto coincide exactamente con algún producto
+<span class="nc" id="L280">            String texto = newText.trim().toLowerCase();</span>
+<span class="nc" id="L281">            boolean existe = productos.stream().anyMatch(</span>
+<span class="nc bnc" id="L282" title="All 4 branches missed.">                    p -&gt; p.getNombre().toLowerCase().equals(texto) || p.getCodigo().toLowerCase().equals(texto));</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">            btnAgregarProducto.setDisable(!existe);</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">            if (filtrados.isEmpty()) {</span>
+<span class="nc" id="L285">                listSugerencias.getSelectionModel().clearSelection();</span>
+            }
+<span class="nc" id="L287">        });</span>
+
+        // Resaltar ListView cuando está visible
+<span class="nc" id="L290">        listSugerencias.setStyle(</span>
+                &quot;-fx-background-color: white; -fx-border-color: #26a69a; -fx-border-width: 2px; -fx-effect: dropshadow(gaussian, #26a69a, 12, 0.3, 0, 2);&quot;);
+
+        // DEBUG: Forzar borde rojo y fondo amarillo para verificar visibilidad
+<span class="nc" id="L294">        listSugerencias.setStyle(</span>
+                &quot;-fx-background-color: white; -fx-border-color: #26a69a; -fx-border-width: 2px; -fx-effect: dropshadow(gaussian, #26a69a, 12, 0.3, 0, 2);&quot;);
+        // Mejorar visualización del ListView de sugerencias
+<span class="nc" id="L297">        listSugerencias.setCellFactory(lv -&gt; new ListCell&lt;Producto&gt;() {</span>
+            @Override
+            protected void updateItem(Producto item, boolean empty) {
+<span class="nc" id="L300">                super.updateItem(item, empty);</span>
+                try {
+<span class="nc bnc" id="L302" title="All 4 branches missed.">                    if (empty || item == null) {</span>
+<span class="nc" id="L303">                        setText(&quot;&quot;);</span>
+<span class="nc" id="L304">                        setStyle(&quot;&quot;);</span>
+<span class="nc" id="L305">                        setGraphic(null);</span>
+                    } else {
+<span class="nc" id="L307">                        String codigo = item.getCodigo();</span>
+<span class="nc" id="L308">                        String nombre = item.getNombre();</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">                        String stock = (item.getStockActual() != null ? item.getStockActual().toString() : &quot;0&quot;);</span>
+<span class="nc" id="L310">                        setText(&quot;&quot;);</span>
+                        // Forzar color y tamaño de fuente en la celda
+<span class="nc" id="L312">                        setStyle(</span>
+                                &quot;-fx-background-color: white; -fx-padding: 8px 12px; -fx-border-color: #b2dfdb; -fx-border-width: 0 0 1px 0; -fx-font-size: 16px; -fx-text-fill: #222;&quot;);
+<span class="nc" id="L314">                        javafx.scene.layout.HBox hbox = new javafx.scene.layout.HBox(10);</span>
+<span class="nc" id="L315">                        javafx.scene.control.Label lblCodigo = new javafx.scene.control.Label(codigo);</span>
+<span class="nc" id="L316">                        lblCodigo.setStyle(</span>
+                                &quot;-fx-font-weight: bold; -fx-text-fill: #388e3c; -fx-min-width: 70px; -fx-font-size: 16px;&quot;);
+<span class="nc" id="L318">                        javafx.scene.control.Label lblNombre = new javafx.scene.control.Label(nombre);</span>
+<span class="nc" id="L319">                        lblNombre.setStyle(</span>
+                                &quot;-fx-text-fill: #222; -fx-font-size: 16px; -fx-min-width: 220px; -fx-font-weight: bold;&quot;);
+<span class="nc" id="L321">                        javafx.scene.control.Label lblStock = new javafx.scene.control.Label(&quot;Stock: &quot; + stock);</span>
+<span class="nc" id="L322">                        lblStock.setStyle(</span>
+                                &quot;-fx-font-weight: bold; -fx-text-fill: #0288d1; -fx-min-width: 80px; -fx-font-size: 16px;&quot;);
+<span class="nc" id="L324">                        hbox.getChildren().addAll(lblCodigo, lblNombre, lblStock);</span>
+<span class="nc" id="L325">                        setGraphic(hbox);</span>
+                        // Efecto hover
+<span class="nc" id="L327">                        this.hoverProperty().addListener((obs, wasHover, isHover) -&gt; {</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">                            if (isHover) {</span>
+<span class="nc" id="L329">                                setStyle(</span>
+                                        &quot;-fx-background-color: #e0f7fa; -fx-padding: 8px 12px; -fx-border-color: #26a69a; -fx-border-width: 0 0 2px 0; -fx-font-size: 16px; -fx-text-fill: #222;&quot;);
+                            } else {
+<span class="nc" id="L332">                                setStyle(</span>
+                                        &quot;-fx-background-color: white; -fx-padding: 8px 12px; -fx-border-color: #b2dfdb; -fx-border-width: 0 0 1px 0; -fx-font-size: 16px; -fx-text-fill: #222;&quot;);
+                            }
+<span class="nc" id="L335">                        });</span>
+                    }
+<span class="nc" id="L337">                } catch (Exception ex) {</span>
+<span class="nc" id="L338">                    System.err.println(&quot;[ERROR ListCell] Error al renderizar producto en ListView: &quot; + ex.getMessage());</span>
+<span class="nc" id="L339">                    ex.printStackTrace();</span>
+<span class="nc" id="L340">                    setText(&quot;ERROR&quot;);</span>
+<span class="nc" id="L341">                    setGraphic(null);</span>
+<span class="nc" id="L342">                }</span>
+<span class="nc" id="L343">            }</span>
+        });
+        // Seleccionar producto desde sugerencias
+<span class="nc" id="L346">        listSugerencias.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -&gt; {</span>
+<span class="nc" id="L347">            int idx = listSugerencias.getSelectionModel().getSelectedIndex();</span>
+<span class="nc" id="L348">            ObservableList&lt;Producto&gt; items = listSugerencias.getItems();</span>
+<span class="nc bnc" id="L349" title="All 4 branches missed.">            if (items == null || items.isEmpty()) {</span>
+<span class="nc" id="L350">                listSugerencias.getSelectionModel().clearSelection();</span>
+<span class="nc" id="L351">                btnAgregarProducto.setDisable(true);</span>
+                // Solo log en terminal, nunca en pantalla
+<span class="nc" id="L353">                System.err.println(&quot;[DEBUG ListView] Intento de selección con lista vacía. Selección cancelada.&quot;);</span>
+<span class="nc" id="L354">                return;</span>
+            }
+<span class="nc bnc" id="L356" title="All 6 branches missed.">            if (newSel != null &amp;&amp; idx &gt;= 0 &amp;&amp; idx &lt; items.size()) {</span>
+<span class="nc" id="L357">                txtBuscarProducto.setText(newSel.getNombre());</span>
+<span class="nc" id="L358">                limpiarSugerencias();</span>
+<span class="nc" id="L359">                btnAgregarProducto.setDisable(false);</span>
+            } else {
+<span class="nc" id="L361">                btnAgregarProducto.setDisable(true);</span>
+<span class="nc bnc" id="L362" title="All 4 branches missed.">                if (idx &lt; 0 || idx &gt;= items.size()) {</span>
+                    // Solo log en terminal, nunca en pantalla
+<span class="nc" id="L364">                    System.err.println(</span>
+<span class="nc" id="L365">                            &quot;[DEBUG ListView] Índice de selección fuera de rango: &quot; + idx + &quot; Tamaño: &quot; + items.size());</span>
+                }
+            }
+<span class="nc" id="L368">        });</span>
+        // Mostrar todos los productos al hacer click en el buscador
+<span class="nc" id="L370">        txtBuscarProducto.setOnMouseClicked(e -&gt; {</span>
+<span class="nc" id="L371">            ObservableList&lt;Producto&gt; todos = FXCollections.observableArrayList(productos);</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">            if (todos.isEmpty()) {</span>
+<span class="nc" id="L373">                listSugerencias.setItems(FXCollections.observableArrayList());</span>
+<span class="nc" id="L374">                listSugerencias.setVisible(false);</span>
+<span class="nc" id="L375">                listSugerencias.setManaged(false);</span>
+<span class="nc" id="L376">                listSugerencias.getSelectionModel().clearSelection();</span>
+<span class="nc" id="L377">                btnAgregarProducto.setDisable(true);</span>
+<span class="nc" id="L378">                System.err.println(&quot;[DEBUG ListView] Click en buscador con lista vacía. No se permite selección.&quot;);</span>
+<span class="nc" id="L379">                return;</span>
+            }
+<span class="nc" id="L381">            listSugerencias.setItems(todos);</span>
+<span class="nc" id="L382">            listSugerencias.setVisible(true);</span>
+<span class="nc" id="L383">            listSugerencias.setManaged(true);</span>
+<span class="nc" id="L384">        });</span>
+
+        // Mejorar visualización de tabla de carrito
+<span class="nc" id="L387">        tablaCarrito.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);</span>
+<span class="nc" id="L388">        tablaCarrito.setStyle(&quot;-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 8px;&quot;);</span>
+        // Usar solo el CSS para el diseño de la tabla
+<span class="nc" id="L390">        tablaCarrito.getStylesheets().clear();</span>
+<span class="nc" id="L391">        tablaCarrito.getStylesheets().add(getClass().getResource(&quot;/css/Proveedor/proveedores.css&quot;).toExternalForm());</span>
+<span class="nc" id="L392">        tablaCarrito.getStyleClass().setAll(&quot;productos-table&quot;);</span>
+        // Eliminar setStyle en columnas y filas, dejar que el CSS controle todo
+<span class="nc" id="L394">        tablaCarrito.setPlaceholder(new Label(&quot;Tabla sin contenido. Busca y agrega productos al carrito.&quot;));</span>
+<span class="nc" id="L395">        cargarProductos();</span>
+<span class="nc" id="L396">        cargarClientes();</span>
+<span class="nc" id="L397">        comboPago.setItems(FXCollections.observableArrayList(&quot;EFECTIVO&quot;, &quot;TARJETA&quot;, &quot;TRANSFERENCIA&quot;, &quot;MIXTO&quot;));</span>
+<span class="nc" id="L398">        comboPago.setPromptText(&quot;Seleccionar método de pago&quot;);</span>
+<span class="nc" id="L399">        comboComprobante.setItems(FXCollections.observableArrayList(&quot;BOLETA&quot;, &quot;FACTURA&quot;, &quot;TICKET&quot;));</span>
+<span class="nc" id="L400">        comboComprobante.setPromptText(&quot;Selecciona comprobante&quot;);</span>
+<span class="nc" id="L401">        comboComprobante.setVisibleRowCount(2);</span>
+<span class="nc" id="L402">        tablaCarrito.setItems(carrito);</span>
+<span class="nc" id="L403">        btnConfirmarVenta.setOnAction(e -&gt; confirmarVenta());</span>
+<span class="nc" id="L404">        btnAgregarProducto.setOnAction(e -&gt; agregarProductoDesdeBuscador());</span>
+<span class="nc" id="L405">        actualizarTotales();</span>
+
+        // Personalizar visualización de clientes en ComboBox: tipo, documento y
+        // nombre/razón social
+<span class="nc" id="L409">        comboClientes.setCellFactory(lv -&gt; new ListCell&lt;Cliente&gt;() {</span>
+            @Override
+            protected void updateItem(Cliente item, boolean empty) {
+<span class="nc" id="L412">                super.updateItem(item, empty);</span>
+<span class="nc bnc" id="L413" title="All 4 branches missed.">                if (empty || item == null) {</span>
+<span class="nc" id="L414">                    setText(null);</span>
+                } else {
+<span class="nc" id="L416">                    String tipo = item.getTipoCliente();</span>
+<span class="nc" id="L417">                    String doc = item.getDocumento();</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">                    String nombre = (&quot;EMPRESA&quot;.equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">                    setText((tipo != null ? tipo : &quot;&quot;) + &quot; | &quot; + doc + &quot; | &quot; + nombre);</span>
+                }
+<span class="nc" id="L421">            }</span>
+        });
+<span class="nc" id="L423">        comboClientes.setButtonCell(new ListCell&lt;Cliente&gt;() {</span>
+            @Override
+            protected void updateItem(Cliente item, boolean empty) {
+<span class="nc" id="L426">                super.updateItem(item, empty);</span>
+<span class="nc bnc" id="L427" title="All 4 branches missed.">                if (empty || item == null) {</span>
+<span class="nc" id="L428">                    setText(&quot;Seleccionar cliente&quot;);</span>
+                } else {
+<span class="nc" id="L430">                    String tipo = item.getTipoCliente();</span>
+<span class="nc" id="L431">                    String doc = item.getDocumento();</span>
+<span class="nc bnc" id="L432" title="All 2 branches missed.">                    String nombre = (&quot;EMPRESA&quot;.equals(tipo)) ? item.getRazonSocial() : item.getNombreCompleto();</span>
+<span class="nc bnc" id="L433" title="All 2 branches missed.">                    setText((tipo != null ? tipo : &quot;&quot;) + &quot; | &quot; + doc + &quot; | &quot; + nombre);</span>
+                }
+<span class="nc" id="L435">            }</span>
+        });
+        // Buscar y agregar producto al carrito según tipo de búsqueda
+<span class="nc" id="L438">    }</span>
+
+    // Método utilitario para limpiar el ListView de sugerencias
+    private void limpiarSugerencias() {
+<span class="nc" id="L442">        listSugerencias.getSelectionModel().clearSelection();</span>
+<span class="nc" id="L443">        listSugerencias.setItems(FXCollections.observableArrayList());</span>
+<span class="nc" id="L444">        listSugerencias.setVisible(false);</span>
+<span class="nc" id="L445">        listSugerencias.setManaged(false);</span>
+<span class="nc" id="L446">        btnAgregarProducto.setDisable(true);</span>
+<span class="nc" id="L447">    }</span>
+
+    private void cargarProductos() {
+<span class="nc" id="L450">        productos.clear();</span>
+<span class="nc" id="L451">        productos.addAll(productoRepository.findAll());</span>
+<span class="nc" id="L452">        listSugerencias.setItems(FXCollections.observableArrayList());</span>
+<span class="nc" id="L453">        listSugerencias.setVisible(false);</span>
+<span class="nc" id="L454">        listSugerencias.setManaged(false);</span>
+<span class="nc" id="L455">        listSugerencias.getSelectionModel().clearSelection();</span>
+<span class="nc" id="L456">        btnAgregarProducto.setDisable(true);</span>
+<span class="nc" id="L457">    }</span>
+
+    private void agregarProductoDesdeBuscador() {
+        final Producto seleccionado;
+<span class="nc bnc" id="L461" title="All 4 branches missed.">        if (!listSugerencias.getItems().isEmpty() &amp;&amp; listSugerencias.getSelectionModel().getSelectedIndex() &gt;= 0</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">                &amp;&amp; listSugerencias.getSelectionModel().getSelectedIndex() &lt; listSugerencias.getItems().size()) {</span>
+<span class="nc" id="L463">            seleccionado = listSugerencias.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L464" title="All 4 branches missed.">        } else if (txtBuscarProducto.getText() != null &amp;&amp; !txtBuscarProducto.getText().isEmpty()) {</span>
+<span class="nc" id="L465">            String texto = txtBuscarProducto.getText().trim().toLowerCase();</span>
+<span class="nc" id="L466">            Optional&lt;Producto&gt; prod = productos.stream()</span>
+<span class="nc bnc" id="L467" title="All 4 branches missed.">                    .filter(p -&gt; p.getNombre().toLowerCase().equals(texto) || p.getCodigo().toLowerCase().equals(texto))</span>
+<span class="nc" id="L468">                    .findFirst();</span>
+<span class="nc" id="L469">            seleccionado = prod.orElse(null);</span>
+<span class="nc" id="L470">        } else {</span>
+<span class="nc" id="L471">            seleccionado = null;</span>
+        }
+<span class="nc bnc" id="L473" title="All 2 branches missed.">        if (seleccionado == null) {</span>
+<span class="nc" id="L474">            mostrarMensaje(</span>
+                    &quot;Selecciona un producto válido de la lista de sugerencias o escribe el nombre/código exacto.&quot;);
+<span class="nc" id="L476">            btnAgregarProducto.setDisable(true);</span>
+<span class="nc" id="L477">            return;</span>
+        }
+<span class="nc" id="L479">        int cantidad = spinnerCantidad.getValue();</span>
+        // Validación de stock
+<span class="nc bnc" id="L481" title="All 4 branches missed.">        if (seleccionado.getStockActual() == null || seleccionado.getStockActual() &lt; cantidad) {</span>
+<span class="nc" id="L482">            mostrarMensaje(</span>
+<span class="nc" id="L483">                    &quot;Stock insuficiente para el producto seleccionado. Stock actual: &quot; + seleccionado.getStockActual());</span>
+<span class="nc" id="L484">            return;</span>
+        }
+        // Validación de vencimiento
+<span class="nc bnc" id="L487" title="All 2 branches missed.">        if (seleccionado.isVencido()) {</span>
+<span class="nc" id="L488">            mostrarMensaje(&quot;El producto está vencido y no puede ser vendido.&quot;);</span>
+<span class="nc" id="L489">            return;</span>
+        }
+<span class="nc bnc" id="L491" title="All 2 branches missed.">        if (seleccionado.isProximoVencer()) {</span>
+<span class="nc" id="L492">            mostrarMensaje(</span>
+<span class="nc" id="L493">                    &quot;Advertencia: El producto está próximo a vencer (&quot; + seleccionado.getFechaVencimiento() + &quot;).&quot;);</span>
+        }
+<span class="nc bnc" id="L495" title="All 2 branches missed.">        Optional&lt;DetalleVenta&gt; existente = carrito.stream().filter(d -&gt; d.getProducto().getId() == seleccionado.getId())</span>
+<span class="nc" id="L496">                .findFirst();</span>
+<span class="nc bnc" id="L497" title="All 2 branches missed.">        if (existente.isPresent()) {</span>
+<span class="nc" id="L498">            DetalleVenta detalle = existente.get();</span>
+<span class="nc" id="L499">            int nuevaCantidad = detalle.getCantidad() + cantidad;</span>
+<span class="nc bnc" id="L500" title="All 2 branches missed.">            if (seleccionado.getStockActual() &lt; nuevaCantidad) {</span>
+<span class="nc" id="L501">                mostrarMensaje(&quot;No hay suficiente stock para sumar la cantidad. Stock actual: &quot;</span>
+<span class="nc" id="L502">                        + seleccionado.getStockActual());</span>
+<span class="nc" id="L503">                return;</span>
+            }
+<span class="nc" id="L505">            detalle.setCantidad(nuevaCantidad);</span>
+<span class="nc" id="L506">            detalle.setSubtotal(detalle.getPrecioUnitario().multiply(BigDecimal.valueOf(detalle.getCantidad())));</span>
+<span class="nc" id="L507">            actualizarTotales();</span>
+<span class="nc" id="L508">            mostrarMensaje(&quot;Cantidad actualizada en el carrito.&quot;);</span>
+<span class="nc" id="L509">        } else {</span>
+<span class="nc" id="L510">            DetalleVenta detalle = new DetalleVenta();</span>
+<span class="nc" id="L511">            detalle.setProducto(seleccionado);</span>
+<span class="nc" id="L512">            detalle.setCantidad(cantidad);</span>
+<span class="nc" id="L513">            detalle.setPrecioUnitario(seleccionado.getPrecioVenta());</span>
+<span class="nc" id="L514">            detalle.setSubtotal(seleccionado.getPrecioVenta().multiply(BigDecimal.valueOf(cantidad)));</span>
+<span class="nc" id="L515">            detalle.setDescuento(BigDecimal.ZERO);</span>
+<span class="nc" id="L516">            carrito.add(detalle);</span>
+<span class="nc" id="L517">            actualizarTotales();</span>
+        }
+        // Limpiar selección y sugerencias de forma segura
+<span class="nc" id="L520">        txtBuscarProducto.clear();</span>
+<span class="nc" id="L521">        limpiarSugerencias();</span>
+<span class="nc" id="L522">        spinnerCantidad.getValueFactory().setValue(1);</span>
+<span class="nc" id="L523">        btnAgregarProducto.setDisable(true);</span>
+<span class="nc" id="L524">    }</span>
+
+    // Método eliminado: agregarProductoAlCarrito
+
+    private void editarCantidadProducto() {
+<span class="nc" id="L529">        DetalleVenta seleccionado = tablaCarrito.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L530" title="All 4 branches missed.">        if (seleccionado == null || tablaCarrito.getItems().isEmpty()) {</span>
+<span class="nc" id="L531">            mostrarMensaje(&quot;Selecciona un producto válido del carrito para editar la cantidad.&quot;);</span>
+<span class="nc" id="L532">            return;</span>
+        }
+<span class="nc" id="L534">        TextInputDialog dialog = new TextInputDialog(String.valueOf(seleccionado.getCantidad()));</span>
+<span class="nc" id="L535">        dialog.setTitle(&quot;Editar cantidad&quot;);</span>
+<span class="nc" id="L536">        dialog.setHeaderText(&quot;Cantidad para &quot; + seleccionado.getProducto().getNombre());</span>
+<span class="nc" id="L537">        dialog.setContentText(&quot;Nueva cantidad:&quot;);</span>
+<span class="nc" id="L538">        Optional&lt;String&gt; result = dialog.showAndWait();</span>
+<span class="nc" id="L539">        result.ifPresent(cantStr -&gt; {</span>
+            try {
+<span class="nc" id="L541">                int cantidad = Integer.parseInt(cantStr);</span>
+<span class="nc bnc" id="L542" title="All 2 branches missed.">                if (cantidad &lt; 1)</span>
+<span class="nc" id="L543">                    throw new NumberFormatException();</span>
+<span class="nc" id="L544">                seleccionado.setCantidad(cantidad);</span>
+<span class="nc" id="L545">                seleccionado.setSubtotal(seleccionado.getPrecioUnitario().multiply(BigDecimal.valueOf(cantidad)));</span>
+<span class="nc" id="L546">                actualizarTotales();</span>
+<span class="nc" id="L547">            } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L548">                mostrarMensaje(&quot;Cantidad inválida.&quot;);</span>
+<span class="nc" id="L549">            }</span>
+<span class="nc" id="L550">        });</span>
+<span class="nc" id="L551">    }</span>
+
+    private void eliminarProductoDelCarrito() {
+<span class="nc" id="L554">        DetalleVenta seleccionado = tablaCarrito.getSelectionModel().getSelectedItem();</span>
+<span class="nc bnc" id="L555" title="All 4 branches missed.">        if (seleccionado == null || tablaCarrito.getItems().isEmpty()) {</span>
+<span class="nc" id="L556">            mostrarMensaje(&quot;Selecciona un producto válido del carrito para eliminar.&quot;);</span>
+<span class="nc" id="L557">            return;</span>
+        }
+<span class="nc" id="L559">        carrito.remove(seleccionado);</span>
+<span class="nc" id="L560">        actualizarTotales();</span>
+<span class="nc" id="L561">    }</span>
+
+    private void cargarClientes() {
+<span class="nc" id="L564">        comboClientes.getItems().clear();</span>
+<span class="nc" id="L565">        java.util.List&lt;Cliente&gt; clientes = clienteRepository.findAll(0, 100);</span>
+        // Filtrar cliente genérico por DNI o ID
+<span class="nc bnc" id="L567" title="All 4 branches missed.">        clientes.removeIf(c -&gt; &quot;00000000&quot;.equals(c.getDocumento()) || c.getId() == 1);</span>
+<span class="nc" id="L568">        comboClientes.getItems().addAll(clientes);</span>
+<span class="nc" id="L569">    }</span>
+
+    private void actualizarTotales() {
+<span class="nc" id="L572">        BigDecimal subtotal = BigDecimal.ZERO;</span>
+<span class="nc" id="L573">        BigDecimal descuento = BigDecimal.ZERO;</span>
+<span class="nc" id="L574">        BigDecimal igv = BigDecimal.ZERO;</span>
+<span class="nc" id="L575">        BigDecimal total = BigDecimal.ZERO;</span>
+<span class="nc bnc" id="L576" title="All 2 branches missed.">        for (DetalleVenta d : carrito) {</span>
+<span class="nc bnc" id="L577" title="All 2 branches missed.">            if (d.getSubtotal() != null)</span>
+<span class="nc" id="L578">                subtotal = subtotal.add(d.getSubtotal());</span>
+<span class="nc bnc" id="L579" title="All 2 branches missed.">            if (d.getDescuento() != null)</span>
+<span class="nc" id="L580">                descuento = descuento.add(d.getDescuento());</span>
+<span class="nc" id="L581">        }</span>
+<span class="nc" id="L582">        igv = subtotal.multiply(new BigDecimal(&quot;0.18&quot;));</span>
+<span class="nc" id="L583">        total = subtotal.subtract(descuento).add(igv);</span>
+<span class="nc" id="L584">        java.text.DecimalFormat df = new java.text.DecimalFormat(&quot;#,##0.00&quot;);</span>
+<span class="nc" id="L585">        df.setDecimalFormatSymbols(new java.text.DecimalFormatSymbols() {</span>
+            {
+<span class="nc" id="L587">                setDecimalSeparator(',');</span>
+<span class="nc" id="L588">                setGroupingSeparator('.');</span>
+<span class="nc" id="L589">            }</span>
+        });
+<span class="nc bnc" id="L591" title="All 2 branches missed.">        lblSubtotal.setText(&quot;Subtotal: S/ &quot; + (subtotal != null ? df.format(subtotal) : &quot;0,00&quot;));</span>
+<span class="nc bnc" id="L592" title="All 2 branches missed.">        lblDescuento.setText(&quot;Descuento: S/ &quot; + (descuento != null ? df.format(descuento) : &quot;0,00&quot;));</span>
+<span class="nc bnc" id="L593" title="All 2 branches missed.">        lblIGV.setText(&quot;IGV: S/ &quot; + (igv != null ? df.format(igv) : &quot;0,00&quot;));</span>
+<span class="nc bnc" id="L594" title="All 2 branches missed.">        lblTotal.setText(&quot;Total: S/ &quot; + (total != null ? df.format(total) : &quot;0,00&quot;));</span>
+<span class="nc" id="L595">    }</span>
+
+    // Obtiene el siguiente número de boleta para la serie dada
+    private String obtenerSiguienteNumeroBoleta(String serie) {
+<span class="nc" id="L599">        int ultimoNumero = comprobanteRepository.obtenerUltimoNumeroPorSerieYTipo(serie, &quot;BOLETA&quot;);</span>
+<span class="nc" id="L600">        return String.format(&quot;%06d&quot;, ultimoNumero + 1);</span>
+    }
+
+    private String obtenerSiguienteNumeroFactura(String serie) {
+<span class="nc" id="L604">        int ultimoNumero = comprobanteRepository.obtenerUltimoNumeroPorSerieYTipo(serie, &quot;FACTURA&quot;);</span>
+<span class="nc" id="L605">        int siguienteNumero = ultimoNumero + 1;</span>
+<span class="nc" id="L606">        return String.format(&quot;%06d&quot;, siguienteNumero);</span>
+    }
+
+    private void anularVenta() {
+<span class="nc" id="L610">        mostrarMensaje(&quot;Funcionalidad de anulación implementada.&quot;);</span>
+<span class="nc" id="L611">    }</span>
+
+    private void mostrarMensaje(String msg) {
+
+<span class="nc bnc" id="L615" title="All 8 branches missed.">        if (msg != null &amp;&amp; (msg.startsWith(&quot;[DEBUG&quot;) || msg.startsWith(&quot;[ERROR&quot;) || msg.contains(&quot;Exception&quot;)</span>
+<span class="nc bnc" id="L616" title="All 2 branches missed.">                || msg.contains(&quot;IndexOutOfBounds&quot;))) {</span>
+            // Solo log en terminal
+<span class="nc" id="L618">            System.err.println(msg);</span>
+<span class="nc" id="L619">            return;</span>
+        }
+<span class="nc" id="L621">        Alert alert = new Alert(Alert.AlertType.INFORMATION);</span>
+<span class="nc" id="L622">        alert.setContentText(msg);</span>
+<span class="nc" id="L623">        alert.showAndWait();</span>
+<span class="nc" id="L624">    }</span>
+
+    // Convierte un monto numérico a letras en formato &quot;CINCO CON 70/100 SOLES&quot;
+    private String convertirMontoALetras(double monto) {
+<span class="nc" id="L628">        final String[] UNIDADES = { &quot;&quot;, &quot;UNO&quot;, &quot;DOS&quot;, &quot;TRES&quot;, &quot;CUATRO&quot;, &quot;CINCO&quot;, &quot;SEIS&quot;, &quot;SIETE&quot;, &quot;OCHO&quot;, &quot;NUEVE&quot;,</span>
+                &quot;DIEZ&quot;, &quot;ONCE&quot;, &quot;DOCE&quot;, &quot;TRECE&quot;, &quot;CATORCE&quot;, &quot;QUINCE&quot;, &quot;DIECISEIS&quot;, &quot;DIECISIETE&quot;, &quot;DIECIOCHO&quot;,
+                &quot;DIECINUEVE&quot; };
+<span class="nc" id="L631">        final String[] DECENAS = { &quot;&quot;, &quot;DIEZ&quot;, &quot;VEINTE&quot;, &quot;TREINTA&quot;, &quot;CUARENTA&quot;, &quot;CINCUENTA&quot;, &quot;SESENTA&quot;, &quot;SETENTA&quot;,</span>
+                &quot;OCHENTA&quot;, &quot;NOVENTA&quot; };
+<span class="nc" id="L633">        final String[] CENTENAS = { &quot;&quot;, &quot;CIEN&quot;, &quot;DOSCIENTOS&quot;, &quot;TRESCIENTOS&quot;, &quot;CUATROCIENTOS&quot;, &quot;QUINIENTOS&quot;,</span>
+                &quot;SEISCIENTOS&quot;, &quot;SETECIENTOS&quot;, &quot;OCHOCIENTOS&quot;, &quot;NOVECIENTOS&quot; };
+<span class="nc" id="L635">        long parteEntera = (long) monto;</span>
+<span class="nc" id="L636">        int parteDecimal = (int) Math.round((monto - parteEntera) * 100);</span>
+<span class="nc" id="L637">        String letras = &quot;&quot;;</span>
+<span class="nc bnc" id="L638" title="All 2 branches missed.">        if (parteEntera == 0) {</span>
+<span class="nc" id="L639">            letras = &quot;CERO&quot;;</span>
+<span class="nc bnc" id="L640" title="All 2 branches missed.">        } else if (parteEntera &lt; 20) {</span>
+<span class="nc" id="L641">            letras = UNIDADES[(int) parteEntera];</span>
+<span class="nc bnc" id="L642" title="All 2 branches missed.">        } else if (parteEntera &lt; 100) {</span>
+<span class="nc" id="L643">            int dec = (int) (parteEntera / 10);</span>
+<span class="nc" id="L644">            int uni = (int) (parteEntera % 10);</span>
+<span class="nc bnc" id="L645" title="All 2 branches missed.">            letras = DECENAS[dec] + (uni &gt; 0 ? &quot; Y &quot; + UNIDADES[uni] : &quot;&quot;);</span>
+<span class="nc bnc" id="L646" title="All 2 branches missed.">        } else if (parteEntera &lt; 1000) {</span>
+<span class="nc" id="L647">            int cen = (int) (parteEntera / 100);</span>
+<span class="nc" id="L648">            int resto = (int) (parteEntera % 100);</span>
+<span class="nc bnc" id="L649" title="All 2 branches missed.">            letras = CENTENAS[cen] + (resto &gt; 0 ? &quot; &quot; + convertirMontoALetras(resto) : &quot;&quot;);</span>
+<span class="nc bnc" id="L650" title="All 2 branches missed.">        } else if (parteEntera &lt; 1000000) {</span>
+<span class="nc" id="L651">            int mil = (int) (parteEntera / 1000);</span>
+<span class="nc" id="L652">            int resto = (int) (parteEntera % 1000);</span>
+<span class="nc bnc" id="L653" title="All 2 branches missed.">            if (mil == 1) {</span>
+<span class="nc bnc" id="L654" title="All 2 branches missed.">                letras = &quot;MIL&quot; + (resto &gt; 0 ? &quot; &quot; + convertirMontoALetras(resto) : &quot;&quot;);</span>
+            } else {
+<span class="nc bnc" id="L656" title="All 2 branches missed.">                letras = convertirMontoALetras(mil) + &quot; MIL&quot; + (resto &gt; 0 ? &quot; &quot; + convertirMontoALetras(resto) : &quot;&quot;);</span>
+            }
+<span class="nc" id="L658">        } else {</span>
+<span class="nc" id="L659">            letras = &quot;UN MILLÓN O MÁS&quot;;</span>
+        }
+<span class="nc" id="L661">        return letras + String.format(&quot; CON %02d/100 SOLES&quot;, parteDecimal);</span>
+    }
+
+    // Muestra un listado de ventas de las últimas 24 horas en una ventana
+    // modal.Incluye botón para revertir/anular cada venta (solo si no está
+    // anulada).
+
+    private void mostrarHistorialVentas24h() {
+        // Obtener fecha límite (hace 24 horas)
+<span class="nc" id="L670">        java.time.LocalDateTime ahora = java.time.LocalDateTime.now();</span>
+<span class="nc" id="L671">        java.time.LocalDateTime hace24h = ahora.minusHours(24);</span>
+        // Obtener todas las ventas y filtrar por fecha
+<span class="nc" id="L673">        java.util.List&lt;Venta&gt; ventas = ventaRepository.findAll();</span>
+<span class="nc" id="L674">        java.util.List&lt;Venta&gt; ventas24h = new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L675" title="All 2 branches missed.">        for (Venta v : ventas) {</span>
+<span class="nc bnc" id="L676" title="All 4 branches missed.">            if (v.getFechaVenta() != null &amp;&amp; !v.getFechaVenta().isBefore(hace24h)) {</span>
+<span class="nc" id="L677">                ventas24h.add(v);</span>
+            }
+<span class="nc" id="L679">        }</span>
+        // Crear ventana/modal
+<span class="nc" id="L681">        javafx.stage.Stage stage = new javafx.stage.Stage();</span>
+<span class="nc" id="L682">        stage.setTitle(&quot;Historial de ventas (últimas 24h)&quot;);</span>
+<span class="nc" id="L683">        javafx.scene.control.TableView&lt;Venta&gt; table = new javafx.scene.control.TableView&lt;&gt;();</span>
+<span class="nc" id="L684">        table.setColumnResizePolicy(javafx.scene.control.TableView.CONSTRAINED_RESIZE_POLICY);</span>
+        // Columnas
+<span class="nc" id="L686">        javafx.scene.control.TableColumn&lt;Venta, String&gt; colFecha = new javafx.scene.control.TableColumn&lt;&gt;(&quot;Fecha&quot;);</span>
+<span class="nc" id="L687">        colFecha.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L688" title="All 2 branches missed.">                data.getValue().getFechaVenta() != null ? data.getValue().getFechaVenta().toString() : &quot;&quot;));</span>
+<span class="nc" id="L689">        javafx.scene.control.TableColumn&lt;Venta, String&gt; colCliente = new javafx.scene.control.TableColumn&lt;&gt;(&quot;Cliente&quot;);</span>
+<span class="nc" id="L690">        colCliente.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L691" title="All 2 branches missed.">                data.getValue().getCliente() != null ? data.getValue().getCliente().getNombreCompleto() : &quot;&quot;));</span>
+<span class="nc" id="L692">        javafx.scene.control.TableColumn&lt;Venta, String&gt; colMonto = new javafx.scene.control.TableColumn&lt;&gt;(&quot;Total S/&quot;);</span>
+<span class="nc" id="L693">        colMonto.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L694" title="All 2 branches missed.">                data.getValue().getTotal() != null ? data.getValue().getTotal().toPlainString() : &quot;&quot;));</span>
+<span class="nc" id="L695">        javafx.scene.control.TableColumn&lt;Venta, String&gt; colEstado = new javafx.scene.control.TableColumn&lt;&gt;(&quot;Estado&quot;);</span>
+<span class="nc" id="L696">        colEstado.setCellValueFactory(data -&gt; new javafx.beans.property.SimpleStringProperty(</span>
+<span class="nc bnc" id="L697" title="All 2 branches missed.">                data.getValue().getEstado() != null ? data.getValue().getEstado() : &quot;&quot;));</span>
+        // Columna botón revertir/anular
+<span class="nc" id="L699">        javafx.scene.control.TableColumn&lt;Venta, Void&gt; colRevertir = new javafx.scene.control.TableColumn&lt;&gt;(</span>
+                &quot;Revertir/Anular&quot;);
+<span class="nc" id="L701">        colRevertir.setCellFactory(tc -&gt; new javafx.scene.control.TableCell&lt;Venta, Void&gt;() {</span>
+<span class="nc" id="L702">            private final javafx.scene.control.Button btn = new javafx.scene.control.Button(&quot;Anular&quot;);</span>
+            {
+<span class="nc" id="L704">                btn.setStyle(</span>
+                        &quot;-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 8px;&quot;);
+<span class="nc" id="L706">                btn.setOnAction(e -&gt; {</span>
+<span class="nc" id="L707">                    Venta venta = getTableView().getItems().get(getIndex());</span>
+<span class="nc bnc" id="L708" title="All 4 branches missed.">                    if (venta != null &amp;&amp; !&quot;ANULADA&quot;.equalsIgnoreCase(venta.getEstado())) {</span>
+                        // Solo llama a la lógica central, que ya maneja el feedback y el envío a
+                        // NubeFacT
+<span class="nc" id="L711">                        VentasController.this.anularVentaDesdeHistorial(venta);</span>
+<span class="nc" id="L712">                        getTableView().refresh();</span>
+                    } else {
+<span class="nc" id="L714">                        mostrarMensaje(&quot;La venta ya está anulada.&quot;);</span>
+                    }
+<span class="nc" id="L716">                });</span>
+<span class="nc" id="L717">            }</span>
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+<span class="nc" id="L721">                super.updateItem(item, empty);</span>
+<span class="nc bnc" id="L722" title="All 2 branches missed.">                Venta venta = empty ? null : getTableView().getItems().get(getIndex());</span>
+<span class="nc bnc" id="L723" title="All 6 branches missed.">                setGraphic((!empty &amp;&amp; venta != null &amp;&amp; !&quot;ANULADA&quot;.equalsIgnoreCase(venta.getEstado())) ? btn : null);</span>
+<span class="nc" id="L724">            }</span>
+        });
+<span class="nc" id="L726">        table.getColumns().addAll(colFecha, colCliente, colMonto, colEstado, colRevertir);</span>
+<span class="nc" id="L727">        table.setItems(FXCollections.observableArrayList(ventas24h));</span>
+<span class="nc" id="L728">        javafx.scene.layout.VBox root = new javafx.scene.layout.VBox(10, table);</span>
+<span class="nc" id="L729">        root.setStyle(&quot;-fx-padding: 18px; -fx-background-color: #f8f9fa;&quot;);</span>
+<span class="nc" id="L730">        stage.setScene(new javafx.scene.Scene(root, 800, 400));</span>
+<span class="nc" id="L731">        stage.show();</span>
+<span class="nc" id="L732">    }</span>
+
+    // Método principal para confirmar la venta y emitir comprobante electrónico
+    private void confirmarVenta() {
+<span class="nc" id="L736">        final Cliente clienteSeleccionado = comboClientes.getValue();</span>
+<span class="nc" id="L737">        final String metodoPago = comboPago.getValue();</span>
+<span class="nc bnc" id="L738" title="All 4 branches missed.">        if (metodoPago == null || carrito.isEmpty()) {</span>
+<span class="nc" id="L739">            mostrarMensaje(&quot;Completa todos los datos y agrega productos al carrito.&quot;);</span>
+<span class="nc" id="L740">            return;</span>
+        }
+        // Si no hay cliente seleccionado, buscar cliente genérico por DNI en la BD
+        final Cliente clienteActual;
+<span class="nc bnc" id="L744" title="All 2 branches missed.">        if (clienteSeleccionado != null) {</span>
+<span class="nc" id="L745">            clienteActual = clienteSeleccionado;</span>
+        } else {
+<span class="nc" id="L747">            com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository clienteRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository();</span>
+<span class="nc" id="L748">            java.util.List&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente&gt; clientes = clienteRepo</span>
+<span class="nc" id="L749">                    .findAll(0, 10);</span>
+<span class="nc" id="L750">            java.util.Optional&lt;com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente&gt; optGenerico = clientes</span>
+<span class="nc" id="L751">                    .stream()</span>
+<span class="nc" id="L752">                    .filter(c -&gt; &quot;00000000&quot;.equals(c.getDocumento()))</span>
+<span class="nc" id="L753">                    .findFirst();</span>
+<span class="nc bnc" id="L754" title="All 2 branches missed.">            if (optGenerico.isPresent()) {</span>
+<span class="nc" id="L755">                clienteActual = optGenerico.get();</span>
+            } else {
+                // Crear cliente genérico automáticamente como 'CONSUMIDOR FINAL'
+<span class="nc" id="L758">                com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente clienteGenerico = new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente();</span>
+<span class="nc" id="L759">                clienteGenerico.setDocumento(&quot;00000000&quot;);</span>
+<span class="nc" id="L760">                clienteGenerico.setNombreCompleto(&quot;CONSUMIDOR FINAL&quot;);</span>
+<span class="nc" id="L761">                clienteGenerico.setTipoCliente(&quot;NATURAL&quot;);</span>
+<span class="nc" id="L762">                clienteGenerico.setRazonSocial(&quot;&quot;);</span>
+                // Si hay otros campos requeridos, inicialízalos aquí
+<span class="nc" id="L764">                clienteRepo.save(clienteGenerico); // O el método correcto para guardar</span>
+<span class="nc" id="L765">                clienteActual = clienteGenerico;</span>
+            }
+        }
+        // Calcular totales antes de crear boleta y venta
+<span class="nc" id="L769">        final java.math.BigDecimal subtotal = carrito.stream().map(DetalleVenta::getSubtotal)</span>
+<span class="nc" id="L770">                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);</span>
+<span class="nc" id="L771">        final java.math.BigDecimal[] descuento = { carrito.stream().map(DetalleVenta::getDescuento)</span>
+<span class="nc" id="L772">                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add) };</span>
+<span class="nc" id="L773">        final java.math.BigDecimal igv = subtotal.multiply(new java.math.BigDecimal(&quot;0.18&quot;));</span>
+<span class="nc" id="L774">        final java.math.BigDecimal[] total = { subtotal.subtract(descuento[0]).add(igv) };</span>
+
+        // Lógica de puntos para clientes NATURAL y boleta
+<span class="nc" id="L777">        final boolean[] puntosUsados = { false };</span>
+<span class="nc" id="L778">        final int[] puntosDescontados = { 0 };</span>
+<span class="nc" id="L779">        double solesDescuento = 0.0;</span>
+<span class="nc bnc" id="L780" title="All 4 branches missed.">        if (clienteActual != null &amp;&amp; &quot;NATURAL&quot;.equalsIgnoreCase(clienteActual.getTipoCliente())</span>
+<span class="nc bnc" id="L781" title="All 2 branches missed.">                &amp;&amp; &quot;BOLETA&quot;.equalsIgnoreCase(comboComprobante.getValue())) {</span>
+<span class="nc" id="L782">            int puntos = consultarPuntosCliente(clienteActual.getId());</span>
+<span class="nc bnc" id="L783" title="All 2 branches missed.">            if (puntos &gt;= 100) {</span>
+<span class="nc" id="L784">                solesDescuento = Math.floor(puntos / 100.0);</span>
+                // Límite opcional: máximo 50% del total
+<span class="nc" id="L786">                double maxDescuento = total[0].doubleValue() * 0.5;</span>
+<span class="nc bnc" id="L787" title="All 2 branches missed.">                if (solesDescuento &gt; maxDescuento) {</span>
+<span class="nc" id="L788">                    solesDescuento = Math.floor(maxDescuento);</span>
+                }
+<span class="nc" id="L790">                puntosDescontados[0] = (int) (solesDescuento * 100);</span>
+<span class="nc bnc" id="L791" title="All 2 branches missed.">                if (solesDescuento &gt; 0) {</span>
+                    // Mostrar pop-up para preguntar si desea usar los puntos
+<span class="nc" id="L793">                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);</span>
+<span class="nc" id="L794">                    alert.setTitle(&quot;Redención de puntos&quot;);</span>
+<span class="nc" id="L795">                    alert.setHeaderText(&quot;¿Desea usar sus puntos?&quot;);</span>
+<span class="nc" id="L796">                    alert.setContentText(&quot;Tiene &quot; + puntos + &quot; puntos disponibles (S/&quot; + solesDescuento</span>
+                            + &quot; de descuento). ¿Desea aplicarlos a esta compra?&quot;);
+<span class="nc" id="L798">                    ButtonType btnSi = new ButtonType(&quot;Sí, usar puntos&quot;, ButtonBar.ButtonData.YES);</span>
+<span class="nc" id="L799">                    ButtonType btnNo = new ButtonType(&quot;No usar puntos&quot;, ButtonBar.ButtonData.NO);</span>
+<span class="nc" id="L800">                    alert.getButtonTypes().setAll(btnSi, btnNo);</span>
+<span class="nc" id="L801">                    Optional&lt;ButtonType&gt; result = alert.showAndWait();</span>
+<span class="nc bnc" id="L802" title="All 4 branches missed.">                    if (result.isPresent() &amp;&amp; result.get() == btnSi) {</span>
+<span class="nc" id="L803">                        puntosUsados[0] = true;</span>
+<span class="nc" id="L804">                        descuento[0] = descuento[0].add(new java.math.BigDecimal(solesDescuento));</span>
+<span class="nc" id="L805">                        total[0] = subtotal.subtract(descuento[0]).add(igv);</span>
+                    }
+                }
+            }
+        }
+<span class="nc" id="L810">        String tipoComprobante = comboComprobante.getValue();</span>
+<span class="nc bnc" id="L811" title="All 2 branches missed.">        if (&quot;TICKET&quot;.equalsIgnoreCase(tipoComprobante)) {</span>
+            // Lógica para registrar venta tipo TICKET
+<span class="nc" id="L813">            com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.TicketVentaController ticketController = new com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.TicketVentaController();</span>
+<span class="nc" id="L814">            Venta ventaGuardada = ticketController.registrarVentaTicket(new ArrayList&lt;&gt;(carrito), metodoPago,</span>
+<span class="nc" id="L815">                    SessionManager.getUsuarioActual().getUsername(), &quot;Farmacia Victoria&quot;, clienteActual);</span>
+            // Mostrar vista previa del ticket
+<span class="nc" id="L817">            String textoTicket = ticketController.generarTextoTicket(ventaGuardada, &quot;Farmacia Victoria&quot;);</span>
+<span class="nc" id="L818">            ticketController.mostrarVistaPreviaTicket(textoTicket);</span>
+<span class="nc" id="L819">            carrito.clear();</span>
+<span class="nc" id="L820">            actualizarTotales();</span>
+<span class="nc" id="L821">            mostrarMensaje(&quot;Venta tipo TICKET registrada correctamente.&quot;);</span>
+<span class="nc" id="L822">            return;</span>
+        }
+<span class="nc bnc" id="L824" title="All 2 branches missed.">        if (&quot;FACTURA&quot;.equalsIgnoreCase(tipoComprobante)) {</span>
+            // Validar que el cliente seleccionado tenga datos completos de empresa
+<span class="nc bnc" id="L826" title="All 6 branches missed.">            if (clienteActual == null || clienteActual.getRuc() == null || clienteActual.getRazonSocial() == null</span>
+<span class="nc bnc" id="L827" title="All 4 branches missed.">                    || clienteActual.getDireccion() == null || clienteActual.getEmail() == null</span>
+<span class="nc bnc" id="L828" title="All 4 branches missed.">                    || clienteActual.getRuc().isEmpty() || clienteActual.getRazonSocial().isEmpty()</span>
+<span class="nc bnc" id="L829" title="All 2 branches missed.">                    || clienteActual.getDireccion().isEmpty()) {</span>
+<span class="nc" id="L830">                mostrarMensaje(</span>
+                        &quot;Para emitir factura electrónica, selecciona un cliente tipo Empresa con RUC, razón social y dirección.&quot;);
+<span class="nc" id="L832">                return;</span>
+            }
+            // Ir directo a la vista previa usando los datos del cliente seleccionado
+            try {
+<span class="nc" id="L836">                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(</span>
+<span class="nc" id="L837">                        getClass().getResource(&quot;/fxml/vista_previa_comprobante.fxml&quot;));</span>
+<span class="nc" id="L838">                javafx.scene.Parent root = loader.load();</span>
+<span class="nc" id="L839">                VistaPreviaComprobanteController previewController = loader.getController();</span>
+<span class="nc" id="L840">                javafx.stage.Stage stage = new javafx.stage.Stage();</span>
+<span class="nc" id="L841">                stage.setTitle(&quot;Vista Previa de Factura Electrónica&quot;);</span>
+<span class="nc" id="L842">                stage.setScene(new javafx.scene.Scene(root));</span>
+                // Convertir Cliente y DetalleVenta locales a tipos PharmavictoriaApplication
+<span class="nc" id="L844">                ComprobanteUtils.Cliente clienteJsonPreview = new ComprobanteUtils.Cliente();</span>
+<span class="nc" id="L845">                clienteJsonPreview.tipo_documento = &quot;6&quot;;</span>
+<span class="nc" id="L846">                clienteJsonPreview.numero_documento = clienteActual.getRuc();</span>
+<span class="nc" id="L847">                clienteJsonPreview.razon_social = clienteActual.getRazonSocial();</span>
+<span class="nc" id="L848">                clienteJsonPreview.direccion = clienteActual.getDireccion();</span>
+<span class="nc" id="L849">                clienteJsonPreview.direccion = clienteActual.getEmail();</span>
+                javafx.collections.ObservableList&lt;ComprobanteUtils.DetalleVenta&gt; detallesPreview = javafx.collections.FXCollections
+<span class="nc" id="L851">                        .observableArrayList();</span>
+<span class="nc bnc" id="L852" title="All 2 branches missed.">                for (DetalleVenta d : carrito) {</span>
+<span class="nc" id="L853">                    ComprobanteUtils.DetalleVenta det = new ComprobanteUtils.DetalleVenta();</span>
+<span class="nc" id="L854">                    det.unidad_de_medida = &quot;NIU&quot;;</span>
+<span class="nc" id="L855">                    det.codigo_producto = d.getProducto().getCodigo();</span>
+<span class="nc" id="L856">                    det.descripcion = d.getProducto().getNombre();</span>
+<span class="nc" id="L857">                    det.cantidad = d.getCantidad();</span>
+<span class="nc" id="L858">                    det.valor_unitario = d.getPrecioUnitario().doubleValue();</span>
+<span class="nc" id="L859">                    det.precio_unitario = d.getPrecioUnitario().doubleValue();</span>
+<span class="nc" id="L860">                    det.subtotal = d.getSubtotal().doubleValue();</span>
+<span class="nc" id="L861">                    det.tipo_de_igv = 1;</span>
+<span class="nc" id="L862">                    double igvDetalle = d.getSubtotal().doubleValue() * 0.18;</span>
+<span class="nc" id="L863">                    det.igv = igvDetalle;</span>
+<span class="nc" id="L864">                    det.total = d.getSubtotal().doubleValue() + igvDetalle;</span>
+<span class="nc" id="L865">                    detallesPreview.add(det);</span>
+<span class="nc" id="L866">                }</span>
+                // Obtener el siguiente número de factura para la serie
+<span class="nc" id="L868">                String serieFactura = &quot;FFF1&quot;;</span>
+<span class="nc" id="L869">                String numeroFactura = obtenerSiguienteNumeroFactura(serieFactura);</span>
+<span class="nc" id="L870">                previewController.setDatos(clienteJsonPreview, &quot;FACTURA&quot;, serieFactura, numeroFactura,</span>
+<span class="nc" id="L871">                        total[0].toPlainString(), detallesPreview);</span>
+<span class="nc" id="L872">                previewController.setStage(stage);</span>
+<span class="nc" id="L873">                previewController.setOnConfirmar(() -&gt; {</span>
+                    try {
+                        // Armado de JSON igual al ejemplo de PharmavictoriaApplication.java
+<span class="nc" id="L876">                        java.util.LinkedHashMap&lt;String, Object&gt; factura = new java.util.LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L877">                        factura.put(&quot;operacion&quot;, &quot;generar_comprobante&quot;);</span>
+<span class="nc" id="L878">                        factura.put(&quot;tipo_de_comprobante&quot;, 1);</span>
+<span class="nc" id="L879">                        factura.put(&quot;serie&quot;, serieFactura);</span>
+<span class="nc" id="L880">                        factura.put(&quot;numero&quot;, Integer.parseInt(numeroFactura));</span>
+<span class="nc" id="L881">                        factura.put(&quot;sunat_transaction&quot;, 1);</span>
+<span class="nc" id="L882">                        factura.put(&quot;cliente_tipo_de_documento&quot;, 6);</span>
+<span class="nc" id="L883">                        factura.put(&quot;cliente_numero_de_documento&quot;, clienteActual.getRuc());</span>
+<span class="nc" id="L884">                        factura.put(&quot;cliente_denominacion&quot;, clienteActual.getRazonSocial());</span>
+<span class="nc" id="L885">                        factura.put(&quot;cliente_direccion&quot;, clienteActual.getDireccion());</span>
+<span class="nc bnc" id="L886" title="All 2 branches missed.">                        factura.put(&quot;cliente_email&quot;, clienteActual.getEmail() != null ? clienteActual.getEmail() : &quot;&quot;);</span>
+<span class="nc" id="L887">                        factura.put(&quot;cliente_email_1&quot;, &quot;&quot;);</span>
+<span class="nc" id="L888">                        factura.put(&quot;cliente_email_2&quot;, &quot;&quot;);</span>
+<span class="nc" id="L889">                        factura.put(&quot;fecha_de_emision&quot;, java.time.LocalDate.now().toString());</span>
+<span class="nc" id="L890">                        factura.put(&quot;fecha_de_vencimiento&quot;, &quot;&quot;);</span>
+<span class="nc" id="L891">                        factura.put(&quot;moneda&quot;, 1);</span>
+<span class="nc" id="L892">                        factura.put(&quot;tipo_de_cambio&quot;, &quot;&quot;);</span>
+<span class="nc" id="L893">                        factura.put(&quot;porcentaje_de_igv&quot;, 18.00);</span>
+<span class="nc" id="L894">                        factura.put(&quot;descuento_global&quot;, &quot;&quot;);</span>
+<span class="nc" id="L895">                        factura.put(&quot;total_descuento&quot;, &quot;&quot;);</span>
+<span class="nc" id="L896">                        factura.put(&quot;total_anticipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L897">                        factura.put(&quot;total_gravada&quot;, subtotal.doubleValue());</span>
+<span class="nc" id="L898">                        factura.put(&quot;total_inafecta&quot;, &quot;&quot;);</span>
+<span class="nc" id="L899">                        factura.put(&quot;total_exonerada&quot;, &quot;&quot;);</span>
+<span class="nc" id="L900">                        factura.put(&quot;total_igv&quot;, igv.doubleValue());</span>
+<span class="nc" id="L901">                        factura.put(&quot;total_gratuita&quot;, &quot;&quot;);</span>
+<span class="nc" id="L902">                        factura.put(&quot;total_otros_cargos&quot;, &quot;&quot;);</span>
+<span class="nc" id="L903">                        factura.put(&quot;total&quot;, total[0].doubleValue());</span>
+<span class="nc" id="L904">                        factura.put(&quot;percepcion_tipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L905">                        factura.put(&quot;percepcion_base_imponible&quot;, &quot;&quot;);</span>
+<span class="nc" id="L906">                        factura.put(&quot;total_percepcion&quot;, &quot;&quot;);</span>
+<span class="nc" id="L907">                        factura.put(&quot;total_incluido_percepcion&quot;, &quot;&quot;);</span>
+<span class="nc" id="L908">                        factura.put(&quot;retencion_tipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L909">                        factura.put(&quot;retencion_base_imponible&quot;, &quot;&quot;);</span>
+<span class="nc" id="L910">                        factura.put(&quot;total_retencion&quot;, &quot;&quot;);</span>
+<span class="nc" id="L911">                        factura.put(&quot;total_impuestos_bolsas&quot;, &quot;&quot;);</span>
+<span class="nc" id="L912">                        factura.put(&quot;detraccion&quot;, false);</span>
+<span class="nc" id="L913">                        factura.put(&quot;observaciones&quot;, &quot;&quot;);</span>
+<span class="nc" id="L914">                        factura.put(&quot;documento_que_se_modifica_tipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L915">                        factura.put(&quot;documento_que_se_modifica_serie&quot;, &quot;&quot;);</span>
+<span class="nc" id="L916">                        factura.put(&quot;documento_que_se_modifica_numero&quot;, &quot;&quot;);</span>
+<span class="nc" id="L917">                        factura.put(&quot;tipo_de_nota_de_credito&quot;, &quot;&quot;);</span>
+<span class="nc" id="L918">                        factura.put(&quot;tipo_de_nota_de_debito&quot;, &quot;&quot;);</span>
+<span class="nc" id="L919">                        factura.put(&quot;enviar_automaticamente_a_la_sunat&quot;, true);</span>
+<span class="nc" id="L920">                        factura.put(&quot;enviar_automaticamente_al_cliente&quot;, false);</span>
+<span class="nc" id="L921">                        factura.put(&quot;condiciones_de_pago&quot;, &quot;&quot;);</span>
+<span class="nc" id="L922">                        factura.put(&quot;medio_de_pago&quot;, &quot;&quot;);</span>
+<span class="nc" id="L923">                        factura.put(&quot;placa_vehiculo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L924">                        factura.put(&quot;orden_compra_servicio&quot;, &quot;&quot;);</span>
+<span class="nc" id="L925">                        factura.put(&quot;formato_de_pdf&quot;, &quot;&quot;);</span>
+<span class="nc" id="L926">                        factura.put(&quot;generado_por_contingencia&quot;, &quot;&quot;);</span>
+<span class="nc" id="L927">                        factura.put(&quot;bienes_region_selva&quot;, &quot;&quot;);</span>
+<span class="nc" id="L928">                        factura.put(&quot;servicios_region_selva&quot;, &quot;&quot;);</span>
+                        // Items
+<span class="nc" id="L930">                        java.util.List&lt;java.util.Map&lt;String, Object&gt;&gt; items = new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L931" title="All 2 branches missed.">                        for (DetalleVenta d : carrito) {</span>
+<span class="nc" id="L932">                            java.util.LinkedHashMap&lt;String, Object&gt; item = new java.util.LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L933">                            item.put(&quot;unidad_de_medida&quot;, &quot;NIU&quot;);</span>
+<span class="nc" id="L934">                            item.put(&quot;codigo&quot;, d.getProducto().getCodigo());</span>
+<span class="nc" id="L935">                            item.put(&quot;codigo_producto_sunat&quot;, &quot;10000000&quot;);</span>
+<span class="nc" id="L936">                            item.put(&quot;descripcion&quot;, d.getProducto().getNombre());</span>
+<span class="nc" id="L937">                            item.put(&quot;cantidad&quot;, d.getCantidad());</span>
+<span class="nc" id="L938">                            double valorUnitario = d.getPrecioUnitario().doubleValue();</span>
+<span class="nc" id="L939">                            item.put(&quot;valor_unitario&quot;, valorUnitario);</span>
+<span class="nc" id="L940">                            double precioUnitarioConIGV = Math.round(valorUnitario * 1.18 * 100.0) / 100.0;</span>
+<span class="nc" id="L941">                            item.put(&quot;precio_unitario&quot;, precioUnitarioConIGV);</span>
+<span class="nc" id="L942">                            item.put(&quot;descuento&quot;, &quot;&quot;);</span>
+<span class="nc" id="L943">                            item.put(&quot;subtotal&quot;, valorUnitario * d.getCantidad());</span>
+<span class="nc" id="L944">                            item.put(&quot;tipo_de_igv&quot;, 1);</span>
+<span class="nc" id="L945">                            double igvDetalle = Math.round(valorUnitario * d.getCantidad() * 0.18 * 100.0) / 100.0;</span>
+<span class="nc" id="L946">                            item.put(&quot;igv&quot;, igvDetalle);</span>
+<span class="nc" id="L947">                            double totalLinea = Math.round(precioUnitarioConIGV * d.getCantidad() * 100.0) / 100.0;</span>
+<span class="nc" id="L948">                            item.put(&quot;total&quot;, totalLinea);</span>
+<span class="nc" id="L949">                            item.put(&quot;anticipo_regularizacion&quot;, false);</span>
+<span class="nc" id="L950">                            item.put(&quot;anticipo_documento_serie&quot;, &quot;&quot;);</span>
+<span class="nc" id="L951">                            item.put(&quot;anticipo_documento_numero&quot;, &quot;&quot;);</span>
+<span class="nc" id="L952">                            items.add(item);</span>
+<span class="nc" id="L953">                        }</span>
+<span class="nc" id="L954">                        factura.put(&quot;items&quot;, items);</span>
+<span class="nc" id="L955">                        factura.put(&quot;guias&quot;, new java.util.ArrayList&lt;&gt;());</span>
+<span class="nc" id="L956">                        factura.put(&quot;venta_al_credito&quot;, new java.util.ArrayList&lt;&gt;());</span>
+<span class="nc" id="L957">                        String jsonFactura = new com.google.gson.Gson().toJson(factura);</span>
+<span class="nc" id="L958">                        System.out.println(&quot;[DEBUG JSON FACTURA] JSON generado para NubeFacT:\n&quot; + jsonFactura);</span>
+<span class="nc" id="L959">                        String apiUrl = &quot;https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127&quot;;</span>
+<span class="nc" id="L960">                        String apiToken = &quot;54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e&quot;;</span>
+<span class="nc" id="L961">                        String respuesta = ComprobanteUtils.enviarFacturaNubeFact(jsonFactura, apiUrl, apiToken);</span>
+<span class="nc" id="L962">                        String hashSunat = &quot;&quot;;</span>
+<span class="nc" id="L963">                        String estadoSunat = &quot;&quot;;</span>
+<span class="nc" id="L964">                        String pdfUrl = &quot;&quot;;</span>
+<span class="nc" id="L965">                        String xmlUrl = &quot;&quot;;</span>
+<span class="nc" id="L966">                        String cdrUrl = &quot;&quot;;</span>
+                        try {
+<span class="nc" id="L968">                            com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(respuesta)</span>
+<span class="nc" id="L969">                                    .getAsJsonObject();</span>
+<span class="nc bnc" id="L970" title="All 2 branches missed.">                            hashSunat = json.has(&quot;hash&quot;) ? json.get(&quot;hash&quot;).getAsString() : &quot;&quot;;</span>
+<span class="nc bnc" id="L971" title="All 2 branches missed.">                            estadoSunat = json.has(&quot;sunat_description&quot;)</span>
+<span class="nc" id="L972">                                    ? json.get(&quot;sunat_description&quot;).getAsString()</span>
+<span class="nc" id="L973">                                    : &quot;&quot;;</span>
+<span class="nc bnc" id="L974" title="All 2 branches missed.">                            pdfUrl = json.has(&quot;enlace_del_pdf&quot;) ? json.get(&quot;enlace_del_pdf&quot;).getAsString() : &quot;&quot;;</span>
+<span class="nc bnc" id="L975" title="All 2 branches missed.">                            xmlUrl = json.has(&quot;enlace_xml&quot;) ? json.get(&quot;enlace_xml&quot;).getAsString() : &quot;&quot;;</span>
+<span class="nc bnc" id="L976" title="All 2 branches missed.">                            cdrUrl = json.has(&quot;enlace_cdr&quot;) ? json.get(&quot;enlace_cdr&quot;).getAsString() : &quot;&quot;;</span>
+<span class="nc" id="L977">                            System.out.println(&quot;[DEBUG] Respuesta NubeFacT: &quot; + respuesta);</span>
+<span class="nc" id="L978">                            System.out.println(&quot;[DEBUG] pdfUrl extraído: &quot; + pdfUrl);</span>
+<span class="nc" id="L979">                        } catch (Exception ex) {</span>
+<span class="nc" id="L980">                            mostrarMensaje(&quot;Error procesando respuesta de NubeFacT: &quot; + ex.getMessage());</span>
+<span class="nc" id="L981">                            System.err.println(&quot;[ERROR NubeFacT] &quot; + ex.getMessage());</span>
+<span class="nc" id="L982">                            ex.printStackTrace();</span>
+<span class="nc" id="L983">                        }</span>
+<span class="nc" id="L984">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.ComprobanteFactory comprobanteFactory = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.FacturaFactory();</span>
+<span class="nc" id="L985">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante comprobante = comprobanteFactory</span>
+<span class="nc" id="L986">                                .crearComprobante();</span>
+<span class="nc" id="L987">                        comprobante.setSerie(serieFactura);</span>
+<span class="nc" id="L988">                        comprobante.setNumero(numeroFactura);</span>
+<span class="nc" id="L989">                        comprobante.setHashSunat(hashSunat);</span>
+<span class="nc" id="L990">                        comprobante.setEstadoSunat(&quot;GENERADO&quot;);</span>
+<span class="nc" id="L991">                        comprobante.setFechaEmision(java.time.LocalDateTime.now());</span>
+
+                        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
+<span class="nc" id="L994">                                .getUsuarioActual();</span>
+<span class="nc" id="L995">                        java.time.LocalDateTime now = java.time.LocalDateTime.now();</span>
+<span class="nc" id="L996">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder ventaBuilder = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder()</span>
+<span class="nc" id="L997">                                .conCliente(clienteActual)</span>
+<span class="nc" id="L998">                                .conUsuario(usuarioActual)</span>
+<span class="nc" id="L999">                                .conSubtotal(subtotal)</span>
+<span class="nc" id="L1000">                                .conDescuentoMonto(descuento[0])</span>
+<span class="nc" id="L1001">                                .conIgvMonto(igv)</span>
+<span class="nc" id="L1002">                                .conTotal(total[0])</span>
+<span class="nc" id="L1003">                                .conTipoPago(metodoPago)</span>
+<span class="nc" id="L1004">                                .conTipoComprobante(&quot;FACTURA&quot;)</span>
+<span class="nc" id="L1005">                                .conNumeroBoleta(numeroFactura)</span>
+<span class="nc" id="L1006">                                .conSerie(serieFactura)</span>
+<span class="nc" id="L1007">                                .conFechaVenta(now)</span>
+<span class="nc" id="L1008">                                .conEstado(&quot;REALIZADA&quot;)</span>
+<span class="nc" id="L1009">                                .conDetalles(new java.util.ArrayList&lt;&gt;(carrito))</span>
+<span class="nc" id="L1010">                                .conComprobante(comprobante)</span>
+<span class="nc" id="L1011">                                .conObservaciones(&quot;&quot;)</span>
+<span class="nc" id="L1012">                                .conCreatedAt(now)</span>
+<span class="nc" id="L1013">                                .conUpdatedAt(now);</span>
+<span class="nc" id="L1014">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta venta = ventaBuilder.build();</span>
+<span class="nc" id="L1015">                        Venta ventaGuardada = ventaRepository.save(venta);</span>
+<span class="nc bnc" id="L1016" title="All 4 branches missed.">                        if (ventaGuardada == null || ventaGuardada.getId() == 0) {</span>
+<span class="nc" id="L1017">                            mostrarMensaje(&quot;Error al guardar la venta. No se pudo obtener el ID generado.&quot;);</span>
+<span class="nc" id="L1018">                            return;</span>
+                        }
+<span class="nc bnc" id="L1020" title="All 2 branches missed.">                        for (DetalleVenta detalle : ventaGuardada.getDetalles()) {</span>
+<span class="nc" id="L1021">                            detalle.setVenta(ventaGuardada);</span>
+                            try {
+<span class="nc" id="L1023">                                detalleVentaRepository.save(detalle);</span>
+<span class="nc" id="L1024">                            } catch (Exception ex) {</span>
+<span class="nc" id="L1025">                                mostrarMensaje(&quot;Error al guardar detalle de venta: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1026">                                System.err.println(&quot;[ERROR DETALLE VENTA] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1027">                            }</span>
+<span class="nc" id="L1028">                            var producto = detalle.getProducto();</span>
+<span class="nc" id="L1029">                            Integer cantidadVendida = detalle.getCantidad();</span>
+<span class="nc bnc" id="L1030" title="All 6 branches missed.">                            if (producto != null &amp;&amp; producto.getId() != null &amp;&amp; cantidadVendida != null) {</span>
+<span class="nc bnc" id="L1031" title="All 2 branches missed.">                                int stockActual = producto.getStockActual() != null ? producto.getStockActual() : 0;</span>
+<span class="nc" id="L1032">                                int nuevoStock = stockActual - cantidadVendida;</span>
+<span class="nc bnc" id="L1033" title="All 2 branches missed.">                                if (nuevoStock &lt; 0) {</span>
+<span class="nc" id="L1034">                                    mostrarMensaje(&quot;Error: El stock del producto '&quot; + producto.getNombre()</span>
+                                            + &quot;' no puede ser negativo. Venta no registrada correctamente.&quot;);
+<span class="nc" id="L1036">                                    System.err.println(&quot;[ERROR STOCK] Stock negativo para producto: &quot;</span>
+<span class="nc" id="L1037">                                            + producto.getNombre() + &quot; (ID: &quot; + producto.getId() + &quot;)&quot;);</span>
+<span class="nc" id="L1038">                                    continue;</span>
+                                }
+<span class="nc" id="L1040">                                producto.setStockActual(nuevoStock);</span>
+                                try {
+                                    // Usar el método correcto del repositorio para actualizar el stock
+<span class="nc" id="L1043">                                    productoRepository.updateStock(producto.getId(), nuevoStock);</span>
+<span class="nc" id="L1044">                                } catch (Exception ex) {</span>
+<span class="nc" id="L1045">                                    mostrarMensaje(&quot;Error al actualizar el stock de '&quot; + producto.getNombre() + &quot;': &quot;</span>
+<span class="nc" id="L1046">                                            + ex.getMessage());</span>
+<span class="nc" id="L1047">                                    System.err.println(&quot;[ERROR STOCK] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1048">                                }</span>
+                            }
+<span class="nc" id="L1050">                        }</span>
+                        // Diagnóstico: mostrar tipo de cliente y total de venta antes de registrar
+                        // puntos
+<span class="nc" id="L1053">                        System.out.println(&quot;[DEBUG DIAGNOSTICO PUNTOS] clienteActual=&quot;</span>
+<span class="nc bnc" id="L1054" title="All 2 branches missed.">                                + (clienteActual != null ? clienteActual.getTipoCliente() : &quot;null&quot;) + &quot; | totalVenta=&quot;</span>
+<span class="nc bnc" id="L1055" title="All 4 branches missed.">                                + (ventaGuardada != null &amp;&amp; ventaGuardada.getTotal() != null ? ventaGuardada.getTotal()</span>
+<span class="nc" id="L1056">                                        : &quot;null&quot;));</span>
+                        // Registrar puntos GANADOS por la venta
+<span class="nc bnc" id="L1058" title="All 4 branches missed.">                        if (clienteActual != null &amp;&amp; &quot;NATURAL&quot;.equalsIgnoreCase(clienteActual.getTipoCliente())) {</span>
+<span class="nc" id="L1059">                            int puntosGanados = calcularPuntosPorVenta(ventaGuardada);</span>
+<span class="nc bnc" id="L1060" title="All 2 branches missed.">                            if (puntosGanados &gt; 0) {</span>
+<span class="nc" id="L1061">                                com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();</span>
+<span class="nc" id="L1062">                                movGanado.setClienteId(clienteActual.getId());</span>
+<span class="nc" id="L1063">                                movGanado.setVentaId(ventaGuardada.getId());</span>
+<span class="nc" id="L1064">                                movGanado.setTipo(&quot;GANADO&quot;);</span>
+<span class="nc" id="L1065">                                movGanado.setPuntos(puntosGanados);</span>
+<span class="nc" id="L1066">                                movGanado.setDescripcion(&quot;Puntos ganados por compra&quot;);</span>
+<span class="nc" id="L1067">                                movGanado.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc bnc" id="L1068" title="All 2 branches missed.">                                movGanado.setUsuarioId(usuarioActual != null</span>
+<span class="nc bnc" id="L1069" title="All 2 branches missed.">                                        ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)</span>
+<span class="nc" id="L1070">                                        : null);</span>
+<span class="nc" id="L1071">                                System.out.println(</span>
+                                        &quot;[DEBUG FLUJO PUNTOS] Se va a guardar transacción de puntos: &quot; + movGanado);
+<span class="nc" id="L1073">                                boolean puntosGuardados = transaccionPuntosRepository.save(movGanado);</span>
+<span class="nc bnc" id="L1074" title="All 2 branches missed.">                                if (!puntosGuardados) {</span>
+<span class="nc" id="L1075">                                    System.err.println(</span>
+                                            &quot;[ERROR PUNTOS] No se pudo guardar la transacción de puntos GANADO: &quot;
+                                                    + movGanado);
+<span class="nc" id="L1078">                                    mostrarMensaje(</span>
+                                            &quot;Error al registrar los puntos ganados. Verifique los datos del cliente y la venta.&quot;);
+                                }
+                            }
+                        }
+                        // 2. Crear comprobante y asociar la venta guardada
+<span class="nc" id="L1084">                        comprobante.setVenta(ventaGuardada);</span>
+<span class="nc" id="L1085">                        comprobanteRepository.save(comprobante);</span>
+
+                        // Registrar historial de venta
+<span class="nc" id="L1088">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio historial = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio();</span>
+<span class="nc" id="L1089">                        historial.setVenta(ventaGuardada);</span>
+<span class="nc" id="L1090">                        historial.setTipoCambio(&quot;CREACION&quot;); // ENUM correcto</span>
+<span class="nc" id="L1091">                        historial.setMotivo(&quot;Venta registrada&quot;);</span>
+<span class="nc" id="L1092">                        historial.setUsuario(usuarioActual);</span>
+<span class="nc" id="L1093">                        historial.setFecha(java.time.LocalDateTime.now());</span>
+                        try {
+<span class="nc" id="L1095">                            historialCambioRepository.save(historial);</span>
+<span class="nc" id="L1096">                        } catch (Exception ex) {</span>
+<span class="nc" id="L1097">                            mostrarMensaje(&quot;Error al registrar historial de venta: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1098">                            System.err.println(&quot;[ERROR HISTORIAL VENTA] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1099">                        }</span>
+<span class="nc" id="L1100">                        StringBuilder msg = new StringBuilder();</span>
+<span class="nc" id="L1101">                        msg.append(&quot;Factura electrónica enviada a SUNAT (demo)\n&quot;);</span>
+<span class="nc" id="L1102">                        msg.append(&quot;Estado SUNAT: &quot;).append(estadoSunat).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L1103" title="All 2 branches missed.">                        if (!pdfUrl.isEmpty())</span>
+<span class="nc" id="L1104">                            msg.append(&quot;PDF: &quot;).append(pdfUrl).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L1105" title="All 2 branches missed.">                        if (!xmlUrl.isEmpty())</span>
+<span class="nc" id="L1106">                            msg.append(&quot;XML: &quot;).append(xmlUrl).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L1107" title="All 2 branches missed.">                        if (!cdrUrl.isEmpty())</span>
+<span class="nc" id="L1108">                            msg.append(&quot;CDR: &quot;).append(cdrUrl).append(&quot;\n&quot;);</span>
+<span class="nc" id="L1109">                        mostrarMensaje(msg.toString());</span>
+                        // Abrir ventana de acciones con PDF y datos del cliente (FACTURA/BOLETA)
+                        try {
+<span class="nc" id="L1112">                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(</span>
+<span class="nc" id="L1113">                                    getClass().getResource(&quot;/fxml/comprobante_acciones.fxml&quot;));</span>
+<span class="nc" id="L1114">                            javafx.scene.Parent accionesRoot = accionesLoader.load();</span>
+<span class="nc" id="L1115">                            ComprobanteAccionesController accionesController = accionesLoader.getController();</span>
+<span class="nc" id="L1116">                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),</span>
+<span class="nc" id="L1117">                                    clienteActual.getEmail(), clienteActual.getTelefono());</span>
+<span class="nc" id="L1118">                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();</span>
+<span class="nc" id="L1119">                            accionesController.setStage(accionesStage);</span>
+<span class="nc" id="L1120">                            accionesStage.setTitle(&quot;Acciones sobre Comprobante Electrónico&quot;);</span>
+<span class="nc" id="L1121">                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));</span>
+<span class="nc" id="L1122">                            accionesStage.show();</span>
+<span class="nc" id="L1123">                        } catch (Exception ex) {</span>
+<span class="nc" id="L1124">                            mostrarMensaje(&quot;No se pudo abrir la ventana de acciones: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1125">                        }</span>
+<span class="nc" id="L1126">                        carrito.clear();</span>
+<span class="nc" id="L1127">                        actualizarTotales();</span>
+<span class="nc" id="L1128">                    } catch (Exception ex) {</span>
+<span class="nc" id="L1129">                        mostrarMensaje(&quot;Error en emisión de factura electrónica: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1130">                        System.err.println(&quot;[ERROR Emisión Factura] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1131">                        ex.printStackTrace();</span>
+<span class="nc" id="L1132">                    }</span>
+<span class="nc" id="L1133">                });</span>
+<span class="nc" id="L1134">                stage.showAndWait();</span>
+<span class="nc" id="L1135">            } catch (Exception ex) {</span>
+<span class="nc" id="L1136">                mostrarMensaje(&quot;Error en emisión de factura electrónica: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1137">                System.err.println(&quot;[ERROR Emisión Factura] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1138">                ex.printStackTrace();</span>
+<span class="nc" id="L1139">            }</span>
+<span class="nc bnc" id="L1140" title="All 2 branches missed.">        } else if (&quot;BOLETA&quot;.equalsIgnoreCase(tipoComprobante)) {</span>
+            // Validar que el cliente seleccionado sea NATURAL y tenga datos completos
+<span class="nc bnc" id="L1142" title="All 6 branches missed.">            if (clienteActual == null || clienteActual.getDni() == null || clienteActual.getNombreCompleto() == null</span>
+<span class="nc bnc" id="L1143" title="All 4 branches missed.">                    || clienteActual.getDireccion() == null || clienteActual.getDni().isEmpty()</span>
+<span class="nc bnc" id="L1144" title="All 4 branches missed.">                    || clienteActual.getNombreCompleto().isEmpty() || clienteActual.getDireccion().isEmpty()) {</span>
+<span class="nc" id="L1145">                mostrarMensaje(</span>
+                        &quot;Para emitir boleta electrónica, selecciona un cliente tipo NATURAL con DNI, nombre y dirección.&quot;);
+<span class="nc" id="L1147">                return;</span>
+            }
+            try {
+<span class="nc" id="L1150">                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(</span>
+<span class="nc" id="L1151">                        getClass().getResource(&quot;/fxml/vista_previa_comprobante.fxml&quot;));</span>
+<span class="nc" id="L1152">                javafx.scene.Parent root = loader.load();</span>
+<span class="nc" id="L1153">                VistaPreviaComprobanteController previewController = loader.getController();</span>
+<span class="nc" id="L1154">                javafx.stage.Stage stage = new javafx.stage.Stage();</span>
+<span class="nc" id="L1155">                stage.setTitle(&quot;Vista Previa de Boleta Electrónica&quot;);</span>
+<span class="nc" id="L1156">                stage.setScene(new javafx.scene.Scene(root));</span>
+<span class="nc" id="L1157">                ComprobanteUtils.Cliente clienteJsonPreview = new ComprobanteUtils.Cliente();</span>
+<span class="nc" id="L1158">                clienteJsonPreview.tipo_documento = &quot;1&quot;;</span>
+<span class="nc" id="L1159">                clienteJsonPreview.numero_documento = clienteActual.getDni();</span>
+<span class="nc" id="L1160">                clienteJsonPreview.razon_social = clienteActual.getNombreCompleto();</span>
+<span class="nc" id="L1161">                clienteJsonPreview.direccion = clienteActual.getDireccion();</span>
+<span class="nc" id="L1162">                clienteJsonPreview.direccion = clienteActual.getEmail();</span>
+                javafx.collections.ObservableList&lt;ComprobanteUtils.DetalleVenta&gt; detallesPreview = javafx.collections.FXCollections
+<span class="nc" id="L1164">                        .observableArrayList();</span>
+<span class="nc bnc" id="L1165" title="All 2 branches missed.">                for (DetalleVenta d : carrito) {</span>
+<span class="nc" id="L1166">                    ComprobanteUtils.DetalleVenta det = new ComprobanteUtils.DetalleVenta();</span>
+<span class="nc" id="L1167">                    det.unidad_de_medida = &quot;NIU&quot;;</span>
+<span class="nc" id="L1168">                    det.codigo_producto = d.getProducto().getCodigo();</span>
+<span class="nc" id="L1169">                    det.descripcion = d.getProducto().getNombre();</span>
+<span class="nc" id="L1170">                    det.cantidad = d.getCantidad();</span>
+<span class="nc" id="L1171">                    det.valor_unitario = d.getPrecioUnitario().doubleValue();</span>
+<span class="nc" id="L1172">                    det.precio_unitario = d.getPrecioUnitario().doubleValue();</span>
+<span class="nc" id="L1173">                    det.subtotal = d.getSubtotal().doubleValue();</span>
+<span class="nc" id="L1174">                    det.tipo_de_igv = 1;</span>
+<span class="nc" id="L1175">                    double igvDetalle = d.getSubtotal().doubleValue() * 0.18;</span>
+<span class="nc" id="L1176">                    det.igv = igvDetalle;</span>
+<span class="nc" id="L1177">                    det.total = d.getSubtotal().doubleValue() + igvDetalle;</span>
+<span class="nc" id="L1178">                    detallesPreview.add(det);</span>
+<span class="nc" id="L1179">                }</span>
+<span class="nc" id="L1180">                String serieBoleta = &quot;BBB1&quot;;</span>
+<span class="nc" id="L1181">                String numeroBoleta = obtenerSiguienteNumeroBoleta(serieBoleta);</span>
+<span class="nc" id="L1182">                previewController.setDatos(clienteJsonPreview, &quot;BOLETA&quot;, serieBoleta, numeroBoleta,</span>
+<span class="nc" id="L1183">                        total[0].toPlainString(), detallesPreview);</span>
+<span class="nc" id="L1184">                previewController.setStage(stage);</span>
+<span class="nc" id="L1185">                previewController.setOnConfirmar(() -&gt; {</span>
+                    try {
+                        // Armado de JSON igual al ejemplo de PharmavictoriaApplication.java
+<span class="nc" id="L1188">                        java.util.LinkedHashMap&lt;String, Object&gt; boleta = new java.util.LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L1189">                        boleta.put(&quot;operacion&quot;, &quot;generar_comprobante&quot;);</span>
+<span class="nc" id="L1190">                        boleta.put(&quot;tipo_de_comprobante&quot;, 2);</span>
+<span class="nc" id="L1191">                        boleta.put(&quot;serie&quot;, serieBoleta);</span>
+<span class="nc" id="L1192">                        boleta.put(&quot;numero&quot;, Integer.parseInt(numeroBoleta));</span>
+<span class="nc" id="L1193">                        boleta.put(&quot;sunat_transaction&quot;, 1);</span>
+<span class="nc" id="L1194">                        boleta.put(&quot;cliente_tipo_de_documento&quot;, 1);</span>
+<span class="nc" id="L1195">                        boleta.put(&quot;cliente_numero_de_documento&quot;, clienteActual.getDni());</span>
+<span class="nc" id="L1196">                        boleta.put(&quot;cliente_denominacion&quot;, clienteActual.getNombreCompleto());</span>
+<span class="nc" id="L1197">                        boleta.put(&quot;cliente_direccion&quot;, clienteActual.getDireccion());</span>
+<span class="nc bnc" id="L1198" title="All 2 branches missed.">                        boleta.put(&quot;cliente_email&quot;, clienteActual.getEmail() != null ? clienteActual.getEmail() : &quot;&quot;);</span>
+<span class="nc" id="L1199">                        boleta.put(&quot;cliente_email_1&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1200">                        boleta.put(&quot;cliente_email_2&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1201">                        boleta.put(&quot;fecha_de_emision&quot;, java.time.LocalDate.now().toString());</span>
+<span class="nc" id="L1202">                        boleta.put(&quot;fecha_de_vencimiento&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1203">                        boleta.put(&quot;moneda&quot;, 1);</span>
+<span class="nc" id="L1204">                        boleta.put(&quot;tipo_de_cambio&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1205">                        boleta.put(&quot;porcentaje_de_igv&quot;, 18.00);</span>
+<span class="nc" id="L1206">                        boleta.put(&quot;descuento_global&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1207">                        boleta.put(&quot;total_descuento&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1208">                        boleta.put(&quot;total_anticipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1209">                        boleta.put(&quot;total_gravada&quot;, subtotal.doubleValue());</span>
+<span class="nc" id="L1210">                        boleta.put(&quot;total_inafecta&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1211">                        boleta.put(&quot;total_exonerada&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1212">                        boleta.put(&quot;total_igv&quot;, igv.doubleValue());</span>
+<span class="nc" id="L1213">                        boleta.put(&quot;total_gratuita&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1214">                        boleta.put(&quot;total_otros_cargos&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1215">                        boleta.put(&quot;total&quot;, total[0].doubleValue());</span>
+<span class="nc" id="L1216">                        boleta.put(&quot;percepcion_tipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1217">                        boleta.put(&quot;percepcion_base_imponible&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1218">                        boleta.put(&quot;total_percepcion&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1219">                        boleta.put(&quot;total_incluido_percepcion&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1220">                        boleta.put(&quot;retencion_tipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1221">                        boleta.put(&quot;retencion_base_imponible&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1222">                        boleta.put(&quot;total_retencion&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1223">                        boleta.put(&quot;total_impuestos_bolsas&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1224">                        boleta.put(&quot;detraccion&quot;, false);</span>
+<span class="nc" id="L1225">                        boleta.put(&quot;observaciones&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1226">                        boleta.put(&quot;documento_que_se_modifica_tipo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1227">                        boleta.put(&quot;documento_que_se_modifica_serie&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1228">                        boleta.put(&quot;documento_que_se_modifica_numero&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1229">                        boleta.put(&quot;tipo_de_nota_de_credito&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1230">                        boleta.put(&quot;tipo_de_nota_de_debito&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1231">                        boleta.put(&quot;enviar_automaticamente_a_la_sunat&quot;, true);</span>
+<span class="nc" id="L1232">                        boleta.put(&quot;enviar_automaticamente_al_cliente&quot;, false);</span>
+<span class="nc" id="L1233">                        boleta.put(&quot;condiciones_de_pago&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1234">                        boleta.put(&quot;medio_de_pago&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1235">                        boleta.put(&quot;placa_vehiculo&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1236">                        boleta.put(&quot;orden_compra_servicio&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1237">                        boleta.put(&quot;formato_de_pdf&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1238">                        boleta.put(&quot;generado_por_contingencia&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1239">                        boleta.put(&quot;bienes_region_selva&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1240">                        boleta.put(&quot;servicios_region_selva&quot;, &quot;&quot;);</span>
+                        // Items
+<span class="nc" id="L1242">                        java.util.List&lt;java.util.Map&lt;String, Object&gt;&gt; items = new java.util.ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L1243" title="All 2 branches missed.">                        for (DetalleVenta d : carrito) {</span>
+<span class="nc" id="L1244">                            java.util.LinkedHashMap&lt;String, Object&gt; item = new java.util.LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L1245">                            item.put(&quot;unidad_de_medida&quot;, &quot;NIU&quot;);</span>
+<span class="nc" id="L1246">                            item.put(&quot;codigo&quot;, d.getProducto().getCodigo());</span>
+<span class="nc" id="L1247">                            item.put(&quot;codigo_producto_sunat&quot;, &quot;10000000&quot;);</span>
+<span class="nc" id="L1248">                            item.put(&quot;descripcion&quot;, d.getProducto().getNombre());</span>
+<span class="nc" id="L1249">                            item.put(&quot;cantidad&quot;, d.getCantidad());</span>
+<span class="nc" id="L1250">                            double valorUnitario = d.getPrecioUnitario().doubleValue();</span>
+<span class="nc" id="L1251">                            item.put(&quot;valor_unitario&quot;, valorUnitario);</span>
+<span class="nc" id="L1252">                            double precioUnitarioConIGV = Math.round(valorUnitario * 1.18 * 100.0) / 100.0;</span>
+<span class="nc" id="L1253">                            item.put(&quot;precio_unitario&quot;, precioUnitarioConIGV);</span>
+<span class="nc" id="L1254">                            item.put(&quot;descuento&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1255">                            item.put(&quot;subtotal&quot;, valorUnitario * d.getCantidad());</span>
+<span class="nc" id="L1256">                            item.put(&quot;tipo_de_igv&quot;, 1);</span>
+<span class="nc" id="L1257">                            double igvDetalle = Math.round(valorUnitario * d.getCantidad() * 0.18 * 100.0) / 100.0;</span>
+<span class="nc" id="L1258">                            item.put(&quot;igv&quot;, igvDetalle);</span>
+<span class="nc" id="L1259">                            double totalLinea = Math.round(precioUnitarioConIGV * d.getCantidad() * 100.0) / 100.0;</span>
+<span class="nc" id="L1260">                            item.put(&quot;total&quot;, totalLinea);</span>
+<span class="nc" id="L1261">                            item.put(&quot;anticipo_regularizacion&quot;, false);</span>
+<span class="nc" id="L1262">                            item.put(&quot;anticipo_documento_serie&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1263">                            item.put(&quot;anticipo_documento_numero&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1264">                            items.add(item);</span>
+<span class="nc" id="L1265">                        }</span>
+<span class="nc" id="L1266">                        boleta.put(&quot;items&quot;, items);</span>
+<span class="nc" id="L1267">                        boleta.put(&quot;guias&quot;, new java.util.ArrayList&lt;&gt;());</span>
+<span class="nc" id="L1268">                        boleta.put(&quot;venta_al_credito&quot;, new java.util.ArrayList&lt;&gt;());</span>
+<span class="nc" id="L1269">                        String jsonBoleta = new com.google.gson.Gson().toJson(boleta);</span>
+<span class="nc" id="L1270">                        System.out.println(&quot;[DEBUG JSON BOLETA] JSON generado para NubeFacT:\n&quot; + jsonBoleta);</span>
+<span class="nc" id="L1271">                        String apiUrl = &quot;https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127&quot;;</span>
+<span class="nc" id="L1272">                        String apiToken = &quot;54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e&quot;;</span>
+<span class="nc" id="L1273">                        String respuesta = com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils</span>
+<span class="nc" id="L1274">                                .enviarFacturaNubeFact(jsonBoleta, apiUrl, apiToken);</span>
+                        // Mostrar JSON y respuesta NubeFacT solo en terminal para diagnóstico
+<span class="nc" id="L1276">                        System.out.println(&quot;[DEBUG JSON enviado a NubeFacT]\n&quot; + jsonBoleta);</span>
+<span class="nc" id="L1277">                        System.out.println(&quot;[DEBUG Respuesta completa de NubeFacT]\n&quot; + respuesta);</span>
+<span class="nc" id="L1278">                        String hashSunat = &quot;&quot;;</span>
+<span class="nc" id="L1279">                        String estadoSunat = &quot;&quot;;</span>
+<span class="nc" id="L1280">                        String pdfUrl = &quot;&quot;;</span>
+<span class="nc" id="L1281">                        String xmlUrl = &quot;&quot;;</span>
+<span class="nc" id="L1282">                        String cdrUrl = &quot;&quot;;</span>
+                        try {
+<span class="nc" id="L1284">                            com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(respuesta)</span>
+<span class="nc" id="L1285">                                    .getAsJsonObject();</span>
+<span class="nc bnc" id="L1286" title="All 4 branches missed.">                            if (json != null &amp;&amp; !json.isJsonNull()) {</span>
+<span class="nc bnc" id="L1287" title="All 4 branches missed.">                                hashSunat = json.has(&quot;hash&quot;) &amp;&amp; !json.get(&quot;hash&quot;).isJsonNull()</span>
+<span class="nc" id="L1288">                                        ? json.get(&quot;hash&quot;).getAsString()</span>
+<span class="nc" id="L1289">                                        : &quot;&quot;;</span>
+<span class="nc bnc" id="L1290" title="All 2 branches missed.">                                estadoSunat = json.has(&quot;sunat_description&quot;)</span>
+<span class="nc bnc" id="L1291" title="All 2 branches missed.">                                        &amp;&amp; !json.get(&quot;sunat_description&quot;).isJsonNull()</span>
+<span class="nc" id="L1292">                                                ? json.get(&quot;sunat_description&quot;).getAsString()</span>
+<span class="nc" id="L1293">                                                : &quot;&quot;;</span>
+<span class="nc bnc" id="L1294" title="All 4 branches missed.">                                pdfUrl = json.has(&quot;enlace_del_pdf&quot;) &amp;&amp; !json.get(&quot;enlace_del_pdf&quot;).isJsonNull()</span>
+<span class="nc" id="L1295">                                        ? json.get(&quot;enlace_del_pdf&quot;).getAsString()</span>
+<span class="nc" id="L1296">                                        : &quot;&quot;;</span>
+<span class="nc bnc" id="L1297" title="All 4 branches missed.">                                xmlUrl = json.has(&quot;enlace_xml&quot;) &amp;&amp; !json.get(&quot;enlace_xml&quot;).isJsonNull()</span>
+<span class="nc" id="L1298">                                        ? json.get(&quot;enlace_xml&quot;).getAsString()</span>
+<span class="nc" id="L1299">                                        : &quot;&quot;;</span>
+<span class="nc bnc" id="L1300" title="All 4 branches missed.">                                cdrUrl = json.has(&quot;enlace_cdr&quot;) &amp;&amp; !json.get(&quot;enlace_cdr&quot;).isJsonNull()</span>
+<span class="nc" id="L1301">                                        ? json.get(&quot;enlace_cdr&quot;).getAsString()</span>
+<span class="nc" id="L1302">                                        : &quot;&quot;;</span>
+<span class="nc" id="L1303">                                System.out.println(&quot;[DEBUG] Respuesta NubeFacT: &quot; + respuesta);</span>
+<span class="nc" id="L1304">                                System.out.println(&quot;[DEBUG] pdfUrl extraído: &quot; + pdfUrl);</span>
+                            } else {
+<span class="nc" id="L1306">                                mostrarMensaje(&quot;Boleta registrada, pero no se recibió respuesta completa de NubeFacT.&quot;);</span>
+                            }
+<span class="nc" id="L1308">                        } catch (Exception ex) {</span>
+<span class="nc" id="L1309">                            mostrarMensaje(&quot;Boleta registrada, pero no se recibió respuesta completa de NubeFacT.&quot;);</span>
+<span class="nc" id="L1310">                            System.err.println(&quot;[ERROR NubeFacT] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1311">                        }</span>
+                        // 1. Crear comprobante usando Factory
+<span class="nc" id="L1313">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.ComprobanteFactory comprobanteFactory = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.BoletaFactory();</span>
+<span class="nc" id="L1314">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Comprobante comprobante = comprobanteFactory</span>
+<span class="nc" id="L1315">                                .crearComprobante();</span>
+<span class="nc" id="L1316">                        comprobante.setSerie(serieBoleta);</span>
+<span class="nc" id="L1317">                        comprobante.setNumero(numeroBoleta);</span>
+<span class="nc" id="L1318">                        comprobante.setHashSunat(hashSunat);</span>
+<span class="nc" id="L1319">                        comprobante.setEstadoSunat(&quot;GENERADO&quot;);</span>
+<span class="nc" id="L1320">                        comprobante.setFechaEmision(java.time.LocalDateTime.now());</span>
+
+                        // 2. Construir venta usando Builder
+                        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
+<span class="nc" id="L1324">                                .getUsuarioActual();</span>
+<span class="nc" id="L1325">                        java.time.LocalDateTime now = java.time.LocalDateTime.now();</span>
+<span class="nc" id="L1326">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder ventaBuilder = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaBuilder()</span>
+<span class="nc" id="L1327">                                .conCliente(clienteActual)</span>
+<span class="nc" id="L1328">                                .conUsuario(usuarioActual)</span>
+<span class="nc" id="L1329">                                .conSubtotal(subtotal)</span>
+<span class="nc" id="L1330">                                .conDescuentoMonto(descuento[0])</span>
+<span class="nc" id="L1331">                                .conIgvMonto(igv)</span>
+<span class="nc" id="L1332">                                .conTotal(total[0])</span>
+<span class="nc" id="L1333">                                .conTipoPago(metodoPago)</span>
+<span class="nc" id="L1334">                                .conTipoComprobante(&quot;BOLETA&quot;)</span>
+<span class="nc" id="L1335">                                .conNumeroBoleta(numeroBoleta)</span>
+<span class="nc" id="L1336">                                .conSerie(serieBoleta)</span>
+<span class="nc" id="L1337">                                .conFechaVenta(now)</span>
+<span class="nc" id="L1338">                                .conEstado(&quot;REALIZADA&quot;)</span>
+<span class="nc" id="L1339">                                .conDetalles(new java.util.ArrayList&lt;&gt;(carrito))</span>
+<span class="nc" id="L1340">                                .conComprobante(comprobante)</span>
+<span class="nc" id="L1341">                                .conObservaciones(&quot;&quot;)</span>
+<span class="nc" id="L1342">                                .conCreatedAt(now)</span>
+<span class="nc" id="L1343">                                .conUpdatedAt(now);</span>
+<span class="nc" id="L1344">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.Venta venta = ventaBuilder.build();</span>
+<span class="nc" id="L1345">                        Venta ventaGuardada = ventaRepository.save(venta);</span>
+<span class="nc bnc" id="L1346" title="All 4 branches missed.">                        if (ventaGuardada == null || ventaGuardada.getId() == 0) {</span>
+<span class="nc" id="L1347">                            mostrarMensaje(&quot;Error al guardar la venta. No se pudo obtener el ID generado.&quot;);</span>
+<span class="nc" id="L1348">                            return;</span>
+                        }
+<span class="nc bnc" id="L1350" title="All 2 branches missed.">                        for (DetalleVenta detalle : ventaGuardada.getDetalles()) {</span>
+<span class="nc" id="L1351">                            detalle.setVenta(ventaGuardada);</span>
+                            try {
+<span class="nc" id="L1353">                                detalleVentaRepository.save(detalle);</span>
+<span class="nc" id="L1354">                            } catch (Exception ex) {</span>
+<span class="nc" id="L1355">                                mostrarMensaje(&quot;Error al guardar detalle de venta: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1356">                                System.err.println(&quot;[ERROR DETALLE VENTA] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1357">                            }</span>
+<span class="nc" id="L1358">                            var producto = detalle.getProducto();</span>
+<span class="nc" id="L1359">                            Integer cantidadVendida = detalle.getCantidad();</span>
+<span class="nc bnc" id="L1360" title="All 6 branches missed.">                            if (producto != null &amp;&amp; producto.getId() != null &amp;&amp; cantidadVendida != null) {</span>
+<span class="nc bnc" id="L1361" title="All 2 branches missed.">                                int stockActual = producto.getStockActual() != null ? producto.getStockActual() : 0;</span>
+<span class="nc" id="L1362">                                int nuevoStock = stockActual - cantidadVendida;</span>
+<span class="nc bnc" id="L1363" title="All 2 branches missed.">                                if (nuevoStock &lt; 0) {</span>
+<span class="nc" id="L1364">                                    mostrarMensaje(&quot;Error: El stock del producto '&quot; + producto.getNombre()</span>
+                                            + &quot;' no puede ser negativo. Venta no registrada correctamente.&quot;);
+<span class="nc" id="L1366">                                    System.err.println(&quot;[ERROR STOCK] Stock negativo para producto: &quot;</span>
+<span class="nc" id="L1367">                                            + producto.getNombre() + &quot; (ID: &quot; + producto.getId() + &quot;)&quot;);</span>
+<span class="nc" id="L1368">                                    continue;</span>
+                                }
+<span class="nc" id="L1370">                                producto.setStockActual(nuevoStock);</span>
+                                try {
+<span class="nc" id="L1372">                                    productoRepository.updateStock(producto.getId(), nuevoStock);</span>
+<span class="nc" id="L1373">                                } catch (Exception ex) {</span>
+<span class="nc" id="L1374">                                    mostrarMensaje(&quot;Error al actualizar el stock de '&quot; + producto.getNombre() + &quot;': &quot;</span>
+<span class="nc" id="L1375">                                            + ex.getMessage());</span>
+<span class="nc" id="L1376">                                    System.err.println(&quot;[ERROR STOCK] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1377">                                }</span>
+                            }
+<span class="nc" id="L1379">                        }</span>
+                        // Registrar puntos GANADOS por la venta SOLO para clientes NATURAL (boleta)
+<span class="nc" id="L1381">                        System.out.println(&quot;[DEBUG DIAGNOSTICO PUNTOS] clienteActual=&quot;</span>
+<span class="nc bnc" id="L1382" title="All 2 branches missed.">                                + (clienteActual != null ? clienteActual.getTipoCliente() : &quot;null&quot;) + &quot; | totalVenta=&quot;</span>
+<span class="nc bnc" id="L1383" title="All 4 branches missed.">                                + (ventaGuardada != null &amp;&amp; ventaGuardada.getTotal() != null ? ventaGuardada.getTotal()</span>
+<span class="nc" id="L1384">                                        : &quot;null&quot;));</span>
+<span class="nc bnc" id="L1385" title="All 4 branches missed.">                        if (clienteActual != null &amp;&amp; &quot;NATURAL&quot;.equalsIgnoreCase(clienteActual.getTipoCliente())) {</span>
+<span class="nc" id="L1386">                            int puntosGanados = calcularPuntosPorVenta(ventaGuardada);</span>
+<span class="nc bnc" id="L1387" title="All 2 branches missed.">                            if (puntosGanados &gt; 0) {</span>
+<span class="nc" id="L1388">                                com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos movGanado = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();</span>
+<span class="nc" id="L1389">                                movGanado.setClienteId(clienteActual.getId());</span>
+<span class="nc" id="L1390">                                movGanado.setVentaId(ventaGuardada.getId());</span>
+<span class="nc" id="L1391">                                movGanado.setTipo(&quot;GANADO&quot;);</span>
+<span class="nc" id="L1392">                                movGanado.setPuntos(puntosGanados);</span>
+<span class="nc" id="L1393">                                movGanado.setDescripcion(&quot;Puntos ganados por compra&quot;);</span>
+<span class="nc" id="L1394">                                movGanado.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc bnc" id="L1395" title="All 2 branches missed.">                                movGanado.setUsuarioId(usuarioActual != null</span>
+<span class="nc bnc" id="L1396" title="All 2 branches missed.">                                        ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)</span>
+<span class="nc" id="L1397">                                        : null);</span>
+<span class="nc" id="L1398">                                System.out.println(</span>
+                                        &quot;[DEBUG FLUJO PUNTOS] Se va a guardar transacción de puntos: &quot; + movGanado);
+<span class="nc" id="L1400">                                boolean puntosGuardados = transaccionPuntosRepository.save(movGanado);</span>
+<span class="nc bnc" id="L1401" title="All 2 branches missed.">                                if (!puntosGuardados) {</span>
+<span class="nc" id="L1402">                                    System.err.println(</span>
+                                            &quot;[ERROR PUNTOS] No se pudo guardar la transacción de puntos GANADO: &quot;
+                                                    + movGanado);
+<span class="nc" id="L1405">                                    mostrarMensaje(</span>
+                                            &quot;Error al registrar los puntos ganados. Verifique los datos del cliente y la venta.&quot;);
+                                }
+                            }
+                        }
+                        // Registrar el uso de puntos si se usaron en la venta
+<span class="nc bnc" id="L1411" title="All 4 branches missed.">                        if (puntosUsados[0] &amp;&amp; puntosDescontados[0] &gt; 0) {</span>
+<span class="nc" id="L1412">                            com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos mov = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();</span>
+<span class="nc" id="L1413">                            mov.setClienteId(clienteActual.getId());</span>
+<span class="nc" id="L1414">                            mov.setVentaId(ventaGuardada.getId());</span>
+<span class="nc" id="L1415">                            mov.setTipo(&quot;USADO&quot;);</span>
+<span class="nc" id="L1416">                            mov.setPuntos(puntosDescontados[0]);</span>
+<span class="nc" id="L1417">                            mov.setDescripcion(&quot;Redención de puntos en venta&quot;);</span>
+<span class="nc" id="L1418">                            mov.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc bnc" id="L1419" title="All 2 branches missed.">                            mov.setUsuarioId(usuarioActual != null</span>
+<span class="nc bnc" id="L1420" title="All 2 branches missed.">                                    ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)</span>
+<span class="nc" id="L1421">                                    : null);</span>
+<span class="nc" id="L1422">                            boolean puntosUsadosGuardados = transaccionPuntosRepository.save(mov);</span>
+<span class="nc bnc" id="L1423" title="All 2 branches missed.">                            if (!puntosUsadosGuardados) {</span>
+<span class="nc" id="L1424">                                System.err.println(</span>
+                                        &quot;[ERROR PUNTOS] No se pudo guardar la transacción de puntos USADO: &quot; + mov);
+<span class="nc" id="L1426">                                mostrarMensaje(</span>
+                                        &quot;Error al registrar el uso de puntos. Verifique los datos del cliente y la venta.&quot;);
+                            }
+                        }
+<span class="nc" id="L1430">                        comprobante.setVenta(ventaGuardada);</span>
+<span class="nc" id="L1431">                        comprobanteRepository.save(comprobante);</span>
+
+<span class="nc" id="L1433">                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio historial = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio();</span>
+<span class="nc" id="L1434">                        historial.setVenta(ventaGuardada);</span>
+<span class="nc" id="L1435">                        historial.setTipoCambio(&quot;CREACION&quot;);</span>
+<span class="nc" id="L1436">                        historial.setMotivo(&quot;Venta registrada&quot;);</span>
+<span class="nc" id="L1437">                        historial.setUsuario(usuarioActual);</span>
+<span class="nc" id="L1438">                        historial.setFecha(java.time.LocalDateTime.now());</span>
+                        try {
+<span class="nc" id="L1440">                            historialCambioRepository.save(historial);</span>
+<span class="nc" id="L1441">                        } catch (Exception ex) {</span>
+<span class="nc" id="L1442">                            mostrarMensaje(&quot;Error al registrar historial de venta: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1443">                            System.err.println(&quot;[ERROR HISTORIAL VENTA] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1444">                        }</span>
+<span class="nc" id="L1445">                        StringBuilder msg = new StringBuilder();</span>
+<span class="nc" id="L1446">                        msg.append(&quot;Boleta electrónica enviada a SUNAT (demo)\n&quot;);</span>
+<span class="nc" id="L1447">                        msg.append(&quot;Estado SUNAT: &quot;).append(estadoSunat).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L1448" title="All 2 branches missed.">                        if (!pdfUrl.isEmpty())</span>
+<span class="nc" id="L1449">                            msg.append(&quot;PDF: &quot;).append(pdfUrl).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L1450" title="All 2 branches missed.">                        if (!xmlUrl.isEmpty())</span>
+<span class="nc" id="L1451">                            msg.append(&quot;XML: &quot;).append(xmlUrl).append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L1452" title="All 2 branches missed.">                        if (!cdrUrl.isEmpty())</span>
+<span class="nc" id="L1453">                            msg.append(&quot;CDR: &quot;).append(cdrUrl).append(&quot;\n&quot;);</span>
+<span class="nc" id="L1454">                        mostrarMensaje(msg.toString());</span>
+<span class="nc" id="L1455">                        carrito.clear();</span>
+<span class="nc" id="L1456">                        actualizarTotales();</span>
+                        // Abrir ventana de acciones con PDF y datos del cliente (BOLETA)
+                        try {
+<span class="nc" id="L1459">                            javafx.fxml.FXMLLoader accionesLoader = new javafx.fxml.FXMLLoader(</span>
+<span class="nc" id="L1460">                                    getClass().getResource(&quot;/fxml/comprobante_acciones.fxml&quot;));</span>
+<span class="nc" id="L1461">                            javafx.scene.Parent accionesRoot = accionesLoader.load();</span>
+<span class="nc" id="L1462">                            ComprobanteAccionesController accionesController = accionesLoader.getController();</span>
+<span class="nc" id="L1463">                            accionesController.setDatos(pdfUrl, clienteActual.getNombreCompleto(),</span>
+<span class="nc" id="L1464">                                    clienteActual.getEmail(), clienteActual.getTelefono());</span>
+<span class="nc" id="L1465">                            javafx.stage.Stage accionesStage = new javafx.stage.Stage();</span>
+<span class="nc" id="L1466">                            accionesController.setStage(accionesStage);</span>
+<span class="nc" id="L1467">                            accionesStage.setTitle(&quot;Acciones sobre Comprobante Electrónico&quot;);</span>
+<span class="nc" id="L1468">                            accionesStage.setScene(new javafx.scene.Scene(accionesRoot));</span>
+<span class="nc" id="L1469">                            accionesStage.show();</span>
+<span class="nc" id="L1470">                        } catch (Exception ex) {</span>
+<span class="nc" id="L1471">                            System.err.println(</span>
+<span class="nc" id="L1472">                                    &quot;[ERROR BOLETA] No se pudo abrir la ventana de acciones: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1473">                            mostrarMensaje(&quot;No se pudo abrir la ventana de acciones: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1474">                        }</span>
+<span class="nc" id="L1475">                    } catch (Exception ex) {</span>
+<span class="nc" id="L1476">                        mostrarMensaje(&quot;Error en emisión de boleta electrónica: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1477">                        System.err.println(&quot;[ERROR Emisión Boleta] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1478">                        ex.printStackTrace();</span>
+<span class="nc" id="L1479">                    }</span>
+<span class="nc" id="L1480">                });</span>
+<span class="nc" id="L1481">                stage.showAndWait();</span>
+<span class="nc" id="L1482">            } catch (Exception ex) {</span>
+<span class="nc" id="L1483">                mostrarMensaje(&quot;Error en emisión de boleta electrónica: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1484">                System.err.println(&quot;[ERROR Emisión Boleta] &quot; + ex.getMessage());</span>
+<span class="nc" id="L1485">                ex.printStackTrace();</span>
+<span class="nc" id="L1486">            }</span>
+        } else {
+<span class="nc" id="L1488">            mostrarMensaje(&quot;Tipo de comprobante no soportado o no seleccionado.&quot;);</span>
+        }
+<span class="nc" id="L1490">    }</span>
+
+    // Anula una venta y restaura el stock de los productos vendidos. Actualiza el
+    // estado en la BD y registra el historial de cambio.
+    private void anularVentaDesdeHistorial(Venta venta) {
+<span class="nc bnc" id="L1495" title="All 4 branches missed.">        if (venta == null || &quot;ANULADA&quot;.equalsIgnoreCase(venta.getEstado())) {</span>
+<span class="nc" id="L1496">            mostrarMensaje(&quot;La venta ya está anulada.&quot;);</span>
+<span class="nc" id="L1497">            return;</span>
+        }
+<span class="nc" id="L1499">        boolean esTicket = &quot;TICKET&quot;.equalsIgnoreCase(venta.getTipoComprobante());</span>
+        try {
+            // Cambiar estado de la venta
+<span class="nc" id="L1502">            venta.setEstado(&quot;ANULADA&quot;);</span>
+            // Asignar usuario actual para auditoría
+            com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
+<span class="nc" id="L1505">                    .getUsuarioActual();</span>
+<span class="nc" id="L1506">            venta.setUsuario(usuarioActual);</span>
+<span class="nc" id="L1507">            ventaRepository.update(venta);</span>
+
+            // Restar puntos ganados por la venta anulada
+<span class="nc bnc" id="L1510" title="All 2 branches missed.">            if (venta.getCliente() != null) {</span>
+<span class="nc" id="L1511">                int puntosGanados = calcularPuntosPorVenta(venta);</span>
+<span class="nc bnc" id="L1512" title="All 2 branches missed.">                if (puntosGanados &gt; 0) {</span>
+<span class="nc" id="L1513">                    com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos movExpirado = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.TransaccionPuntos();</span>
+<span class="nc" id="L1514">                    movExpirado.setClienteId(venta.getCliente().getId());</span>
+<span class="nc" id="L1515">                    movExpirado.setVentaId(venta.getId());</span>
+<span class="nc" id="L1516">                    movExpirado.setTipo(&quot;EXPIRADO&quot;);</span>
+<span class="nc" id="L1517">                    movExpirado.setPuntos(puntosGanados);</span>
+<span class="nc" id="L1518">                    movExpirado.setDescripcion(&quot;Puntos expirados por anulación de venta&quot;);</span>
+<span class="nc" id="L1519">                    movExpirado.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc bnc" id="L1520" title="All 2 branches missed.">                    movExpirado.setUsuarioId(usuarioActual != null</span>
+<span class="nc bnc" id="L1521" title="All 2 branches missed.">                            ? (usuarioActual.getId() != null ? usuarioActual.getId().intValue() : null)</span>
+<span class="nc" id="L1522">                            : null);</span>
+<span class="nc" id="L1523">                    transaccionPuntosRepository.save(movExpirado);</span>
+                }
+            }
+            // Restaurar stock de cada producto consultando el stock real en BD y mostrando
+            // logs
+<span class="nc bnc" id="L1528" title="All 2 branches missed.">            if (venta.getDetalles() != null) {</span>
+<span class="nc bnc" id="L1529" title="All 2 branches missed.">                for (DetalleVenta detalle : venta.getDetalles()) {</span>
+<span class="nc" id="L1530">                    Producto producto = detalle.getProducto();</span>
+<span class="nc bnc" id="L1531" title="All 4 branches missed.">                    if (producto != null &amp;&amp; producto.getId() != null) {</span>
+                        try {
+                            // Stock antes de la anulación
+<span class="nc" id="L1534">                            java.util.Optional&lt;Producto&gt; productoBDAntes = productoRepository</span>
+<span class="nc" id="L1535">                                    .findById(producto.getId().longValue());</span>
+<span class="nc bnc" id="L1536" title="All 2 branches missed.">                            int stockAntes = productoBDAntes.isPresent()</span>
+<span class="nc bnc" id="L1537" title="All 2 branches missed.">                                    &amp;&amp; productoBDAntes.get().getStockActual() != null</span>
+<span class="nc" id="L1538">                                            ? productoBDAntes.get().getStockActual()</span>
+<span class="nc" id="L1539">                                            : 0;</span>
+<span class="nc" id="L1540">                            int cantidadVendida = detalle.getCantidad();</span>
+<span class="nc" id="L1541">                            int nuevoStock = stockAntes + cantidadVendida;</span>
+<span class="nc" id="L1542">                            System.out.println(&quot;[ANULACION STOCK] Producto: &quot; + producto.getNombre() + &quot; (ID: &quot;</span>
+<span class="nc" id="L1543">                                    + producto.getId() + &quot;) | Stock antes BD: &quot; + stockAntes + &quot; | Cantidad anulada: &quot;</span>
+                                    + cantidadVendida + &quot; | Nuevo stock: &quot; + nuevoStock);
+<span class="nc" id="L1545">                            boolean actualizado = productoRepository.updateStock(producto.getId(), nuevoStock);</span>
+                            // Stock después de la anulación
+<span class="nc" id="L1547">                            java.util.Optional&lt;Producto&gt; productoBDAfter = productoRepository</span>
+<span class="nc" id="L1548">                                    .findById(producto.getId().longValue());</span>
+<span class="nc bnc" id="L1549" title="All 2 branches missed.">                            int stockDespues = productoBDAfter.isPresent()</span>
+<span class="nc bnc" id="L1550" title="All 2 branches missed.">                                    &amp;&amp; productoBDAfter.get().getStockActual() != null</span>
+<span class="nc" id="L1551">                                            ? productoBDAfter.get().getStockActual()</span>
+<span class="nc" id="L1552">                                            : 0;</span>
+<span class="nc bnc" id="L1553" title="All 2 branches missed.">                            if (!actualizado) {</span>
+<span class="nc" id="L1554">                                System.err.println(</span>
+                                        &quot;[ERROR UPDATE STOCK] No se actualizó el stock en BD para producto ID: &quot;
+<span class="nc" id="L1556">                                                + producto.getId() + &quot; | Cantidad: &quot; + cantidadVendida</span>
+                                                + &quot; | Nuevo stock: &quot; + nuevoStock);
+                            } else {
+<span class="nc" id="L1559">                                System.out.println(</span>
+                                        &quot;[UPDATE STOCK OK] Stock actualizado correctamente en BD para producto ID: &quot;
+<span class="nc" id="L1561">                                                + producto.getId() + &quot; | Stock después BD: &quot; + stockDespues);</span>
+                            }
+<span class="nc" id="L1563">                        } catch (Exception ex) {</span>
+<span class="nc" id="L1564">                            System.err.println(&quot;[ERROR ANULACION STOCK] Producto: &quot;</span>
+<span class="nc bnc" id="L1565" title="All 2 branches missed.">                                    + (producto.getNombre() != null ? producto.getNombre() : &quot;(sin nombre)&quot;) + &quot; (ID: &quot;</span>
+<span class="nc" id="L1566">                                    + producto.getId() + &quot;) | Detalle: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1567">                        }</span>
+                    } else {
+<span class="nc" id="L1569">                        System.err.println(&quot;[ERROR ANULACION STOCK] Producto nulo o sin ID en detalle venta&quot;);</span>
+                    }
+<span class="nc" id="L1571">                }</span>
+            }
+
+            // Guardar historial de cambio de anulación
+<span class="nc" id="L1575">            com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio historial = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.VentaHistorialCambio();</span>
+<span class="nc" id="L1576">            historial.setVenta(venta);</span>
+<span class="nc" id="L1577">            historial.setTipoCambio(&quot;ANULACION&quot;);</span>
+<span class="nc" id="L1578">            historial.setMotivo(&quot;Venta anulada desde historial&quot;);</span>
+<span class="nc" id="L1579">            historial.setUsuario(usuarioActual);</span>
+<span class="nc" id="L1580">            historial.setFecha(java.time.LocalDateTime.now());</span>
+<span class="nc" id="L1581">            historialCambioRepository.save(historial);</span>
+
+            // Enviar anulación a NubeFacT/SUNAT
+<span class="nc bnc" id="L1584" title="All 2 branches missed.">            if (esTicket) {</span>
+<span class="nc" id="L1585">                mostrarMensaje(&quot;Venta tipo ticket anulada correctamente.&quot;);</span>
+            } else {
+<span class="nc" id="L1587">                String apiUrl = &quot;https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127&quot;;</span>
+<span class="nc" id="L1588">                String apiToken = &quot;54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e&quot;;</span>
+<span class="nc" id="L1589">                java.util.LinkedHashMap&lt;String, Object&gt; jsonAnulacion = new java.util.LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L1590">                jsonAnulacion.put(&quot;operacion&quot;, &quot;generar_anulacion&quot;);</span>
+<span class="nc bnc" id="L1591" title="All 2 branches missed.">                int tipoComprobante = &quot;FACTURA&quot;.equalsIgnoreCase(venta.getTipoComprobante()) ? 1 : 2;</span>
+<span class="nc" id="L1592">                jsonAnulacion.put(&quot;tipo_de_comprobante&quot;, tipoComprobante);</span>
+<span class="nc" id="L1593">                String serie = &quot;&quot;;</span>
+<span class="nc bnc" id="L1594" title="All 4 branches missed.">                if (venta.getComprobante() != null &amp;&amp; venta.getComprobante().getSerie() != null</span>
+<span class="nc bnc" id="L1595" title="All 2 branches missed.">                        &amp;&amp; !venta.getComprobante().getSerie().isEmpty()) {</span>
+<span class="nc" id="L1596">                    serie = venta.getComprobante().getSerie();</span>
+<span class="nc bnc" id="L1597" title="All 4 branches missed.">                } else if (venta.getSerie() != null &amp;&amp; !venta.getSerie().isEmpty()) {</span>
+<span class="nc" id="L1598">                    serie = venta.getSerie();</span>
+                } else {
+<span class="nc" id="L1600">                    mostrarMensaje(&quot;No se encontró la serie del comprobante para la anulación. Verifique la venta.&quot;);</span>
+<span class="nc" id="L1601">                    return;</span>
+                }
+<span class="nc" id="L1603">                String numero = null;</span>
+<span class="nc bnc" id="L1604" title="All 4 branches missed.">                if (venta.getComprobante() != null &amp;&amp; venta.getComprobante().getNumero() != null</span>
+<span class="nc bnc" id="L1605" title="All 2 branches missed.">                        &amp;&amp; !venta.getComprobante().getNumero().isEmpty()) {</span>
+<span class="nc" id="L1606">                    numero = venta.getComprobante().getNumero();</span>
+<span class="nc bnc" id="L1607" title="All 4 branches missed.">                } else if (venta.getNumeroBoleta() != null &amp;&amp; !venta.getNumeroBoleta().isEmpty()) {</span>
+<span class="nc" id="L1608">                    numero = venta.getNumeroBoleta();</span>
+                } else {
+<span class="nc" id="L1610">                    mostrarMensaje(&quot;No se encontró el número de comprobante para la anulación. Verifique la venta.&quot;);</span>
+<span class="nc" id="L1611">                    return;</span>
+                }
+<span class="nc bnc" id="L1613" title="All 2 branches missed.">                if (numero != null) {</span>
+<span class="nc" id="L1614">                    numero = numero.replaceFirst(&quot;^0+&quot;, &quot;&quot;);</span>
+                }
+<span class="nc" id="L1616">                jsonAnulacion.put(&quot;serie&quot;, serie);</span>
+<span class="nc" id="L1617">                jsonAnulacion.put(&quot;numero&quot;, numero);</span>
+<span class="nc" id="L1618">                jsonAnulacion.put(&quot;motivo&quot;, &quot;ERROR DEL SISTEMA&quot;);</span>
+<span class="nc" id="L1619">                jsonAnulacion.put(&quot;codigo_unico&quot;, &quot;&quot;);</span>
+<span class="nc" id="L1620">                String json = new com.google.gson.Gson().toJson(jsonAnulacion);</span>
+<span class="nc" id="L1621">                String respuestaNubeFact = ComprobanteUtils.enviarFacturaNubeFact(json, apiUrl, apiToken);</span>
+<span class="nc bnc" id="L1622" title="All 2 branches missed.">                if (respuestaNubeFact != null) {</span>
+<span class="nc" id="L1623">                    System.out.println(&quot;[NUBEFACT ANULACION] Respuesta: &quot; + respuestaNubeFact);</span>
+<span class="nc" id="L1624">                    com.google.gson.JsonObject jsonResp = null;</span>
+                    try {
+<span class="nc" id="L1626">                        jsonResp = new com.google.gson.JsonParser().parse(respuestaNubeFact).getAsJsonObject();</span>
+<span class="nc" id="L1627">                    } catch (Exception e) {</span>
+<span class="nc" id="L1628">                        mostrarMensaje(&quot;No se pudo procesar la respuesta de NubeFacT. Respuesta: &quot; + respuestaNubeFact);</span>
+<span class="nc" id="L1629">                        return;</span>
+<span class="nc" id="L1630">                    }</span>
+<span class="nc" id="L1631">                    boolean aceptadaPorSunat = false;</span>
+<span class="nc bnc" id="L1632" title="All 2 branches missed.">                    if (jsonResp.has(&quot;aceptada_por_sunat&quot;)) {</span>
+<span class="nc" id="L1633">                        aceptadaPorSunat = jsonResp.get(&quot;aceptada_por_sunat&quot;).getAsBoolean();</span>
+                    }
+<span class="nc bnc" id="L1635" title="All 2 branches missed.">                    String enlace = jsonResp.has(&quot;enlace&quot;) ? jsonResp.get(&quot;enlace&quot;).getAsString() : &quot;&quot;;</span>
+<span class="nc" id="L1636">                    String ticket = &quot;&quot;;</span>
+<span class="nc bnc" id="L1637" title="All 4 branches missed.">                    if (jsonResp.has(&quot;sunat_ticket_numero&quot;) &amp;&amp; !jsonResp.get(&quot;sunat_ticket_numero&quot;).isJsonNull()) {</span>
+                        try {
+<span class="nc" id="L1639">                            ticket = jsonResp.get(&quot;sunat_ticket_numero&quot;).getAsString();</span>
+<span class="nc" id="L1640">                        } catch (Exception ex) {</span>
+<span class="nc" id="L1641">                            ticket = &quot;&quot;;</span>
+<span class="nc" id="L1642">                        }</span>
+                    }
+<span class="nc bnc" id="L1644" title="All 2 branches missed.">                    String estadoSunat = aceptadaPorSunat ? &quot;Aceptada&quot;</span>
+<span class="nc bnc" id="L1645" title="All 2 branches missed.">                            : (ticket.isEmpty() ? &quot;Pendiente&quot; : &quot;En proceso&quot;);</span>
+<span class="nc" id="L1646">                    String mensaje = &quot;Venta anulada correctamente en NubeFacT. Estado SUNAT: &quot; + estadoSunat</span>
+                            + &quot;.\nEnlace: &quot;
+                            + enlace;
+<span class="nc bnc" id="L1649" title="All 2 branches missed.">                    if (!ticket.isEmpty()) {</span>
+<span class="nc" id="L1650">                        mensaje += &quot;\nTicket SUNAT: &quot; + ticket;</span>
+                    }
+<span class="nc" id="L1652">                    mostrarMensaje(mensaje);</span>
+<span class="nc" id="L1653">                } else {</span>
+<span class="nc" id="L1654">                    mostrarMensaje(&quot;No se pudo anular la venta en SUNAT/NubeFacT. Respuesta: null&quot;);</span>
+                }
+            }
+<span class="nc" id="L1657">        } catch (Exception ex) {</span>
+<span class="nc" id="L1658">            mostrarMensaje(&quot;Error al anular la venta: &quot; + ex.getMessage());</span>
+<span class="nc" id="L1659">        }</span>
+<span class="nc" id="L1660">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

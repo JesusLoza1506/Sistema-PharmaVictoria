@@ -2,10 +2,6 @@ package com.farmaciavictoria.proyectopharmavictoria.model.Usuario;
 
 import java.time.LocalDateTime;
 
-/**
- * Entidad Usuario del sistema
- * Representa a los usuarios que pueden acceder al sistema (Admin y Vendedor)
- */
 public class Usuario {
     public void setRol(Rol rol) {
         this.rol = rol;
@@ -23,7 +19,6 @@ public class Usuario {
     private boolean activo;
     private LocalDateTime createdAt;
     private LocalDateTime lastLogin;
-    // NUEVO: historial de accesos y auditoría
     private java.util.List<UsuarioAcceso> accesos = new java.util.ArrayList<>();
     private java.util.List<UsuarioAuditoria> auditoria = new java.util.ArrayList<>();
 
