@@ -32,14 +32,7 @@ public class PharmavictoriaApplication extends Application {
                 showDatabaseErrorAndExit();
                 return;
             }
-            // TransaccionPuntosRepository repo = new TransaccionPuntosRepository();
-            // repo.sincronizarPuntosClientes(); // Eliminado, ya no es necesario
-            DatabaseUpdater.updateProductsTable();
-            DatabaseUpdater.updateProveedoresTable();
-            DatabaseUpdater.ensureUsuarioHistorialTables();
 
-            // === SUSCRIBIR OBSERVADOR DE CORREO PARA STOCK BAJO Y VENCIMIENTO (DINÁMICO)
-            // ===
             try {
                 com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.EmailConfig emailConfig = com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.EmailConfigService
                         .cargarConfig();

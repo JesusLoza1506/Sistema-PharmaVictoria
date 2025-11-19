@@ -162,7 +162,7 @@ public class ComprobanteAccionesController {
                 }
                 // Configuración SMTP (demo Gmail)
                 String remitente = "lozayataco@gmail.com"; // Cambia por tu correo
-                String password = "bahx gnoo ejji jgeh"; // Usa contraseña de aplicación Gmail
+                String password = "qmgj extv wepl vocw"; // Usa contraseña de aplicación Gmail
                 String host = "smtp.gmail.com";
                 int port = 587;
                 java.util.Properties props = new java.util.Properties();
