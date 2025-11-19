@@ -26,6 +26,7 @@ replay_pid*
 # Archivos de configuración sensibles
 config.properties
 .env
+target/
 src/main/resources/smtp_proveedores.properties
 src/main/resources/recuperacion_email.properties
 src/main/resources/gmail_nubefact.properties
