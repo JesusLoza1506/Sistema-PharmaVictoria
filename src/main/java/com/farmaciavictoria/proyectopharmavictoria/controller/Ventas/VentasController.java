@@ -956,8 +956,13 @@ public class VentasController implements Initializable {
                         factura.put("venta_al_credito", new java.util.ArrayList<>());
                         String jsonFactura = new com.google.gson.Gson().toJson(factura);
                         System.out.println("[DEBUG JSON FACTURA] JSON generado para NubeFacT:\n" + jsonFactura);
-                        String apiUrl = "https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127";
-                        String apiToken = "54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e";
+                        java.util.Properties nubefactProps = new java.util.Properties();
+                        try (java.io.InputStream input = new java.io.FileInputStream(
+                                "src/main/resources/venta_nubefact.properties")) {
+                            nubefactProps.load(input);
+                        }
+                        String apiUrl = nubefactProps.getProperty("api.url");
+                        String apiToken = nubefactProps.getProperty("api.token");
                         String respuesta = ComprobanteUtils.enviarFacturaNubeFact(jsonFactura, apiUrl, apiToken);
                         String hashSunat = "";
                         String estadoSunat = "";
@@ -1268,8 +1273,13 @@ public class VentasController implements Initializable {
                         boleta.put("venta_al_credito", new java.util.ArrayList<>());
                         String jsonBoleta = new com.google.gson.Gson().toJson(boleta);
                         System.out.println("[DEBUG JSON BOLETA] JSON generado para NubeFacT:\n" + jsonBoleta);
-                        String apiUrl = "https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127";
-                        String apiToken = "54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e";
+                        java.util.Properties nubefactProps = new java.util.Properties();
+                        try (java.io.InputStream input = new java.io.FileInputStream(
+                                "src/main/resources/venta_nubefact.properties")) {
+                            nubefactProps.load(input);
+                        }
+                        String apiUrl = nubefactProps.getProperty("api.url");
+                        String apiToken = nubefactProps.getProperty("api.token");
                         String respuesta = com.farmaciavictoria.proyectopharmavictoria.util.ComprobanteUtils
                                 .enviarFacturaNubeFact(jsonBoleta, apiUrl, apiToken);
                         // Mostrar JSON y respuesta NubeFacT solo en terminal para diagnóstico
@@ -1584,8 +1594,13 @@ public class VentasController implements Initializable {
             if (esTicket) {
                 mostrarMensaje("Venta tipo ticket anulada correctamente.");
             } else {
-                String apiUrl = "https://api.nubefact.com/api/v1/67621495-8f31-4429-80db-dc03e461d127";
-                String apiToken = "54ffb5d0528547219b7fdc07225666584b45928ea4d145fd89524ab4877d462e";
+                java.util.Properties nubefactProps = new java.util.Properties();
+                try (java.io.InputStream input = new java.io.FileInputStream(
+                        "src/main/resources/venta_nubefact.properties")) {
+                    nubefactProps.load(input);
+                }
+                String apiUrl = nubefactProps.getProperty("api.url");
+                String apiToken = nubefactProps.getProperty("api.token");
                 java.util.LinkedHashMap<String, Object> jsonAnulacion = new java.util.LinkedHashMap<>();
                 jsonAnulacion.put("operacion", "generar_anulacion");
                 int tipoComprobante = "FACTURA".equalsIgnoreCase(venta.getTipoComprobante()) ? 1 : 2;

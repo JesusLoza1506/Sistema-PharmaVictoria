@@ -160,14 +160,19 @@ public class ComprobanteAccionesController {
                         out.write(buffer, 0, bytesRead);
                     }
                 }
-                // Configuración SMTP (demo Gmail)
-                String remitente = "lozayataco@gmail.com"; // Cambia por tu correo
-                String password = "qmgj extv wepl vocw"; // Usa contraseña de aplicación Gmail
-                String host = "smtp.gmail.com";
-                int port = 587;
+                // Leer credenciales desde gmail_nubefact.properties
+                java.util.Properties gmailProps = new java.util.Properties();
+                try (java.io.InputStream input = new java.io.FileInputStream(
+                        "src/main/resources/gmail_nubefact.properties")) {
+                    gmailProps.load(input);
+                }
+                String remitente = gmailProps.getProperty("gmail.user");
+                String password = gmailProps.getProperty("gmail.password");
+                String host = gmailProps.getProperty("gmail.host", "smtp.gmail.com");
+                int port = Integer.parseInt(gmailProps.getProperty("gmail.port", "587"));
                 java.util.Properties props = new java.util.Properties();
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.smtp.auth", gmailProps.getProperty("gmail.auth", "true"));
+                props.put("mail.smtp.starttls.enable", gmailProps.getProperty("gmail.starttls", "true"));
                 props.put("mail.smtp.host", host);
                 props.put("mail.smtp.port", String.valueOf(port));
                 jakarta.mail.Session session = jakarta.mail.Session.getInstance(props,
