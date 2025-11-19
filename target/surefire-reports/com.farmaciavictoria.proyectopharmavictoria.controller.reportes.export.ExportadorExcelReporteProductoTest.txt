@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export.ExportadorExcelReporteProductoTest
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.330 s -- in com.farmaciavictoria.proyectopharmavictoria.controller.reportes.export.ExportadorExcelReporteProductoTest

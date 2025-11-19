@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.SearchByLoteStrategyTest
--------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.SearchByLoteStrategyTest

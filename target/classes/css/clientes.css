@@ -1,9 +1,0 @@
-/* Estilos de tabla de inventario aplicados para clientes */
-@import url("../css/Inventario/productos.css");
-
-.total-clientes-label {
-	-fx-font-weight: bold;
-	-fx-text-fill: #20c997;
-	-fx-font-size: 14px;
-}
-/* Puedes agregar aquí reglas específicas para clientes si lo necesitas */
