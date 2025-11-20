@@ -26,16 +26,23 @@ public class ConfiguracionController {
             AnchorPane cardCorreo = loaderCorreo.load();
             cardsPane.getChildren().add(cardCorreo);
 
-            FXMLLoader loaderVencimiento = new FXMLLoader(
-                    getClass().getResource("/fxml/Configuracion/VencimientoAlertaCard.fxml"));
-            AnchorPane cardVencimiento = loaderVencimiento.load();
-            cardsPane.getChildren().add(cardVencimiento);
-
-            // Nuevo card: Permisos de Vendedor
+            // Permisos de Vendedor
             FXMLLoader loaderPermisos = new FXMLLoader(
                     getClass().getResource("/fxml/Configuracion/PermisosVendedorCard.fxml"));
             AnchorPane cardPermisos = loaderPermisos.load();
             cardsPane.getChildren().add(cardPermisos);
+
+            // Respaldos y Restauración
+            FXMLLoader loaderRespaldos = new FXMLLoader(
+                    getClass().getResource("/fxml/Configuracion/RespaldosRestauracionCard.fxml"));
+            AnchorPane cardRespaldos = loaderRespaldos.load();
+            cardsPane.getChildren().add(cardRespaldos);
+
+            // Alerta de Vencimiento
+            FXMLLoader loaderVencimiento = new FXMLLoader(
+                    getClass().getResource("/fxml/Configuracion/VencimientoAlertaCard.fxml"));
+            AnchorPane cardVencimiento = loaderVencimiento.load();
+            cardsPane.getChildren().add(cardVencimiento);
         } catch (Exception e) {
             e.printStackTrace();
             mostrarError("Error", "No se pudo cargar los cards de configuración: " + e.getMessage());

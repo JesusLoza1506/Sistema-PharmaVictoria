@@ -23,6 +23,17 @@
 hs_err_pid*
 replay_pid*
 
+# Archivos generados y binarios
+*.ser
+*.db
+*.sqlite
+*.bak
+*.tmp
+*.swp
+*.iml
+*.exec
+*.lock
+
 # Archivos de configuración sensibles
 config.properties
 .env
@@ -31,3 +42,12 @@ src/main/resources/smtp_proveedores.properties
 src/main/resources/recuperacion_email.properties
 src/main/resources/gmail_nubefact.properties
 src/main/resources/venta_nubefact.properties
+src/main/resources/client_secret.json
+src/main/resources/backup-path.properties
+src/main/resources/application.properties
+src/main/resources/alerta-config.properties
+
+# IDE y sistema
+*.DS_Store
+.idea/
+.vscode/

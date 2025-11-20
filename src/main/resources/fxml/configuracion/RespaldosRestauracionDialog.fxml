@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Separator?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.configuracion.RespaldosRestauracionDialogController" 
+            prefWidth="750" prefHeight="480" style="-fx-background-color: #fff; -fx-background-radius: 16;">
+    <children>
+        <Label text="Gestión de Respaldos y Restauración" layoutX="40" layoutY="40" 
+               style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #6D4C41;" />
+        <Separator layoutX="40" layoutY="90" prefWidth="670" />
+
+        <Label text="Configuración de Respaldo" layoutX="40" layoutY="110" style="-fx-font-size: 19px; -fx-font-weight: bold;" />
+        
+        <Label text="Destino del respaldo:" layoutX="60" layoutY="160" style="-fx-font-size: 17px; -fx-font-weight: bold;" />
+        <ComboBox fx:id="comboDestino" layoutX="260" layoutY="155" prefWidth="250" promptText="Selecciona destino" />
+        
+        <Label text="Ruta de respaldo:" layoutX="60" layoutY="205" style="-fx-font-size: 17px;" />
+        <TextField fx:id="txtRutaRespaldo" layoutX="260" layoutY="200" prefWidth="250" promptText="Ej: C:/respaldos/" />
+        <Button fx:id="btnSeleccionarCarpeta" text="Seleccionar carpeta" layoutX="520" layoutY="200" prefWidth="180" 
+                style="-fx-background-color: #BCAAA4; -fx-text-fill: #333; -fx-font-size: 15px; -fx-background-radius: 10;" />
+        
+        <Label text="Respaldo Programado" layoutX="40" layoutY="255" style="-fx-font-size: 19px; -fx-font-weight: bold;" />
+
+        <Label text="Frecuencia:" layoutX="60" layoutY="305" style="-fx-font-size: 17px;" />
+        <ComboBox fx:id="comboFrecuencia" layoutX="260" layoutY="300" prefWidth="250" promptText="Selecciona frecuencia" />
+        
+        <Label text="Hora de respaldo:" layoutX="60" layoutY="350" style="-fx-font-size: 17px;" />
+        <ComboBox fx:id="comboHora" layoutX="260" layoutY="345" prefWidth="250" promptText="Selecciona hora" />
+        
+        <Separator layoutX="40" layoutY="395" prefWidth="670" />
+
+        <Button fx:id="btnEjecutarRespaldo" text="Ejecutar Respaldo Ahora" layoutX="50" layoutY="425" prefWidth="200" 
+                style="-fx-background-color: #6D4C41; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 14; -fx-padding: 10 18;" />
+        
+        <Button fx:id="btnIniciarRespaldoProgramado" text="Guardar Programación" layoutX="275" layoutY="425" prefWidth="200" 
+                style="-fx-background-color: #6D4C41; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 14; -fx-padding: 10 18;" />
+        
+        <Button fx:id="btnRestaurarInformacion" text="Restaurar Información" layoutX="500" layoutY="425" prefWidth="200" 
+                style="-fx-background-color: #6D4C41; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 14; -fx-padding: 10 18;" />
+        
+    </children>
+</AnchorPane>
