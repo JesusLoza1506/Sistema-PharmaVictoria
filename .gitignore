@@ -51,3 +51,4 @@ src/main/resources/alerta-config.properties
 *.DS_Store
 .idea/
 .vscode/
+tokens/StoredCredential
