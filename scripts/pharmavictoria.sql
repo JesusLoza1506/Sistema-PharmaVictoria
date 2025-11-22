@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: Nov 18, 2025 at 12:58 AM
+-- Generation Time: Nov 21, 2025 at 03:40 AM
 -- Server version: 8.4.3
 -- PHP Version: 8.3.26
 
@@ -40,7 +40,6 @@ CREATE TABLE `clientes` (
   `puntos_totales` int DEFAULT '0',
   `puntos_usados` int DEFAULT '0',
   `puntos_disponibles` int GENERATED ALWAYS AS ((`puntos_totales` - `puntos_usados`)) STORED,
-  `es_frecuente` tinyint(1) DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `tipo_cliente` enum('Natural','Empresa') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Natural',
@@ -126,6 +125,19 @@ CREATE TABLE `configuracion_codigos` (
   `prefijo` varchar(5) COLLATE utf8mb4_general_ci NOT NULL,
   `ultimo_numero` int DEFAULT '0',
   `longitud_numero` int DEFAULT '3'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `detalle_pago_venta`
+--
+
+CREATE TABLE `detalle_pago_venta` (
+  `id` int NOT NULL,
+  `venta_id` int NOT NULL,
+  `tipo_pago` enum('EFECTIVO','TARJETA','TRANSFERENCIA') COLLATE utf8mb4_general_ci NOT NULL,
+  `monto` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -349,20 +361,20 @@ CREATE TABLE `venta_historial_cambio` (
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_busqueda_productos` (
-`id` int
+`categoria` enum('ANALGESICOS','ANTIBIOTICOS','ANTIINFLAMATORIOS','VITAMINAS','ANTIACIDOS','ANTIHISTAMINICOS','ANTIHIPERTENSIVOS','DIABETES','RESPIRATORIO','DERMATOLOGIA','HIGIENE','OTROS')
 ,`codigo` varchar(20)
-,`nombre` varchar(150)
-,`descripcion` text
-,`principio_activo` varchar(100)
-,`concentracion` varchar(50)
-,`forma_farmaceutica` varchar(20)
-,`precio_venta` decimal(10,2)
-,`stock_actual` int
-,`categoria` enum('ANALGESICOS','ANTIBIOTICOS','ANTIINFLAMATORIOS','VITAMINAS','ANTIACIDOS','ANTIHISTAMINICOS','ANTIHIPERTENSIVOS','DIABETES','RESPIRATORIO','DERMATOLOGIA','HIGIENE','OTROS')
-,`ubicacion` varchar(20)
-,`requiere_receta` tinyint(1)
 ,`codigo_nombre` varchar(173)
+,`concentracion` varchar(50)
+,`descripcion` text
+,`forma_farmaceutica` varchar(20)
+,`id` int
+,`nombre` varchar(150)
+,`precio_venta` decimal(10,2)
+,`principio_activo` varchar(100)
+,`requiere_receta` tinyint(1)
+,`stock_actual` int
 ,`texto_busqueda` varchar(302)
+,`ubicacion` varchar(20)
 );
 
 -- --------------------------------------------------------
@@ -372,11 +384,11 @@ CREATE TABLE `vw_busqueda_productos` (
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_inventario_alertas` (
-`id_producto` int
+`fecha_vencimiento` date
+,`id_producto` int
 ,`nombre_producto` varchar(150)
 ,`stock_actual` int
 ,`stock_minimo` int
-,`fecha_vencimiento` date
 );
 
 -- --------------------------------------------------------
@@ -386,17 +398,17 @@ CREATE TABLE `vw_inventario_alertas` (
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_resumen_ventas` (
-`id` int
+`cliente` varchar(201)
+,`descuento_monto` decimal(10,2)
+,`estado` enum('REALIZADA','ANULADA','PENDIENTE')
+,`fecha_venta` datetime
+,`id` int
 ,`numero_boleta` varchar(20)
 ,`serie` varchar(10)
-,`fecha_venta` datetime
-,`cliente` varchar(201)
-,`vendedor` varchar(201)
 ,`subtotal` decimal(10,2)
-,`descuento_monto` decimal(10,2)
-,`total` decimal(10,2)
 ,`tipo_pago` enum('EFECTIVO','TARJETA','TRANSFERENCIA','MIXTO')
-,`estado` enum('REALIZADA','ANULADA','PENDIENTE')
+,`total` decimal(10,2)
+,`vendedor` varchar(201)
 );
 
 --
@@ -412,8 +424,7 @@ ALTER TABLE `clientes`
   ADD KEY `idx_dni` (`dni`),
   ADD KEY `idx_nombres` (`nombres`,`apellidos`),
   ADD KEY `idx_puntos` (`puntos_disponibles`),
-  ADD KEY `idx_frecuente` (`es_frecuente`),
-  ADD KEY `idx_clientes_puntos_frecuente` (`puntos_disponibles`,`es_frecuente`);
+  ADD KEY `idx_clientes_puntos_frecuente` (`puntos_disponibles`);
 
 --
 -- Indexes for table `cliente_historial_cambio`
@@ -454,6 +465,13 @@ ALTER TABLE `configuracion_codigos`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `categoria` (`categoria`),
   ADD KEY `idx_categoria` (`categoria`);
+
+--
+-- Indexes for table `detalle_pago_venta`
+--
+ALTER TABLE `detalle_pago_venta`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `venta_id` (`venta_id`);
 
 --
 -- Indexes for table `detalle_ventas`
@@ -593,6 +611,12 @@ ALTER TABLE `configuracion_codigos`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `detalle_pago_venta`
+--
+ALTER TABLE `detalle_pago_venta`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `detalle_ventas`
 --
 ALTER TABLE `detalle_ventas`
@@ -713,6 +737,12 @@ ALTER TABLE `comprobantes`
 --
 ALTER TABLE `configuracion`
   ADD CONSTRAINT `configuracion_ibfk_1` FOREIGN KEY (`updated_by`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+--
+-- Constraints for table `detalle_pago_venta`
+--
+ALTER TABLE `detalle_pago_venta`
+  ADD CONSTRAINT `detalle_pago_venta_ibfk_1` FOREIGN KEY (`venta_id`) REFERENCES `ventas` (`id`);
 
 --
 -- Constraints for table `detalle_ventas`

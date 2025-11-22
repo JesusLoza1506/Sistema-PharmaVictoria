@@ -39,6 +39,13 @@ public class ReportesController {
             AnchorPane cardProducto = loaderProducto.load();
             // El controlador del card ya maneja el evento de abrir detalle
             cardsPane.getChildren().add(cardProducto);
+
+            // Card de ventas por usuario
+            FXMLLoader loaderUsuario = new FXMLLoader(
+                    getClass().getResource("/fxml/reportes/ReporteVentasPorUsuarioCard.fxml"));
+            AnchorPane cardUsuario = loaderUsuario.load();
+            // El controlador del card ya maneja el evento de abrir detalle
+            cardsPane.getChildren().add(cardUsuario);
         } catch (Exception e) {
             e.printStackTrace();
             mostrarError("Error",

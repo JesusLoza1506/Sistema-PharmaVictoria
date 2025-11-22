@@ -4,11 +4,11 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view.ReporteVentasDetalleController" prefWidth="900" prefHeight="600">
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view.ReporteVentasPorUsuarioDetalleController" prefWidth="900" prefHeight="600">
     <top>
-        <HBox spacing="16" alignment="CENTER_LEFT" style="-fx-padding: 16; -fx-background-color: #2196F3;">
+        <HBox spacing="16" alignment="CENTER_LEFT" style="-fx-padding: 16; -fx-background-color: #8BC34A;">
             <children>
-                <Label text="Reporte de Ventas por Período" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;" />
+                <Label text="Reporte de Ventas por Usuario" style="-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;" />
                 <Region HBox.hgrow="ALWAYS" />
                 <Button fx:id="btnExportarPDF" styleClass="exportar-pdf-btn" onAction="#onExportarPDF">
                     <graphic>
@@ -43,18 +43,11 @@
                         <Button fx:id="btnFiltrar" text="Filtrar" onAction="#onFiltrar" />
                     </children>
                 </HBox>
-                <TableView fx:id="tableVentas" prefHeight="500">
+                <TableView fx:id="tableUsuarios" prefHeight="500">
                     <columns>
-                        <TableColumn fx:id="colNumero" text="N° Boleta" />
-                        <TableColumn fx:id="colSerie" text="Serie" />
-                        <TableColumn fx:id="colFecha" text="Fecha" />
-                        <TableColumn fx:id="colCliente" text="Cliente" />
-                        <TableColumn fx:id="colVendedor" text="Vendedor" />
-                        <TableColumn fx:id="colTotal" text="Total" />
-                        <TableColumn fx:id="colTipoPago" text="Pago" />
-                        <TableColumn fx:id="colDetallePago" text="Detalle Pago" />
-                        <TableColumn fx:id="colEstado" text="Estado" />
-                        <TableColumn fx:id="colProductos" text="Productos Vendidos" />
+                        <TableColumn fx:id="colUsuario" text="Usuario" />
+                        <TableColumn fx:id="colNombre" text="Nombre" />
+                        <TableColumn fx:id="colTotalVentas" text="Total Ventas (S/.)" />
                     </columns>
                 </TableView>
             </children>

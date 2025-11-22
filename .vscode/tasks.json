@@ -142,6 +142,15 @@
 				"test"
 			],
 			"group": "test"
+		},
+		{
+			"label": "Compilar proyecto JavaFX (clean)",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"clean",
+				"compile"
+			]
 		}
 	]
 }

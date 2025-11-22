@@ -82,10 +82,22 @@
                     </TableView>
                 </children>
             </VBox>
-            <!-- Panel de cliente, pago y totales -->
-            <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
-                <Label text="Cliente existente:" styleClass="cliente-label" />
-                <ComboBox fx:id="comboClientes" promptText="Seleccionar cliente" styleClass="combo-box" />
+            <!-- Panel de cliente, método de pago y comprobante agrupados y ordenados -->
+            <HBox spacing="24.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
+                <VBox spacing="8.0">
+                    <Label text="Cliente existente:" styleClass="cliente-label" />
+                    <ComboBox fx:id="comboClientes" promptText="Seleccionar cliente" styleClass="combo-box" editable="true" />
+                </VBox>
+                <VBox spacing="8.0">
+                    <Label text="Método de pago:" styleClass="pago-label" />
+                    <ComboBox fx:id="comboPago" promptText="Seleccionar método de pago" styleClass="combo-box" />
+                </VBox>
+                <VBox spacing="8.0">
+                    <Label text="Tipo de comprobante:" styleClass="cliente-label" />
+                    <ComboBox fx:id="comboComprobante" promptText="Selecciona comprobante" styleClass="combo-box">
+                        <!-- Los items se inicializan en el controlador Java -->
+                    </ComboBox>
+                </VBox>
             </HBox>
             <!-- Panel de puntos del cliente -->
             <HBox fx:id="panelPuntosCliente" spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
@@ -93,6 +105,22 @@
                 <Label fx:id="lblPuntosDisponibles" text="Puntos disponibles: 0" styleClass="puntos-label" />
                 <Label fx:id="lblEquivalenteSoles" text="Equivalente: S/0.00" styleClass="puntos-label" />
             </HBox>
+                <!-- Panel de pago mixto -->
+                <HBox fx:id="panelPagoMixto" spacing="18.0" alignment="CENTER_LEFT" visible="false" managed="false" style="-fx-padding: 8px 0;">
+                    <VBox spacing="6.0">
+                        <CheckBox fx:id="chkEfectivo" text="Efectivo" />
+                        <TextField fx:id="txtMontoEfectivo" promptText="Monto efectivo" prefWidth="80.0" visible="false" managed="false" />
+                    </VBox>
+                    <VBox spacing="6.0">
+                        <CheckBox fx:id="chkTarjeta" text="Tarjeta" />
+                        <TextField fx:id="txtMontoTarjeta" promptText="Monto tarjeta" prefWidth="80.0" visible="false" managed="false" />
+                    </VBox>
+                    <VBox spacing="6.0">
+                        <CheckBox fx:id="chkTransferencia" text="Transferencia" />
+                        <TextField fx:id="txtMontoTransferencia" promptText="Monto transferencia" prefWidth="80.0" visible="false" managed="false" />
+                    </VBox>
+                    <Label fx:id="lblTotalMixto" text="Total: S/ 0.00" styleClass="total-label" />
+                </HBox>
             <!-- Panel dinámico para datos de cliente -->
             <HBox fx:id="panelDatosCliente" spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
                 <Label text="Tipo:" styleClass="cliente-label" />
@@ -101,14 +129,6 @@
                 <TextField fx:id="txtDocumento" promptText="DNI o RUC" editable="false" styleClass="cliente-field" />
                 <Label text="Nombre/Razón Social:" styleClass="cliente-label" />
                 <TextField fx:id="txtNombreRazon" promptText="Nombre completo o razón social" editable="false" styleClass="cliente-field" />
-            </HBox>
-            <HBox spacing="18.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
-                <Label text="Método de pago:" styleClass="pago-label" />
-                <ComboBox fx:id="comboPago" promptText="Seleccionar método de pago" styleClass="combo-box" />
-                <Label text="Tipo de comprobante:" styleClass="cliente-label" />
-                <ComboBox fx:id="comboComprobante" promptText="Selecciona comprobante" styleClass="combo-box">
-                    <!-- Los items se inicializan en el controlador Java -->
-                </ComboBox>
             </HBox>
             <HBox spacing="32.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
                 <VBox spacing="10.0" style="-fx-padding: 0 0 0 0;">

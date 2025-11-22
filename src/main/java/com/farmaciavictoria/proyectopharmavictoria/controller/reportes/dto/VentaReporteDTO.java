@@ -17,6 +17,7 @@ public class VentaReporteDTO {
     private String tipoPago;
     private String estado;
     private List<ProductoDetalleDTO> productos;
+    private String detallePago;
 
     public int getIdVenta() {
         return idVenta;
@@ -112,5 +113,13 @@ public class VentaReporteDTO {
 
     public void setProductos(List<ProductoDetalleDTO> productos) {
         this.productos = productos;
+    }
+
+    public String getDetallePago() {
+        return detallePago;
+    }
+
+    public void setDetallePago(String detallePago) {
+        this.detallePago = detallePago;
     }
 }

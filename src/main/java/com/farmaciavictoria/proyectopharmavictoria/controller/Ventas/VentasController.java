@@ -21,6 +21,174 @@ import java.net.URL;
 import java.util.*;
 
 public class VentasController implements Initializable {
+    /**
+     * Convierte el texto de un campo de monto a double. Si el texto no es válido,
+     * retorna 0.0
+     */
+    private double parseMonto(String txt) {
+        try {
+            return Double.parseDouble(txt.replace(",", "").trim());
+        } catch (Exception e) {
+            return 0.0;
+        }
+    }
+
+    /**
+     * Actualiza los montos y el total del pago mixto según el campo editado.
+     * 
+     * @param tipoEditado El campo que se editó ("EFECTIVO", "TARJETA",
+     *                    "TRANSFERENCIA", "CHECKBOX_CHANGE", etc.)
+     */
+    private void actualizarMontosMixto(String tipoEditado) {
+        // Obtiene el total de la venta desde el label principal
+        double totalVenta = 0.0;
+        try {
+            String txtTotal = lblTotal.getText().replace("Total: S/", "").replace(",", ".").trim();
+            totalVenta = Double.parseDouble(txtTotal);
+        } catch (Exception e) {
+            totalVenta = 0.0;
+        }
+
+        // Leer montos actuales
+        double montoEfectivo = chkEfectivo.isSelected() ? parseMonto(txtMontoEfectivo.getText()) : 0.0;
+        double montoTarjeta = chkTarjeta.isSelected() ? parseMonto(txtMontoTarjeta.getText()) : 0.0;
+        double montoTransferencia = chkTransferencia.isSelected() ? parseMonto(txtMontoTransferencia.getText()) : 0.0;
+
+        // Contar cuántos métodos están activos
+        int activos = 0;
+        if (chkEfectivo.isSelected())
+            activos++;
+        if (chkTarjeta.isSelected())
+            activos++;
+        if (chkTransferencia.isSelected())
+            activos++;
+
+        // Si solo hay uno activo, poner el total ahí
+        if (activos == 1) {
+            if (chkEfectivo.isSelected())
+                txtMontoEfectivo.setText(String.format("%.2f", totalVenta));
+            if (chkTarjeta.isSelected())
+                txtMontoTarjeta.setText(String.format("%.2f", totalVenta));
+            if (chkTransferencia.isSelected())
+                txtMontoTransferencia.setText(String.format("%.2f", totalVenta));
+            montoEfectivo = chkEfectivo.isSelected() ? totalVenta : 0.0;
+            montoTarjeta = chkTarjeta.isSelected() ? totalVenta : 0.0;
+            montoTransferencia = chkTransferencia.isSelected() ? totalVenta : 0.0;
+        } else if (activos == 2) {
+            // Si hay dos activos, ajustar el que NO se está editando
+            double montoEditado = 0.0;
+            if ("EFECTIVO".equals(tipoEditado)) {
+                montoEditado = montoEfectivo;
+                if (chkTarjeta.isSelected() && chkTransferencia.isSelected()) {
+                    // Si ambos están activos, no se puede saber cuál ajustar, dejar ambos editables
+                } else if (chkTarjeta.isSelected()) {
+                    double restante = totalVenta - montoEditado;
+                    txtMontoTarjeta.setText(String.format("%.2f", Math.max(restante, 0.0)));
+                    montoTarjeta = Math.max(restante, 0.0);
+                } else if (chkTransferencia.isSelected()) {
+                    double restante = totalVenta - montoEditado;
+                    txtMontoTransferencia.setText(String.format("%.2f", Math.max(restante, 0.0)));
+                    montoTransferencia = Math.max(restante, 0.0);
+                }
+                // Formatear los montos ingresados a dos decimales si el campo está activo y el
+                // texto no está vacío
+                if (chkEfectivo.isSelected() && !txtMontoEfectivo.getText().isEmpty()) {
+                    txtMontoEfectivo.setText(String.format("%.2f", montoEfectivo));
+                }
+                if (chkTarjeta.isSelected() && !txtMontoTarjeta.getText().isEmpty()) {
+                    txtMontoTarjeta.setText(String.format("%.2f", montoTarjeta));
+                }
+                if (chkTransferencia.isSelected() && !txtMontoTransferencia.getText().isEmpty()) {
+                    txtMontoTransferencia.setText(String.format("%.2f", montoTransferencia));
+                }
+            } else if ("TARJETA".equals(tipoEditado)) {
+                montoEditado = montoTarjeta;
+                if (chkEfectivo.isSelected() && chkTransferencia.isSelected()) {
+                    // Si ambos están activos, no se puede saber cuál ajustar, dejar ambos editables
+                } else if (chkEfectivo.isSelected()) {
+                    double restante = totalVenta - montoEditado;
+                    txtMontoEfectivo.setText(String.format("%.2f", Math.max(restante, 0.0)));
+                    montoEfectivo = Math.max(restante, 0.0);
+                } else if (chkTransferencia.isSelected()) {
+                    double restante = totalVenta - montoEditado;
+                    txtMontoTransferencia.setText(String.format("%.2f", Math.max(restante, 0.0)));
+                    montoTransferencia = Math.max(restante, 0.0);
+                }
+            } else if ("TRANSFERENCIA".equals(tipoEditado)) {
+                montoEditado = montoTransferencia;
+                if (chkEfectivo.isSelected() && chkTarjeta.isSelected()) {
+                    // Si ambos están activos, no se puede saber cuál ajustar, dejar ambos editables
+                } else if (chkEfectivo.isSelected()) {
+                    double restante = totalVenta - montoEditado;
+                    txtMontoEfectivo.setText(String.format("%.2f", Math.max(restante, 0.0)));
+                    montoEfectivo = Math.max(restante, 0.0);
+                } else if (chkTarjeta.isSelected()) {
+                    double restante = totalVenta - montoEditado;
+                    txtMontoTarjeta.setText(String.format("%.2f", Math.max(restante, 0.0)));
+                    montoTarjeta = Math.max(restante, 0.0);
+                }
+            } else if ("CHECKBOX_CHANGE".equals(tipoEditado)) {
+                // Si se activa/desactiva un método, limpiar los montos y recalcular
+                if (activos == 2) {
+                    // Poner 0 en ambos y el total en el primero
+                    if (chkEfectivo.isSelected() && chkTarjeta.isSelected()) {
+                        txtMontoEfectivo.setText(String.format("%.2f", totalVenta));
+                        txtMontoTarjeta.setText("0.00");
+                    } else if (chkEfectivo.isSelected() && chkTransferencia.isSelected()) {
+                        txtMontoEfectivo.setText(String.format("%.2f", totalVenta));
+                        txtMontoTransferencia.setText("0.00");
+                    } else if (chkTarjeta.isSelected() && chkTransferencia.isSelected()) {
+                        txtMontoTarjeta.setText(String.format("%.2f", totalVenta));
+                        txtMontoTransferencia.setText("0.00");
+                    }
+                }
+            }
+        } else if (activos == 3) {
+            // Lógica para tres métodos activos
+            if ("EFECTIVO".equals(tipoEditado)) {
+                // El usuario editó EFECTIVO, mantener TARJETA y recalcular TRANSFERENCIA
+                double nuevoTransferencia = totalVenta - montoEfectivo - montoTarjeta;
+                txtMontoTransferencia.setText(String.format("%.2f", Math.max(nuevoTransferencia, 0.0)));
+                montoTransferencia = Math.max(nuevoTransferencia, 0.0);
+            } else if ("TARJETA".equals(tipoEditado)) {
+                // El usuario editó TARJETA, mantener EFECTIVO y recalcular TRANSFERENCIA
+                double nuevoTransferencia = totalVenta - montoEfectivo - montoTarjeta;
+                txtMontoTransferencia.setText(String.format("%.2f", Math.max(nuevoTransferencia, 0.0)));
+                montoTransferencia = Math.max(nuevoTransferencia, 0.0);
+            } else if ("TRANSFERENCIA".equals(tipoEditado)) {
+                // El usuario editó TRANSFERENCIA, mantener EFECTIVO y recalcular TARJETA
+                double nuevoTarjeta = totalVenta - montoEfectivo - montoTransferencia;
+                txtMontoTarjeta.setText(String.format("%.2f", Math.max(nuevoTarjeta, 0.0)));
+                montoTarjeta = Math.max(nuevoTarjeta, 0.0);
+            } else if ("CHECKBOX_CHANGE".equals(tipoEditado)) {
+                // Si se activa/desactiva un método, limpiar los montos y recalcular
+                txtMontoEfectivo.setText("");
+                txtMontoTarjeta.setText("");
+                txtMontoTransferencia.setText("");
+            }
+        }
+        // Recalcular suma final
+        double sumaFinal = montoEfectivo + montoTarjeta + montoTransferencia;
+        lblTotalMixto.setText(String.format("Total: S/ %.2f", sumaFinal));
+    }
+
+    // --- MIXTO: Controles de pago mixto ---
+    @FXML
+    private HBox panelPagoMixto;
+    @FXML
+    private TextField txtMontoEfectivo;
+    @FXML
+    private TextField txtMontoTarjeta;
+    @FXML
+    private TextField txtMontoTransferencia;
+    @FXML
+    private CheckBox chkEfectivo;
+    @FXML
+    private CheckBox chkTarjeta;
+    @FXML
+    private CheckBox chkTransferencia;
+    @FXML
+    private Label lblTotalMixto;
 
     private int calcularPuntosPorVenta(Venta venta) {
         if (venta == null || venta.getTotal() == null)
@@ -124,7 +292,12 @@ public class VentasController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Estilos modernos para tabla de ventas
+        // Abrir lista de clientes al hacer clic en el campo de texto
+        comboClientes.getEditor().setOnMouseClicked(e -> {
+            comboClientes.show();
+        });
+
+        // Configuración inicial y estilos para tabla de ventas
         btnHistorial.setOnAction(e -> mostrarHistorialVentas24h());
         tablaCarrito.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tablaCarrito.setStyle(
@@ -133,7 +306,113 @@ public class VentasController implements Initializable {
         tablaCarrito.getStylesheets().add(getClass().getResource("/css/Proveedor/proveedores.css").toExternalForm());
         tablaCarrito.getStyleClass().setAll("productos-table", "ventas-table");
         tablaCarrito.setPlaceholder(new Label("Tabla sin contenido. Busca y agrega productos al carrito."));
-        // Configurar CellValueFactory para mostrar texto en las columnas
+
+        // --- MIXTO: Inicialización de controles (Ocultar al inicio) ---
+        panelPagoMixto.setVisible(false);
+        panelPagoMixto.setManaged(false);
+        txtMontoEfectivo.setVisible(false);
+        txtMontoEfectivo.setManaged(false);
+        txtMontoTarjeta.setVisible(false);
+        txtMontoTarjeta.setManaged(false);
+        txtMontoTransferencia.setVisible(false);
+        txtMontoTransferencia.setManaged(false);
+
+        // Listener para mostrar/ocultar el panel de Pago Mixto
+        comboPago.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if ("MIXTO".equals(newVal)) {
+                panelPagoMixto.setVisible(true);
+                panelPagoMixto.setManaged(true);
+                // Esto asume que lblTotal ya tiene el valor correcto antes de seleccionar MIXTO
+                lblTotalMixto.setText(lblTotal.getText());
+            } else {
+                panelPagoMixto.setVisible(false);
+                panelPagoMixto.setManaged(false);
+                // Limpiar y ocultar todos los campos mixtos
+                chkEfectivo.setSelected(false);
+                chkTarjeta.setSelected(false);
+                chkTransferencia.setSelected(false);
+                txtMontoEfectivo.clear();
+                txtMontoTarjeta.clear();
+                txtMontoTransferencia.clear();
+                txtMontoEfectivo.setVisible(false);
+                txtMontoEfectivo.setManaged(false);
+                txtMontoTarjeta.setVisible(false);
+                txtMontoTarjeta.setManaged(false);
+                txtMontoTransferencia.setVisible(false);
+                txtMontoTransferencia.setManaged(false);
+            }
+        });
+
+        // Listeners para mostrar/ocultar los campos de monto al seleccionar checkbox
+        chkEfectivo.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            txtMontoEfectivo.setVisible(newVal);
+            txtMontoEfectivo.setManaged(newVal);
+            if (!newVal)
+                txtMontoEfectivo.clear();
+            if (panelPagoMixto.isVisible())
+                actualizarMontosMixto("CHECKBOX_CHANGE");
+        });
+        chkTarjeta.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            txtMontoTarjeta.setVisible(newVal);
+            txtMontoTarjeta.setManaged(newVal);
+            if (!newVal)
+                txtMontoTarjeta.clear();
+            if (panelPagoMixto.isVisible())
+                actualizarMontosMixto("CHECKBOX_CHANGE");
+        });
+        chkTransferencia.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            txtMontoTransferencia.setVisible(newVal);
+            txtMontoTransferencia.setManaged(newVal);
+            if (!newVal)
+                txtMontoTransferencia.clear();
+            if (panelPagoMixto.isVisible())
+                actualizarMontosMixto("CHECKBOX_CHANGE");
+        });
+
+        // Listener para autocompletar solo al presionar ENTER en los campos de pago
+        // mixto
+        txtMontoEfectivo.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                // Formatear el valor ingresado a dos decimales
+                try {
+                    double valor = parseMonto(txtMontoEfectivo.getText());
+                    txtMontoEfectivo.setText(String.format("%.2f", valor));
+                } catch (Exception ex) {
+                }
+                actualizarMontosMixto("EFECTIVO");
+            }
+        });
+        txtMontoTarjeta.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                try {
+                    double valor = parseMonto(txtMontoTarjeta.getText());
+                    txtMontoTarjeta.setText(String.format("%.2f", valor));
+                } catch (Exception ex) {
+                }
+                actualizarMontosMixto("TARJETA");
+            }
+        });
+        txtMontoTransferencia.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                try {
+                    double valor = parseMonto(txtMontoTransferencia.getText());
+                    txtMontoTransferencia.setText(String.format("%.2f", valor));
+                } catch (Exception ex) {
+                }
+                actualizarMontosMixto("TRANSFERENCIA");
+            }
+        });
+
+        // ----------------------------------------------------------------------
+        // --- Funciones Auxiliares para Pago Mixto ---
+        // ----------------------------------------------------------------------
+
+        // NOTA: Se asume que estas funciones existen fuera del initialize
+        // private double obtenerTotalVenta() { ... }
+        // private double parseMonto(String txt) { ... }
+
+        // --- Configuración de Columnas de la Tabla Carrito (Parte del initialize) ---
+
         colCodigo.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
                 cellData.getValue().getProducto().getCodigo()));
         colNombre.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(
@@ -145,9 +424,11 @@ public class VentasController implements Initializable {
                 cellData -> new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getPrecioUnitario()));
         colSubtotal.setCellValueFactory(
                 cellData -> new javafx.beans.property.SimpleObjectProperty<>(cellData.getValue().getSubtotal()));
+
         // Encabezados con alto contraste y fuente grande
         tablaCarrito.lookupAll(".column-header").forEach(node -> node.setStyle(
                 "-fx-background-color: #26a69a; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;"));
+
         // Filas con efecto hover y fuente grande
         tablaCarrito.setRowFactory(tv -> new TableRow<DetalleVenta>() {
             @Override
@@ -167,6 +448,8 @@ public class VentasController implements Initializable {
                 }
             }
         });
+
+        // Columna de edición
         colEditar.setCellFactory(tc -> new TableCell<DetalleVenta, Void>() {
             private final Button btn = new Button();
             {
@@ -193,6 +476,7 @@ public class VentasController implements Initializable {
                 setGraphic(empty ? null : btn);
             }
         });
+
         // Listener para actualizar el panel dinámico de datos de cliente
         comboClientes.getSelectionModel().selectedItemProperty().addListener((obs, oldCliente, newCliente) -> {
             if (newCliente != null) {
@@ -230,9 +514,12 @@ public class VentasController implements Initializable {
                 panelPuntosCliente.setManaged(false);
             }
         });
+
         // Inicialmente ocultar el panel de datos de cliente
         panelDatosCliente.setVisible(false);
         panelDatosCliente.setManaged(false);
+
+        // Columna de eliminación
         colEliminar.setCellFactory(tc -> new TableCell<DetalleVenta, Void>() {
             private final Button btn = new Button();
             {
@@ -260,7 +547,8 @@ public class VentasController implements Initializable {
                 setGraphic(empty ? null : btn);
             }
         });
-        // Buscar productos al escribir
+
+        // Buscar productos al escribir (lógica de autocompletado/sugerencias)
         txtBuscarProducto.textProperty().addListener((obs, oldText, newText) -> {
             if (newText == null || newText.isEmpty()) {
                 limpiarSugerencias();
@@ -276,11 +564,13 @@ public class VentasController implements Initializable {
             listSugerencias.setVisible(!filtrados.isEmpty());
             listSugerencias.setManaged(!filtrados.isEmpty());
             listSugerencias.setDisable(filtrados.isEmpty());
+
             // Habilitar el botón solo si el texto coincide exactamente con algún producto
             String texto = newText.trim().toLowerCase();
             boolean existe = productos.stream().anyMatch(
                     p -> p.getNombre().toLowerCase().equals(texto) || p.getCodigo().toLowerCase().equals(texto));
             btnAgregarProducto.setDisable(!existe);
+
             if (filtrados.isEmpty()) {
                 listSugerencias.getSelectionModel().clearSelection();
             }
@@ -290,9 +580,6 @@ public class VentasController implements Initializable {
         listSugerencias.setStyle(
                 "-fx-background-color: white; -fx-border-color: #26a69a; -fx-border-width: 2px; -fx-effect: dropshadow(gaussian, #26a69a, 12, 0.3, 0, 2);");
 
-        // DEBUG: Forzar borde rojo y fondo amarillo para verificar visibilidad
-        listSugerencias.setStyle(
-                "-fx-background-color: white; -fx-border-color: #26a69a; -fx-border-width: 2px; -fx-effect: dropshadow(gaussian, #26a69a, 12, 0.3, 0, 2);");
         // Mejorar visualización del ListView de sugerencias
         listSugerencias.setCellFactory(lv -> new ListCell<Producto>() {
             @Override
@@ -304,14 +591,13 @@ public class VentasController implements Initializable {
                         setStyle("");
                         setGraphic(null);
                     } else {
-                        String codigo = item.getCodigo();
-                        String nombre = item.getNombre();
-                        String stock = (item.getStockActual() != null ? item.getStockActual().toString() : "0");
-                        setText("");
-                        // Forzar color y tamaño de fuente en la celda
-                        setStyle(
-                                "-fx-background-color: white; -fx-padding: 8px 12px; -fx-border-color: #b2dfdb; -fx-border-width: 0 0 1px 0; -fx-font-size: 16px; -fx-text-fill: #222;");
-                        javafx.scene.layout.HBox hbox = new javafx.scene.layout.HBox(10);
+                        String codigo = item.getCodigo() != null ? item.getCodigo() : "";
+                        String nombre = item.getNombre() != null ? item.getNombre() : "";
+                        Integer stock = item.getStockActual() != null ? item.getStockActual() : 0;
+                        java.math.BigDecimal precio = item.getPrecioVenta() != null ? item.getPrecioVenta()
+                                : java.math.BigDecimal.ZERO;
+                        String precioStr = "S/. " + precio.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString();
+
                         javafx.scene.control.Label lblCodigo = new javafx.scene.control.Label(codigo);
                         lblCodigo.setStyle(
                                 "-fx-font-weight: bold; -fx-text-fill: #388e3c; -fx-min-width: 70px; -fx-font-size: 16px;");
@@ -321,8 +607,16 @@ public class VentasController implements Initializable {
                         javafx.scene.control.Label lblStock = new javafx.scene.control.Label("Stock: " + stock);
                         lblStock.setStyle(
                                 "-fx-font-weight: bold; -fx-text-fill: #0288d1; -fx-min-width: 80px; -fx-font-size: 16px;");
-                        hbox.getChildren().addAll(lblCodigo, lblNombre, lblStock);
+                        javafx.scene.control.Label lblPrecio = new javafx.scene.control.Label(precioStr);
+                        lblPrecio.setStyle(
+                                "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #d32f2f; -fx-padding: 0 0 0 12px;");
+
+                        javafx.scene.layout.HBox hbox = new javafx.scene.layout.HBox(10, lblCodigo, lblNombre, lblStock,
+                                lblPrecio);
+                        hbox.setStyle("-fx-padding: 4 8 4 8; -fx-background-color: transparent;");
                         setGraphic(hbox);
+                        setText("");
+
                         // Efecto hover
                         this.hoverProperty().addListener((obs, wasHover, isHover) -> {
                             if (isHover) {
@@ -342,30 +636,29 @@ public class VentasController implements Initializable {
                 }
             }
         });
+
         // Seleccionar producto desde sugerencias
         listSugerencias.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
-            int idx = listSugerencias.getSelectionModel().getSelectedIndex();
             ObservableList<Producto> items = listSugerencias.getItems();
-            if (items == null || items.isEmpty()) {
+            int idx = listSugerencias.getSelectionModel().getSelectedIndex();
+
+            // Validar que la lista no esté vacía y el índice sea válido
+            if (items == null || items.isEmpty() || idx < 0 || idx >= items.size()) {
                 listSugerencias.getSelectionModel().clearSelection();
                 btnAgregarProducto.setDisable(true);
-                // Solo log en terminal, nunca en pantalla
-                System.err.println("[DEBUG ListView] Intento de selección con lista vacía. Selección cancelada.");
+                System.err.println("[DEBUG ListView] Selección inválida o lista vacía. Selección cancelada.");
                 return;
             }
-            if (newSel != null && idx >= 0 && idx < items.size()) {
+
+            if (newSel != null) {
                 txtBuscarProducto.setText(newSel.getNombre());
                 limpiarSugerencias();
                 btnAgregarProducto.setDisable(false);
             } else {
                 btnAgregarProducto.setDisable(true);
-                if (idx < 0 || idx >= items.size()) {
-                    // Solo log en terminal, nunca en pantalla
-                    System.err.println(
-                            "[DEBUG ListView] Índice de selección fuera de rango: " + idx + " Tamaño: " + items.size());
-                }
             }
         });
+
         // Mostrar todos los productos al hacer click en el buscador
         txtBuscarProducto.setOnMouseClicked(e -> {
             ObservableList<Producto> todos = FXCollections.observableArrayList(productos);
@@ -383,29 +676,42 @@ public class VentasController implements Initializable {
             listSugerencias.setManaged(true);
         });
 
-        // Mejorar visualización de tabla de carrito
-        tablaCarrito.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tablaCarrito.setStyle("-fx-background-color: white; -fx-border-color: #dee2e6; -fx-border-radius: 8px;");
-        // Usar solo el CSS para el diseño de la tabla
-        tablaCarrito.getStylesheets().clear();
-        tablaCarrito.getStylesheets().add(getClass().getResource("/css/Proveedor/proveedores.css").toExternalForm());
-        tablaCarrito.getStyleClass().setAll("productos-table");
-        // Eliminar setStyle en columnas y filas, dejar que el CSS controle todo
-        tablaCarrito.setPlaceholder(new Label("Tabla sin contenido. Busca y agrega productos al carrito."));
+        // ----------------------------------------------------------------------
+        // --- Configuración Final y Carga de Datos ---
+        // ----------------------------------------------------------------------
+
+        // Cargar datos y configurar ComboBoxes
         cargarProductos();
         cargarClientes();
+
         comboPago.setItems(FXCollections.observableArrayList("EFECTIVO", "TARJETA", "TRANSFERENCIA", "MIXTO"));
         comboPago.setPromptText("Seleccionar método de pago");
+
         comboComprobante.setItems(FXCollections.observableArrayList("BOLETA", "FACTURA", "TICKET"));
         comboComprobante.setPromptText("Selecciona comprobante");
         comboComprobante.setVisibleRowCount(2);
+
         tablaCarrito.setItems(carrito);
+
+        // Acciones de botones
         btnConfirmarVenta.setOnAction(e -> confirmarVenta());
         btnAgregarProducto.setOnAction(e -> agregarProductoDesdeBuscador());
+
+        // Asegurar que los totales se calculen al inicio
         actualizarTotales();
 
         // Personalizar visualización de clientes en ComboBox: tipo, documento y
         // nombre/razón social
+        comboClientes.setEditable(true);
+
+        // Guardar la lista original de clientes para filtrar
+        final ObservableList<Cliente> clientesOriginales = FXCollections.observableArrayList();
+        java.util.List<Cliente> clientesCargados = clienteRepository.findAll(0, 100);
+        clientesCargados.removeIf(c -> "00000000".equals(c.getDocumento()));
+        clientesOriginales.addAll(clientesCargados);
+        comboClientes.setItems(FXCollections.observableArrayList(clientesOriginales));
+
+        // Configuración visual de las celdas del ComboBox (desplegable)
         comboClientes.setCellFactory(lv -> new ListCell<Cliente>() {
             @Override
             protected void updateItem(Cliente item, boolean empty) {
@@ -420,6 +726,8 @@ public class VentasController implements Initializable {
                 }
             }
         });
+
+        // Configuración visual de la celda de botón del ComboBox (seleccionado)
         comboClientes.setButtonCell(new ListCell<Cliente>() {
             @Override
             protected void updateItem(Cliente item, boolean empty) {
@@ -434,7 +742,31 @@ public class VentasController implements Initializable {
                 }
             }
         });
-        // Buscar y agregar producto al carrito según tipo de búsqueda
+
+        // Filtro dinámico en el editor del ComboBox (Autocompletado de clientes)
+        comboClientes.getEditor().textProperty().addListener((obs, oldText, newText) -> {
+            if (newText == null || newText.isEmpty()) {
+                comboClientes.setItems(FXCollections.observableArrayList(clientesOriginales));
+                comboClientes.setVisibleRowCount(8);
+            } else {
+                String filtro = newText.toLowerCase();
+                ObservableList<Cliente> filtrados = clientesOriginales.stream()
+                        .filter(c -> c.getNombreCompleto().toLowerCase().contains(filtro)
+                                || c.getDocumento().toLowerCase().contains(filtro)
+                                || (c.getRazonSocial() != null && c.getRazonSocial().toLowerCase().contains(filtro)))
+                        .collect(java.util.stream.Collectors.toCollection(FXCollections::observableArrayList));
+                comboClientes.setItems(filtrados);
+
+                // Ajustar altura del popup según resultados
+                if (filtrados.size() <= 1) {
+                    comboClientes.setVisibleRowCount(filtrados.size() == 0 ? 1 : 2);
+                } else if (filtrados.size() < 8) {
+                    comboClientes.setVisibleRowCount(filtrados.size());
+                } else {
+                    comboClientes.setVisibleRowCount(8);
+                }
+            }
+        });
     }
 
     // Método utilitario para limpiar el ListView de sugerencias
@@ -458,8 +790,9 @@ public class VentasController implements Initializable {
 
     private void agregarProductoDesdeBuscador() {
         final Producto seleccionado;
-        if (!listSugerencias.getItems().isEmpty() && listSugerencias.getSelectionModel().getSelectedIndex() >= 0
-                && listSugerencias.getSelectionModel().getSelectedIndex() < listSugerencias.getItems().size()) {
+        ObservableList<Producto> items = listSugerencias.getItems();
+        int idx = listSugerencias.getSelectionModel().getSelectedIndex();
+        if (items != null && !items.isEmpty() && idx >= 0 && idx < items.size()) {
             seleccionado = listSugerencias.getSelectionModel().getSelectedItem();
         } else if (txtBuscarProducto.getText() != null && !txtBuscarProducto.getText().isEmpty()) {
             String texto = txtBuscarProducto.getText().trim().toLowerCase();
@@ -733,16 +1066,171 @@ public class VentasController implements Initializable {
 
     // Método principal para confirmar la venta y emitir comprobante electrónico
     private void confirmarVenta() {
-        final Cliente clienteSeleccionado = comboClientes.getValue();
+        Object valorCombo = comboClientes.getValue();
         final String metodoPago = comboPago.getValue();
         if (metodoPago == null || carrito.isEmpty()) {
             mostrarMensaje("Completa todos los datos y agrega productos al carrito.");
             return;
         }
-        // Si no hay cliente seleccionado, buscar cliente genérico por DNI en la BD
-        final Cliente clienteActual;
-        if (clienteSeleccionado != null) {
-            clienteActual = clienteSeleccionado;
+        final String tipoComprobante = comboComprobante.getValue();
+        final Cliente[] clienteActualRef = new Cliente[1];
+        // --- INTEGRACIÓN BOLETA/FACTURA RÁPIDA ---
+        if ((valorCombo == null || valorCombo.toString().trim().isEmpty()) &&
+                ("BOLETA".equalsIgnoreCase(tipoComprobante) || "FACTURA".equalsIgnoreCase(tipoComprobante))) {
+            try {
+                if ("BOLETA".equalsIgnoreCase(tipoComprobante)) {
+                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                            getClass().getResource("/fxml/Ventas/BoletaRapidaDialog.fxml"));
+                    DialogPane dialogPane = loader.load();
+                    BoletaRapidaDialogController dialogController = loader.getController();
+                    double montoTotal = 0.0;
+                    try {
+                        String txtTotal = lblTotal.getText().replace("Total: S/", "").replace(",", ".").trim();
+                        montoTotal = Double.parseDouble(txtTotal);
+                    } catch (Exception e) {
+                        montoTotal = 0.0;
+                    }
+                    Dialog<java.util.Map<String, String>> dialog = new Dialog<>();
+                    dialog.setDialogPane(dialogPane);
+                    dialog.setTitle("Datos rápidos para Boleta");
+                    dialog.setHeaderText("Completa los datos mínimos para la boleta electrónica");
+                    ButtonType okType = null;
+                    for (ButtonType bt : dialogPane.getButtonTypes()) {
+                        if (bt.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                            okType = bt;
+                            break;
+                        }
+                    }
+                    final double finalMontoTotal = montoTotal;
+                    dialog.setResultConverter(bt -> {
+                        if (bt != null && bt.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                            if (!dialogController.validar(finalMontoTotal)) {
+                                return null;
+                            }
+                            java.util.Map<String, String> datos = new java.util.HashMap<>();
+                            datos.put("nombre", dialogController.getNombre());
+                            datos.put("dni", dialogController.getDni());
+                            return datos;
+                        }
+                        return null;
+                    });
+                    if (okType != null) {
+                        Button okBtn = (Button) dialogPane.lookupButton(okType);
+                        okBtn.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                            if (!dialogController.validar(finalMontoTotal)) {
+                                event.consume();
+                            }
+                        });
+                    }
+                    Optional<java.util.Map<String, String>> result = dialog.showAndWait();
+                    if (result.isPresent()) {
+                        String nombre = result.get().getOrDefault("nombre", "Cliente Genérico");
+                        String dni = result.get().getOrDefault("dni", "");
+                        com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente clienteTemp = new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente();
+                        clienteTemp.setNombreCompleto(nombre);
+                        clienteTemp.setDni(dni);
+                        clienteTemp.setTipoCliente("NATURAL");
+                        clienteTemp.setDireccion("-");
+                        clienteTemp.setEmail("");
+                        clienteTemp.setId(null);
+                        com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository clienteRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository();
+                        boolean guardado = clienteRepo.save(clienteTemp);
+                        if (guardado && clienteTemp.getId() != null && clienteTemp.getId() > 0) {
+                            clienteActualRef[0] = clienteTemp;
+                        } else {
+                            mostrarMensaje("No se pudo registrar el cliente rápido. Operación cancelada.");
+                            return;
+                        }
+                    } else {
+                        mostrarMensaje("Operación cancelada por el usuario.");
+                        return;
+                    }
+                } else if ("FACTURA".equalsIgnoreCase(tipoComprobante)) {
+                    javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                            getClass().getResource("/fxml/Ventas/FacturaRapidaDialog.fxml"));
+                    DialogPane dialogPane = loader.load();
+                    com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.FacturaRapidaDialogController dialogController = loader
+                            .getController();
+                    Dialog<java.util.Map<String, String>> dialog = new Dialog<>();
+                    dialog.setDialogPane(dialogPane);
+                    dialog.setTitle("Datos rápidos para Factura");
+                    dialog.setHeaderText("Completa los datos mínimos para la factura electrónica");
+                    ButtonType okType = null;
+                    for (ButtonType bt : dialogPane.getButtonTypes()) {
+                        if (bt.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                            okType = bt;
+                            break;
+                        }
+                    }
+                    dialog.setResultConverter(bt -> {
+                        if (bt != null && bt.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                            if (!dialogController.validar()) {
+                                return null;
+                            }
+                            java.util.Map<String, String> datos = new java.util.HashMap<>();
+                            datos.put("razonSocial", dialogController.getRazonSocial());
+                            datos.put("ruc", dialogController.getRuc());
+                            datos.put("direccion", dialogController.getDireccion());
+                            return datos;
+                        }
+                        return null;
+                    });
+                    if (okType != null) {
+                        Button okBtn = (Button) dialogPane.lookupButton(okType);
+                        okBtn.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+                            if (!dialogController.validar()) {
+                                event.consume();
+                            }
+                        });
+                    }
+                    Optional<java.util.Map<String, String>> result = dialog.showAndWait();
+                    if (result.isPresent()) {
+                        String razonSocial = result.get().getOrDefault("razonSocial", "Empresa Genérica");
+                        String ruc = result.get().getOrDefault("ruc", "");
+                        String direccion = result.get().getOrDefault("direccion", "");
+                        com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente clienteTemp = new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente();
+                        clienteTemp.setTipoCliente("EMPRESA");
+                        clienteTemp.setRuc(ruc);
+                        clienteTemp.setRazonSocial(razonSocial);
+                        clienteTemp.setDireccion(direccion);
+                        clienteTemp.setEmail("");
+                        clienteTemp.setNombres(""); // Para cumplir con NOT NULL
+                        clienteTemp.setApellidos(""); // Para cumplir con NOT NULL
+                        clienteTemp.setId(null);
+                        com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository clienteRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository();
+                        boolean guardado = clienteRepo.save(clienteTemp);
+                        if (guardado && clienteTemp.getId() != null && clienteTemp.getId() > 0) {
+                            clienteActualRef[0] = clienteTemp;
+                        } else {
+                            mostrarMensaje("No se pudo registrar el cliente rápido de factura. Operación cancelada.");
+                            return;
+                        }
+                    } else {
+                        mostrarMensaje("Operación cancelada por el usuario.");
+                        return;
+                    }
+                }
+            } catch (Exception ex) {
+                mostrarMensaje("Error al mostrar el formulario rápido: " + ex.getMessage());
+                return;
+            }
+        } else if (valorCombo instanceof com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente) {
+            clienteActualRef[0] = (com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente) valorCombo;
+        } else if (valorCombo instanceof String) {
+            String texto = ((String) valorCombo).trim().toLowerCase();
+            Cliente encontrado = comboClientes.getItems().stream()
+                    .filter(c -> c.getNombreCompleto().toLowerCase().equals(texto)
+                            || c.getDocumento().toLowerCase().equals(texto)
+                            || (c.getRazonSocial() != null && c.getRazonSocial().toLowerCase().equals(texto)))
+                    .findFirst()
+                    .orElse(null);
+            if (encontrado != null) {
+                comboClientes.getSelectionModel().select(encontrado);
+                clienteActualRef[0] = encontrado;
+            } else {
+                mostrarMensaje("No se encontró un cliente que coincida con el texto ingresado.");
+                return;
+            }
         } else {
             com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository clienteRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository();
             java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> clientes = clienteRepo
@@ -752,7 +1240,7 @@ public class VentasController implements Initializable {
                     .filter(c -> "00000000".equals(c.getDocumento()))
                     .findFirst();
             if (optGenerico.isPresent()) {
-                clienteActual = optGenerico.get();
+                clienteActualRef[0] = optGenerico.get();
             } else {
                 // Crear cliente genérico automáticamente como 'CONSUMIDOR FINAL'
                 com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente clienteGenerico = new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente();
@@ -762,7 +1250,7 @@ public class VentasController implements Initializable {
                 clienteGenerico.setRazonSocial("");
                 // Si hay otros campos requeridos, inicialízalos aquí
                 clienteRepo.save(clienteGenerico); // O el método correcto para guardar
-                clienteActual = clienteGenerico;
+                clienteActualRef[0] = clienteGenerico;
             }
         }
         // Calcular totales antes de crear boleta y venta
@@ -777,6 +1265,7 @@ public class VentasController implements Initializable {
         final boolean[] puntosUsados = { false };
         final int[] puntosDescontados = { 0 };
         double solesDescuento = 0.0;
+        Cliente clienteActual = clienteActualRef[0];
         if (clienteActual != null && "NATURAL".equalsIgnoreCase(clienteActual.getTipoCliente())
                 && "BOLETA".equalsIgnoreCase(comboComprobante.getValue())) {
             int puntos = consultarPuntosCliente(clienteActual.getId());
@@ -807,12 +1296,89 @@ public class VentasController implements Initializable {
                 }
             }
         }
-        String tipoComprobante = comboComprobante.getValue();
+        // String tipoComprobante = comboComprobante.getValue(); // Eliminada
+        // declaración duplicada
         if ("TICKET".equalsIgnoreCase(tipoComprobante)) {
             // Lógica para registrar venta tipo TICKET
             com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.TicketVentaController ticketController = new com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.TicketVentaController();
             Venta ventaGuardada = ticketController.registrarVentaTicket(new ArrayList<>(carrito), metodoPago,
                     SessionManager.getUsuarioActual().getUsername(), "Farmacia Victoria", clienteActual);
+            // Guardar los pagos mixtos en la tabla detalle_pago_venta para TICKET
+            if ("MIXTO".equalsIgnoreCase(metodoPago) && ventaGuardada != null) {
+                java.sql.Connection conn = null;
+                try {
+                    conn = com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig.getInstance()
+                            .getConnection();
+                    com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetallePagoVentaRepositoryJdbcImpl detallePagoVentaRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetallePagoVentaRepositoryJdbcImpl(
+                            conn);
+                    int ventaId = ventaGuardada.getId();
+                    System.out.println("[DEBUG MIXTO] Guardando pagos mixtos para ventaId=" + ventaId);
+                    if (chkEfectivo.isSelected()) {
+                        double monto = parseMonto(txtMontoEfectivo.getText());
+                        System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                + ", tipo_pago=EFECTIVO, monto=" + monto);
+                        if (ventaId > 0 && monto > 0) {
+                            com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                    ventaId, "EFECTIVO", monto);
+                            boolean ok = detallePagoVentaRepository.save(pago);
+                            System.out.println("[DEBUG MIXTO] Pago EFECTIVO guardado: " + ok);
+                            if (!ok) {
+                                mostrarMensaje(
+                                        "Error al guardar el pago EFECTIVO en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                            }
+                        } else {
+                            System.err.println("[ERROR MIXTO] Datos inválidos para EFECTIVO: venta_id=" + ventaId
+                                    + ", monto=" + monto);
+                        }
+                    }
+                    if (chkTarjeta.isSelected()) {
+                        double monto = parseMonto(txtMontoTarjeta.getText());
+                        System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                + ", tipo_pago=TARJETA, monto=" + monto);
+                        if (ventaId > 0 && monto > 0) {
+                            com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                    ventaId, "TARJETA", monto);
+                            boolean ok = detallePagoVentaRepository.save(pago);
+                            System.out.println("[DEBUG MIXTO] Pago TARJETA guardado: " + ok);
+                            if (!ok) {
+                                mostrarMensaje(
+                                        "Error al guardar el pago TARJETA en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                            }
+                        } else {
+                            System.err.println("[ERROR MIXTO] Datos inválidos para TARJETA: venta_id=" + ventaId
+                                    + ", monto=" + monto);
+                        }
+                    }
+                    if (chkTransferencia.isSelected()) {
+                        double monto = parseMonto(txtMontoTransferencia.getText());
+                        System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                + ", tipo_pago=TRANSFERENCIA, monto=" + monto);
+                        if (ventaId > 0 && monto > 0) {
+                            com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                    ventaId, "TRANSFERENCIA", monto);
+                            boolean ok = detallePagoVentaRepository.save(pago);
+                            System.out.println("[DEBUG MIXTO] Pago TRANSFERENCIA guardado: " + ok);
+                            if (!ok) {
+                                mostrarMensaje(
+                                        "Error al guardar el pago TRANSFERENCIA en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                            }
+                        } else {
+                            System.err.println("[ERROR MIXTO] Datos inválidos para TRANSFERENCIA: venta_id=" + ventaId
+                                    + ", monto=" + monto);
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.err.println("[ERROR MIXTO] Error al guardar pagos mixtos: " + ex.getMessage());
+                } finally {
+                    if (conn != null) {
+                        try {
+                            conn.close();
+                        } catch (java.sql.SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
             // Mostrar vista previa del ticket
             String textoTicket = ticketController.generarTextoTicket(ventaGuardada, "Farmacia Victoria");
             ticketController.mostrarVistaPreviaTicket(textoTicket);
@@ -1050,6 +1616,82 @@ public class VentasController implements Initializable {
                                     mostrarMensaje("Error al actualizar el stock de '" + producto.getNombre() + "': "
                                             + ex.getMessage());
                                     System.err.println("[ERROR STOCK] " + ex.getMessage());
+                                }
+                            }
+                        }
+                        // Guardar los pagos mixtos en la tabla detalle_pago_venta
+                        if ("MIXTO".equalsIgnoreCase(metodoPago)) {
+                            java.sql.Connection conn = null;
+                            try {
+                                conn = com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig.getInstance()
+                                        .getConnection();
+                                com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetallePagoVentaRepositoryJdbcImpl detallePagoVentaRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetallePagoVentaRepositoryJdbcImpl(
+                                        conn);
+                                int ventaId = ventaGuardada.getId();
+                                System.out.println("[DEBUG MIXTO] Guardando pagos mixtos para ventaId=" + ventaId);
+                                if (chkEfectivo.isSelected()) {
+                                    double monto = parseMonto(txtMontoEfectivo.getText());
+                                    System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                            + ", tipo_pago=EFECTIVO, monto=" + monto);
+                                    if (ventaId > 0 && monto > 0) {
+                                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                                ventaId, "EFECTIVO", monto);
+                                        boolean ok = detallePagoVentaRepository.save(pago);
+                                        System.out.println("[DEBUG MIXTO] Pago EFECTIVO guardado: " + ok);
+                                        if (!ok) {
+                                            mostrarMensaje(
+                                                    "Error al guardar el pago EFECTIVO en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                                        }
+                                    } else {
+                                        System.err.println("[ERROR MIXTO] Datos inválidos para EFECTIVO: venta_id="
+                                                + ventaId + ", monto=" + monto);
+                                    }
+                                }
+                                if (chkTarjeta.isSelected()) {
+                                    double monto = parseMonto(txtMontoTarjeta.getText());
+                                    System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                            + ", tipo_pago=TARJETA, monto=" + monto);
+                                    if (ventaId > 0 && monto > 0) {
+                                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                                ventaId, "TARJETA", monto);
+                                        boolean ok = detallePagoVentaRepository.save(pago);
+                                        System.out.println("[DEBUG MIXTO] Pago TARJETA guardado: " + ok);
+                                        if (!ok) {
+                                            mostrarMensaje(
+                                                    "Error al guardar el pago TARJETA en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                                        }
+                                    } else {
+                                        System.err.println("[ERROR MIXTO] Datos inválidos para TARJETA: venta_id="
+                                                + ventaId + ", monto=" + monto);
+                                    }
+                                }
+                                if (chkTransferencia.isSelected()) {
+                                    double monto = parseMonto(txtMontoTransferencia.getText());
+                                    System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                            + ", tipo_pago=TRANSFERENCIA, monto=" + monto);
+                                    if (ventaId > 0 && monto > 0) {
+                                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                                ventaId, "TRANSFERENCIA", monto);
+                                        boolean ok = detallePagoVentaRepository.save(pago);
+                                        System.out.println("[DEBUG MIXTO] Pago TRANSFERENCIA guardado: " + ok);
+                                        if (!ok) {
+                                            mostrarMensaje(
+                                                    "Error al guardar el pago TRANSFERENCIA en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                                        }
+                                    } else {
+                                        System.err.println("[ERROR MIXTO] Datos inválidos para TRANSFERENCIA: venta_id="
+                                                + ventaId + ", monto=" + monto);
+                                    }
+                                }
+                            } catch (Exception ex) {
+                                System.err.println("[ERROR MIXTO] Error al guardar pagos mixtos: " + ex.getMessage());
+                            } finally {
+                                if (conn != null) {
+                                    try {
+                                        conn.close();
+                                    } catch (java.sql.SQLException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
                         }
@@ -1392,6 +2034,82 @@ public class VentasController implements Initializable {
                                 + (clienteActual != null ? clienteActual.getTipoCliente() : "null") + " | totalVenta="
                                 + (ventaGuardada != null && ventaGuardada.getTotal() != null ? ventaGuardada.getTotal()
                                         : "null"));
+                        // Guardar pagos mixtos en detalle_pago_venta para BOLETA
+                        if ("MIXTO".equalsIgnoreCase(metodoPago)) {
+                            java.sql.Connection conn = null;
+                            try {
+                                conn = com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig.getInstance()
+                                        .getConnection();
+                                com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetallePagoVentaRepositoryJdbcImpl detallePagoVentaRepository = new com.farmaciavictoria.proyectopharmavictoria.repository.Ventas.DetallePagoVentaRepositoryJdbcImpl(
+                                        conn);
+                                int ventaId = ventaGuardada.getId();
+                                System.out.println("[DEBUG MIXTO] Guardando pagos mixtos para ventaId=" + ventaId);
+                                if (chkEfectivo.isSelected()) {
+                                    double monto = parseMonto(txtMontoEfectivo.getText());
+                                    System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                            + ", tipo_pago=EFECTIVO, monto=" + monto);
+                                    if (ventaId > 0 && monto > 0) {
+                                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                                ventaId, "EFECTIVO", monto);
+                                        boolean ok = detallePagoVentaRepository.save(pago);
+                                        System.out.println("[DEBUG MIXTO] Pago EFECTIVO guardado: " + ok);
+                                        if (!ok) {
+                                            mostrarMensaje(
+                                                    "Error al guardar el pago EFECTIVO en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                                        }
+                                    } else {
+                                        System.err.println("[ERROR MIXTO] Datos inválidos para EFECTIVO: venta_id="
+                                                + ventaId + ", monto=" + monto);
+                                    }
+                                }
+                                if (chkTarjeta.isSelected()) {
+                                    double monto = parseMonto(txtMontoTarjeta.getText());
+                                    System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                            + ", tipo_pago=TARJETA, monto=" + monto);
+                                    if (ventaId > 0 && monto > 0) {
+                                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                                ventaId, "TARJETA", monto);
+                                        boolean ok = detallePagoVentaRepository.save(pago);
+                                        System.out.println("[DEBUG MIXTO] Pago TARJETA guardado: " + ok);
+                                        if (!ok) {
+                                            mostrarMensaje(
+                                                    "Error al guardar el pago TARJETA en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                                        }
+                                    } else {
+                                        System.err.println("[ERROR MIXTO] Datos inválidos para TARJETA: venta_id="
+                                                + ventaId + ", monto=" + monto);
+                                    }
+                                }
+                                if (chkTransferencia.isSelected()) {
+                                    double monto = parseMonto(txtMontoTransferencia.getText());
+                                    System.out.println("[DEBUG MIXTO] Intentando guardar pago: venta_id=" + ventaId
+                                            + ", tipo_pago=TRANSFERENCIA, monto=" + monto);
+                                    if (ventaId > 0 && monto > 0) {
+                                        com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta pago = new com.farmaciavictoria.proyectopharmavictoria.model.Ventas.DetallePagoVenta(
+                                                ventaId, "TRANSFERENCIA", monto);
+                                        boolean ok = detallePagoVentaRepository.save(pago);
+                                        System.out.println("[DEBUG MIXTO] Pago TRANSFERENCIA guardado: " + ok);
+                                        if (!ok) {
+                                            mostrarMensaje(
+                                                    "Error al guardar el pago TRANSFERENCIA en la tabla detalle_pago_venta. Verifica la conexión y los datos.");
+                                        }
+                                    } else {
+                                        System.err.println("[ERROR MIXTO] Datos inválidos para TRANSFERENCIA: venta_id="
+                                                + ventaId + ", monto=" + monto);
+                                    }
+                                }
+                            } catch (Exception ex) {
+                                System.err.println("[ERROR MIXTO] Error al guardar pagos mixtos: " + ex.getMessage());
+                            } finally {
+                                if (conn != null) {
+                                    try {
+                                        conn.close();
+                                    } catch (java.sql.SQLException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
                         if (clienteActual != null && "NATURAL".equalsIgnoreCase(clienteActual.getTipoCliente())) {
                             int puntosGanados = calcularPuntosPorVenta(ventaGuardada);
                             if (puntosGanados > 0) {

@@ -40,6 +40,11 @@ public class ReporteVentasDetalleStrategy implements ReporteVentasStrategy {
                     venta.setTipoPago(rs.getString("tipo_pago"));
                     venta.setEstado(rs.getString("estado"));
                     venta.setProductos(obtenerProductosPorVenta(conn, venta.getIdVenta()));
+                    if ("MIXTO".equalsIgnoreCase(venta.getTipoPago())) {
+                        venta.setDetallePago(obtenerDetallePagoPorVenta(conn, venta.getIdVenta()));
+                    } else {
+                        venta.setDetallePago(venta.getTipoPago() + " : S/" + venta.getTotal());
+                    }
                     ventas.add(venta);
                 }
             }
@@ -47,6 +52,26 @@ public class ReporteVentasDetalleStrategy implements ReporteVentasStrategy {
             e.printStackTrace();
         }
         return ventas;
+    }
+
+    private String obtenerDetallePagoPorVenta(java.sql.Connection conn, int ventaId) {
+        StringBuilder detalle = new StringBuilder();
+        String sql = "SELECT tipo_pago, monto FROM detalle_pago_venta WHERE venta_id = ?";
+        try (java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, ventaId);
+            try (java.sql.ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String tipo = rs.getString("tipo_pago");
+                    java.math.BigDecimal monto = rs.getBigDecimal("monto");
+                    if (detalle.length() > 0)
+                        detalle.append(", ");
+                    detalle.append(tipo).append(": S/").append(monto);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return detalle.length() > 0 ? detalle.toString() : "-";
     }
 
     private java.sql.Connection obtenerConexion() throws Exception {

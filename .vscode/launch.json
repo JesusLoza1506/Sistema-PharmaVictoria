@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "PasswordUtil",
+            "request": "launch",
+            "mainClass": "com.farmaciavictoria.proyectopharmavictoria.util.PasswordUtil",
+            "projectName": "proyectopharmavictoria"
+        },
+        {
+            "type": "java",
             "name": "DemoGeneradorCodigos",
             "request": "launch",
             "mainClass": "com.farmaciavictoria.proyectopharmavictoria.demo.DemoGeneradorCodigos",

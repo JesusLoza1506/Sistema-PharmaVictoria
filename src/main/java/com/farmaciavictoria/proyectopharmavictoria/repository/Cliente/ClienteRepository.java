@@ -30,6 +30,30 @@ public class ClienteRepository {
         this.databaseConfig = DatabaseConfig.getInstance();
     }
 
+    /**
+     * Busca un cliente por documento (DNI/RUC)
+     * 
+     * @param documento Documento a buscar
+     * @return Optional<Cliente> si existe, vacío si no
+     */
+    public Optional<Cliente> findByDocumento(String documento) {
+        String sql = "SELECT * FROM clientes WHERE documento = ? AND activo = true";
+        try (Connection conn = databaseConfig.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, documento);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Cliente cliente = mapResultSetToCliente(rs);
+                    logger.debug("Cliente encontrado por documento {}: {}", documento, cliente.getNombreCompleto());
+                    return Optional.of(cliente);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Error al buscar cliente por documento {}: {}", documento, e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
     public List<Cliente> findAll(int offset, int limit) {
         String sql = "SELECT * FROM clientes ORDER BY id ASC LIMIT ? OFFSET ?";
         List<Cliente> clientes = new ArrayList<>();

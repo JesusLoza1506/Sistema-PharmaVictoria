@@ -38,6 +38,8 @@ public class ReporteVentasDetalleController {
     @FXML
     private TableColumn<com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String> colEstado;
     @FXML
+    private TableColumn<com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String> colDetallePago;
+    @FXML
     private TableColumn<com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO, String> colProductos;
 
     private com.farmaciavictoria.proyectopharmavictoria.controller.reportes.strategy.ReporteVentasStrategy estrategia = new com.farmaciavictoria.proyectopharmavictoria.controller.reportes.strategy.ReporteVentasDetalleStrategy();
@@ -57,11 +59,13 @@ public class ReporteVentasDetalleController {
         colVendedor.setCellValueFactory(
                 data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getVendedor()));
         colTotal.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(
-                data.getValue().getTotal() != null ? data.getValue().getTotal().toPlainString() : ""));
+                data.getValue().getTotal() != null ? "S/" + data.getValue().getTotal().toPlainString() : ""));
         colTipoPago.setCellValueFactory(
                 data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTipoPago()));
         colEstado.setCellValueFactory(
                 data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getEstado()));
+        colDetallePago.setCellValueFactory(
+                data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getDetallePago()));
         colProductos.setCellValueFactory(
                 data -> new javafx.beans.property.SimpleStringProperty(
                         data.getValue().getProductos() != null && !data.getValue().getProductos().isEmpty()

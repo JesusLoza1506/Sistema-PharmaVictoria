@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<DialogPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.BoletaRapidaDialogController">
+    <content>
+        <VBox spacing="12" style="-fx-padding: 20;">
+            <children>
+                <Label text="Datos para Boleta Electrónica" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                <HBox spacing="8">
+                    <children>
+                        <Label text="Nombre:" minWidth="70" />
+                        <TextField fx:id="txtNombre" promptText="Cliente Genérico" prefWidth="220" />
+                    </children>
+                </HBox>
+                <HBox spacing="8">
+                    <children>
+                        <Label text="DNI:" minWidth="70" />
+                        <TextField fx:id="txtDni" promptText="Opcional (8 dígitos)" prefWidth="120" />
+                    </children>
+                </HBox>
+                <Label fx:id="lblAdvertencia" textFill="red" visible="false" />
+            </children>
+        </VBox>
+    </content>
+    <buttonTypes>
+        <ButtonType fx:id="btnAceptar" text="Aceptar" buttonData="OK_DONE" />
+        <ButtonType text="Cancelar" buttonData="CANCEL_CLOSE" />
+    </buttonTypes>
+</DialogPane>

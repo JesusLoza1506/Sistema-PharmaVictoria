@@ -41,8 +41,9 @@ public class ExportadorPDFReporte implements ExportadorReporte {
                         + venta.getCliente() + " | Vendedor: " + venta.getVendedor()));
                 document.add(new com.itextpdf.text.Paragraph(
                         "Total: S/. " + venta.getTotal() + " | Estado: " + venta.getEstado()));
-                document.add(new com.itextpdf.text.Paragraph("Productos:"));
-
+                document.add(new com.itextpdf.text.Paragraph("Detalle Pago: " + venta.getDetallePago()));
+                // Agregar espacio extra antes de la tabla
+                document.add(new com.itextpdf.text.Paragraph(" "));
                 com.itextpdf.text.pdf.PdfPTable table = new com.itextpdf.text.pdf.PdfPTable(5);
                 // Cabecera con fondo y fuente blanca
                 com.itextpdf.text.BaseColor headerColor = new com.itextpdf.text.BaseColor(33, 150, 243);
@@ -67,6 +68,8 @@ public class ExportadorPDFReporte implements ExportadorReporte {
                     table.addCell(prod.getSubtotal().toPlainString());
                 }
                 document.add(table);
+                document.add(new com.itextpdf.text.Paragraph(" "));
+                document.add(new com.itextpdf.text.Paragraph(" "));
                 document.add(new com.itextpdf.text.Paragraph(" "));
             }
             document.close();

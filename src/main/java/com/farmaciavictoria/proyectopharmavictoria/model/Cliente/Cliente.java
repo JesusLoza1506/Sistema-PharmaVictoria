@@ -280,9 +280,14 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "Cliente{" +
-                "id=" + id +
-                '}';
+        if ("Empresa".equalsIgnoreCase(this.tipoCliente)) {
+            return (razonSocial != null && !razonSocial.isEmpty()) ? razonSocial
+                    : (documento != null ? documento : "Empresa");
+        } else {
+            String nombreCompleto = (nombres != null ? nombres : "") + " " + (apellidos != null ? apellidos : "");
+            return nombreCompleto.trim().isEmpty() ? (documento != null ? documento : "Cliente")
+                    : nombreCompleto.trim();
+        }
     }
 
     @Override

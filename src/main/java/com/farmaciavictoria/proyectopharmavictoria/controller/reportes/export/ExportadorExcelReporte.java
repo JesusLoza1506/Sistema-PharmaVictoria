@@ -60,8 +60,8 @@ public class ExportadorExcelReporte implements ExportadorReporte {
             headerStyle.setBorderLeft(org.apache.poi.ss.usermodel.BorderStyle.THIN);
             headerStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
 
-            String[] headers = { "N° Boleta", "Serie", "Fecha", "Cliente", "Vendedor", "Total", "Estado", "Producto",
-                    "Cantidad", "Precio Unitario", "Descuento", "Subtotal" };
+            String[] headers = { "N° Boleta", "Serie", "Fecha", "Cliente", "Vendedor", "Total", "Detalle Pago",
+                    "Estado", "Productos", "Precio Unitario", "Descuento", "Subtotal" };
             for (int i = 0; i < headers.length; i++) {
                 org.apache.poi.ss.usermodel.Cell cell = header.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -76,42 +76,40 @@ public class ExportadorExcelReporte implements ExportadorReporte {
             dataStyle.setBorderRight(org.apache.poi.ss.usermodel.BorderStyle.THIN);
 
             for (VentaReporteDTO venta : datos) {
-                if (venta.getProductos() == null || venta.getProductos().isEmpty()) {
-                    org.apache.poi.ss.usermodel.Row row = sheet.createRow(rowIdx++);
-                    row.createCell(0).setCellValue(venta.getNumeroBoleta());
-                    row.createCell(1).setCellValue(venta.getSerie());
-                    row.createCell(2)
-                            .setCellValue(venta.getFechaVenta() != null ? venta.getFechaVenta().toString() : "");
-                    row.createCell(3).setCellValue(venta.getCliente());
-                    row.createCell(4).setCellValue(venta.getVendedor());
-                    row.createCell(5).setCellValue(venta.getTotal() != null ? venta.getTotal().doubleValue() : 0);
-                    row.createCell(6).setCellValue(venta.getEstado());
-                    for (int i = 0; i < 7; i++)
-                        row.getCell(i).setCellStyle(dataStyle);
-                } else {
-                    for (com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.ProductoDetalleDTO prod : venta
-                            .getProductos()) {
-                        org.apache.poi.ss.usermodel.Row row = sheet.createRow(rowIdx++);
-                        row.createCell(0).setCellValue(venta.getNumeroBoleta());
-                        row.createCell(1).setCellValue(venta.getSerie());
-                        row.createCell(2)
-                                .setCellValue(venta.getFechaVenta() != null ? venta.getFechaVenta().toString() : "");
-                        row.createCell(3).setCellValue(venta.getCliente());
-                        row.createCell(4).setCellValue(venta.getVendedor());
-                        row.createCell(5).setCellValue(venta.getTotal() != null ? venta.getTotal().doubleValue() : 0);
-                        row.createCell(6).setCellValue(venta.getEstado());
-                        row.createCell(7).setCellValue(prod.getNombre());
-                        row.createCell(8).setCellValue(prod.getCantidad());
-                        row.createCell(9).setCellValue(
-                                prod.getPrecioUnitario() != null ? prod.getPrecioUnitario().doubleValue() : 0);
-                        row.createCell(10)
-                                .setCellValue(prod.getDescuento() != null ? prod.getDescuento().doubleValue() : 0);
-                        row.createCell(11)
-                                .setCellValue(prod.getSubtotal() != null ? prod.getSubtotal().doubleValue() : 0);
-                        for (int i = 0; i < 12; i++)
-                            row.getCell(i).setCellStyle(dataStyle);
-                    }
+                org.apache.poi.ss.usermodel.Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(venta.getNumeroBoleta());
+                row.createCell(1).setCellValue(venta.getSerie());
+                row.createCell(2).setCellValue(venta.getFechaVenta() != null ? venta.getFechaVenta().toString() : "");
+                row.createCell(3).setCellValue(venta.getCliente());
+                row.createCell(4).setCellValue(venta.getVendedor());
+                row.createCell(5)
+                        .setCellValue(venta.getTotal() != null ? "S/" + String.format("%.2f", venta.getTotal()) : "");
+                row.createCell(6).setCellValue(venta.getDetallePago());
+                row.createCell(7).setCellValue(venta.getEstado());
+                String productos = "";
+                String precios = "";
+                String descuentos = "";
+                String subtotales = "";
+                if (venta.getProductos() != null && !venta.getProductos().isEmpty()) {
+                    productos = venta.getProductos().stream()
+                            .map(p -> p.getNombre() + " x" + p.getCantidad())
+                            .reduce((a, b) -> a + ", " + b).orElse("");
+                    precios = venta.getProductos().stream()
+                            .map(p -> "S/" + String.format("%.2f", p.getPrecioUnitario()))
+                            .reduce((a, b) -> a + ", " + b).orElse("");
+                    descuentos = venta.getProductos().stream()
+                            .map(p -> "S/" + String.format("%.2f", p.getDescuento()))
+                            .reduce((a, b) -> a + ", " + b).orElse("");
+                    subtotales = venta.getProductos().stream()
+                            .map(p -> "S/" + String.format("%.2f", p.getSubtotal()))
+                            .reduce((a, b) -> a + ", " + b).orElse("");
                 }
+                row.createCell(8).setCellValue(productos);
+                row.createCell(9).setCellValue(precios);
+                row.createCell(10).setCellValue(descuentos);
+                row.createCell(11).setCellValue(subtotales);
+                for (int i = 0; i < 12; i++)
+                    row.getCell(i).setCellStyle(dataStyle);
             }
 
             // Autoajustar columnas
