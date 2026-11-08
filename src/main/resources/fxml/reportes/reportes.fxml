@@ -2,9 +2,14 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.geometry.Insets?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view.ReportesController" prefWidth="900" prefHeight="600" style="-fx-background-color: #f5f5f5;">
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.reportes.view.ReportesController" prefWidth="900" prefHeight="600" stylesheets="@/css/pharma-ui.css" styleClass="pv-centro">
     <children>
-    <FlowPane fx:id="cardsPane" layoutX="40" layoutY="30" prefWidth="820" prefHeight="480" hgap="24" vgap="24" style="-fx-background-color: transparent;">
+        <VBox AnchorPane.leftAnchor="32" AnchorPane.rightAnchor="32" AnchorPane.topAnchor="22" spacing="4">
+            <Label text="Reportes" styleClass="pv-pagina-titulo" />
+            <Label text="Consulta las ventas por período, producto o vendedor." styleClass="pv-pagina-subtitulo" />
+        </VBox>
+    <FlowPane fx:id="cardsPane" AnchorPane.leftAnchor="32" AnchorPane.rightAnchor="32"
+                  AnchorPane.topAnchor="100" hgap="18" vgap="18">
             <!-- Aquí se cargarán los cards dinámicamente -->
         </FlowPane>
     </children>

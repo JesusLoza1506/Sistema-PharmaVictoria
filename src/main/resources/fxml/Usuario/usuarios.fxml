@@ -11,7 +11,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Usuario.UsuariosController">
     <content>
-    <VBox styleClass="productos-view" stylesheets="@/css/Proveedor/proveedores.css" spacing="0">
+    <VBox styleClass="productos-view, pv-listado" stylesheets="@/css/Proveedor/proveedores.css,@/css/pharma-ui.css" spacing="0">
         <children>
             <VBox spacing="0" styleClass="productos-header-box">
                 <children>

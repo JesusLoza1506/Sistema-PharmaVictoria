@@ -44,7 +44,7 @@
                 <graphic>
                     <ImageView fitHeight="70" fitWidth="820" preserveRatio="true">
                         <image>
-                            <Image url="@/icons/pdf download.png" />
+                            <Image url="@/icons/pdf_download.png" />
                         </image>
                     </ImageView>
                 </graphic>

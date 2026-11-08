@@ -99,6 +99,11 @@ public class VencimientoAlertaCardController {
     private void mostrarDialogoEditarDias(MouseEvent event) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
+        // Establecer la ventana origen como owner (si existe) para bloquear sólo esa
+        Stage owner = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+        if (owner != null) {
+            dialog.initOwner(owner);
+        }
         dialog.setTitle("Editar días de alerta de vencimiento");
 
         Label lbl = new Label("Días para alerta:");
@@ -138,6 +143,21 @@ public class VencimientoAlertaCardController {
                 "-fx-background-color: #fff; -fx-background-radius: 16; -fx-padding: 32 32 24 32; -fx-effect: dropshadow(gaussian, #bdbdbd, 16, 0.2, 0, 4);");
 
         Scene scene = new Scene(vbox);
+        // Permitir Enter para guardar y Escape para cerrar (compatibilidad sin switch
+        // con flechas)
+        scene.setOnKeyPressed(k -> {
+            switch (k.getCode()) {
+                case ENTER:
+                    btnGuardar.fire();
+                    break;
+                case ESCAPE:
+                    dialog.close();
+                    break;
+                default:
+                    break;
+            }
+        });
+
         dialog.setScene(scene);
         dialog.showAndWait();
     }

@@ -88,7 +88,7 @@ public class ReporteVentasDetalleController {
         java.time.LocalDateTime inicioDT = inicio.atStartOfDay();
         java.time.LocalDateTime finDT = fin.atTime(23, 59, 59);
         try {
-            ventasFiltradas = estrategia.obtenerReporte(inicioDT.toLocalDate(), finDT.toLocalDate());
+            ventasFiltradas = estrategia.obtenerReporte(inicioDT, finDT);
             logger.info("[REPORTE] Ventas encontradas: {}", ventasFiltradas.size());
             tableVentas.getItems().setAll(ventasFiltradas);
             mostrarAlerta("Filtro aplicado: " + inicioDT + " a " + finDT + "\nResultados: " + ventasFiltradas.size());

@@ -9,7 +9,7 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Ventas.VentasController">
     <content>
-    <VBox styleClass="ventas-main-panel" stylesheets="@/css/Ventas/ventas.css" spacing="0">
+    <VBox styleClass="ventas-main-panel, pv-ventas" stylesheets="@/css/Ventas/ventas.css,@/css/pharma-ui.css" spacing="0">
         <children>
             <VBox spacing="0" styleClass="ventas-header-box">
                 <children>
@@ -22,7 +22,7 @@
                                             <Image url="@/icons/ventas.png" />
                                         </image>
                                     </ImageView>
-                                    <Label text="PUNTO DE VENTA" style="-fx-text-fill: #222; -fx-font-size: 24px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', 'Arial', sans-serif;" />
+                                    <Label text="PUNTO DE VENTA" styleClass="pv-ventas-titulo" />
                                 </children>
                             </HBox>
                             <Region HBox.hgrow="ALWAYS" />
@@ -57,7 +57,7 @@
                             <Image url="@/icons/carrito.png" />
                         </image>
                     </ImageView>
-                    <Label text="CARRITO DE VENTA" style="-fx-text-fill: #222; -fx-font-size: 20px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', 'Arial', sans-serif;" />
+                    <Label text="CARRITO DE VENTA" styleClass="pv-ventas-subtitulo" />
                     <Region HBox.hgrow="ALWAYS" />
                     <HBox spacing="12.0">
                         <!-- Aquí puedes agregar dos íconos extra si lo deseas -->
@@ -130,7 +130,7 @@
                 <Label text="Nombre/Razón Social:" styleClass="cliente-label" />
                 <TextField fx:id="txtNombreRazon" promptText="Nombre completo o razón social" editable="false" styleClass="cliente-field" />
             </HBox>
-            <HBox spacing="32.0" alignment="CENTER_LEFT" style="-fx-padding: 8px 0;">
+            <HBox spacing="32.0" alignment="CENTER_LEFT" styleClass="pv-ventas-resumen">
                 <VBox spacing="10.0" style="-fx-padding: 0 0 0 0;">
                     <Label fx:id="lblSubtotal" text="Subtotal: S/ 0.00" styleClass="subtotal-label" />
                     <Label fx:id="lblIGV" text="IGV (18%): S/ 0.00" styleClass="igv-label" />

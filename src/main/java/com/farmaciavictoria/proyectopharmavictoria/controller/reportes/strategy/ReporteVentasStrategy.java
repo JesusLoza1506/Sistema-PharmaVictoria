@@ -6,5 +6,5 @@ import java.util.List;
 import com.farmaciavictoria.proyectopharmavictoria.controller.reportes.dto.VentaReporteDTO;
 
 public interface ReporteVentasStrategy {
-    List<VentaReporteDTO> obtenerReporte(LocalDate fechaInicio, LocalDate fechaFin);
+    List<VentaReporteDTO> obtenerReporte(java.time.LocalDateTime fechaInicio, java.time.LocalDateTime fechaFin);
 }

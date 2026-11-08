@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.DashboardVendedorController">
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.DashboardVendedorController" stylesheets="@/css/pharma-ui.css" styleClass="pv-dashboard">
    
    <!-- BARRA SUPERIOR -->
    <top>

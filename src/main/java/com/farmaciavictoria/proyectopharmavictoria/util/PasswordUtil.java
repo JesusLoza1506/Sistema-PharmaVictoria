@@ -8,8 +8,18 @@ public class PasswordUtil {
     }
 
     public static void main(String[] args) {
-        String password = "123456"; // Cambia aquí la contraseña si lo deseas
-        String hash = hashPassword(password);
-        System.out.println("Hash bcrypt para '" + password + "': " + hash);
+        java.io.Console console = System.console();
+        if (console == null) {
+            throw new IllegalStateException("Ejecuta el generador de hash desde una terminal interactiva.");
+        }
+        char[] password = console.readPassword("Contraseña: ");
+        if (password == null) {
+            return;
+        }
+        try {
+            System.out.println(hashPassword(new String(password)));
+        } finally {
+            java.util.Arrays.fill(password, '\0');
+        }
     }
 }

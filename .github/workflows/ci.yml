@@ -1,0 +1,34 @@
+name: CI · PharmaVictoria
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Java 21 · Maven verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Compilar y ejecutar pruebas
+        run: mvn --batch-mode --no-transfer-progress -Pportable-ci clean verify
+      - name: Guardar resultados de pruebas y cobertura
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: resultados-java21
+          path: |
+            target/surefire-reports/*.xml
+            target/site/jacoco/**
+          if-no-files-found: ignore

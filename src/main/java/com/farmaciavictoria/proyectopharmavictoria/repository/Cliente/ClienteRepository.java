@@ -1,3 +1,4 @@
+
 package com.farmaciavictoria.proyectopharmavictoria.repository.Cliente;
 
 import com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig;
@@ -22,6 +23,31 @@ import java.util.Optional;
  * @version 1.0
  */
 public class ClienteRepository {
+    /**
+     * Busca un cliente por nombre completo (ignorando mayúsculas/minúsculas y
+     * espacios)
+     *
+     * @param nombreCompleto Nombre completo a buscar
+     * @return Optional<Cliente> si existe, vacío si no
+     */
+    public Optional<Cliente> findByNombreCompleto(String nombreCompleto) {
+        String sql = "SELECT * FROM clientes WHERE REPLACE(LOWER(CONCAT(TRIM(nombres), ' ', TRIM(apellidos))), '  ', ' ') = ? AND activo = true";
+        try (Connection conn = databaseConfig.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, nombreCompleto.trim().toLowerCase());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Cliente cliente = mapResultSetToCliente(rs);
+                    logger.debug("Cliente encontrado por nombre completo {}: {}", nombreCompleto,
+                            cliente.getDocumento());
+                    return Optional.of(cliente);
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Error al buscar cliente por nombre completo {}: {}", nombreCompleto, e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(ClienteRepository.class);
     private final DatabaseConfig databaseConfig;
@@ -55,7 +81,7 @@ public class ClienteRepository {
     }
 
     public List<Cliente> findAll(int offset, int limit) {
-        String sql = "SELECT * FROM clientes ORDER BY id ASC LIMIT ? OFFSET ?";
+        String sql = "SELECT * FROM clientes WHERE es_rapido = 0 ORDER BY id ASC LIMIT ? OFFSET ?";
         List<Cliente> clientes = new ArrayList<>();
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -205,7 +231,7 @@ public class ClienteRepository {
     }
 
     private boolean insert(Cliente cliente) {
-        String sql = "INSERT INTO clientes (documento, tipo_cliente, razon_social, nombres, apellidos, telefono, email, direccion, fecha_nacimiento, puntos_totales, puntos_usados, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes (documento, tipo_cliente, razon_social, nombres, apellidos, telefono, email, direccion, fecha_nacimiento, puntos_totales, puntos_usados, created_at, updated_at, es_rapido) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             String tipo = cliente.getTipoCliente();
@@ -238,6 +264,7 @@ public class ClienteRepository {
             stmt.setInt(11, cliente.getPuntosUsados() != null ? cliente.getPuntosUsados() : 0);
             stmt.setTimestamp(12, new java.sql.Timestamp(System.currentTimeMillis()));
             stmt.setTimestamp(13, new java.sql.Timestamp(System.currentTimeMillis()));
+            stmt.setBoolean(14, cliente.isEsRapido());
             int rowsAffected = stmt.executeUpdate();
             logger.info("[INSERT] Filas afectadas: {}", rowsAffected);
             if (rowsAffected > 0) {
@@ -259,7 +286,7 @@ public class ClienteRepository {
     }
 
     private boolean update(Cliente cliente) {
-        String sql = "UPDATE clientes SET documento = ?, tipo_cliente = ?, razon_social = ?, nombres = ?, apellidos = ?, telefono = ?, email = ?, direccion = ?, fecha_nacimiento = ?, puntos_totales = ?, puntos_usados = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+        String sql = "UPDATE clientes SET documento = ?, tipo_cliente = ?, razon_social = ?, nombres = ?, apellidos = ?, telefono = ?, email = ?, direccion = ?, fecha_nacimiento = ?, puntos_totales = ?, puntos_usados = ?, updated_at = CURRENT_TIMESTAMP, es_rapido = ? WHERE id = ?";
         try (Connection conn = databaseConfig.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             int idx = 1;
@@ -291,6 +318,7 @@ public class ClienteRepository {
             }
             stmt.setInt(idx++, cliente.getPuntosTotales() != null ? cliente.getPuntosTotales() : 0);
             stmt.setInt(idx++, cliente.getPuntosUsados() != null ? cliente.getPuntosUsados() : 0);
+            stmt.setBoolean(idx++, cliente.isEsRapido());
             stmt.setInt(idx++, cliente.getId());
             int rowsAffected = stmt.executeUpdate();
             logger.info("[UPDATE] Filas afectadas: {}", rowsAffected);
@@ -472,6 +500,18 @@ public class ClienteRepository {
             cliente.setUpdatedAt(updated.toLocalDateTime());
         logger.info("[MAPEO CLIENTE] tipo_cliente={} | documento={} | razon_social={}", cliente.getTipoCliente(),
                 cliente.getDocumento(), cliente.getRazonSocial());
+        // Nuevo: mapear campo es_rapido
+        try {
+            boolean esRapido = false;
+            try {
+                esRapido = rs.getBoolean("es_rapido");
+            } catch (SQLException ex) {
+                logger.warn("[WARN] No se pudo leer campo es_rapido: {}", ex.getMessage());
+            }
+            cliente.setEsRapido(esRapido);
+        } catch (Exception ex) {
+            logger.error("[EXCEPCION] Error al mapear es_rapido: {}", ex.getMessage(), ex);
+        }
         return cliente;
     }
 }

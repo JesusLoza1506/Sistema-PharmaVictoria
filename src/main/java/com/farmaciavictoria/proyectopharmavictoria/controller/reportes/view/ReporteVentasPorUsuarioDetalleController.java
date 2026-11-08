@@ -53,10 +53,12 @@ public class ReporteVentasPorUsuarioDetalleController {
     private void onFiltrar(ActionEvent event) {
         LocalDate inicio = dateInicio.getValue();
         LocalDate fin = dateFin.getValue();
-        cargarVentasPorUsuario(inicio, fin);
+        java.time.LocalDateTime inicioDT = inicio != null ? inicio.atStartOfDay() : null;
+        java.time.LocalDateTime finDT = fin != null ? fin.atTime(23, 59, 59) : null;
+        cargarVentasPorUsuario(inicioDT, finDT);
     }
 
-    private void cargarVentasPorUsuario(LocalDate inicio, LocalDate fin) {
+    private void cargarVentasPorUsuario(java.time.LocalDateTime inicio, java.time.LocalDateTime fin) {
         ObservableList<UsuarioVentaDTO> data = FXCollections.observableArrayList();
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT u.username, CONCAT(u.nombres, ' ', u.apellidos) AS nombre, SUM(v.total) AS totalVentas ");
@@ -73,9 +75,9 @@ public class ReporteVentasPorUsuarioDetalleController {
                 java.sql.PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
             if (inicio != null)
-                ps.setObject(idx++, java.sql.Date.valueOf(inicio));
+                ps.setObject(idx++, java.sql.Timestamp.valueOf(inicio));
             if (fin != null)
-                ps.setObject(idx++, java.sql.Date.valueOf(fin));
+                ps.setObject(idx++, java.sql.Timestamp.valueOf(fin));
             try (java.sql.ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     UsuarioVentaDTO dto = new UsuarioVentaDTO();

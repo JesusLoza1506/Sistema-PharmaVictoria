@@ -6,7 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox styleClass="productos-view" stylesheets="@/css/Inventario/productos.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Inventario.ProductosController">
+<VBox styleClass="productos-view, pv-listado" stylesheets="@/css/Inventario/productos.css,@/css/pharma-ui.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Inventario.ProductosController">
    <children>
       <!-- Header -->
       <VBox spacing="0" styleClass="productos-header-box">

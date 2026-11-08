@@ -822,13 +822,13 @@ public class ClientesController implements Initializable {
         // Filtrar cliente genérico
         java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> filtradosSinGenerico = filtrados
                 .stream()
-                .filter(c -> c.getDocumento() == null || !c.getDocumento().equals("00000000"))
+                .filter(c -> (c.getDocumento() == null || !c.getDocumento().equals("00000000")) && !c.isEsRapido())
                 .toList();
         tablaClientes.setItems(javafx.collections.FXCollections.observableArrayList(filtradosSinGenerico));
         // Mostrar total real de clientes en verde, igual que proveedores
         if (lblTotalClientes != null && clienteService != null) {
             int totalClientes = clienteService.obtenerTodos().stream()
-                    .filter(c -> c.getDocumento() == null || !c.getDocumento().equals("00000000"))
+                    .filter(c -> (c.getDocumento() == null || !c.getDocumento().equals("00000000")) && !c.isEsRapido())
                     .toList().size(); // Incluye NATURAL y EMPRESA
             lblTotalClientes.setText("Total: " + totalClientes + " clientes");
             lblTotalClientes.setStyle("-fx-text-fill: #1bb934; -fx-font-weight: bold;");

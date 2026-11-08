@@ -8,7 +8,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.LoginController" stylesheets="@../css/styles.css">
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.LoginController" stylesheets="@../css/styles.css,@/css/pharma-ui.css" styleClass="pv-login">
    <center>
       <StackPane alignment="CENTER">
          <children>

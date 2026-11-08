@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
+import java.net.URL;
 
 public class NotificacionesCorreoCardController {
     // Panel raíz de la tarjeta
@@ -22,14 +24,26 @@ public class NotificacionesCorreoCardController {
 
     // Abre la ventana de configuración de notificaciones por correo
     private void abrirConfiguracion(MouseEvent event) {
+        final String path = "/fxml/configuracion/ConfiguracionNotificaciones.fxml";
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/configuracion/ConfiguracionNotificaciones.fxml"));
+            URL url = getClass().getResource(path);
+            if (url == null) {
+                System.err.println("FXML no encontrado: " + path);
+                return;
+            }
+            FXMLLoader loader = new FXMLLoader(url);
             Parent formRoot = loader.load();
             Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            // Establecer la ventana que originó el evento como owner (si existe)
+            Stage owner = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            if (owner != null) {
+                stage.initOwner(owner);
+            }
             stage.setTitle("Configuración de Notificaciones por Correo");
             stage.setScene(new Scene(formRoot));
-            stage.show();
+            stage.setResizable(false);
+            stage.showAndWait();
         } catch (Exception e) {
             e.printStackTrace();
         }
