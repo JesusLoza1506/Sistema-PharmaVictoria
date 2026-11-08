@@ -1,5 +1,6 @@
 package com.farmaciavictoria.proyectopharmavictoria.controller.Inventario;
 
+import com.farmaciavictoria.proyectopharmavictoria.service.AuditoriaEdicionProducto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.CategoriaProducto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Inventario.Producto;
 import com.farmaciavictoria.proyectopharmavictoria.model.Proveedor.Proveedor;
@@ -130,6 +131,7 @@ public class ProductoFormController implements Initializable {
         }
         try {
             logger.debug("Iniciando inicialización de ProductoFormController");
+            setupNumericFields();
             initializeComponents();
             setupEventHandlers();
             loadComboBoxData();
@@ -487,7 +489,7 @@ public class ProductoFormController implements Initializable {
     private void onGuardar(ActionEvent event) {
         if (validarCampos()) {
             try {
-                Producto producto = modoEdicion ? new Producto() : new Producto();
+                Producto producto = new Producto();
                 // Establecer datos básicos
                 producto.setId(modoEdicion && productoActual != null ? productoActual.getId() : null);
                 producto.setCodigo(txtCodigo.getText().trim().toUpperCase());
@@ -543,139 +545,7 @@ public class ProductoFormController implements Initializable {
                 // guardar
                 boolean esEdicion = modoEdicion && productoActual != null && productoActual.getId() != null;
                 if (esEdicion) {
-                    String usuarioNombreCompleto = "Desconocido";
-                    try {
-                        com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.service.AuthenticationService
-                                .getUsuarioActual();
-                        if (usuarioActual != null) {
-                            usuarioNombreCompleto = usuarioActual.getNombreCompleto();
-                        }
-                    } catch (Exception ex) {
-                    }
-
-                    java.util.function.BiPredicate<Object, Object> distintos = (a, b) -> {
-                        if (a == null && b == null)
-                            return false;
-                        if (a == null || b == null)
-                            return true;
-                        return !a.equals(b);
-                    };
-
-                    if (distintos.test(productoActual.getNombre(), producto.getNombre())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "nombre", String.valueOf(productoActual.getNombre()),
-                                        String.valueOf(producto.getNombre()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getPrincipioActivo(), producto.getPrincipioActivo())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "principio_activo",
-                                        String.valueOf(productoActual.getPrincipioActivo()),
-                                        String.valueOf(producto.getPrincipioActivo()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getConcentracion(), producto.getConcentracion())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "concentracion",
-                                        String.valueOf(productoActual.getConcentracion()),
-                                        String.valueOf(producto.getConcentracion()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getLaboratorio(), producto.getLaboratorio())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "laboratorio",
-                                        String.valueOf(productoActual.getLaboratorio()),
-                                        String.valueOf(producto.getLaboratorio()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getCategoria(), producto.getCategoria())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "categoria",
-                                        String.valueOf(productoActual.getCategoria()),
-                                        String.valueOf(producto.getCategoria()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getProveedorId(), producto.getProveedorId())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "proveedor_id",
-                                        String.valueOf(productoActual.getProveedorId()),
-                                        String.valueOf(producto.getProveedorId()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getDescripcion(), producto.getDescripcion())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "descripcion",
-                                        String.valueOf(productoActual.getDescripcion()),
-                                        String.valueOf(producto.getDescripcion()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getPrecioCompra(), producto.getPrecioCompra())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "precio_compra",
-                                        String.valueOf(productoActual.getPrecioCompra()),
-                                        String.valueOf(producto.getPrecioCompra()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getPrecioVenta(), producto.getPrecioVenta())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "precio_venta",
-                                        String.valueOf(productoActual.getPrecioVenta()),
-                                        String.valueOf(producto.getPrecioVenta()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getFechaFabricacion(), producto.getFechaFabricacion())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "fecha_fabricacion",
-                                        String.valueOf(productoActual.getFechaFabricacion()),
-                                        String.valueOf(producto.getFechaFabricacion()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getFechaVencimiento(), producto.getFechaVencimiento())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "fecha_vencimiento",
-                                        String.valueOf(productoActual.getFechaVencimiento()),
-                                        String.valueOf(producto.getFechaVencimiento()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getUbicacion(), producto.getUbicacion())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "ubicacion",
-                                        String.valueOf(productoActual.getUbicacion()),
-                                        String.valueOf(producto.getUbicacion()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getLote(), producto.getLote())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "lote", String.valueOf(productoActual.getLote()),
-                                        String.valueOf(producto.getLote()), usuarioNombreCompleto);
-                    }
-                    if (stockAnterior != -1 && stockAnterior != stockNuevo) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "stock_actual", String.valueOf(stockAnterior),
-                                        String.valueOf(stockNuevo), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getRequiereReceta(), producto.getRequiereReceta())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "requiere_receta",
-                                        String.valueOf(productoActual.getRequiereReceta()),
-                                        String.valueOf(producto.getRequiereReceta()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getEsControlado(), producto.getEsControlado())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "es_controlado",
-                                        String.valueOf(productoActual.getEsControlado()),
-                                        String.valueOf(producto.getEsControlado()), usuarioNombreCompleto);
-                    }
-                    if (distintos.test(productoActual.getActivo(), producto.getActivo())) {
-                        com.farmaciavictoria.proyectopharmavictoria.repository.Inventario.ProductoHistorialCambioRepository
-                                .registrarCambio(
-                                        productoActual.getId(), "activo", String.valueOf(productoActual.getActivo()),
-                                        String.valueOf(producto.getActivo()), usuarioNombreCompleto);
-                    }
+                    AuditoriaEdicionProducto.registrar(productoActual, producto, stockAnterior, stockNuevo);
                 }
 
                 // Guardar producto

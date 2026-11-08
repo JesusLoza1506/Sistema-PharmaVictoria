@@ -20,29 +20,24 @@ public class ConfiguracionController {
 
     // Carga las tarjetas de configuración en el panel
     private void cargarCardsConfiguracion() {
+        String basePath = "/fxml/configuracion/"; // carpeta real en resources (minúsculas)
+        String[] archivos = {
+                "NotificacionesCorreoCard.fxml",
+                "PermisosVendedorCard.fxml",
+                "RespaldosRestauracionCard.fxml",
+                "VencimientoAlertaCard.fxml"
+        };
         try {
-            FXMLLoader loaderCorreo = new FXMLLoader(
-                    getClass().getResource("/fxml/Configuracion/NotificacionesCorreoCard.fxml"));
-            AnchorPane cardCorreo = loaderCorreo.load();
-            cardsPane.getChildren().add(cardCorreo);
-
-            // Permisos de Vendedor
-            FXMLLoader loaderPermisos = new FXMLLoader(
-                    getClass().getResource("/fxml/Configuracion/PermisosVendedorCard.fxml"));
-            AnchorPane cardPermisos = loaderPermisos.load();
-            cardsPane.getChildren().add(cardPermisos);
-
-            // Respaldos y Restauración
-            FXMLLoader loaderRespaldos = new FXMLLoader(
-                    getClass().getResource("/fxml/Configuracion/RespaldosRestauracionCard.fxml"));
-            AnchorPane cardRespaldos = loaderRespaldos.load();
-            cardsPane.getChildren().add(cardRespaldos);
-
-            // Alerta de Vencimiento
-            FXMLLoader loaderVencimiento = new FXMLLoader(
-                    getClass().getResource("/fxml/Configuracion/VencimientoAlertaCard.fxml"));
-            AnchorPane cardVencimiento = loaderVencimiento.load();
-            cardsPane.getChildren().add(cardVencimiento);
+            for (String archivo : archivos) {
+                String ruta = basePath + archivo;
+                java.net.URL url = getClass().getResource(ruta);
+                if (url == null) {
+                    throw new IllegalStateException("Recurso FXML no encontrado: " + ruta);
+                }
+                FXMLLoader loader = new FXMLLoader(url);
+                AnchorPane card = loader.load();
+                cardsPane.getChildren().add(card);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             mostrarError("Error", "No se pudo cargar los cards de configuración: " + e.getMessage());

@@ -74,7 +74,17 @@ public class ConfiguracionNotificacionesController {
             config.setAlertasActivas(chkActivarAlertas.isSelected());
             config.setDestinatario(txtDestinatario.getText());
             config.setSmtpServer(txtSmtpServer.getText());
-            config.setSmtpPort(Integer.parseInt(txtSmtpPort.getText()));
+            // Parseo seguro del puerto
+            String portText = txtSmtpPort.getText();
+            int port = 0;
+            if (portText != null && !portText.isBlank()) {
+                try {
+                    port = Integer.parseInt(portText.trim());
+                } catch (NumberFormatException ex) {
+                    port = 0;
+                }
+            }
+            config.setSmtpPort(port);
             config.setUseSSL(chkSSL.isSelected());
             config.setUseTLS(chkTLS.isSelected());
             EmailConfigService.guardarConfig(config);

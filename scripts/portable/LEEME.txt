@@ -1,0 +1,10 @@
+PharmaVictoria portátil para Windows x64
+
+1. Extrae el ZIP en una carpeta en la que tengas permisos de escritura.
+2. Copia config/application.properties.example a config/application.properties.
+3. Completa los datos de una base MySQL de PharmaVictoria ya preparada.
+4. Ejecuta Iniciar-PharmaVictoria.bat.
+
+El runtime Java 21 con JavaFX está incluido. Las configuraciones de facturación,
+correo y Google Drive se agregan dentro de config/ con los nombres que usa la
+aplicación. Conserva esas configuraciones en el equipo de operación.

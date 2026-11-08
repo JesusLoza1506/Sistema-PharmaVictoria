@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class ReporteVentasResumenStrategy implements ReporteVentasStrategy {
     @Override
-    public List<VentaReporteDTO> obtenerReporte(LocalDate fechaInicio, LocalDate fechaFin) {
+    public List<VentaReporteDTO> obtenerReporte(java.time.LocalDateTime fechaInicio, java.time.LocalDateTime fechaFin) {
         // Aquí iría la lógica para consultar la vista vw_resumen_ventas y mapear a
         // VentaReporteDTO
         // Simulación de datos

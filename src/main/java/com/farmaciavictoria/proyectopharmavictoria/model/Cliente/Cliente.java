@@ -13,6 +13,26 @@ import java.time.Period;
  * @version 1.0 (Tabla Básica)
  */
 public class Cliente {
+    // Indica si el cliente es rápido/temporal (no debe mostrarse en gestión)
+    private boolean esRapido = false;
+    private Integer id;
+    private String nombres;
+    private String apellidos;
+    private String telefono;
+    private String email;
+    private String direccion;
+    private LocalDate fechaNacimiento;
+    // Soporte para clientes naturales y empresariales
+    private String tipoCliente; // "NATURAL" o "EMPRESA"
+    private String razonSocial; // Solo para empresas
+    private String documento; // DNI (Natural) o RUC (Empresa) según tipoCliente
+    // Sistema de puntos
+    private Integer puntosTotales;
+    private Integer puntosUsados;
+    // Timestamps
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
     // Métodos para compatibilidad con mapeo de documento (DNI/RUC)
     public void setRuc(String ruc) {
         if ("Empresa".equalsIgnoreCase(this.tipoCliente)) {
@@ -33,8 +53,6 @@ public class Cliente {
     public String getDni() {
         return !"Empresa".equalsIgnoreCase(this.tipoCliente) ? this.documento : "";
     }
-
-    private String nombres;
 
     // Permite setear el nombre completo (divide en nombres y apellidos si es
     // posible)
@@ -57,28 +75,11 @@ public class Cliente {
         return createdAt.getYear() == ahora.getYear() && createdAt.getMonth() == ahora.getMonth();
     }
 
-    private Integer id;
-    private String apellidos;
-    private String telefono;
-    private String email;
-    private String direccion;
-    private LocalDate fechaNacimiento;
-    // Soporte para clientes naturales y empresariales
-    private String tipoCliente; // "NATURAL" o "EMPRESA"
-    private String razonSocial; // Solo para empresas
-    private String documento; // DNI (Natural) o RUC (Empresa) según tipoCliente
-
-    // Sistema de puntos
-    private Integer puntosTotales;
-    private Integer puntosUsados;
-    // Timestamps
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
     public Cliente() {
         this.puntosTotales = 0;
         this.puntosUsados = 0;
         this.createdAt = LocalDateTime.now();
+        this.esRapido = false;
     }
 
     public Cliente(String documento, String nombres, String apellidos) {
@@ -86,6 +87,15 @@ public class Cliente {
         this.documento = documento;
         this.nombres = nombres;
         this.apellidos = apellidos;
+        this.esRapido = false;
+    }
+
+    public boolean isEsRapido() {
+        return esRapido;
+    }
+
+    public void setEsRapido(boolean esRapido) {
+        this.esRapido = esRapido;
     }
 
     // Obtiene el nombre completo o razón social del cliente

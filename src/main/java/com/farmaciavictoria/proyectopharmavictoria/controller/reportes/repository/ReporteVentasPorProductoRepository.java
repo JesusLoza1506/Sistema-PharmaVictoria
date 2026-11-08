@@ -11,7 +11,8 @@ import java.util.List;
 public class ReporteVentasPorProductoRepository {
     private final DatabaseConfig databaseConfig = DatabaseConfig.getInstance();
 
-    public List<VentaPorProductoDTO> obtenerRankingProductos(LocalDate desde, LocalDate hasta) {
+    public List<VentaPorProductoDTO> obtenerRankingProductos(java.time.LocalDateTime desde,
+            java.time.LocalDateTime hasta) {
         List<VentaPorProductoDTO> lista = new ArrayList<>();
         String sql = "SELECT p.nombre, SUM(dv.cantidad), SUM(dv.subtotal) " +
                 "FROM detalle_ventas dv " +

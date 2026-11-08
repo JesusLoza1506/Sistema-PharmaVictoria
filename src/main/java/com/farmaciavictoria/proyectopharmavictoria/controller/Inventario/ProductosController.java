@@ -9,8 +9,6 @@ import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventObserver;
 import com.farmaciavictoria.proyectopharmavictoria.events.SystemEvent;
 import com.farmaciavictoria.proyectopharmavictoria.events.SystemEventManager;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -21,13 +19,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +32,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.util.converter.BigDecimalStringConverter;
-import javafx.util.converter.IntegerStringConverter;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -122,6 +115,8 @@ public class ProductosController implements Initializable, SystemEventObserver {
     private final DecimalFormat formatoMoneda = new DecimalFormat("S/ #,##0.00");
     private final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
+    private final DialogosInventario dialogosInventario;
+
     public ProductosController() {
         try {
             ServiceContainer container = ServiceContainer.getInstance();
@@ -130,6 +125,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
             this.eventManager = SystemEventManager.getInstance();
 
             logger.info("ProductosController inicializado con enterprise patterns");
+            this.dialogosInventario = new DialogosInventario(productoService, notificationService, logger);
         } catch (Exception e) {
             logger.error("Error al inicializar ProductosController: {}", e.getMessage(), e);
             throw new RuntimeException("Fallo crítico en inicialización del controlador", e);
@@ -324,23 +320,7 @@ public class ProductosController implements Initializable, SystemEventObserver {
     }
 
     private void mostrarModalExportar() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Inventario/exportar-inventario.fxml"));
-            Parent root = loader.load();
-            ExportarInventarioController exportController = loader.getController();
-            exportController.setProductosFiltrados(new java.util.ArrayList<>(productosFiltrados));
-            Stage stage = new Stage();
-            stage.setTitle("Exportar Inventario / Reporte");
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(true);
-            stage.setMinWidth(900);
-            stage.setMinHeight(600);
-            stage.showAndWait();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            notificationService.mostrarError("No se pudo abrir la ventana de exportación: " + ex.getMessage());
-        }
+        dialogosInventario.mostrarModalExportar(productosFiltrados);
     }
 
     @Override
@@ -450,174 +430,12 @@ public class ProductosController implements Initializable, SystemEventObserver {
     }
 
     private void setupTableColumns() {
-        colPrecioVenta.setCellFactory(TextFieldTableCell.forTableColumn(new BigDecimalStringConverter()));
-        colPrecioVenta.setOnEditCommit(event -> {
-            Producto producto = event.getRowValue();
-            productoService.actualizarCampo(producto.getId(), "precio_venta", event.getNewValue());
-            // Consultar el valor actualizado desde la base de datos
-            Producto actualizado = productoService.obtenerPorId(producto.getId());
-            if (actualizado != null) {
-                producto.setPrecioVenta(actualizado.getPrecioVenta());
-            } else {
-                producto.setPrecioVenta(event.getNewValue());
-            }
-            tableProductos.refresh();
-        });
-
-        colStockActual.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        colStockActual.setOnEditCommit(event -> {
-            Producto producto = event.getRowValue();
-            producto.setStockActual(event.getNewValue());
-            productoService.actualizarCampo(producto.getId(), "stock_actual", event.getNewValue());
-            tableProductos.refresh();
-        });
-
-        colFechaVencimiento.setCellFactory(TextFieldTableCell.forTableColumn());
-        colFechaVencimiento.setOnEditCommit(event -> {
-            Producto producto = event.getRowValue();
-            try {
-                LocalDate nuevaFecha = LocalDate.parse(event.getNewValue(), formatoFecha);
-                productoService.actualizarCampo(producto.getId(), "fecha_vencimiento", nuevaFecha);
-                // Consultar el valor actualizado desde la base de datos
-                Producto actualizado = productoService.obtenerPorId(producto.getId());
-                if (actualizado != null) {
-                    producto.setFechaVencimiento(actualizado.getFechaVencimiento());
-                } else {
-                    producto.setFechaVencimiento(nuevaFecha);
-                }
-            } catch (Exception e) {
-                // Si la fecha no es válida, no actualiza
-            }
-            tableProductos.refresh();
-        });
-
-        // Ejemplo para nombre, puedes replicar para los demás campos editables
-        colNombre.setCellFactory(TextFieldTableCell.forTableColumn());
-        colNombre.setOnEditCommit(event -> {
-            Producto producto = event.getRowValue();
-            producto.setNombre(event.getNewValue());
-            productoService.actualizarCampo(producto.getId(), "nombre", event.getNewValue());
-            tableProductos.refresh();
-        });
-
-        // Repetir para otros campos editables si lo necesitas (categoría, proveedor,
-        // etc.)
-
-        tableProductos.setEditable(true);
-        // Configurar columnas básicas
-        colCodigo.setCellValueFactory(new PropertyValueFactory<>("codigo"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-
-        // Precio con formato y consulta en BD
-        colPrecioVenta.setCellValueFactory(cellData -> {
-            Producto p = cellData.getValue();
-            BigDecimal precio = null;
-            try {
-                Producto actualizado = productoService.obtenerPorId(p.getId());
-                precio = actualizado != null ? actualizado.getPrecioVenta() : p.getPrecioVenta();
-            } catch (Exception e) {
-                precio = p.getPrecioVenta();
-            }
-            return new SimpleObjectProperty<>(precio);
-        });
-        colPrecioVenta.setCellFactory(column -> new TableCell<Producto, BigDecimal>() {
-            @Override
-            protected void updateItem(BigDecimal item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(formatoMoneda.format(item));
-                }
-            }
-        });
-
-        colStockActual.setCellValueFactory(cellData -> {
-            Producto p = cellData.getValue();
-            Integer stock = null;
-            try {
-                Producto actualizado = productoService.obtenerPorId(p.getId());
-                stock = actualizado != null ? actualizado.getStockActual() : p.getStockActual();
-            } catch (Exception e) {
-                stock = p.getStockActual();
-            }
-            return new SimpleObjectProperty<>(stock);
-        });
-
-        // Fecha de vencimiento consultando en BD
-        colFechaVencimiento.setCellValueFactory(cellData -> {
-            Producto p = cellData.getValue();
-            LocalDate fecha = null;
-            try {
-                Producto actualizado = productoService.obtenerPorId(p.getId());
-                fecha = actualizado != null ? actualizado.getFechaVencimiento() : p.getFechaVencimiento();
-            } catch (Exception e) {
-                fecha = p.getFechaVencimiento();
-            }
-            if (fecha != null) {
-                return new SimpleStringProperty(fecha.format(formatoFecha));
-            }
-            return new SimpleStringProperty("Sin fecha");
-        });
-
-        // Estado con colores y fondo especial si es inactivo
-        colEstado.setCellValueFactory(new PropertyValueFactory<>("activo"));
-        colEstado.setCellFactory(column -> new TableCell<Producto, Boolean>() {
-            @Override
-            protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    if (item) {
-                        setText("Activo");
-                        setStyle("-fx-text-fill: #28a745; -fx-font-weight: bold; -fx-background-color: transparent;");
-                    } else {
-                        setText("Inactivo");
-                        setStyle("-fx-text-fill: #dc3545; -fx-font-weight: bold; -fx-background-color: #F3F4F6;");
-                    }
-                }
-            }
-        });
+        new ColumnasInventario(tableProductos, productoService, formatoMoneda, formatoFecha,
+                colPrecioVenta, colStockActual, colFechaVencimiento, colNombre, colCodigo, colEstado).configurar();
     }
 
     private void setupRowStyles() {
-        tableProductos.setRowFactory(tv -> {
-            TableRow<Producto> row = new TableRow<>();
-            row.itemProperty().addListener((obs, oldProducto, newProducto) -> {
-                if (newProducto == null) {
-                    row.getStyleClass().removeAll("row-stock-bajo", "row-proximo-vencer",
-                            "row-sin-stock", "row-vencido", "row-inactivo");
-                } else {
-                    // Limpiar estilos anteriores
-                    row.getStyleClass().removeAll("row-stock-bajo", "row-proximo-vencer",
-                            "row-sin-stock", "row-vencido", "row-inactivo");
-
-                    // Aplicar estilos según el estado del producto
-                    if (!newProducto.getActivo()) {
-                        row.getStyleClass().add("row-inactivo");
-                    } else if (newProducto.getFechaVencimiento() != null &&
-                            newProducto.getFechaVencimiento().isBefore(LocalDate.now())) {
-                        row.getStyleClass().add("row-vencido");
-                    } else if (newProducto.getStockActual() == 0) {
-                        row.getStyleClass().add("row-sin-stock");
-                    } else if (newProducto.getStockActual() <= newProducto.getStockMinimo()) {
-                        row.getStyleClass().add("row-stock-bajo");
-                    } else if (newProducto.getFechaVencimiento() != null) {
-                        int dias = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService
-                                .getDiasVencimientoAlerta();
-                        java.time.LocalDate hoy = java.time.LocalDate.now();
-                        java.time.LocalDate limite = hoy.plusDays(dias);
-                        if (!newProducto.getFechaVencimiento().isBefore(hoy) &&
-                                !newProducto.getFechaVencimiento().isAfter(limite)) {
-                            row.getStyleClass().add("row-proximo-vencer");
-                        }
-                    }
-                }
-            });
-            return row;
-        });
+        FilasProductos.configurar(tableProductos);
     }
 
     private void setupFilters() {
@@ -649,146 +467,13 @@ public class ProductosController implements Initializable, SystemEventObserver {
     }
 
     private void setupActionColumn() {
-        colAcciones.setCellFactory(new Callback<TableColumn<Producto, Void>, TableCell<Producto, Void>>() {
-            @Override
-            public TableCell<Producto, Void> call(TableColumn<Producto, Void> param) {
-                return new TableCell<Producto, Void>() {
-                    private final Button btnEditar = new Button();
-                    private final Button btnVer = new Button();
-                    private final Button btnToggleEstado = new Button();
-                    private final Button btnEliminar = new Button();
-
-                    {
-                        // Íconos personalizados para agregar, ver y eliminar
-                        // Usar imágenes descargadas como íconos
-                        // Íconos correctos para acciones: editar, ver detalles y eliminar
-                        javafx.scene.image.ImageView iconEditar = new javafx.scene.image.ImageView(
-                                getClass().getResource("/icons/editar.png").toExternalForm());
-                        javafx.scene.image.ImageView iconVer = new javafx.scene.image.ImageView(
-                                getClass().getResource("/icons/ver.png").toExternalForm());
-                        javafx.scene.image.ImageView iconEliminar = new javafx.scene.image.ImageView(
-                                getClass().getResource("/icons/eliminar.png").toExternalForm());
-
-                        iconEditar.setFitWidth(24);
-                        iconEditar.setFitHeight(24);
-                        iconVer.setFitWidth(24);
-                        iconVer.setFitHeight(24);
-                        iconEliminar.setFitWidth(24);
-                        iconEliminar.setFitHeight(24);
-
-                        btnEditar.setGraphic(iconEditar);
-                        btnVer.setGraphic(iconVer);
-                        btnEliminar.setGraphic(iconEliminar);
-                        btnEditar.getStyleClass().setAll("btn-action", "btn-add");
-                        btnVer.getStyleClass().setAll("btn-action", "btn-eye");
-                        btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle");
-                        if (btnPaginaAnterior != null && btnPaginaSiguiente != null && lblPaginaActual != null) {
-                            btnPaginaAnterior.setOnAction(e -> onPaginaAnterior());
-                            btnPaginaSiguiente.setOnAction(e -> onPaginaSiguiente());
-                        }
-                        btnEliminar.getStyleClass().setAll("btn-action", "btn-trash");
-                        btnEditar.setPrefWidth(35);
-                        btnEditar.setPrefHeight(35);
-                        btnVer.setPrefWidth(35);
-                        btnVer.setPrefHeight(35);
-                        btnToggleEstado.setPrefWidth(35);
-                        btnToggleEstado.setPrefHeight(35);
-                        btnEliminar.setPrefWidth(35);
-                        btnEliminar.setPrefHeight(35);
-
-                        btnEditar.setOnAction(e -> {
-                            Producto producto = getTableView().getItems().get(getIndex());
-                            editarProducto(producto);
-                        });
-                        btnVer.setOnAction(e -> {
-                            Producto producto = getTableView().getItems().get(getIndex());
-                            verDetallesProducto(producto);
-                        });
-                        btnToggleEstado.setOnAction(e -> {
-                            Producto producto = getTableView().getItems().get(getIndex());
-                            toggleEstadoProducto(producto);
-                        });
-                        btnEliminar.setOnAction(e -> {
-                            Producto producto = getTableView().getItems().get(getIndex());
-                            eliminarProductoDefinitivo(producto);
-                        });
+        colAcciones.setCellFactory(column -> new CeldaAccionesProducto(this::editarProducto,
+                this::verDetallesProducto, this::toggleEstadoProducto, this::eliminarProductoDefinitivo, () -> {
+                    if (btnPaginaAnterior != null && btnPaginaSiguiente != null && lblPaginaActual != null) {
+                        btnPaginaAnterior.setOnAction(e -> onPaginaAnterior());
+                        btnPaginaSiguiente.setOnAction(e -> onPaginaSiguiente());
                     }
-
-                    @Override
-                    protected void updateItem(Void item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            Producto producto = getTableView().getItems().get(getIndex());
-                            com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuario = com.farmaciavictoria.proyectopharmavictoria.config.ServiceContainer
-                                    .getInstance()
-                                    .getAuthenticationService().getUsuarioActual();
-                            boolean esAdmin = usuario != null && usuario.isAdmin();
-                            // Acciones por producto según rol
-                            if (esAdmin) {
-                                btnEditar.setVisible(true);
-                                btnEditar.setManaged(true);
-                                btnToggleEstado.setVisible(true);
-                                btnToggleEstado.setManaged(true);
-                                btnEliminar.setVisible(true);
-                                btnEliminar.setManaged(true);
-                                btnVer.setVisible(true);
-                                btnVer.setManaged(true);
-                            } else if (usuario != null && usuario.isVendedor()) {
-                                // Obtener permisos granulares del primer vendedor (global)
-                                com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService usuarioService = com.farmaciavictoria.proyectopharmavictoria.service.UsuarioService
-                                        .getInstance();
-                                java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario> vendedores = usuarioService
-                                        .obtenerUsuarios().stream()
-                                        .filter(u -> u
-                                                .getRol() == com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario.Rol.VENDEDOR)
-                                        .collect(java.util.stream.Collectors.toList());
-                                final java.util.List<com.farmaciavictoria.proyectopharmavictoria.model.Usuario.UsuarioPermiso> permisos;
-                                if (!vendedores.isEmpty()) {
-                                    permisos = usuarioService.obtenerPermisos(vendedores.get(0).getId());
-                                } else {
-                                    permisos = java.util.Collections.emptyList();
-                                }
-                                java.util.function.Function<String, Boolean> tienePermiso = clave -> permisos.stream()
-                                        .anyMatch(p -> clave.equals(p.getPermiso()) && p.isValor());
-
-                                btnEditar.setVisible(tienePermiso.apply("inventario.editar"));
-                                btnEditar.setManaged(tienePermiso.apply("inventario.editar"));
-                                btnToggleEstado.setVisible(tienePermiso.apply("inventario.activar_inactivar"));
-                                btnToggleEstado.setManaged(tienePermiso.apply("inventario.activar_inactivar"));
-                                btnEliminar.setVisible(tienePermiso.apply("inventario.eliminar"));
-                                btnEliminar.setManaged(tienePermiso.apply("inventario.eliminar"));
-                                btnVer.setVisible(true); // Ver detalles siempre visible
-                                btnVer.setManaged(true);
-                            } else {
-                                btnEditar.setVisible(false);
-                                btnEditar.setManaged(false);
-                                btnToggleEstado.setVisible(false);
-                                btnToggleEstado.setManaged(false);
-                                btnEliminar.setVisible(false);
-                                btnEliminar.setManaged(false);
-                                btnVer.setVisible(true);
-                                btnVer.setManaged(true);
-                            }
-                            if (producto.getActivo()) {
-                                btnToggleEstado.setText("⏸");
-                                btnToggleEstado.setTooltip(new Tooltip("Inactivar producto"));
-                                btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle", "btn-toggle-active");
-                            } else {
-                                btnToggleEstado.setText("▶");
-                                btnToggleEstado.setTooltip(new Tooltip("Activar producto"));
-                                btnToggleEstado.getStyleClass().setAll("btn-action", "btn-toggle",
-                                        "btn-toggle-inactive");
-                            }
-                            HBox buttons = new HBox(5, btnEditar, btnVer, btnToggleEstado, btnEliminar);
-                            buttons.setAlignment(javafx.geometry.Pos.CENTER);
-                            setGraphic(buttons);
-                        }
-                    }
-                };
-            }
-        });
+                }));
     }
 
     // Mostrar historial de movimientos de inventario para un producto
@@ -863,56 +548,9 @@ public class ProductosController implements Initializable, SystemEventObserver {
         String estrategia = (cmbBusquedaStrategy != null && cmbBusquedaStrategy.getValue() != null)
                 ? cmbBusquedaStrategy.getValue()
                 : "Nombre";
-        com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.ProductSearchStrategy strategy;
-        switch (estrategia) {
-            case "Laboratorio":
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.SearchByLaboratorioStrategy();
-                break;
-            case "Lote":
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.SearchByLoteStrategy();
-                break;
-            case "Proveedor":
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.SearchByProveedorStrategy();
-                break;
-            case "Vencimiento":
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.SearchByVencimientoStrategy();
-                break;
-            case "Nombre":
-            default:
-                strategy = new com.farmaciavictoria.proyectopharmavictoria.strategy.Inventario.SearchByNameStrategy();
-                break;
-        }
-
-        int diasVencimiento = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService
-                .getDiasVencimientoAlerta();
-        List<Producto> filtrados = strategy.buscar(productos, textoBusqueda)
-                .stream()
-                .filter(producto -> mostrarInactivos || producto.getActivo())
-                .filter(producto -> categoriaSeleccionada == null
-                        || producto.getCategoria().equals(categoriaSeleccionada))
-                .filter(producto -> {
-                    if ("Todos".equals(estadoSeleccionado))
-                        return true;
-                    if ("Activo".equals(estadoSeleccionado))
-                        return producto.getActivo();
-                    if ("Inactivo".equals(estadoSeleccionado))
-                        return !producto.getActivo();
-                    if ("Stock Bajo".equals(estadoSeleccionado))
-                        return producto.getStockActual() <= producto.getStockMinimo();
-                    if ("Próximos a Vencer".equals(estadoSeleccionado))
-                        return producto.getFechaVencimiento() != null
-                                && producto.getFechaVencimiento().isAfter(LocalDate.now())
-                                && (producto.getFechaVencimiento().isEqual(LocalDate.now().plusDays(diasVencimiento))
-                                        || producto.getFechaVencimiento()
-                                                .isBefore(LocalDate.now().plusDays(diasVencimiento)));
-                    if ("Sin Stock".equals(estadoSeleccionado))
-                        return producto.getStockActual() == 0;
-                    if ("Productos Vencidos".equals(estadoSeleccionado))
-                        return producto.getFechaVencimiento() != null
-                                && producto.getFechaVencimiento().isBefore(LocalDate.now());
-                    return true;
-                })
-                .collect(java.util.stream.Collectors.toList());
+        int diasVencimiento = com.farmaciavictoria.proyectopharmavictoria.service.ProductoService.getDiasVencimientoAlerta();
+        List<Producto> filtrados = FiltroProductos.filtrar(productos, textoBusqueda, categoriaSeleccionada,
+                estadoSeleccionado, mostrarInactivos, estrategia, diasVencimiento);
 
         productosFiltrados = new javafx.collections.transformation.FilteredList<>(
                 javafx.collections.FXCollections.observableArrayList(filtrados));
@@ -1126,89 +764,16 @@ public class ProductosController implements Initializable, SystemEventObserver {
     }
 
     private void verDetallesProducto(Producto producto) {
-        try {
-            // Refrescar el producto desde la base de datos antes de mostrar detalles
-            Producto productoActualizado = productoService.obtenerPorId(producto.getId());
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Inventario/producto-detalles.fxml"));
-            Parent root = loader.load();
-
-            ProductoDetallesController controller = loader.getController();
-            controller.setProducto(productoActualizado != null ? productoActualizado : producto);
-
-            Stage stage = new Stage();
-            stage.setTitle("Detalles del Producto - "
-                    + (productoActualizado != null ? productoActualizado.getNombre() : producto.getNombre()));
-            Scene scene = new Scene(root);
-
-            try {
-                String css = getClass().getResource("/css/Inventario/producto-detalles.css").toExternalForm();
-                scene.getStylesheets().add(css);
-            } catch (Exception e) {
-                System.out.println("No se pudo cargar el CSS de detalles: " + e.getMessage());
-            }
-
-            stage.setScene(scene);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(true);
-            stage.setMinWidth(500);
-            stage.setMinHeight(400);
-            stage.setWidth(800);
-            stage.setHeight(700);
-            stage.show();
-
-        } catch (IOException e) {
-            System.err.println("Error al abrir ventana de detalles: " + e.getMessage());
-            e.printStackTrace();
-            notificationService.mostrarError("No se pudo abrir la ventana de detalles del producto.");
-        }
+        dialogosInventario.verDetallesProducto(producto);
     }
 
     // Ajustar stock usando service layer
     private void ajustarStock(Producto producto) {
-        TextInputDialog dialog = new TextInputDialog(String.valueOf(producto.getStockActual()));
-        dialog.setTitle("Ajustar Stock");
-        dialog.setHeaderText("Ajustar stock del producto: " + producto.getNombre());
-        dialog.setContentText("Nuevo stock:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(stock -> {
-            try {
-                int stockAnterior = producto.getStockActual();
-                int nuevoStock = Integer.parseInt(stock);
-                if (producto.getId() != null && stockAnterior != nuevoStock) {
-                    producto.setStockActual(nuevoStock);
-                    productoService.actualizar(producto);
-                    notificationService.mostrarExito("Stock actualizado correctamente");
-                } else {
-                    notificationService.mostrarError("No se realizó ningún cambio de stock.");
-                }
-            } catch (NumberFormatException e) {
-                notificationService.mostrarError("Por favor ingrese un número válido");
-            } catch (Exception e) {
-                logger.error("Error al actualizar stock: {}", e.getMessage(), e);
-                notificationService.mostrarError("No se pudo actualizar el stock: " + e.getMessage());
-            }
-        });
+        dialogosInventario.ajustarStock(producto);
     }
 
     private void cambiarUbicacion(Producto producto) {
-        TextInputDialog dialog = new TextInputDialog(producto.getUbicacion());
-        dialog.setTitle("Cambiar Ubicación");
-        dialog.setHeaderText("Cambiar ubicación del producto: " + producto.getNombre());
-        dialog.setContentText("Nueva ubicación:");
-
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(ubicacion -> {
-            try {
-                producto.setUbicacion(ubicacion);
-                productoService.actualizar(producto);
-                notificationService.mostrarExito("Ubicación actualizada correctamente");
-                // No necesario llamar loadData() - Observer Pattern se encarga
-            } catch (Exception e) {
-                logger.error("Error al actualizar ubicación: {}", e.getMessage(), e);
-                notificationService.mostrarError("No se pudo actualizar la ubicación: " + e.getMessage());
-            }
-        });
+        dialogosInventario.cambiarUbicacion(producto);
     }
 
     // Desactivar producto

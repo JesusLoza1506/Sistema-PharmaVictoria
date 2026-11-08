@@ -29,7 +29,9 @@ public class TransaccionPuntosRepository {
             if (mov.getUsuarioId() != null) {
                 stmt.setInt(7, mov.getUsuarioId());
             } else {
-                stmt.setNull(7, java.sql.Types.INTEGER);
+                // Si usuario_id es null, usar 1 (admin/sistema) y advertir
+                System.err.println("[WARN PUNTOS] usuario_id es null, usando 1 (admin/sistema) para cumplir NOT NULL");
+                stmt.setInt(7, 1);
             }
             int rows = stmt.executeUpdate();
             System.out.println("[DEBUG PUNTOS] Filas afectadas: " + rows);

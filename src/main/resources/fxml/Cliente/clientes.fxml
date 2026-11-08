@@ -12,7 +12,7 @@
 
 <ScrollPane fitToWidth="true" fitToHeight="false" styleClass="clientes-scroll" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.farmaciavictoria.proyectopharmavictoria.controller.Cliente.ClientesController">
    <content>
-   <VBox styleClass="clientes-view" stylesheets="@/css/styles.css,@/css/clientes.css" spacing="0">
+   <VBox styleClass="clientes-view, pv-listado" stylesheets="@/css/styles.css,@/css/clientes.css,@/css/pharma-ui.css" spacing="0">
          <!-- HEADER -->
          <VBox spacing="0" styleClass="clientes-header-box">
             <children>

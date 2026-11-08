@@ -349,12 +349,26 @@ public class RespaldosRestauracionDialogController implements Initializable {
         String host = "localhost";
         int port = 3307;
         RestoreService restoreService = new RestoreService(user, pass, db, host, port);
-        boolean ok = restoreService.restaurarDesdeArchivo(archivo.getAbsolutePath());
-        if (ok) {
-            mostrarAlerta("Restauración exitosa", "Restauración realizada correctamente.", Alert.AlertType.INFORMATION);
-        } else {
-            mostrarAlerta("Error", "Error al restaurar información.", Alert.AlertType.ERROR);
-        }
+
+        javafx.concurrent.Task<Boolean> task = new javafx.concurrent.Task<Boolean>() {
+            @Override
+            protected Boolean call() {
+                return restoreService.restaurarDesdeArchivo(archivo.getAbsolutePath());
+            }
+        };
+        task.setOnSucceeded(ev -> {
+            boolean ok = task.getValue();
+            if (ok) {
+                mostrarAlerta("Restauración exitosa", "Restauración realizada correctamente.",
+                        Alert.AlertType.INFORMATION);
+            } else {
+                mostrarAlerta("Error", "Error al restaurar información.", Alert.AlertType.ERROR);
+            }
+        });
+        task.setOnFailed(ev -> {
+            mostrarAlerta("Error", "Error inesperado al restaurar información.", Alert.AlertType.ERROR);
+        });
+        new Thread(task).start();
     }
 
     private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {

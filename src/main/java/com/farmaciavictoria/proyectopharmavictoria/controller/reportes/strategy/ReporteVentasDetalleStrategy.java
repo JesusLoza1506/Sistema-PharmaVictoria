@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class ReporteVentasDetalleStrategy implements ReporteVentasStrategy {
     @Override
-    public List<VentaReporteDTO> obtenerReporte(LocalDate fechaInicio, LocalDate fechaFin) {
+    public List<VentaReporteDTO> obtenerReporte(java.time.LocalDateTime fechaInicio, java.time.LocalDateTime fechaFin) {
         List<VentaReporteDTO> ventas = new ArrayList<>();
         String sqlVentas = "SELECT v.id, v.numero_boleta, v.serie, v.fecha_venta, " +
                 "CASE WHEN c.tipo_cliente = 'Empresa' THEN IFNULL(c.razon_social, 'EMPRESA SIN NOMBRE') ELSE CONCAT(IFNULL(c.nombres,'SIN'),' ',IFNULL(c.apellidos,'CLIENTE')) END AS cliente, "

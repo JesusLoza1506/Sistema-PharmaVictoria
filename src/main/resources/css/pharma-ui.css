@@ -1,0 +1,185 @@
+/* PharmaVictoria — superficies, navegación y jerarquía visual de las vistas principales. */
+.pv-login, .pv-dashboard, .pv-listado, .pv-ventas, .pv-centro {
+    -fx-background-color: #f2f6f5;
+    -fx-font-family: "Segoe UI";
+    -fx-accent: #167568;
+    -fx-focus-color: #167568;
+    -fx-faint-focus-color: #16756822;
+}
+
+.pv-login .header-bar, .pv-dashboard .header-bar {
+    -fx-background-color: linear-gradient(to right, #123c3b, #17685e);
+}
+
+.pv-login .login-container {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-border-color: #d8e7e3;
+    -fx-border-radius: 18;
+}
+
+.pv-login .primary-button, .pv-ventas .btn-confirmar, .pv-ventas .btn-agregar {
+    -fx-background-color: #14766a;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+}
+
+.pv-login .primary-button:hover, .pv-ventas .btn-confirmar:hover, .pv-ventas .btn-agregar:hover {
+    -fx-background-color: #0e6055;
+}
+
+.pv-dashboard .sidebar {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dce8e5;
+}
+
+.pv-dashboard .menu-button {
+    -fx-background-radius: 8;
+    -fx-text-fill: #274944;
+}
+
+.pv-dashboard .menu-button:hover {
+    -fx-background-color: #e3f1ed;
+}
+
+.pv-dashboard .menu-button-active, .pv-dashboard .menu-button-active:hover {
+    -fx-background-color: #176b60;
+    -fx-text-fill: white;
+}
+
+.pv-dashboard .dashboard-content {
+    -fx-background-color: #f2f6f5;
+}
+
+.pv-dashboard .stats-card, .pv-dashboard .info-panel {
+    -fx-background-color: white;
+    -fx-border-color: #dce8e5;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, #153b3012, 10, 0, 0, 3);
+}
+
+.pv-dashboard .stats-value, .pv-dashboard .welcome-title {
+    -fx-text-fill: #155c53;
+}
+
+.pv-dashboard .info-panel-header, .pv-dashboard .info-panel-header2 {
+    -fx-background-color: #225550;
+    -fx-background-radius: 11 11 0 0;
+}
+
+.pv-dashboard .status-bar {
+    -fx-background-color: #e6eeec;
+    -fx-border-color: #d7e4e0;
+}
+
+.pv-listado .productos-header, .pv-listado .clientes-header, .pv-ventas .ventas-header-box {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dce8e5;
+    -fx-border-width: 0 0 1 0;
+}
+
+.pv-listado .productos-header-title, .pv-listado .clientes-header-title, .pv-ventas-titulo {
+    -fx-text-fill: #173b37;
+    -fx-font-size: 23px;
+    -fx-font-weight: bold;
+}
+
+.pv-listado .filter-bar, .pv-listado .pagination-bar {
+    -fx-background-color: #edf4f1;
+    -fx-background-radius: 8;
+}
+
+.pv-listado .search-field, .pv-ventas .search-field {
+    -fx-background-color: white;
+    -fx-border-color: #c5d8d4;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.pv-listado .search-field:focused, .pv-ventas .search-field:focused {
+    -fx-border-color: #167568;
+}
+
+.pv-listado .table-view {
+    -fx-border-color: #c9ded9;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.pv-listado .table-view .column-header-background,
+.pv-listado .table-view .column-header, .pv-listado .table-view .filler,
+.pv-ventas .table-view .column-header-background,
+.pv-ventas .table-view .column-header, .pv-ventas .table-view .filler {
+    -fx-background-color: #225f56;
+}
+
+.pv-listado .table-view .column-header .label,
+.pv-ventas .table-view .column-header .label {
+    -fx-text-fill: white;
+}
+
+.pv-ventas-subtitulo {
+    -fx-text-fill: #315954;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.pv-ventas-resumen {
+    -fx-padding: 10 14;
+    -fx-background-color: #e6f3ef;
+    -fx-background-radius: 10;
+}
+
+.pv-ventas .total-label {
+    -fx-text-fill: #104d45;
+    -fx-font-weight: bold;
+}
+
+.pv-ventas .btn-historial {
+    -fx-background-color: #ddece8;
+    -fx-text-fill: #174c46;
+    -fx-background-radius: 8;
+}
+
+.pv-pagina-titulo {
+    -fx-text-fill: #173b37;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+}
+
+.pv-pagina-subtitulo {
+    -fx-text-fill: #49645f;
+    -fx-font-size: 14px;
+}
+
+.pv-tarjeta {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #cbded9;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, #133b3014, 10, 0, 0, 3);
+}
+
+.pv-tarjeta:hover {
+    -fx-background-color: #f5faf8;
+    -fx-border-color: #71a99b;
+}
+
+.pv-tarjeta-titulo {
+    -fx-text-fill: #173b37;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+}
+
+.pv-tarjeta-detalle {
+    -fx-text-fill: #2d5e55;
+    -fx-font-size: 14px;
+    -fx-underline: true;
+}
+
+.pv-tarjeta-azul .pv-tarjeta-detalle { -fx-text-fill: #235b86; }
+.pv-tarjeta-ambar .pv-tarjeta-detalle { -fx-text-fill: #805018; }
+.pv-tarjeta-verde .pv-tarjeta-detalle { -fx-text-fill: #286341; }
+.pv-tarjeta-violeta .pv-tarjeta-detalle { -fx-text-fill: #644587; }

@@ -1,0 +1,184 @@
+/* === TABLAS PUNTO DE VENTA === */
+.venta-table {
+    -fx-background-color: #fff;
+    -fx-border-color: #b2dfdb;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(33,167,69,0.08), 8, 0.2, 0, 2);
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 15px;
+}
+.venta-table .column-header-background {
+    -fx-background-color: #e8f5e9;
+    -fx-border-color: #b2dfdb;
+    -fx-border-width: 0 0 2px 0;
+}
+.venta-table .column-header, .venta-table .table-column {
+    -fx-alignment: CENTER;
+    -fx-font-weight: bold;
+    -fx-text-fill: #218838;
+    -fx-font-size: 15px;
+}
+.venta-table .table-row-cell {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 0 0 1px 0;
+}
+.venta-table .table-row-cell:odd {
+    -fx-background-color: #f9fbe7;
+}
+.venta-table .table-row-cell:even {
+    -fx-background-color: #ffffff;
+}
+.venta-table .table-row-cell:selected {
+    -fx-background-color: #b2dfdb;
+    -fx-text-fill: #1b5e20;
+}
+.venta-table .table-row-cell:hover {
+    -fx-background-color: #c8e6c9;
+}
+.venta-table .placeholder {
+    -fx-text-fill: #757575;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+}
+/* Caja de contenido del modal de exportación */
+.modal-content-box {
+    -fx-background-color: #fff;
+    -fx-background-radius: 14px;
+    -fx-padding: 18px 24px 18px 24px;
+    -fx-spacing: 18px;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.08), 12, 0.3, 0, 2);
+}
+.modal-footer-bar {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 0 0 14px 14px;
+    -fx-padding: 18px 0 8px 0;
+    -fx-spacing: 32px;
+    -fx-alignment: center;
+}
+/* Botón moderno para exportar Excel */
+/* Botón Excel mejorado */
+.exportar-excel-btn {
+    -fx-background-color: linear-gradient(to bottom, #28a745, #218838);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+    -fx-border-color: #218838;
+    -fx-border-width: 2px;
+    -fx-cursor: hand;
+    -fx-font-size: 17px;
+    -fx-padding: 14px 32px;
+    -fx-effect: dropshadow(gaussian, rgba(33,167,69,0.25), 8, 0.4, 0, 2);
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-transition: all 0.3s ease;
+}
+.exportar-excel-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #218838, #28a745);
+    -fx-scale-x: 1.07;
+    -fx-scale-y: 1.07;
+    -fx-effect: dropshadow(gaussian, rgba(33,167,69,0.35), 12, 0.5, 0, 3);
+}
+
+/* Botón moderno para exportar PDF */
+/* Botón PDF mejorado */
+.exportar-pdf-btn {
+    -fx-background-color: linear-gradient(to bottom, #dc3545, #a71d2a);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12px;
+    -fx-border-color: #a71d2a;
+    -fx-border-width: 2px;
+    -fx-cursor: hand;
+    -fx-font-size: 17px;
+    -fx-padding: 14px 32px;
+    -fx-effect: dropshadow(gaussian, rgba(220,53,69,0.25), 8, 0.4, 0, 2);
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-transition: all 0.3s ease;
+}
+.exportar-pdf-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #a71d2a, #dc3545);
+    -fx-scale-x: 1.07;
+    -fx-scale-y: 1.07;
+    -fx-effect: dropshadow(gaussian, rgba(220,53,69,0.35), 12, 0.5, 0, 3);
+}
+/* Modal de exportación mejorado */
+.exportar-modal {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f8f9fa 80%);
+    -fx-background-radius: 18px;
+    -fx-border-color: #28a745;
+    -fx-border-width: 3px;
+    -fx-border-radius: 18px;
+    -fx-effect: dropshadow(gaussian, rgba(40,167,69,0.12), 24, 0.5, 0, 4);
+    -fx-padding: 24px;
+}
+.modal-title {
+    -fx-text-fill: #218838;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-padding: 0 0 8px 0;
+}
+.modal-filter-bar {
+    -fx-padding: 8px 0 8px 0;
+}
+.modal-footer-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 12px 0 0 0;
+}
+.preview-label {
+    -fx-text-fill: #495057;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 0 6px 0;
+}
+.productos-table {
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #28a745;
+    -fx-border-width: 2px;
+    -fx-font-size: 14px;
+    -fx-table-cell-border-color: #dee2e6;
+}
+/* ========================================
+   ALERTAS DE PELIGRO PERSONALIZADAS
+   ======================================== */
+/* ========================================
+   ALERTAS DE PRODUCTOS (MODERNO, COHERENTE)
+   ======================================== */
+.productos-alert {
+    -fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    -fx-border-color: #28a745;
+    -fx-border-width: 2px;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+}
+.productos-alert .label {
+    -fx-text-fill: #218838;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+.productos-alert .text-field {
+    -fx-background-color: #e9ecef;
+    -fx-border-color: #28a745;
+    -fx-border-width: 2px;
+    -fx-text-fill: #218838;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+}
+.productos-alert .button {
+    -fx-background-color: linear-gradient(to bottom, #28a745, #20c997);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+}
+.productos-alert .button:disabled {
+    -fx-background-color: #b7e4c7;
+    -fx-text-fill: #fff;
+    -fx-opacity: 0.7;
+}
+.productos-alert .button:hover {
+    -fx-background-color: linear-gradient(to bottom, #218838, #1ea085);
+}

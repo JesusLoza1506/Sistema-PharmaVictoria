@@ -2,6 +2,9 @@ package com.farmaciavictoria.proyectopharmavictoria.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class BackupService {
     private final String mysqlUser;
@@ -22,7 +25,7 @@ public class BackupService {
         com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig dbConfig = com.farmaciavictoria.proyectopharmavictoria.config.DatabaseConfig
                 .getInstance();
         String mysqldumpPath = dbConfig.getProperty("mysqldump.path", "mysqldump");
-        String fileName = rutaDestino; // ruta completa del archivo
+        String fileName = rutaDestino; // puede ser nombre simple o ruta completa
         File mysqldumpFile = new File(mysqldumpPath);
         if (!mysqldumpFile.exists()) {
             return new BackupResult(false, "No se encontró el ejecutable mysqldump en la ruta: " + mysqldumpPath);
@@ -30,26 +33,43 @@ public class BackupService {
         if (mysqlUser == null || mysqlUser.isEmpty()) {
             return new BackupResult(false, "Usuario de MySQL no configurado.");
         }
-        // Solo validar carpeta si el archivo tiene una carpeta (Local/Ambos)
-        File carpeta = new File(fileName).getParentFile();
-        if (carpeta != null && !carpeta.exists() && fileName.contains(File.separator)) {
-            return new BackupResult(false, "La carpeta de destino no existe o no es válida: "
-                    + carpeta.getAbsolutePath());
+        // Resolver ruta de salida garantizando ubicación escribible (User Home si es
+        // relativa)
+        Path outputPath = Paths.get(fileName);
+        if (!outputPath.isAbsolute()) {
+            Path defaultDir = Paths.get(System.getProperty("user.home"), "PharmaVictoria", "backups");
+            try {
+                Files.createDirectories(defaultDir);
+            } catch (IOException e) {
+                return new BackupResult(false,
+                        "No se pudo crear directorio de backups: " + defaultDir + " - " + e.getMessage());
+            }
+            outputPath = defaultDir.resolve(fileName);
+        } else {
+            Path parent = outputPath.getParent();
+            if (parent != null && !Files.exists(parent)) {
+                try {
+                    Files.createDirectories(parent);
+                } catch (IOException e) {
+                    return new BackupResult(false,
+                            "No se pudo crear carpeta destino: " + parent + " - " + e.getMessage());
+                }
+            }
         }
-        String comando;
+        File carpeta = outputPath.getParent() != null ? outputPath.getParent().toFile() : null;
+        if (carpeta != null && !carpeta.canWrite()) {
+            return new BackupResult(false,
+                    "La carpeta de destino no tiene permisos de escritura: " + carpeta.getAbsolutePath());
+        }
         ProcessBuilder pb;
         if (mysqlPassword == null || mysqlPassword.isEmpty()) {
-            comando = String.format("\"%s\" -h%s -P%d -u%s %s > \"%s\"", mysqldumpPath, mysqlHost, mysqlPort, mysqlUser,
-                    databaseName, fileName);
             pb = new ProcessBuilder(mysqldumpPath, "-h" + mysqlHost, "-P" + mysqlPort, "-u" + mysqlUser, databaseName);
         } else {
-            comando = String.format("\"%s\" -h%s -P%d -u%s -p%s %s > \"%s\"", mysqldumpPath, mysqlHost, mysqlPort,
-                    mysqlUser, mysqlPassword, databaseName, fileName);
             pb = new ProcessBuilder(mysqldumpPath, "-h" + mysqlHost, "-P" + mysqlPort, "-u" + mysqlUser,
                     "-p" + mysqlPassword, databaseName);
         }
-        System.out.println("[BackupService] Ejecutando comando: " + comando);
-        pb.redirectOutput(new File(fileName));
+        System.out.println("[BackupService] Ejecutando mysqldump hacia: " + outputPath);
+        pb.redirectOutput(outputPath.toFile());
         StringBuilder stdErr = new StringBuilder();
         StringBuilder stdOut = new StringBuilder();
         try {
@@ -67,7 +87,7 @@ public class BackupService {
                 }
             }
             int exitCode = process.waitFor();
-            File backupFile = new File(fileName);
+            File backupFile = outputPath.toFile();
             boolean hasContent = backupFile.exists() && backupFile.length() > 0;
             if (exitCode == 0 && hasContent) {
                 // Subir respaldo a Google Drive

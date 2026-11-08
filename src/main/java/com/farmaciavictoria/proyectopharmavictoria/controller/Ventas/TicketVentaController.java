@@ -67,9 +67,47 @@ public class TicketVentaController {
         com.farmaciavictoria.proyectopharmavictoria.model.Usuario.Usuario usuarioActual = com.farmaciavictoria.proyectopharmavictoria.SessionManager
                 .getUsuarioActual();
         venta.setUsuario(usuarioActual);
-        // Asignar cliente recibido
+        // Asignar cliente recibido o reutilizar CONSUMIDOR FINAL
         if (cliente != null) {
             venta.setCliente(cliente);
+        } else {
+            // Buscar cliente CONSUMIDOR FINAL por documento
+            com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository clienteRepo = new com.farmaciavictoria.proyectopharmavictoria.repository.Cliente.ClienteRepository();
+            java.util.Optional<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> optGenerico = clienteRepo
+                    .findByDocumento("00000000");
+            if (optGenerico.isPresent()) {
+                venta.setCliente(optGenerico.get());
+            } else {
+                // Buscar también por nombre/apellido en caso de inconsistencias
+                java.util.Optional<com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente> optPorNombre = clienteRepo
+                        .findByNombreCompleto("CONSUMIDOR FINAL");
+                if (optPorNombre.isPresent()) {
+                    com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente c = optPorNombre.get();
+                    boolean modificado = false;
+                    if (c.getDocumento() == null || c.getDocumento().isEmpty()) {
+                        c.setDocumento("00000000");
+                        modificado = true;
+                    }
+                    if (!c.isEsRapido()) {
+                        c.setEsRapido(true);
+                        modificado = true;
+                    }
+                    if (modificado) {
+                        clienteRepo.save(c);
+                    }
+                    venta.setCliente(c);
+                } else {
+                    // Crear cliente genérico automáticamente como 'CONSUMIDOR FINAL'
+                    com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente clienteGenerico = new com.farmaciavictoria.proyectopharmavictoria.model.Cliente.Cliente();
+                    clienteGenerico.setDocumento("00000000");
+                    clienteGenerico.setNombreCompleto("CONSUMIDOR FINAL");
+                    clienteGenerico.setTipoCliente("NATURAL");
+                    clienteGenerico.setRazonSocial("");
+                    clienteGenerico.setEsRapido(true);
+                    clienteRepo.save(clienteGenerico);
+                    venta.setCliente(clienteGenerico);
+                }
+            }
         }
         // Asignar updatedAt igual a createdAt
         venta.setUpdatedAt(venta.getCreatedAt());

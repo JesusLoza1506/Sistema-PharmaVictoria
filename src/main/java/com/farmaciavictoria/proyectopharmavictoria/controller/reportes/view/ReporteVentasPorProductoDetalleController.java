@@ -62,7 +62,9 @@ public class ReporteVentasPorProductoDetalleController {
     private void cargarDatos() {
         LocalDate desde = dateInicio.getValue();
         LocalDate hasta = dateFin.getValue();
-        List<VentaPorProductoDTO> lista = repo.obtenerRankingProductos(desde, hasta);
+        java.time.LocalDateTime desdeDT = desde.atStartOfDay();
+        java.time.LocalDateTime hastaDT = hasta.atTime(23, 59, 59);
+        List<VentaPorProductoDTO> lista = repo.obtenerRankingProductos(desdeDT, hastaDT);
         ObservableList<VentaPorProductoDTO> datos = FXCollections.observableArrayList(lista);
         tableProductos.setItems(datos);
     }
