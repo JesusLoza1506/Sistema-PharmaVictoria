@@ -52,3 +52,5 @@ src/main/resources/alerta-config.properties
 .idea/
 .vscode/
 tokens/StoredCredentialdist/PharmaVictoria-1.0.exe 
+
+/tokens/
