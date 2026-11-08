@@ -17,6 +17,16 @@ if not exist "target\classes" (
     )
 )
 
+if not exist "target\dependency" (
+    echo Preparando dependencias...
+    call mvn dependency:copy-dependencies
+    if errorlevel 1 (
+        echo ERROR: No se pudieron preparar las dependencias
+        pause
+        exit /b 1
+    )
+)
+
 echo Ejecutando PHARMAVICTORIA...
 java --module-path "target/dependency" --add-modules javafx.controls,javafx.fxml --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED -cp "target/classes;target/dependency/*" com.farmaciavictoria.proyectopharmavictoria.PharmavictoriaApplication
 

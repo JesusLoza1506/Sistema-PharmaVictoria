@@ -162,8 +162,12 @@ public class ComprobanteAccionesController {
                 }
                 // Leer credenciales desde gmail_nubefact.properties
                 java.util.Properties gmailProps = new java.util.Properties();
-                try (java.io.InputStream input = new java.io.FileInputStream(
-                        "src/main/resources/gmail_nubefact.properties")) {
+                try (java.io.InputStream input = getClass().getClassLoader()
+                        .getResourceAsStream("gmail_nubefact.properties")) {
+                    if (input == null) {
+                        throw new java.io.FileNotFoundException(
+                                "No se encontró gmail_nubefact.properties en el classpath");
+                    }
                     gmailProps.load(input);
                 }
                 String remitente = gmailProps.getProperty("gmail.user");
